@@ -1,24 +1,36 @@
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import WebFont from 'webfontloader';
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+
+
+import Homepage from "./components/Homepage/Homepage";
+import Navbar from './components/Navbar/Navbar';
+import Register from './components/Register/Register';
 
 function App() {
+
+  const [hide, setHide] = useState(false);
+  
+  useEffect(() => {
+    WebFont.load({
+      google: {
+        families: ['Raleway']
+      }
+    });
+   }, []);
+
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className='container'>
+        <Navbar hide={hide}/>
+        <Routes>
+          <Route exact path='/' element={<Homepage setHide={setHide} />}></Route>
+          <Route exact path='/Register' element={<Register setHide={setHide} />}></Route>
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
