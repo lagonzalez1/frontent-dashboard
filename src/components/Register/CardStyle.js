@@ -20,11 +20,6 @@ export const StyledCard = styled(Card)(({ theme }) => ({
       
     },
   }));
-
-
-
-
-
   
 /**
  * Card style for Register page.
