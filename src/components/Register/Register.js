@@ -8,7 +8,6 @@ import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRou
 import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
 import { StyledCard, StyledCardService } from "./CardStyle";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import { object, string, number, date, InferType } from 'yup';
 
 import { DURATION_DEMO, HOURS_LIST, WEEK_LIST, WEEK_OBJ } from "../Testing/RegisterTest.js";
 
@@ -258,11 +257,17 @@ export default function Register(props){
                                     <Button endIcon={ <ControlPointRoundedIcon fontSize="large" /> } size="large" variant="outlined" color="primary">
                                         Add a service
                                     </Button>
-                                    <Grid container sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 2, sm: 2, md: 2, lg: 6 }}>
+                                    <Grid container sx={{ pt: 2}} 
+                                        direction="row"
+                                        spacing={1}
+                                        justifyContent="center"
+                                        alignItems="stretch"
+                                        columns={{ xs: 4, sm: 8, md: 12 }}
+                                    >
                                         {
                                             DEMO.map((item, index) => {
                                                 return (
-                                                    <Grid item xs={2} sm={2} md={2} key={index}>
+                                                    <Grid item xs={3} sm={3} md={3} key={index}>
                                                         <StyledCardService id="service_cards">
                                                             <CardContent>
                                                                 <Typography variant="subtitle1">{item.service_name}</Typography>
@@ -292,7 +297,6 @@ export default function Register(props){
                 }
                 {
                     step === 77.5 ? (
-                    <>
                     <Container className="content_container" sx={{ p: 3}}>
                             <Box sx={{ flexGrow: 1, p: 1}}>
                                 <Typography variant="h3">Add your hours of operation.</Typography>
@@ -328,17 +332,16 @@ export default function Register(props){
                                                     id="end_time"
                                                     label="End"
                                                     variant="filled"
-
                                                 >
                                                 { HOURS && HOURS.map((item, index) =>(
-                                                     <MenuItem key={index} value={item}>{item}</MenuItem>
+                                                     <MenuItem key={index} value={index}>{item}</MenuItem>
                                                 ) )}
                                                 </Select>
                                             </FormControl>
                                             </Box>
                                         </Grid>
                                     </Grid>
-                                    <Typography sx={{ pt: 2}} variant="subtitle2" textAlign="left"><strong>Hours</strong></Typography>
+                                    <Typography sx={{ pt: 2}} variant="subtitle2" textAlign="left"><strong>Days</strong></Typography>
 
                                     <Grid container
                                         sx={{ pt: 2}}
@@ -347,7 +350,7 @@ export default function Register(props){
                                         alignItems="stretch"
                                         spacing={3}>
                                         
-                                        { WEEK.map((item, index) => {
+                                        { WEEK && WEEK.map((item, index) => {
                                             return(
                                                 <>
                                                     <Grid item xs={6} md={4} lg={2}>
@@ -377,9 +380,8 @@ export default function Register(props){
                             </Box>
                             
 
-                        </Container>
-                    
-                    </>) : null
+                    </Container>
+                    ) : null
                 }
 
             </Container>
