@@ -19,4 +19,6 @@
     outline-style: solid;
     outline-width: 0.1px;
     outline-color: lightgray;
+    align-items: center;
+    align-content: center;
 }

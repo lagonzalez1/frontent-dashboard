@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
-Tooltip, IconButton, Stack, CardActions, CardContent, CardMedia, Card } from "@mui/material";
+Tooltip, IconButton, Stack, CardActions, CardContent, CardMedia, Checkbox , FormControl, Select,
+InputLabel, MenuItem } from "@mui/material";
 import { Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRounded';
 import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
 import { StyledCard, StyledCardService } from "./CardStyle";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import { object, string, number, date, InferType } from 'yup';
 
-import { DURATION_DEMO } from "../Testing/RegisterTest.js";
+import { DURATION_DEMO, HOURS_LIST, WEEK_LIST, WEEK_OBJ } from "../Testing/RegisterTest.js";
 
 import LIST_IMG from "../../assets/images/listhd.png";
 import CAL_IMG from "../../assets/images/calendarsd.png";
@@ -29,7 +31,12 @@ import "./Register.css";
 
 export default function Register(props){
 
-    const DEMO = DURATION_DEMO();
+    let DEMO = DURATION_DEMO();
+    let HOURS = HOURS_LIST();
+    let WEEK = WEEK_LIST();
+    let WEEK_OBJECT = WEEK_OBJ();
+
+    console.log(HOURS.length)
     
     const [step, setStep] = useState(10);
     const [state, setState] = useState({
@@ -81,6 +88,11 @@ export default function Register(props){
     const operationHoursInfo = () => {
         setStep((prev) => prev+=22.5);
     }
+
+    const handleCheckedEvent = (item) => {
+        WEEK_OBJECT[item] = !WEEK_OBJECT[item];
+    }
+
 
 
     // TO DO: 
@@ -246,20 +258,17 @@ export default function Register(props){
                                     <Button endIcon={ <ControlPointRoundedIcon fontSize="large" /> } size="large" variant="outlined" color="primary">
                                         Add a service
                                     </Button>
-                                    <Grid container sx={{ pt: 2}} spacing={{ xs: 2, md: 2, sm: 2, lg: 2 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+                                    <Grid container sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 2, sm: 2, md: 2, lg: 6 }}>
                                         {
                                             DEMO.map((item, index) => {
                                                 return (
-                                                    <Grid item xs={2} sm={4} md={4} key={index}>
+                                                    <Grid item xs={2} sm={2} md={2} key={index}>
                                                         <StyledCardService id="service_cards">
                                                             <CardContent>
-                                                                <Stack direction="row" spacing={2}> 
-                                                                    <Typography variant="subtitle1">{item.service_name}</Typography>
-
+                                                                <Typography variant="subtitle1">{item.service_name}</Typography>
                                                                     <IconButton onClick={() => console.log('Remove action')}>
                                                                         <CloseRoundedIcon/>
                                                                     </IconButton>
-                                                            </Stack>
                                                             </CardContent>
                                                         </StyledCardService>
                                                     </Grid>
@@ -284,6 +293,91 @@ export default function Register(props){
                 {
                     step === 77.5 ? (
                     <>
+                    <Container className="content_container" sx={{ p: 3}}>
+                            <Box sx={{ flexGrow: 1, p: 1}}>
+                                <Typography variant="h3">Add your hours of operation.</Typography>
+
+                                <Container sx={{ pt: 5}}>
+                                    <Typography variant="subtitle2" textAlign="left"><strong>Hours</strong></Typography>
+                                    <Grid container spacing={3} justifyContent="space-between">
+                                        <Grid item lg={6} md={6} sm={4}>
+                                        <Box sx={{ minWidth: 120 }}>
+                                            <FormControl fullWidth>
+                                                <InputLabel id="start_time_label">Select start from</InputLabel>
+                                                <Select
+                                                labelId="start_time_label"
+                                                id="start_time"
+                                                variant="filled"
+                                                label="Start"
+                                                
+                                                >
+                                                { HOURS && HOURS.map((item, index) =>(
+                                                     <MenuItem key={index} value={item}>{item}</MenuItem>
+                                                     ) )}
+                                                
+                                                </Select>
+                                            </FormControl>
+                                            </Box>
+                                        </Grid>
+                                        <Grid item lg={6} md={6} sm={4}>
+                                        <Box sx={{ minWidth: 120 }}>
+                                            <FormControl fullWidth>
+                                                <InputLabel id="end_time_label">Select to time </InputLabel>
+                                                <Select
+                                                    labelId="end_time_label"
+                                                    id="end_time"
+                                                    label="End"
+                                                    variant="filled"
+
+                                                >
+                                                { HOURS && HOURS.map((item, index) =>(
+                                                     <MenuItem key={index} value={item}>{item}</MenuItem>
+                                                ) )}
+                                                </Select>
+                                            </FormControl>
+                                            </Box>
+                                        </Grid>
+                                    </Grid>
+                                    <Typography sx={{ pt: 2}} variant="subtitle2" textAlign="left"><strong>Hours</strong></Typography>
+
+                                    <Grid container
+                                        sx={{ pt: 2}}
+                                        direction="row"
+                                        justifyContent="space-around"
+                                        alignItems="stretch"
+                                        spacing={3}>
+                                        
+                                        { WEEK.map((item, index) => {
+                                            return(
+                                                <>
+                                                    <Grid item xs={6} md={4} lg={2}>
+                                                        <StyledCardService id="service_cards" sx={{ p: 2}}>
+                                                        <Checkbox
+                                                            onChange={ handleCheckedEvent(item) }
+                                                            inputProps={{ 'aria-label': 'controlled' }}
+                                                            />
+                                                        <Typography variant="subtitle2" textAlign="center" color="gray">{item}</Typography>
+
+                                                        </StyledCardService>
+
+                                                    </Grid>
+                                                </>
+                                            )
+                                        })}
+                                    </Grid>
+
+                                </Container>
+
+                            </Box>
+                            <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
+                                <Stack sx={{ pt: 3}} direction="row" spacing={2}>
+                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
+                                </Stack>
+                            </Box>
+                            
+
+                        </Container>
                     
                     </>) : null
                 }
