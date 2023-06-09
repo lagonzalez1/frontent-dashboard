@@ -24,7 +24,11 @@ export const WEEK_OBJ = () => {
     const week_list = WEEK_LIST();
     const check_state = {}
     for (let i = 0; i < week_list.length; i ++){
-        check_state[week_list[i]] = false;
+        check_state[week_list[i]] = {
+            start: '',
+            end: '',
+            status: false
+        };
     }
     return check_state;
 }

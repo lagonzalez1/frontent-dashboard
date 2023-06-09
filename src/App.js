@@ -4,9 +4,9 @@ import WebFont from 'webfontloader';
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 
 
-import Homepage from "./components/Homepage/Homepage";
-import Navbar from './components/Navbar/Navbar';
-import Register from './components/Register/Register';
+import Homepage from "./pages/Homepage/Homepage";
+import Navbar from './pages/Navbar/Navbar';
+import Register from './pages/Register/Register';
 
 function App() {
 

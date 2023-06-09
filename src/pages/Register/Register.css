@@ -13,6 +13,7 @@
     outline-style: solid;
     outline-width: 0.1px;
     outline-color: lightgray;
+    height: 100%;
 }
 
 #service_cards {
