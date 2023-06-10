@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
 Tooltip, IconButton, Stack, CardActions, CardContent, CardMedia, Checkbox , FormControl, Select,
-InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from "@mui/material";
+InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,InputAdornment  } from "@mui/material";
 import { Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRounded';
@@ -16,6 +16,7 @@ import LIST_IMG from "../../assets/images/listhd.png";
 import CAL_IMG from "../../assets/images/calendarsd.png";
 import BOTH_IMG from  "../../assets/images/bothsd.png";
 import "./Register.css";
+import ServicesGrid from "../../components/ServicesGrid";
 
 
 
@@ -96,8 +97,9 @@ export default function Register(props){
      * Increment loader
      * Save user appointment type.
      */
-    const durationInfo = () =>{
+    const durationInfo = () => {
         setStep((prev) => prev += 22.5);
+        setUser((prev) => ({...prev, mode: mode}))
     }
 
     /**
@@ -107,6 +109,7 @@ export default function Register(props){
     const buisnessInfo = () => {
         setStep((prev) => prev += 22.5);
         // Save user buisness data
+        console.log(user);
     }
 
     /**
@@ -116,7 +119,6 @@ export default function Register(props){
     const previous = () => {
         setStep((prev) => prev -= 22.5)
     }
-
     
 
     /**
@@ -124,9 +126,20 @@ export default function Register(props){
      * Save durations 
      */
     const operationHoursInfo = () => {
-        console.log(WEEK_OBJECT)
-
+        
         setStep((prev) => prev+=22.5);
+        console.log(user.services)
+        
+        Object.keys(WEEK_OBJECT).forEach(function (key) {
+            console.log(WEEK_OBJECT[key]);
+            if (WEEK_OBJECT[key].status === true){
+                WEEK_OBJECT[key].start = operationsObject.start;
+                WEEK_OBJECT[key].end = operationsObject.end;
+
+            }
+        })
+        setUser((prev) => ({...prev, schedule: WEEK_OBJECT }));
+        console.log(user.schedule)
     }
 
     const handleCheckedEvent = (item) => {
@@ -150,7 +163,7 @@ export default function Register(props){
     const handleNewService = () => {
         setUser((prev) => ({
             ...prev, 
-            services: [...prev, servicesObject]
+            services: [ ...prev.services, servicesObject ]
         }));
         setServices({ title: '', minutes: 0})
         setServicesModal(false);
@@ -165,7 +178,9 @@ export default function Register(props){
                         <Container className="content_container" sx={{ p: 3}}>
                         <Box sx={{ flexGrow: 1, p: 1}}>
                             <Typography variant="h3">Tell us about your business.</Typography>
-                            <Grid spacing={2}
+                            <Grid
+                                sx={{ pt: 2, p: 2}}
+                                spacing={2}
                                 columnSpacing={5}
                                 container
                                 direction="row"
@@ -177,7 +192,8 @@ export default function Register(props){
                                 <FormHelperText id="component-helper-text">
                                     <Typography variant="body2"><strong>Buisness name*</strong></Typography>
                                 </FormHelperText>
-                                    <TextField name="buisnessName"  id="buisness-name" variant="filled" value={user.buisnessName} onChange={e => setUser((prev) => ({ ...prev, buisnessName: e.target.value}))} fullWidth/>
+                                    <TextField 
+                                     name="buisnessName"  id="buisness-name" variant="filled" value={user.buisnessName} onChange={e => setUser((prev) => ({ ...prev, buisnessName: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
@@ -196,7 +212,9 @@ export default function Register(props){
                                         
                                         </Typography>
                                     </FormHelperText>
-                                    <TextField name="publicLink" variant="filled" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
+                                    <TextField InputProps={{
+                                            startAdornment: <InputAdornment position="start">/welcome/</InputAdornment>,
+                                        }} name="publicLink" variant="filled" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
@@ -253,18 +271,18 @@ export default function Register(props){
                                         spacing={2}
                                     >
                                         <Grid item xs={12} sm={12} md={4}>
-                                            <StyledCard sx={{ backgroundColor: mode === 0 ? '#ffc34d': '', boxShadow: mode === 0 ? 3: 0 }} onClick={() => handleCardClick(0) } id="selection_card">
+                                            <StyledCard sx={{ backgroundColor: mode === 0 ? '#ffc34d': '',boxShadow: mode === 1 ? 3: 0 }}  onClick={() => handleCardClick(0) } id="selection_card">
                                                     <CardContent>
-                                                    <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Set up waitlist</strong></Typography>
-                                                    <Typography sx={{ textAlign: 'left', pt: 2}} variant="subtitle2" color="dark">Let my clients wait from anywhere.</Typography>
-                                                    <Typography sx={{ textAlign: 'left', pt: 0}} variant="body2" color="dark">Free.</Typography>
+                                                        <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Set up waitlist</strong></Typography>
+                                                        <Typography sx={{ textAlign: 'left', pt: 2}} variant="subtitle2" color="dark">Let my clients wait from anywhere.</Typography>
+                                                        <Typography sx={{ textAlign: 'left', pt: 0}} variant="body2" color="dark">Free.</Typography>
 
-                                                    <CardMedia
-                                                        component="img"
-                                                        sx={{ width: '100%', height: '100%'}}
-                                                        image={LIST_IMG}
-                                                        alt="Live from space album cover"
-                                                    />
+                                                        <CardMedia
+                                                            component="img"
+                                                            sx={{ width: '100%', height: '100%'}}
+                                                            image={LIST_IMG}
+                                                            alt="Live from space album cover"
+                                                        />
                                                     </CardContent>
                                                     
                                             </StyledCard>
@@ -328,25 +346,9 @@ export default function Register(props){
                                         <Button onClick={() => setServicesModal(true)} endIcon={ <ControlPointRoundedIcon fontSize="large" /> } size="large" variant="outlined" color="primary">
                                             Add a service
                                         </Button>
-                                        <Grid container sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 6, sm: 4, md: 4, lg: 6 }}>
-                                            {
-                                                DEMO.map((item, index) => {
-                                                    return (
-                                                        <Grid item xs={2} sm={2} md={2} key={index}>
-                                                            <StyledCardService id="service_cards">
-                                                                <CardContent>
-                                                                    <Typography variant="subtitle1">{item.service_name}</Typography>
-                                                                        <IconButton onClick={() => console.log('Remove action')}>
-                                                                            <CloseRoundedIcon/>
-                                                                        </IconButton>
-                                                                </CardContent>
-                                                            </StyledCardService>
-                                                        </Grid>
-                                                    )
-                                                })
-                                            }
-                                        </Grid>
 
+                                            { /**  */}
+                                            <ServicesGrid services={user.services} setServices={setUser}/>
                                         <Dialog
                                             open={servicesModal}
                                             onClose={closeServicesModal}
