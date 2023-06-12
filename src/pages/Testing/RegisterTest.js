@@ -20,7 +20,7 @@ export const WEEK_LIST = () => {
     return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 }
 
-export const WEEK_OBJ = () => {
+export function WEEK_OBJ() {
     const week_list = WEEK_LIST();
     const check_state = {}
     for (let i = 0; i < week_list.length; i ++){
