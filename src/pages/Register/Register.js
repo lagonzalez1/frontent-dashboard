@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
-Tooltip, IconButton, Stack, CardActions, CardContent, CardMedia, Checkbox , FormControl, Select,
+Tooltip, IconButton, Stack, Alert, CardContent, CardMedia, Checkbox , FormControl, Select,
 InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,InputAdornment  } from "@mui/material";
 import { Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRounded';
 import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
 import { StyledCard, StyledCardService } from "./CardStyle";
-import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import { Formik } from "formik";
-import * as yup from "yup";
+import { getFormData, checkObjectData } from "./RegisterHelper";
 import { DURATION_DEMO, HOURS_LIST, WEEK_LIST, WEEK_OBJ } from "../Testing/RegisterTest.js";
 
 import LIST_IMG from "../../assets/images/listhd.png";
@@ -51,7 +49,6 @@ const getCountries = (lang = 'en') => {
 
 export default function Register(props){
 
-    let DEMO = DURATION_DEMO();
     let HOURS = HOURS_LIST();
     let WEEK = WEEK_LIST();
     let WEEK_OBJECT = WEEK_OBJ();
@@ -59,7 +56,11 @@ export default function Register(props){
 
     const [step, setStep] = useState(10);
     const [mode, setMode] = useState(0);
+    const [error, setErrors] = useState();
+    const [passwordError, setPasswordError] = useState(false);
 
+
+    const [selectErrors, setSelectErrors] = useState(false);
     
     const [operationsObject, setOperations] = useState({ start: '', end: ''});
     const [servicesObject, setServices] = useState({ title: '', minutes: 0});
@@ -76,7 +77,7 @@ export default function Register(props){
         country: '',
         mode: 0,
         services: [],
-        schedule: WEEK_OBJECT,
+        schedule: {},
     })
     
     function closeServicesModal () { setServicesModal(false); }
@@ -126,20 +127,16 @@ export default function Register(props){
      * Save durations 
      */
     const operationHoursInfo = () => {
-        
         setStep((prev) => prev+=22.5);
-        console.log(user.services)
-        
-        Object.keys(WEEK_OBJECT).forEach(function (key) {
-            console.log(WEEK_OBJECT[key]);
-            if (WEEK_OBJECT[key].status === true){
-                WEEK_OBJECT[key].start = operationsObject.start;
-                WEEK_OBJECT[key].end = operationsObject.end;
-
+    
+        for (let day in WEEK_OBJECT) {
+            if (WEEK_OBJECT[day].status === true){
+                WEEK_OBJECT[day].start = operationsObject.start;
+                WEEK_OBJECT[day].end = operationsObject.end;
             }
-        })
+        }
+        console.log(WEEK_OBJECT);
         setUser((prev) => ({...prev, schedule: WEEK_OBJECT }));
-        console.log(user.schedule)
     }
 
     const handleCheckedEvent = (item) => {
@@ -170,88 +167,148 @@ export default function Register(props){
     }
 
 
+    const handlePasswordChange = (event) => {
+        const newPassword = event.target.value;
+        setUser((prev) => ({...prev, password: event.target.value}))
+        setPasswordError(!validatePassword(newPassword));
+    };
+
+    const validatePassword = (password) => {
+        // Regex pattern for password validation
+        const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/;
+        return passwordRegex.test(password);
+    };
+
+    const checkPublicLink = new Promise((resolve, reject) => {
+        
+    })
+
+
+
+    /**
+     * 
+     * @param {Array} missing       Missing key values as key strings.
+     *                              Display Error count and setBack to step zero. 
+     */
+    const displayErrors = (missing) => {
+
+        setErrors(`Number of errors found: ${missing.length}.`);
+        let count = 0;
+        for (let key in missing){
+            if (key !== "services" || key !== "schedule"){
+                setUser((prev) => ({...prev, key: `${count}: Missing.`}))
+            }else{
+                setSelectErrors(true);
+            }
+            count += 1
+        }
+    }
+
+    
+
+
+
+    /**
+     * Submit to backend.
+     */
+    const submitBuisnessInfo = () => {
+        const {status, missing} = checkObjectData(user);
+        if (!status){
+            const formData = getFormData(user);
+        }else {
+            console.log(missing);
+            displayErrors(missing)
+            setStep(0);
+        }
+
+    }
+
+
     return(
         <>  
             
-                    <Container className="container" sx={{ pt: 5, pb: 5}}>                
+                    <Container className="container" sx={{ pt: 5, pb: 5}}>       
+                    {error ? (<Alert severity="error">{error}</Alert>): null}         
                     { step === 10 ?(
-                        <Container className="content_container" sx={{ p: 3}}>
-                        <Box sx={{ flexGrow: 1, p: 1}}>
-                            <Typography variant="h3">Tell us about your business.</Typography>
-                            <Grid
-                                sx={{ pt: 2, p: 2}}
-                                spacing={2}
-                                columnSpacing={5}
-                                container
-                                direction="row"
-                                justifyContent="center"
-                                alignItems="center"
-                                fullWidth
-                            >
-                                <Grid item sm={12} xs={12} md={6}>
-                                <FormHelperText id="component-helper-text">
-                                    <Typography variant="body2"><strong>Buisness name*</strong></Typography>
-                                </FormHelperText>
-                                    <TextField 
-                                     name="buisnessName"  id="buisness-name" variant="filled" value={user.buisnessName} onChange={e => setUser((prev) => ({ ...prev, buisnessName: e.target.value}))} fullWidth/>
-                                </Grid>
-                                <Grid item sm={12} xs={12} md={6}>
+                            <Container className="content_container" sx={{ p: 3}}>
+                            <Box sx={{ flexGrow: 1, p: 1}}>
+                                <Typography variant="h3">Tell us about your business.</Typography>
+                                <Grid
+                                    sx={{ pt: 2, p: 2}}
+                                    spacing={2}
+                                    columnSpacing={5}
+                                    container
+                                    direction="row"
+                                    justifyContent="center"
+                                    alignItems="center"
+                                    fullWidth
+                                >
+                                    <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>Company website*</strong></Typography>
+                                        <Typography variant="body2"><strong>Buisness name*</strong></Typography>
                                     </FormHelperText>
-                                    <TextField name="buisnessWebsite" variant="filled" value={user.buisnessWebsite} onChange={e => setUser((prev) => ({ ...prev, buisnessWebsite: e.target.value}))} fullWidth/>
-                                </Grid>
-                                <Grid item sm={12} xs={12} md={6}>
-                                    <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>Choose public link*</strong>
-                                        <Tooltip title="Here is the link where your customers will be able to join.">
-                                            <IconButton>
-                                                <InfoOutlinedIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        
-                                        </Typography>
-                                    </FormHelperText>
-                                    <TextField InputProps={{
-                                            startAdornment: <InputAdornment position="start">/welcome/</InputAdornment>,
-                                        }} name="publicLink" variant="filled" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
-                                </Grid>
-                                <Grid item sm={12} xs={12} md={6}>
-                                    <FormHelperText id="component-helper-text">
-                                    <Typography variant="body2"><strong>Country*</strong></Typography>
+                                        <TextField 
+                                        name="buisnessName"  id="buisness-name" variant="filled" value={user.buisnessName} onChange={e => setUser((prev) => ({ ...prev, buisnessName: e.target.value}))} fullWidth/>
+                                    </Grid>
+                                    <Grid item sm={12} xs={12} md={6}>
+                                        <FormHelperText id="component-helper-text">
+                                            <Typography variant="body2"><strong>Company website*</strong></Typography>
+                                        </FormHelperText>
+                                        <TextField name="buisnessWebsite" variant="filled" value={user.buisnessWebsite} onChange={e => setUser((prev) => ({ ...prev, buisnessWebsite: e.target.value}))} fullWidth/>
+                                    </Grid>
+                                    <Grid item sm={12} xs={12} md={6}>
+                                        <FormHelperText id="component-helper-text">
+                                            <Typography variant="body2"><strong>Choose public link*</strong>
+                                            <Tooltip title="Here is the link where your customers will be able to join.">
+                                                <IconButton>
+                                                    <InfoOutlinedIcon fontSize="small" />
+                                                </IconButton>
+                                            </Tooltip>
+                                            
+                                            </Typography>
+                                        </FormHelperText>
+                                        <TextField InputProps={{
+                                                startAdornment: <InputAdornment position="start">/welcome/</InputAdornment>,
+                                            }} name="publicLink" variant="filled" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
+                                    </Grid>
+                                    <Grid item sm={12} xs={12} md={6}>
+                                        <FormHelperText id="component-helper-text">
+                                        <Typography variant="body2"><strong>Country*</strong></Typography>
 
-                                    <Select
-                                        labelId="Country-simple-select-label"
-                                        id="Country-simple-select"
-                                        label="Country"
-                                        variant="filled"
-                                        fullWidth
-                                        name="country"
-                                    >
-                                        {country_list && Object.entries(country_list).map(([key, value]) => (
-                                            <MenuItem key={key} value={key}>
-                                                {value}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                    </FormHelperText>
+                                        <Select
+                                            labelId="Country-simple-select-label"
+                                            id="Country-simple-select"
+                                            label="Country"
+                                            variant="filled"
+                                            fullWidth
+                                            name="country"
+                                            onChange={e => setUser((prev) => ({...prev, country: e.target.value }))}
+                                            onError={selectErrors}
+                                        >
+                                            {country_list && Object.entries(country_list).map(([key, value]) => (
+                                                <MenuItem key={key} value={key}>
+                                                    {value}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                        </FormHelperText>
+                                    </Grid>
+                                    <Grid item sm={12} xs={12} md={6}>
+                                        <FormHelperText id="component-helper-text">
+                                            <Typography variant="body2"><strong>Select your role (optional)</strong></Typography>
+                                        </FormHelperText>
+                                        <TextField name="role" variant="filled" value={user.role} onChange={e => setUser((prev) => ({ ...prev, role: e.target.value}))} fullWidth/>
+                                    </Grid>
+                                    <Grid item sm={12} xs={12} md={6}>
+                                        <FormHelperText id="component-helper-text">
+                                            <Typography variant="body2"><strong>Buisness address (optional)</strong></Typography>
+                                        </FormHelperText>
+                                        <TextField name="buisnessAddress" value={user.buisnessAddress} onChange={e => setUser((prev) => ({ ...prev, buisnessAddress: e.target.value}))}  variant="filled" fullWidth/>
+                                    </Grid>
                                 </Grid>
-                                <Grid item sm={12} xs={12} md={6}>
-                                    <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>Select your role (optional)</strong></Typography>
-                                    </FormHelperText>
-                                    <TextField name="role" variant="filled" value={user.role} onChange={e => setUser((prev) => ({ ...prev, role: e.target.value}))} fullWidth/>
-                                </Grid>
-                                <Grid item sm={12} xs={12} md={6}>
-                                    <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>Buisness address (optional)</strong></Typography>
-                                    </FormHelperText>
-                                    <TextField name="buisnessAddress" value={user.buisnessAddress} onChange={e => setUser((prev) => ({ ...prev, buisnessAddress: e.target.value}))}  variant="filled" fullWidth/>
-                                </Grid>
-                            </Grid>
-                        </Box>
-                        <Button sx={{ mt: 3, width: '100px'}} variant="contained" color="primary" onClick={() => buisnessInfo() }>Next</Button>
-                        </Container>
+                            </Box>
+                            <Button sx={{ mt: 3, width: '100px'}} variant="contained" color="primary" onClick={() => buisnessInfo() }>Next</Button>
+                            </Container>
                         ): null
                     }
                     {
@@ -410,6 +467,7 @@ export default function Register(props){
                                                         id="start_time"
                                                         variant="filled"
                                                         label="Start"
+                                                        onError={selectErrors}
                                                         onChange={e => setOperations((prev) => ({...prev, start: e.target.value}))}
                                                         value={operationsObject.start}
                                                         >
@@ -430,6 +488,7 @@ export default function Register(props){
                                                             id="end_time"
                                                             label="End"
                                                             variant="filled"
+                                                            onError={selectErrors}
                                                             onChange={e => setOperations((prev) => ({...prev, end: e.target.value}))}
                                                             value={operationsObject.end}
 
@@ -489,18 +548,27 @@ export default function Register(props){
                             <Container className='content_container'>
                                 <Box sx={{ pl: 2, pr: 2}}>
                                     <Typography variant="h3">Finally, Login information, Last step!</Typography>
-                                    <Grid container spacing={2}>
-                                        <Grid item xs={12} md={4} lg={4}></Grid>
-                                        <Grid item xs={12} md={4} lg={4}>
-                                        <Stack direction="column" sx={{ pt: 2}} spacing={2}>
-                                            <TextField name="fullName"  label="Full name" variant="filled"></TextField>
-                                            <TextField name="password" label="Password" type="password" variant="filled"></TextField>
-                                            <TextField name="email" label="Email" type="email" variant="filled"></TextField>
-                                            <Button type="submit" variant="contained">Submit</Button>
-                                        </Stack>
+                                        <Grid container spacing={2}>
+                                            <Grid item xs={12} md={4} lg={4}></Grid>
+                                            <Grid item xs={12} md={4} lg={4}>
+                                            <Stack direction="column" sx={{ pt: 2}} spacing={2}>
+                                                <TextField name="fullName" value={user.fullName} onChange={e => (setUser((prev) => ({...prev, fullName: e.target.value}) )) }
+                                                label="Full name" variant="filled"></TextField>
+                                                <TextField name="password" label="Password" value={user.password} onChange={handlePasswordChange} error={passwordError} type="password" pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="filled"></TextField>
+                                                <TextField name="email" label="Email" value={user.email} onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="filled"></TextField>
+                                                
+                                            </Stack>
+
+                                            <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
+                                                <Stack sx={{ pt: 3}} direction="row" spacing={2}>
+                                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => submitBuisnessInfo() }>submit</Button>
+                                                </Stack>
+                                            </Box>
+
+                                            </Grid>
+                                            <Grid item xs={12} md={4} lg={4}></Grid>
                                         </Grid>
-                                        <Grid item xs={12} md={4} lg={4}></Grid>
-                                    </Grid>
                                 </Box>
                             </Container>
                         ):
@@ -508,19 +576,6 @@ export default function Register(props){
                     }
 
                     </Container>
-                    
-                
-
-
-            
-                
-            
-
-
-
-            
-
-            
 
             <N collapseOnSelect expand="lg" fixed="bottom">
                 <Box sx={{ width: '100%', backgroundColor: 'white'}} >
