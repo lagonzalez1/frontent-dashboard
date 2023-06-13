@@ -12,19 +12,23 @@ export function getFormData (object) {
     return formData;
 }
 
-
 /**
  * 
  * @param {*}   object              Object  need to be checked for empty values
- * @returns {status, array}         False: No mossing values,
+ * @returns {status, array}         False: No missing values,
  *                                  True: Missing values to address on the front end.
  */
 export function checkObjectData (object) {
-    let missing = []
+    let missing = {}
+    let status = false;
     Object.keys(object).forEach( (key) => {
-        if (object[key] === '' || object[key] === [] || object[key] === {}){
-            missing.push(key);
+        if (object[key] === '' || object[key] === {}){
+            missing[key] = true;
+            status = true;
+        }else {
+            missing[key] = false;
         }
     })
-    return {status: missing.length === 0 ? false : true, missing: missing };
+    return {status: status, missing: missing };
 }
+

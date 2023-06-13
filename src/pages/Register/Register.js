@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
 Tooltip, IconButton, Stack, Alert, CardContent, CardMedia, Checkbox , FormControl, Select,
 InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,InputAdornment  } from "@mui/material";
+import axios from 'axios';
 import { Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRounded';
@@ -60,7 +61,7 @@ export default function Register(props){
     const [passwordError, setPasswordError] = useState(false);
 
 
-    const [selectErrors, setSelectErrors] = useState(false);
+    
     
     const [operationsObject, setOperations] = useState({ start: '', end: ''});
     const [servicesObject, setServices] = useState({ title: '', minutes: 0});
@@ -78,6 +79,21 @@ export default function Register(props){
         mode: 0,
         services: [],
         schedule: {},
+    })
+
+    const [userErrors, setUserErrors] = useState({
+        fullName: false,
+        email: false,
+        password: false,
+        buisnessWebsite: false,
+        buisnessName: false,
+        publicLink: false,
+        role: false,
+        buisnessAddress: false,
+        country: false,
+        mode: false,
+        services: false,
+        schedule: false,
     })
     
     function closeServicesModal () { setServicesModal(false); }
@@ -107,9 +123,17 @@ export default function Register(props){
      * Increment loadbar.
      * Save user buisness data.
      */
-    const buisnessInfo = () => {
-        setStep((prev) => prev += 22.5);
+    const buisnessInfo = async () => {
         // Save user buisness data
+        try {
+            const uniqueLink = await checkPublicLink();
+            console.log(uniqueLink.value);
+            setStep((prev) => prev += 22.5); // Next step in register.
+        }catch {
+            setErrors('Public link is taken, please try again.');
+            return;
+        }
+        
         console.log(user);
     }
 
@@ -179,33 +203,29 @@ export default function Register(props){
         return passwordRegex.test(password);
     };
 
-    const checkPublicLink = new Promise((resolve, reject) => {
-        
-    })
-
-
+    function checkPublicLink () {
+        return new Promise((resolve, reject) => {
+            const publicLink = user.publicLink;
+            axios.post('/unique_link', {link: publicLink})
+            .then((data) => {
+                return resolve(data.status);
+            })
+            .catch((error) => {
+                return reject('link taken.');
+            })
+        });
+    }
 
     /**
      * 
-     * @param {Array} missing       Missing key values as key strings.
+     * @param {Object} missing       Missing key values as key strings.
      *                              Display Error count and setBack to step zero. 
      */
     const displayErrors = (missing) => {
-
-        setErrors(`Number of errors found: ${missing.length}.`);
-        let count = 0;
-        for (let key in missing){
-            if (key !== "services" || key !== "schedule"){
-                setUser((prev) => ({...prev, key: `${count}: Missing.`}))
-            }else{
-                setSelectErrors(true);
-            }
-            count += 1
-        }
+        setUserErrors(missing);
+        console.log(userErrors);
+        setErrors(`Errors found!`);
     }
-
-    
-
 
 
     /**
@@ -215,10 +235,13 @@ export default function Register(props){
         const {status, missing} = checkObjectData(user);
         if (!status){
             const formData = getFormData(user);
+            console.log("No missing values.");
+            console.log(formData);
         }else {
             console.log(missing);
-            displayErrors(missing)
-            setStep(0);
+            displayErrors(missing);
+            setStep(10);
+            return;
         }
 
     }
@@ -245,16 +268,16 @@ export default function Register(props){
                                 >
                                     <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>Buisness name*</strong></Typography>
+                                        <Typography variant="body2"><strong>Buisness name *</strong></Typography>
                                     </FormHelperText>
                                         <TextField 
-                                        name="buisnessName"  id="buisness-name" variant="filled" value={user.buisnessName} onChange={e => setUser((prev) => ({ ...prev, buisnessName: e.target.value}))} fullWidth/>
+                                        name="buisnessName" error={userErrors.buisnessName}  id="buisness-name" variant="filled" value={user.buisnessName} onChange={e => setUser((prev) => ({ ...prev, buisnessName: e.target.value}))} fullWidth/>
                                     </Grid>
                                     <Grid item sm={12} xs={12} md={6}>
                                         <FormHelperText id="component-helper-text">
-                                            <Typography variant="body2"><strong>Company website*</strong></Typography>
+                                            <Typography variant="body2"><strong>Company website (optional)</strong></Typography>
                                         </FormHelperText>
-                                        <TextField name="buisnessWebsite" variant="filled" value={user.buisnessWebsite} onChange={e => setUser((prev) => ({ ...prev, buisnessWebsite: e.target.value}))} fullWidth/>
+                                        <TextField error={userErrors.buisnessWebsite}  name="buisnessWebsite" variant="filled" value={user.buisnessWebsite} onChange={e => setUser((prev) => ({ ...prev, buisnessWebsite: e.target.value}))} fullWidth/>
                                     </Grid>
                                     <Grid item sm={12} xs={12} md={6}>
                                         <FormHelperText id="component-helper-text">
@@ -267,7 +290,7 @@ export default function Register(props){
                                             
                                             </Typography>
                                         </FormHelperText>
-                                        <TextField InputProps={{
+                                        <TextField error={userErrors.publicLink} InputProps={{
                                                 startAdornment: <InputAdornment position="start">/welcome/</InputAdornment>,
                                             }} name="publicLink" variant="filled" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
                                     </Grid>
@@ -283,7 +306,7 @@ export default function Register(props){
                                             fullWidth
                                             name="country"
                                             onChange={e => setUser((prev) => ({...prev, country: e.target.value }))}
-                                            onError={selectErrors}
+                                            error={userErrors.country}
                                         >
                                             {country_list && Object.entries(country_list).map(([key, value]) => (
                                                 <MenuItem key={key} value={key}>
@@ -403,8 +426,6 @@ export default function Register(props){
                                         <Button onClick={() => setServicesModal(true)} endIcon={ <ControlPointRoundedIcon fontSize="large" /> } size="large" variant="outlined" color="primary">
                                             Add a service
                                         </Button>
-
-                                            { /**  */}
                                             <ServicesGrid services={user.services} setServices={setUser}/>
                                         <Dialog
                                             open={servicesModal}
@@ -453,10 +474,10 @@ export default function Register(props){
                         step === 77.5 ? (
                             <Container className="content_container" sx={{ p: 3}}>
                                     <Box sx={{ flexGrow: 1, p: 1}}>
-                                        <Typography variant="h3">Add your hours of operation.</Typography>
+                                        <Typography variant="h3">Add your hours of operation. </Typography>
 
                                         <Container sx={{ pt: 5}}>
-                                            <Typography variant="subtitle2" textAlign="left"><strong>Hours</strong></Typography>
+                                            <Typography variant="subtitle2" textAlign="left"><strong>Hours *</strong></Typography>
                                             <Grid container spacing={1} justifyContent="space-between">
                                                 <Grid item lg={6} md={6} sm={6}>
                                                 <Box sx={{ minWidth: 120 }}>
@@ -467,7 +488,7 @@ export default function Register(props){
                                                         id="start_time"
                                                         variant="filled"
                                                         label="Start"
-                                                        onError={selectErrors}
+                                                        error={userErrors.schedule}
                                                         onChange={e => setOperations((prev) => ({...prev, start: e.target.value}))}
                                                         value={operationsObject.start}
                                                         >
@@ -488,7 +509,7 @@ export default function Register(props){
                                                             id="end_time"
                                                             label="End"
                                                             variant="filled"
-                                                            onError={selectErrors}
+                                                            error={userErrors.schedule}
                                                             onChange={e => setOperations((prev) => ({...prev, end: e.target.value}))}
                                                             value={operationsObject.end}
 
@@ -501,7 +522,7 @@ export default function Register(props){
                                                     </Box>
                                                 </Grid>
                                             </Grid>
-                                            <Typography sx={{ pt: 2}} variant="subtitle2" textAlign="left"><strong>Hours</strong></Typography>
+                                            <Typography sx={{ pt: 2}} variant="subtitle2" textAlign="left"><strong>Week</strong></Typography>
 
                                             <Grid container
                                                 sx={{ pt: 2}}
@@ -552,10 +573,10 @@ export default function Register(props){
                                             <Grid item xs={12} md={4} lg={4}></Grid>
                                             <Grid item xs={12} md={4} lg={4}>
                                             <Stack direction="column" sx={{ pt: 2}} spacing={2}>
-                                                <TextField name="fullName" value={user.fullName} onChange={e => (setUser((prev) => ({...prev, fullName: e.target.value}) )) }
+                                                <TextField error={userErrors.fullName} name="fullName" value={user.fullName} onChange={e => (setUser((prev) => ({...prev, fullName: e.target.value}) )) }
                                                 label="Full name" variant="filled"></TextField>
-                                                <TextField name="password" label="Password" value={user.password} onChange={handlePasswordChange} error={passwordError} type="password" pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="filled"></TextField>
-                                                <TextField name="email" label="Email" value={user.email} onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="filled"></TextField>
+                                                <TextField helperText="Password must container one uppercase, special character and a number." name="password" label="Password" value={user.password} onChange={handlePasswordChange} error={passwordError} type="password" pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="filled"></TextField>
+                                                <TextField error={userErrors.email} name="email" label="Email" value={user.email} onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="filled"></TextField>
                                                 
                                             </Stack>
 
