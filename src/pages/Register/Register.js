@@ -60,8 +60,6 @@ export default function Register(props){
     const [error, setErrors] = useState();
     const [passwordError, setPasswordError] = useState(false);
 
-
-    
     
     const [operationsObject, setOperations] = useState({ start: '', end: ''});
     const [servicesObject, setServices] = useState({ title: '', minutes: 0});
@@ -124,17 +122,20 @@ export default function Register(props){
      * Save user buisness data.
      */
     const buisnessInfo = async () => {
-        // Save user buisness data
-        try {
-            const uniqueLink = await checkPublicLink();
-            console.log(uniqueLink.value);
+        // Once database is set up this need to be removed.
+        if(true){
             setStep((prev) => prev += 22.5); // Next step in register.
-        }catch {
-            setErrors('Public link is taken, please try again.');
-            return;
+        }else {
+            try {
+                const uniqueLink = await checkPublicLink();
+                console.log(uniqueLink.value);
+                setStep((prev) => prev += 22.5); // Next step in register.
+            }catch {
+                setErrors('Public link is taken, please try again.');
+                return;
+            }       
         }
-        
-        console.log(user);
+         
     }
 
     /**
@@ -145,7 +146,6 @@ export default function Register(props){
         setStep((prev) => prev -= 22.5)
     }
     
-
     /**
      * Increment loader
      * Save durations 
@@ -190,19 +190,33 @@ export default function Register(props){
         setServicesModal(false);
     }
 
-
+    /**
+     * 
+     * @param {*} event     Handle password change and check for any errors.
+     */
     const handlePasswordChange = (event) => {
         const newPassword = event.target.value;
         setUser((prev) => ({...prev, password: event.target.value}))
         setPasswordError(!validatePassword(newPassword));
     };
 
+    /**
+     * 
+     * @param {String} password   Regex testing. 
+     * @returns 
+     */
     const validatePassword = (password) => {
         // Regex pattern for password validation
         const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/;
         return passwordRegex.test(password);
     };
 
+    
+    /**
+     * 
+     * @returns a promise resolve (Boolean)
+     *          a promise reject (String)
+     */
     function checkPublicLink () {
         return new Promise((resolve, reject) => {
             const publicLink = user.publicLink;
@@ -211,7 +225,7 @@ export default function Register(props){
                 return resolve(data.status);
             })
             .catch((error) => {
-                return reject('link taken.');
+                return reject('Public link is not available, try gain.');
             })
         });
     }
@@ -223,7 +237,6 @@ export default function Register(props){
      */
     const displayErrors = (missing) => {
         setUserErrors(missing);
-        console.log(userErrors);
         setErrors(`Errors found!`);
     }
 
@@ -234,16 +247,17 @@ export default function Register(props){
     const submitBuisnessInfo = () => {
         const {status, missing} = checkObjectData(user);
         if (!status){
-            const formData = getFormData(user);
-            console.log("No missing values.");
-            console.log(formData);
+            const objectUser = user;
+            const data = JSON.stringify(objectUser);
+            const formData = new FormData();
+            formData.append("RegisterData", data);
+            
         }else {
             console.log(missing);
             displayErrors(missing);
             setStep(10);
             return;
         }
-
     }
 
 
