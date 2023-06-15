@@ -28,7 +28,7 @@ export default function Login(props) {
     async function loginRequest(data) {
         const response = await axios.post('/api/external/login', data)
         return response;
-    } 
+    }
 
 	const handleSubmit = () => {
         if ( credentials.email && credentials.password ){
@@ -81,13 +81,13 @@ export default function Login(props) {
                 }}
             >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                
+
                 </Avatar>
                 <Typography component="h1" variant="h5">
                 Sign in
                 </Typography>
                 <Box component="form" noValidate sx={{ mt: 1 }}>
-                    {error ? (<Alert severity="error">{error}</Alert>): null}         
+                    {error ? (<Alert severity="error">{error}</Alert>): null}
                 <TextField
                     margin="normal"
                     required
@@ -110,7 +110,7 @@ export default function Login(props) {
                     onChange={e => setCredentials((prev) => ({ ...prev, password: e.target.value}))}
                     autoComplete="current-password"
                 />
-                
+
                 <Button
                     fullWidth
                     variant="contained"
@@ -143,7 +143,7 @@ export default function Login(props) {
                 </Box>
             </Box>
             </Container>
-        
+
         </>
 	)
 }

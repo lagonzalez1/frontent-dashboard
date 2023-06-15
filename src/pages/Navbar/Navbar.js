@@ -8,11 +8,10 @@ import './Navbar.css';
 import RocketTwoToneIcon from '@mui/icons-material/RocketTwoTone';
 
 export default function Navbar(props) {
-    
+
     const navigate = useNavigate();
 
      useEffect(() => {
-        console.log(props.hide)
         if(props.hide === true) {
             const ref = document.getElementById('app_bar');
             ref.classList.add('fade-out-up');
@@ -21,9 +20,9 @@ export default function Navbar(props) {
             }, 200)
         }
      }, [props])
-    
+
     return (
-        <>  
+        <>
             <N collapseOnSelect expand="lg" bg="light" variant="light" id="app_bar" fixed="top">
                 <Container>
                     <N.Brand href="/"><RocketTwoToneIcon /> <strong>Logo</strong></N.Brand>
