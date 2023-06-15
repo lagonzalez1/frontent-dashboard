@@ -1,78 +1,22 @@
 import React, { useState, useEffect} from "react";
 import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, styled, useTheme} from "@mui/material";
 import MuiDrawer from '@mui/material/Drawer';
-
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
-const drawerWidth = 240;
+import { DrawerHeader, Drawer ,drawerWidth,openedMixin, closedMixin } from "./SideBarHelper";
 
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-  }));
-
-  const openedMixin = (theme) => ({
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    overflowX: 'hidden',
-  });
-
-  const closedMixin = (theme) => ({
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    overflowX: 'hidden',
-    width: `calc(${theme.spacing(7)} + 1px)`,
-    [theme.breakpoints.up('sm')]: {
-      width: `calc(${theme.spacing(8)} + 1px)`,
-    },
-  });
-
-
-  const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' })(
-    ({ theme, open }) => ({
-      width: drawerWidth,
-      flexShrink: 0,
-      whiteSpace: 'nowrap',
-      boxSizing: 'border-box',
-      ...(open && {
-        ...openedMixin(theme),
-        '& .MuiDrawer-paper': openedMixin(theme),
-      }),
-      ...(!open && {
-        ...closedMixin(theme),
-        '& .MuiDrawer-paper': closedMixin(theme),
-      }),
-    }),
-  );
-
-
-export default function SideBar(props) {
-
+export default function SideBar({navState, openNav}) {
     const theme = useTheme();
-
-    useEffect(() => {
-        console.log("SIDE", props.navState)
-    }, [props])
-
 
     return (
         <>
-        <Drawer variant="permanent" open={props.navState}>
-        <DrawerHeader>
-          <IconButton onClick={() => props.openNav(true)}>
+        <Drawer variant="permanent" open={navState}>
+          <DrawerHeader>
+          <IconButton onClick={() => openNav(false)}>
             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>
         </DrawerHeader>
@@ -83,20 +27,20 @@ export default function SideBar(props) {
               <ListItemButton
                 sx={{
                   minHeight: 48,
-                  justifyContent: props.navState ? 'initial' : 'center',
+                  justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: props.navState ? 3 : 'auto',
+                    mr: navState ? 3 : 'auto',
                     justifyContent: 'center',
                   }}
                 >
                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                 </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: props.navState ? 1 : 0 }} />
+                <ListItemText primary={text} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
             </ListItem>
           ))}
@@ -108,20 +52,20 @@ export default function SideBar(props) {
               <ListItemButton
                 sx={{
                   minHeight: 48,
-                  justifyContent: props.navState ? 'initial' : 'center',
+                  justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: props.navState ? 3 : 'auto',
+                    mr: navState ? 3 : 'auto',
                     justifyContent: 'center',
                   }}
                 >
                   {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
                 </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: props.navState ? 1 : 0 }} />
+                <ListItemText primary={text} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
             </ListItem>
           ))}

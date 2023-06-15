@@ -2,16 +2,8 @@ import React, { useEffect, useState} from "react";
 import { Box, Typography, styled } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
-
-
-const DashboardHeader = styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
-    ...theme.mixins.toolbar,
-  }));
+import { Outlet } from "react-router-dom";
+import { DashboardHeader } from "./DashboardHelper"
 
 
 export default function Dashboard (props) {
@@ -28,6 +20,14 @@ export default function Dashboard (props) {
      */
     const removeNavbar = () => {
         props.setHide(true);
+    }
+
+    const Content = () => {
+      return (
+        <Box>
+          Re-render
+        </Box>
+      )
     }
 
 
