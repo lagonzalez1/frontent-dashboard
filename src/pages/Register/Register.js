@@ -2,21 +2,21 @@ import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
 Tooltip, IconButton, Stack, Alert, CardContent, CardMedia, Checkbox , FormControl, Select,
 InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,InputAdornment  } from "@mui/material";
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import ArrowCircleRightRoundedIcon from '@mui/icons-material/ArrowCircleRightRounded';
 import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
 import { StyledCard, StyledCardService } from "./CardStyle";
-import { getFormData, checkObjectData } from "./RegisterHelper";
-import { DURATION_DEMO, HOURS_LIST, WEEK_LIST, WEEK_OBJ } from "../Testing/RegisterTest.js";
+import { checkObjectData } from "./RegisterHelper";
+import {  HOURS_LIST, WEEK_LIST, WEEK_OBJ } from "../Testing/RegisterTest.js";
+import { useNavigate } from "react-router-dom";
 
 import LIST_IMG from "../../assets/images/listhd.png";
 import CAL_IMG from "../../assets/images/calendarsd.png";
 import BOTH_IMG from  "../../assets/images/bothsd.png";
 import "./Register.css";
 import ServicesGrid from "../../components/ServicesGrid";
-
+import { useSignIn } from "react-auth-kit";
 
 
 /** 
@@ -27,8 +27,6 @@ import ServicesGrid from "../../components/ServicesGrid";
  * 
  * 
 */
-
-
 
 const getCountries = (lang = 'en') => {
     const A = 65
@@ -49,6 +47,9 @@ const getCountries = (lang = 'en') => {
 
 
 export default function Register(props){
+
+    const navigate = useNavigate();
+    const signIn = useSignIn();
 
     let HOURS = HOURS_LIST();
     let WEEK = WEEK_LIST();
@@ -77,6 +78,8 @@ export default function Register(props){
         mode: 0,
         services: [],
         schedule: {},
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timestamp: new Date()
     })
 
     const [userErrors, setUserErrors] = useState({
@@ -240,6 +243,18 @@ export default function Register(props){
         setErrors(`Errors found!`);
     }
 
+    
+    async function registerBuisness(data) {
+        const config = {
+            headers: {
+                'Content-type': 'application/json' 
+            }
+        }         
+        const response = await axios.post('/api/external/register_buisness', data, config)
+        return response;
+    } 
+
+
 
     /**
      * Submit to backend.
@@ -247,13 +262,37 @@ export default function Register(props){
     const submitBuisnessInfo = () => {
         const {status, missing} = checkObjectData(user);
         if (!status){
-            const objectUser = user;
-            const data = JSON.stringify(objectUser);
+            const data = JSON.stringify(user);
             const formData = new FormData();
-            formData.append("RegisterData", data);
-            
+            formData.append('RegisterData',data);
+            registerBuisness(formData)
+            .then(response => {
+                if (response.status === 200){
+                    signIn({
+                        token: response.data.token,
+                        expiresIn: 3600,
+                        tokenType: "Bearer",
+                        authState: { id: response.data.id },
+                    })
+                    navigate('/Dashboard');
+                    return;
+                }else {
+                    setErrors('Status: ' + response.status + 'Unable to proccess request at the moment.');
+                    return;
+                }
+            })
+            .catch(error => {
+                if (error && error instanceof AxiosError){
+                    setErrors('Axios: ' + error);
+                    return;
+                }else if (error && error instanceof Error){
+                    setErrors('Error: ' + error);
+                    return;
+                }
+                setErrors('Error: ' + error);
+                return;
+            })
         }else {
-            console.log(missing);
             displayErrors(missing);
             setStep(10);
             return;
