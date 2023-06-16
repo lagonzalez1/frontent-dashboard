@@ -22,13 +22,6 @@ export default function Dashboard (props) {
         props.setHide(true);
     }
 
-    const Content = () => {
-      return (
-        <Box>
-          Re-render
-        </Box>
-      )
-    }
 
 
     return (
