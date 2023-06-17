@@ -1,13 +1,14 @@
 import React, { useState, useEffect} from "react";
-import { Container, IconButton,Typography, Toolbar, Box, styled } from "@mui/material";
+import { Container, IconButton,Typography, Toolbar, Button, Box } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import MuiDrawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AppBar, drawerWidth } from "./NavBarHelper";
+import { AppBar } from "./NavBarHelper";
+import { useSignOut } from "react-auth-kit";
 
 
 export default function NavBar({ navState, openNav }) {
-
+  const signOut = useSignOut();
   useEffect(() => {
     console.log("Navbar" + navState);
   }, [])
@@ -32,10 +33,12 @@ export default function NavBar({ navState, openNav }) {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" noWrap component="div">
+            <Typography variant="h6" sx={{ flexGrow: 1}} noWrap component="div">
               Mini variant drawer
-
             </Typography>
+            <Box>
+              <Button onClick={() => signOut()} color="inherit">Logout</Button>
+            </Box>
           </Toolbar>
       </AppBar>
     )

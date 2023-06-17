@@ -1,6 +1,5 @@
 import {styled, theme} from "@mui/material";
 import MuiAppBar from '@mui/material/AppBar';
-
 export const drawerWidth = 240;
 
 export const AppBar = styled(MuiAppBar, {
@@ -20,3 +19,5 @@ export const AppBar = styled(MuiAppBar, {
     }),
   }),
 }));
+
+

@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import { Avatar, Typography ,Button, TextField, FormControlLabel, Checkbox, Link, Paper, Box, Grid, Container, Alert } from "@mui/material";
+import { Avatar, Typography ,Button, TextField, Checkbox, Link, Paper, Box, Grid, Container, Alert } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { useNavigate  } from "react-router-dom";
 import { useSignIn } from "react-auth-kit";
 
@@ -8,6 +9,7 @@ export default function Login(props) {
     const navigate = useNavigate();
     const signIn = useSignIn();
 
+    const [loading, setLoading] = useState(false);
     const [error, setErrors] = useState(false);
     const [credentials, setCredentials] = useState({
         email: '',
@@ -31,6 +33,7 @@ export default function Login(props) {
     }
 
 	const handleSubmit = () => {
+        setLoading(true);
         if ( credentials.email && credentials.password ){
             const data = { email: credentials.email, password: credentials.password };
             loginRequest(data)
@@ -44,13 +47,17 @@ export default function Login(props) {
                         authState: { id: response.data.id },
                     })
                     navigate('/Dashboard');
+                    setLoading(false);
                     return;
                 }else {
                     setErrors('Status: ' + response.status + 'Unable to proccess request at the moment.');
+                    setLoading(false);
                     return;
                 }
+                
             })
             .catch(error => {
+                setLoading(false);
                 if (error && error instanceof AxiosError){
                     setErrors('Axios: ' + error);
                     return;
@@ -63,6 +70,7 @@ export default function Login(props) {
             })
         }
         else {
+            setLoading(false);
             setErrors('Error: Empty fields found.');
             return;
         }
@@ -84,7 +92,7 @@ export default function Login(props) {
 
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                Sign in
+                    Sign in
                 </Typography>
                 <Box component="form" noValidate sx={{ mt: 1 }}>
                     {error ? (<Alert severity="error">{error}</Alert>): null}
@@ -110,7 +118,11 @@ export default function Login(props) {
                     onChange={e => setCredentials((prev) => ({ ...prev, password: e.target.value}))}
                     autoComplete="current-password"
                 />
-
+                { loading ? (<LoadingButton
+                                loading={loading}
+                                variant="outlined"
+                                disabled
+                                > Sign In</LoadingButton>): 
                 <Button
                     fullWidth
                     variant="contained"
@@ -120,6 +132,7 @@ export default function Login(props) {
                 >
                     Sign In
                 </Button>
+                }
                 <Grid container>
                     <Grid item xs>
                     <Link href="#" variant="body2">
