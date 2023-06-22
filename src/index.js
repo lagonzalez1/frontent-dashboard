@@ -5,6 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from '@emotion/react';
 import { theme, darkTheme } from "./theme/theme";
+import { BrowserRouter } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from "react-auth-kit";
 
@@ -14,17 +15,15 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <AuthProvider
-    authType={"cookie"}
-    authName={"_auth"}
-    cookieDomain={window.location.hostname}
-    cookieSecure={false}
+      authType={"cookie"}
+      authName={"_auth"}
+      cookieDomain={window.location.hostname}
+      cookieSecure={false}
     >
       <ThemeProvider theme={theme}>
-        <App />
+          <App />
       </ThemeProvider>
     </AuthProvider>
-    
-    
   </React.StrictMode>
 );
 

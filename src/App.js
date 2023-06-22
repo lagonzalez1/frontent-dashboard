@@ -8,8 +8,8 @@ import Navbar from './pages/Navbar/Navbar';
 import Register from './pages/Register/Register';
 import Dashboard from './Layouts/Dashboard/Dashboard';
 import Login from './pages/Login/Login';
-
 import { RequireAuth } from "react-auth-kit";
+
 
 
 function App() {
@@ -17,6 +17,7 @@ function App() {
   const [hide, setHide] = useState(false);
   
   useEffect(() => {
+    console.log("CAALLED");
     WebFont.load({
       google: {
         families: ['Raleway']
@@ -28,16 +29,18 @@ function App() {
   return (
     <Router>
       <div className='container'>
-        <Navbar hide={hide}/>
+        { hide ? null : <Navbar hide={hide}/> }
         <Routes>
-          <Route exact path='/' element={<Homepage setHide={setHide} />}></Route>
-          <Route exact path='/Register' element={<Register setHide={setHide} />}></Route>
-          <Route exact path='/Login' element={<Login setHide={setHide}/>}></Route>
-          <Route exact path='/Dashboard' element={
-              <RequireAuth loginPath="/Login">
-                <Dashboard setHide={setHide} />
+          <Route path='/Home' element={<Homepage setHide={setHide} />}></Route>
+          <Route path='/Register' element={<Register setHide={setHide} />}></Route>
+          <Route path='/Login' element={<Login setHide={setHide}/>}></Route>
+
+          <Route path={'/Dashboard'} element={
+              <RequireAuth loginPath={'/Login'}>
+                <Dashboard/>
               </RequireAuth>
-          }></Route>
+          }> </Route>
+
         </Routes>
       </div>
     </Router>

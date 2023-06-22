@@ -1,9 +1,10 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import { Avatar, Typography ,Button, TextField, Checkbox, Link, Paper, Box, Grid, Container, Alert } from "@mui/material";
+import { Avatar, Typography ,Button, TextField, Link, Box, Grid, Container, Alert } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useNavigate  } from "react-router-dom";
 import { useSignIn } from "react-auth-kit";
+import { setAccessToken } from "../../auth/Auth";
 
 export default function Login(props) {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function Login(props) {
     })
 
     useEffect(() => {
+        console.log("LOGIN");
         removeNavbar();
     }, [])
 
@@ -32,7 +34,8 @@ export default function Login(props) {
         return response;
     }
 
-	const handleSubmit = () => {
+	const handleSubmit = (e) => {
+        e.preventDefault();
         setLoading(true);
         if ( credentials.email && credentials.password ){
             const data = { email: credentials.email, password: credentials.password };
@@ -46,6 +49,7 @@ export default function Login(props) {
                         tokenType: "Bearer",
                         authState: { id: response.data.id },
                     })
+                    setAccessToken(response.data.accessToken);
                     navigate('/Dashboard');
                     setLoading(false);
                     return;
@@ -119,6 +123,7 @@ export default function Login(props) {
                     autoComplete="current-password"
                 />
                 { loading ? (<LoadingButton
+                                fullWidth
                                 loading={loading}
                                 variant="outlined"
                                 disabled
@@ -128,7 +133,7 @@ export default function Login(props) {
                     variant="contained"
                     color="primary"
                     sx={{ mt: 3, mb: 2 }}
-                    onClick={ () => handleSubmit() }
+                    onClick={ (e) => handleSubmit(e) }
                 >
                     Sign In
                 </Button>
