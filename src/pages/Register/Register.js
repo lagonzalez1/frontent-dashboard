@@ -79,7 +79,8 @@ export default function Register(props){
         services: [],
         schedule: {},
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        timestamp: new Date()
+        timestamp: new Date(),
+        settings: {}
     })
 
     const [userErrors, setUserErrors] = useState({
@@ -101,15 +102,9 @@ export default function Register(props){
 
 
     useEffect(() => {
-        removeNavbar();
     }, [])
 
-    /**
-     * Fade navabar for Register and Login pages.
-     */
-    const removeNavbar = () => {
-        props.setHide(true);
-    }
+   
 
     /**
      * Increment loader
@@ -233,14 +228,7 @@ export default function Register(props){
         });
     }
 
-    function registerBuisness (data) {
-        return new Promise((resolve, reject) => {
-            axios.post('/register_buisness', data)
-            .then((data) => {
-                return resolve()
-            })
-        });
-    }
+    
 
     /**
      * 
@@ -313,7 +301,7 @@ export default function Register(props){
     return(
         <>  
             
-                <Container className="container" sx={{ pt: 5, pb: 5}}>       
+            <Container className="container" sx={{ pt: 5, pb: 5}}>       
                 {error ? (<Alert severity="error">{error}</Alert>): null}         
                 { step === 10 ?(
                         <Container className="content_container" sx={{ p: 3}}>

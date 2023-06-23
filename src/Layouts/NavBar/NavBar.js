@@ -3,17 +3,19 @@ import { Container, IconButton,Typography, Toolbar, Button, Box } from "@mui/mat
 import MenuIcon from '@mui/icons-material/Menu';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AppBar } from "./NavBarHelper";
+import { useSignOut } from "react-auth-kit";
+import { removeAccessToken } from "../../auth/Auth";
 
 
-export default function NavBar({ navState, openNav, logout }) {
 
+export default function NavBar({ navState, openNav }) {
 
+    const signOut = useSignOut();
 
-  useEffect(() => {
-    console.log("NAVBAR");
-  }, [])
-
-  
+    function logout() {
+      removeAccessToken();
+      signOut();
+    }
 
     return (
       <AppBar position="fixed" open={navState}>
@@ -35,7 +37,7 @@ export default function NavBar({ navState, openNav, logout }) {
               Mini variant drawer
             </Typography>
             <Box>
-              <Button onClick={()=> logout()} color="inherit">Logout</Button>
+              <Button onClick={() => logout()} color="inherit">Logout</Button>
             </Box>
           </Toolbar>
       </AppBar>

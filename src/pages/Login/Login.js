@@ -6,7 +6,12 @@ import { useNavigate  } from "react-router-dom";
 import { useSignIn } from "react-auth-kit";
 import { setAccessToken } from "../../auth/Auth";
 
-export default function Login(props) {
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser } from '../../reducers/user';
+
+export default function Login() {
+    
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const signIn = useSignIn();
 
@@ -19,15 +24,7 @@ export default function Login(props) {
 
     useEffect(() => {
         console.log("LOGIN");
-        removeNavbar();
     }, [])
-
-    /**
-     * Fade navabar for Register and Login pages.
-     */
-    const removeNavbar = () => {
-        props.setHide(true);
-    }
 
     async function loginRequest(data) {
         const response = await axios.post('/api/external/login', data)
@@ -50,6 +47,7 @@ export default function Login(props) {
                         authState: { id: response.data.id },
                     })
                     setAccessToken(response.data.accessToken);
+                    dispatch(setUser({ id: response.data.id, email: response.data.email}))
                     navigate('/Dashboard');
                     setLoading(false);
                     return;
@@ -127,6 +125,7 @@ export default function Login(props) {
                                 loading={loading}
                                 variant="outlined"
                                 disabled
+                                sx={{ mt: 3, mb: 2 }}
                                 > Sign In</LoadingButton>): 
                 <Button
                     fullWidth

@@ -1,18 +1,12 @@
 import React, { useState, useEffect } from "react";
+import Navbar from '../Navbar/Navbar'
 
-export default function Homepage(props) {
+export default function Homepage() {
 
-    useEffect(() => {
-        showNavbar();
-    }, []);
-
-    const showNavbar = () => {
-        props.setHide(false);
-    }
-    
     
     return (
         <>
+            <Navbar/>
             
         </>
     )

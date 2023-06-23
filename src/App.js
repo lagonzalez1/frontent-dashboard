@@ -11,29 +11,30 @@ import Login from './pages/Login/Login';
 import { RequireAuth } from "react-auth-kit";
 
 
-
 function App() {
-
   const [hide, setHide] = useState(false);
-  
-  useEffect(() => {
-    console.log("CAALLED");
+
+  function setFont() {
     WebFont.load({
       google: {
         families: ['Raleway']
       }
     });
+  }
+  
+  useEffect(() => {
+    setFont()
    }, []);
 
   
   return (
     <Router>
       <div className='container'>
-        { hide ? null : <Navbar hide={hide}/> }
+      
         <Routes>
-          <Route path='/Home' element={<Homepage setHide={setHide} />}></Route>
-          <Route path='/Register' element={<Register setHide={setHide} />}></Route>
-          <Route path='/Login' element={<Login setHide={setHide}/>}></Route>
+          <Route path='/' element={<Homepage />}></Route>
+          <Route path='/Register' element={<Register />}></Route>
+          <Route path='/Login' element={<Login />}></Route>
 
           <Route path={'/Dashboard'} element={
               <RequireAuth loginPath={'/Login'}>

@@ -8,7 +8,8 @@ import { theme, darkTheme } from "./theme/theme";
 import { BrowserRouter } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from "react-auth-kit";
-
+import { Provider } from 'react-redux';
+import store from "./store/store"
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -21,7 +22,9 @@ root.render(
       cookieSecure={false}
     >
       <ThemeProvider theme={theme}>
+        <Provider store={store}>
           <App />
+        </Provider>
       </ThemeProvider>
     </AuthProvider>
   </React.StrictMode>

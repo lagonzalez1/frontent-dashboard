@@ -1,37 +1,69 @@
-import React, { useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState} from "react";
 import { Box, Typography, styled } from "@mui/material";
-import { DashboardHeader } from "./DashboardHelper"
-import { useSignOut } from "react-auth-kit";
-import { removeAccessToken } from "../../auth/Auth";
-import { useNavigate } from "react-router-dom";
-
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
-
+import { useSignOut } from "react-auth-kit";
+import { DashboardHeader, getBuisnessData } from "./DashboardHelper"
+import { isAuthenticated, removeAccessToken } from "../../auth/Auth";
+import { useSelector, useDispatch } from 'react-redux';
+import { setBuisnessId } from "../../reducers/buisness";
 
 export default function Dashboard (props) {
 
-    const signOut = useSignOut();
     const [openNav, setOpenNav] = useState(false);
-
-    const logout = () => {
-        removeAccessToken();
-        signOut();
-    }
+    const signOut = useSignOut();
+    const email = useSelector((state) => state.user.email);
+    const id = useSelector((state) => state.user.id);
+    const dispatch = useDispatch();
+    
 
     useEffect(() => {
-        console.log("DASHBAR");
-    }, [])
+        checkAuthStatus();
+        // need to load default buisness. 
+        // Note Redux refresh causes entire state to be empty.
 
+    },[email])
+
+    async function checkAuthStatus() {
+        try {
+            const isAuth = await isAuthenticated(email);
+            console.log(isAuth)
+            if (!isAuth) {
+                removeAccessToken();
+                signOut();
+                return;
+            }
+        }catch(error) {
+            console.log(error)
+            return;
+        }
+        
+    }
+
+    // Issue
+    async function loadBuisness() {
+        await getBuisnessData(id)
+        .then(id => {
+            console.log(id)
+            dispatch(setBuisnessId(id))
+
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
+    
 
     return (
         <>
             <Box sx={{ display: 'flex' }}>
-                <NavBar navState={openNav} openNav={setOpenNav} logout={logout} />
+                <NavBar navState={openNav} openNav={setOpenNav} />
                 <SideBar navState={openNav} openNav={setOpenNav} />
                  <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                       <DashboardHeader />
                       <Typography variant="h2">MAIN CONTENT</Typography>
+                      { /** Elements */}
                  </Box>
             </Box>
         </>
