@@ -45,7 +45,9 @@ export default function Login() {
                         expiresIn: response.data.expiration,
                         tokenType: "Bearer",
                         authState: { id: response.data.id },
-                    })
+                    });
+                    
+                    console.log(response.data.accessToken)
                     setAccessToken(response.data.accessToken);
                     dispatch(setUser({ id: response.data.id, email: response.data.email}))
                     navigate('/Dashboard');

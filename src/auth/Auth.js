@@ -9,13 +9,13 @@
  *              
  */
 import axios from "axios";
-import { useSignOut } from "react-auth-kit";
-
+import { setBuisness } from "../reducers/buisness";
 const TOKEN_KEY = 'access_token';
 
 
+
 export const setAccessToken = (accessToken) => {
-    localStorage.setItem(TOKEN_KEY, accessToken);
+  localStorage.setItem(TOKEN_KEY, accessToken);
   };
   
   export const getAccessToken = () => {
@@ -26,16 +26,10 @@ export const setAccessToken = (accessToken) => {
     localStorage.removeItem(TOKEN_KEY);
   };
   
-  export const isAuthenticated = async (email) => {
+  export const isAuthenticated = async (id,email, dispatch) => {
     try {
-      const accessToken = getAccessToken();
-      if (!accessToken) {
-        return false;
-      }
-      const data = await checkAccessToken(email, accessToken);
-      removeAccessToken();
-      setAccessToken(data.accessToken);
-
+      const status = await checkAccessToken(id,email);
+      dispatch(setBuisness(status.data.buisness));
       return true;
     } catch (error) {
       console.log(error);
@@ -47,16 +41,13 @@ export const setAccessToken = (accessToken) => {
   // Issue: The token being passed into function is not being utilized.
   //        The token used in cookie-parse rather.
   //        What i need to do: Configure a header object and pass it via Auth Bearer 'Token'
-
-  function checkAccessToken(email, token) {
-    return new Promise((resolve, reject) => {
-      axios
-        .post('/api/internal/refresh_access', { email })
-        .then(response => {
-          resolve(response.data);
-        })
-        .catch(error => {
-          reject(new Error('Failed to check access token'));
-        });
-    });
+  async function checkAccessToken(id, email) {
+    const token = getAccessToken();
+    try {
+      const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: {'x-access-token': token} });
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw new Error(error);
+    }
   }

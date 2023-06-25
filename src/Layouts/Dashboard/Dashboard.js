@@ -6,27 +6,18 @@ import { useSignOut } from "react-auth-kit";
 import { DashboardHeader, getBuisnessData } from "./DashboardHelper"
 import { isAuthenticated, removeAccessToken } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
-import { setBuisnessId } from "../../reducers/buisness";
 
 export default function Dashboard (props) {
-
+    const dispatch = useDispatch();
     const [openNav, setOpenNav] = useState(false);
     const signOut = useSignOut();
     const email = useSelector((state) => state.user.email);
     const id = useSelector((state) => state.user.id);
-    const dispatch = useDispatch();
     
-
-    useEffect(() => {
-        checkAuthStatus();
-        // need to load default buisness. 
-        // Note Redux refresh causes entire state to be empty.
-
-    },[email])
 
     async function checkAuthStatus() {
         try {
-            const isAuth = await isAuthenticated(email);
+            const isAuth = await isAuthenticated(id,email, dispatch);
             console.log(isAuth)
             if (!isAuth) {
                 removeAccessToken();
@@ -36,22 +27,17 @@ export default function Dashboard (props) {
         }catch(error) {
             console.log(error)
             return;
-        }
-        
+        }   
     }
 
-    // Issue
-    async function loadBuisness() {
-        await getBuisnessData(id)
-        .then(id => {
-            console.log(id)
-            dispatch(setBuisnessId(id))
+    useEffect(() => {
+        checkAuthStatus();
+        // need to load default buisness. 
+        // Note Redux refresh causes entire state to be empty.
 
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
+    },[email])
+
+    
 
     
 
