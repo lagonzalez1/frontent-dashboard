@@ -1,18 +1,16 @@
 import React, { useState, useEffect} from "react";
 import { Grid, Typography, IconButton, CardContent} from "@mui/material";
 import { StyledCardService } from "../pages/Register/CardStyle";
-
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+
 
 export default function ServicesGrid (props) {
 
     const [services, setServices] = useState([]);
-
     useEffect(() => {
         setServices(props.services);
         console.log(props.services);
     },[props.services])
-
 
     /**
      * 
@@ -27,9 +25,7 @@ export default function ServicesGrid (props) {
         }));
         console.log(services)
     }
-
-    
-    
+  
     return(
         <>
         <Grid container sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 6, sm: 4, md: 4, lg: 6 }}>

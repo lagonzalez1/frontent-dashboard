@@ -2,9 +2,10 @@ import React, { useCallback, useEffect, useState} from "react";
 import { Box, Typography, styled } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
+import Waitlist from "../../components/Waitlist/Waitlist";
 import { useSignOut } from "react-auth-kit";
 import { DashboardHeader, getBuisnessData } from "./DashboardHelper"
-import { isAuthenticated, removeAccessToken } from "../../auth/Auth";
+import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 
 export default function Dashboard (props) {
@@ -17,10 +18,10 @@ export default function Dashboard (props) {
 
     async function checkAuthStatus() {
         try {
-            const isAuth = await isAuthenticated(id,email, dispatch);
+            const isAuth = await isAuthenticated(dispatch);
             console.log(isAuth)
             if (!isAuth) {
-                removeAccessToken();
+                removeUserState();
                 signOut();
                 return;
             }
@@ -49,7 +50,7 @@ export default function Dashboard (props) {
                  <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
                       <DashboardHeader />
                       <Typography variant="h2">MAIN CONTENT</Typography>
-                      { /** Elements */}
+                      <Waitlist />
                  </Box>
             </Box>
         </>

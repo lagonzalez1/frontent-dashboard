@@ -1,5 +1,4 @@
 /**
- * 
  * Purpose:     Auth state for access token.
  * 
  * Description: This class serves the puspose of managing access token for API calls to server.
@@ -10,9 +9,17 @@
  */
 import axios from "axios";
 import { setBuisness } from "../reducers/buisness";
+import { setUser } from "../reducers/user";
 const TOKEN_KEY = 'access_token';
+const BUISNESS = 'buisness';
+const USER = 'user';
 
 
+export const getStateData = () => {
+  const buisness = JSON.parse(localStorage.getItem(BUISNESS));
+  const user = JSON.parse(localStorage.getItem(USER));
+  return { user, buisness };
+}
 
 export const setAccessToken = (accessToken) => {
   localStorage.setItem(TOKEN_KEY, accessToken);
@@ -25,11 +32,27 @@ export const setAccessToken = (accessToken) => {
   export const removeAccessToken = () => {
     localStorage.removeItem(TOKEN_KEY);
   };
+
+  export const removeBuisnessState = () => {
+    localStorage.removeItem(BUISNESS);
+  }
+
+  export const removeUser = () => {
+    localStorage.removeItem(USER);
+  }
   
-  export const isAuthenticated = async (id,email, dispatch) => {
+  export const removeUserState = () => {
+    removeUser();
+    removeAccessToken();
+    removeBuisnessState();
+  }
+  
+  export const isAuthenticated = async (dispatch) => {
+    
     try {
-      const status = await checkAccessToken(id,email);
-      dispatch(setBuisness(status.data.buisness));
+      const status = await checkAccessToken();
+      dispatch(setBuisness(status.business));
+      dispatch(setUser({ id: status.id, email: status.email}))
       return true;
     } catch (error) {
       console.log(error);
@@ -41,8 +64,11 @@ export const setAccessToken = (accessToken) => {
   // Issue: The token being passed into function is not being utilized.
   //        The token used in cookie-parse rather.
   //        What i need to do: Configure a header object and pass it via Auth Bearer 'Token'
-  async function checkAccessToken(id, email) {
+  async function checkAccessToken() {
     const token = getAccessToken();
+    const { user, _ } = getStateData();
+    const id = user.id;
+    const email = user.email;
     try {
       const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: {'x-access-token': token} });
       return response.data;

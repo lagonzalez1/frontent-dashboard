@@ -23,7 +23,6 @@ export default function Login() {
     })
 
     useEffect(() => {
-        console.log("LOGIN");
     }, [])
 
     async function loginRequest(data) {

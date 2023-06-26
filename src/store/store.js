@@ -7,9 +7,9 @@ const saveToLocalStorage = (store) => (next) => (action) => {
   const result = next(action); // Call the next middleware or reducer
 
   // Save user and business data to local storage
-  const { user, business } = store.getState();
+  const { user, buisness } = store.getState();
   localStorage.setItem('user', JSON.stringify(user));
-  localStorage.setItem('business', JSON.stringify(business));
+  localStorage.setItem('buisness', JSON.stringify(buisness));
 
   return result;
 };
