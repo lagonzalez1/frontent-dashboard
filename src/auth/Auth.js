@@ -51,7 +51,7 @@ export const setAccessToken = (accessToken) => {
     
     try {
       const status = await checkAccessToken();
-      dispatch(setBuisness(status.business));
+      dispatch(setBuisness(status.buisness));
       dispatch(setUser({ id: status.id, email: status.email}))
       return true;
     } catch (error) {

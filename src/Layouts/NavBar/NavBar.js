@@ -4,7 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AppBar } from "./NavBarHelper";
 import { useSignOut } from "react-auth-kit";
-import { removeAccessToken } from "../../auth/Auth";
+import { removeUserState } from "../../auth/Auth";
 
 
 
@@ -13,7 +13,7 @@ export default function NavBar({ navState, openNav }) {
     const signOut = useSignOut();
 
     function logout() {
-      removeAccessToken();
+      removeUserState();
       signOut();
     }
 

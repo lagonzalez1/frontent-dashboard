@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  buisness: null,
 };
 
 const buisnessSlice = createSlice({
@@ -9,10 +8,10 @@ const buisnessSlice = createSlice({
   initialState,
   reducers: {
     setBuisness: (state, action) => {
-      state.buisness = action.payload;
+      return action.payload;
     }
   },
 });
 
-export const { setBuisness} = buisnessSlice.actions;
+export const { setBuisness } = buisnessSlice.actions;
 export default buisnessSlice.reducer;
