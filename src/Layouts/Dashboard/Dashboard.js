@@ -8,6 +8,18 @@ import { DashboardHeader, getBuisnessData } from "./DashboardHelper"
 import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 
+
+
+
+/**
+ * 
+ * Strucutre:
+ *          Have the user change the retrived state from mongo by only storing into local storage.
+ *          User makes a request. Update all from localStorage.
+ *              =
+ */
+
+
 export default function Dashboard (props) {
     const dispatch = useDispatch();
     const [openNav, setOpenNav] = useState(false);
@@ -47,9 +59,8 @@ export default function Dashboard (props) {
             <Box sx={{ display: 'flex' }}>
                 <NavBar navState={openNav} openNav={setOpenNav} />
                 <SideBar navState={openNav} openNav={setOpenNav} />
-                 <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                 <Box component="main" id="innerDashboard" sx={{ flexGrow: 1, p: 1 , width : "100%"}}>
                       <DashboardHeader />
-                      <Typography variant="h2">MAIN CONTENT</Typography>
                       <Waitlist />
                  </Box>
             </Box>

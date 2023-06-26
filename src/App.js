@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import './App.css';
 import WebFont from 'webfontloader';
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
-
 import Homepage from "./pages/Homepage/Homepage";
 import Navbar from './pages/Navbar/Navbar';
 import Register from './pages/Register/Register';
@@ -29,7 +28,7 @@ function App() {
   
   return (
     <Router>
-      <div className='container'>
+      <div id="mainContainer">
       
         <Routes>
           <Route path='/' element={<Homepage />}></Route>

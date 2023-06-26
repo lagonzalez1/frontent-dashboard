@@ -2,7 +2,14 @@
   text-align: center;
 }
 
-
+#mainContainer {
+  margin-left: 0%;
+  margin-right: 0%;
+  width: 100%;
+  padding-left: 1%;
+  padding-right: 1%;
+  padding-top: 1%;
+}
 
 body { 
   background-color: #ffffff;
@@ -19,6 +26,7 @@ body {
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
 
 .App-header {
   background-color: #282c34;

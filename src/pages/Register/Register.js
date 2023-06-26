@@ -15,7 +15,7 @@ import LIST_IMG from "../../assets/images/listhd.png";
 import CAL_IMG from "../../assets/images/calendarsd.png";
 import BOTH_IMG from  "../../assets/images/bothsd.png";
 import "./Register.css";
-import ServicesGrid from "../../components/ServicesGrid";
+import ServicesGrid from "../../components/Service/ServicesGrid";
 import { useSignIn } from "react-auth-kit";
 
 

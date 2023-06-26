@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { Grid, Typography, IconButton, CardContent} from "@mui/material";
-import { StyledCardService } from "../pages/Register/CardStyle";
+import { StyledCardService } from "../../pages/Register/CardStyle";
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 
