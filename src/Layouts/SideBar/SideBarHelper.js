@@ -1,4 +1,4 @@
-import { styled, useTheme} from "@mui/material";
+import { styled} from "@mui/material";
 import MuiDrawer from '@mui/material/Drawer';
 
 
@@ -50,3 +50,13 @@ export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 
       }),
     }),
   );
+
+
+  export const LOCATIONS = {
+    'Dashboard': 0,
+    'Serving': 1,
+    'Resources': 2,
+    'Customers': 3,
+    'Settings': 4,
+    'Help': 5
+  };

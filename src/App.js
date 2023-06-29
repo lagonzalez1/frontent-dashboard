@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import WebFont from 'webfontloader';
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import Homepage from "./pages/Homepage/Homepage";
-import Navbar from './pages/Navbar/Navbar';
 import Register from './pages/Register/Register';
 import Dashboard from './Layouts/Dashboard/Dashboard';
 import Login from './pages/Login/Login';
@@ -11,7 +10,6 @@ import { RequireAuth } from "react-auth-kit";
 
 
 function App() {
-  const [hide, setHide] = useState(false);
 
   function setFont() {
     WebFont.load({
@@ -24,6 +22,7 @@ function App() {
   useEffect(() => {
     setFont()
    }, []);
+
 
   
   return (

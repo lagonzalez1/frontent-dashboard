@@ -1,8 +1,5 @@
-import React, { useState, useEffect} from "react";
-import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, styled, useTheme, Tooltip} from "@mui/material";
-import MuiDrawer from '@mui/material/Drawer';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import React from "react";
+import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip} from "@mui/material";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
@@ -11,13 +8,28 @@ import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
-
-
-import { DrawerHeader, Drawer ,drawerWidth,openedMixin, closedMixin } from "./SideBarHelper";
+import { LOCATIONS } from "./SideBarHelper";
+import { useDispatch, useSelector } from "react-redux";
+import { setLocation } from "../../reducers/user";
+import { DrawerHeader, Drawer , drawerWidth,openedMixin, closedMixin } from "./SideBarHelper";
 
 
 export default function SideBar({navState, openNav}) {
     const theme = useTheme();
+    const dispatch = useDispatch();
+    const currentLocation = useSelector((state) => state.user.location);
+
+
+    /**
+     * 
+     * @param {Number} location
+     *  Changes the location tof the current page based.
+     *  Change the state of redux user.location  
+     */
+    const changeLocation = (location) => {
+        dispatch(setLocation(location))
+    }
+
 
     return (
         <>
@@ -33,20 +45,24 @@ export default function SideBar({navState, openNav}) {
             <ListItem disablePadding sx={{ display: 'block' }}>
             <Tooltip title="Dashboard" placement="right">
               <ListItemButton
+                color="info"
                 sx={{
                   minHeight: 48,
                   justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
+                
+                onClick={() => changeLocation(LOCATIONS.Dashboard)}
               >
                 <ListItemIcon
+                  
                   sx={{
                     minWidth: 0,
                     mr: navState ? 3 : 'auto',
                     justifyContent: 'center',
                   }}
                 >
-                  <AccessTimeRoundedIcon />
+                  <AccessTimeRoundedIcon htmlColor={ currentLocation === 0 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
@@ -62,6 +78,7 @@ export default function SideBar({navState, openNav}) {
                   justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
+                onClick={() => changeLocation(LOCATIONS.Serving)}
               >
                 <ListItemIcon
                   sx={{
@@ -70,7 +87,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckBoxRoundedIcon />
+                  <CheckBoxRoundedIcon  htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
@@ -86,6 +103,7 @@ export default function SideBar({navState, openNav}) {
                   justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
+                onClick={() => changeLocation(LOCATIONS.Resources)}
               >
                 <ListItemIcon
                   sx={{
@@ -94,7 +112,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <WidgetsRoundedIcon />
+                  <WidgetsRoundedIcon htmlColor={ currentLocation === 2 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Resources"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
@@ -110,6 +128,7 @@ export default function SideBar({navState, openNav}) {
                   justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
+                onClick={() => changeLocation(LOCATIONS.Customers)}
               >
                 <ListItemIcon
                   sx={{
@@ -118,7 +137,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <PeopleRoundedIcon />
+                  <PeopleRoundedIcon  htmlColor={ currentLocation === 3 ? '#ffc34d' : '' }/>
                 </ListItemIcon>
                 <ListItemText primary={"Customers"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
@@ -137,6 +156,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: navState ? 'initial' : 'center',
                     px: 2.5,
                   }}
+                  onClick={() => changeLocation(LOCATIONS.Settings)}
                 >
                   <ListItemIcon
                     sx={{
@@ -145,7 +165,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <SettingsRoundedIcon />
+                    <SettingsRoundedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>
@@ -163,6 +183,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: navState ? 'initial' : 'center',
                     px: 2.5,
                   }}
+                  onClick={() => changeLocation(LOCATIONS.Help)}
                 >
                   <ListItemIcon
                     sx={{
@@ -171,7 +192,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <HelpRoundedIcon />
+                    <HelpRoundedIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>

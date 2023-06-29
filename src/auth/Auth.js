@@ -9,17 +9,17 @@
  */
 import axios from "axios";
 import { setBuisness } from "../reducers/buisness";
-import { setUser } from "../reducers/user";
+import { setIndex, setUser } from "../reducers/user";
 const TOKEN_KEY = 'access_token';
 const BUISNESS = 'buisness';
 const USER = 'user';
 
 
-export const getStateData = () => {
-  const buisness = JSON.parse(localStorage.getItem(BUISNESS));
-  const user = JSON.parse(localStorage.getItem(USER));
-  return { user, buisness };
-}
+  export const getStateData = () => {
+    const buisness = JSON.parse(localStorage.getItem(BUISNESS));
+    const user = JSON.parse(localStorage.getItem(USER));
+    return { user, buisness };
+  }
 
 export const setAccessToken = (accessToken) => {
   localStorage.setItem(TOKEN_KEY, accessToken);
@@ -53,6 +53,7 @@ export const setAccessToken = (accessToken) => {
       const status = await checkAccessToken();
       dispatch(setBuisness(status.buisness));
       dispatch(setUser({ id: status.id, email: status.email}))
+      dispatch(setIndex(status.defaultIndex))
       return true;
     } catch (error) {
       console.log(error);

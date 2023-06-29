@@ -4,7 +4,9 @@ const initialState = {
   id: null,
   email: null,
   permisisons: null,
+  defaultIndex : null,
   isLoggedIn: false,
+  location: 0,
 };
 
 const userSlice = createSlice({
@@ -21,12 +23,17 @@ const userSlice = createSlice({
       state.id = null;
       state.isLoggedIn = false;
     },
-
-    setPermisisons: (state, action) =>{
+    setIndex: (state, action) => {
+      state.defaultIndex = action.payload;
+    },
+    setPermisisons: (state, action) => {
       state.permisisons = action.payload;
+    },
+    setLocation: (state, action) => {
+      state.location = action.payload;
     }
   },
 });
 
-export const { setUser, logoutUser, setPermisisons } = userSlice.actions;
+export const { setUser, logoutUser, setPermisisons, setIndex, setLocation } = userSlice.actions;
 export default userSlice.reducer;

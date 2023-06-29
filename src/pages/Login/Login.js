@@ -7,7 +7,7 @@ import { useSignIn } from "react-auth-kit";
 import { setAccessToken } from "../../auth/Auth";
 
 import { useSelector, useDispatch } from 'react-redux';
-import { setUser } from '../../reducers/user';
+import { setLocation, setUser } from '../../reducers/user';
 
 export default function Login() {
     

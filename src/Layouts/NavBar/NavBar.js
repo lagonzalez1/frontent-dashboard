@@ -1,5 +1,5 @@
-import React, { useState, useEffect} from "react";
-import { Container, IconButton,Typography, Toolbar, Button, Box } from "@mui/material";
+import React from "react";
+import { IconButton,Typography, Toolbar, Button, Box } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AppBar } from "./NavBarHelper";
@@ -10,6 +10,7 @@ import { removeUserState } from "../../auth/Auth";
 
 export default function NavBar({ navState, openNav }) {
 
+    
     const signOut = useSignOut();
 
     function logout() {
@@ -34,7 +35,7 @@ export default function NavBar({ navState, openNav }) {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" sx={{ flexGrow: 1}} noWrap component="div">
-              Mini variant drawer
+              {'Dashboard'}
             </Typography>
             <Box>
               <Button onClick={() => logout()} color="inherit">Logout</Button>

@@ -1,4 +1,4 @@
-import {styled, theme} from "@mui/material";
+import {styled} from "@mui/material";
 import MuiAppBar from '@mui/material/AppBar';
 export const drawerWidth = 240;
 

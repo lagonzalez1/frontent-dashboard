@@ -1,12 +1,21 @@
-import React, { useCallback, useEffect, useState} from "react";
-import { Box, Typography, styled } from "@mui/material";
+import React, {  useEffect, useState} from "react";
+import { Box } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
 import Waitlist from "../../components/Waitlist/Waitlist";
+import FabButton from "../../components/Add/FabButton";
+import FullScreenLoader from "../../components/Loader/FullScreenLoader";
+import Resources from "../Resources/Resources";
+import Serving from "../Serving/Serving";
+import Settings from "../Settings/Settings";
+import Help from "../Help/Help";
+
+
 import { useSignOut } from "react-auth-kit";
-import { DashboardHeader, getBuisnessData } from "./DashboardHelper"
+import { DashboardHeader } from "./DashboardHelper"
 import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
+import Customers from "../Customers/Customers";
 
 
 
@@ -20,13 +29,13 @@ import { useSelector, useDispatch } from 'react-redux';
  */
 
 
-export default function Dashboard (props) {
+export default function Dashboard () {
     const dispatch = useDispatch();
-    const [openNav, setOpenNav] = useState(false);
     const signOut = useSignOut();
+
+    const [openNav, setOpenNav] = useState(false);
     const email = useSelector((state) => state.user.email);
-    const id = useSelector((state) => state.user.id);
-    
+    const location = useSelector((state) => state.user.location);
 
     async function checkAuthStatus() {
         try {
@@ -43,6 +52,9 @@ export default function Dashboard (props) {
         }   
     }
 
+
+
+
     useEffect(() => {
         checkAuthStatus();
         // need to load default buisness. 
@@ -50,8 +62,32 @@ export default function Dashboard (props) {
 
     },[email])
 
-    
+    const RenderLocation = () => {
 
+
+        switch(location) {
+            case 0:
+            return( <> 
+                <Waitlist />
+                <FabButton />
+            </> );
+            case 1:
+            return <Serving />
+            case 2:
+                return ( <Resources /> );
+            case 3:
+                
+            return (<Customers/>);
+            case 4: 
+            return ( <Settings />);
+            case 5: 
+            return ( <Help />);
+
+            default:
+                console.log("Something went wrong picking render location.")
+            
+        }
+    }
     
 
     return (
@@ -61,8 +97,9 @@ export default function Dashboard (props) {
                 <SideBar navState={openNav} openNav={setOpenNav} />
                  <Box component="main" id="innerDashboard" sx={{ flexGrow: 1, p: 1 , width : "100%"}}>
                       <DashboardHeader />
-                      <Waitlist />
+                      <RenderLocation />
                  </Box>
+                 
             </Box>
         </>
     )

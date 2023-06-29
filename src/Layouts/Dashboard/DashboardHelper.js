@@ -1,6 +1,6 @@
 import { styled } from "@mui/material"
 import axios from "axios";
-import { getAccessToken } from "../../auth/Auth";
+import { getStateData } from "../../auth/Auth";
 
 
 export const DashboardHeader = styled('div')(({ theme }) => ({
@@ -25,3 +25,17 @@ export const DashboardHeader = styled('div')(({ theme }) => ({
         });
     });
   }
+
+
+
+  const BUISNESS_INDEX = 'user';
+  
+  export const setBuisnessIndex = (index) => {
+    const { user, _} = getStateData();
+    user.defaultIndex = index;
+    localStorage.setItem(BUISNESS_INDEX, index)
+  }
+
+  export const getBuisnessIndex = () => {
+    return localStorage.getItem(BUISNESS_INDEX);
+  } 
