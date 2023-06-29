@@ -52,11 +52,19 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
   }
   
   export function stringAvatar(name) {
+    let initials = '';
+  
+    if (name.includes(' ')) {
+      initials = `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`;
+    } else {
+      initials = name[0];
+    }
+  
     return {
       sx: {
         bgcolor: stringToColor(name),
       },
-      children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
+      children: initials,
     };
   }
 

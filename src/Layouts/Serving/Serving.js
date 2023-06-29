@@ -47,7 +47,7 @@ export default function Serving() {
                                     <TableRow>
                                         {
                                            columns.map((col) => (
-                                            <TableCell key={col.id} align='left' minWidth={col.minWidth}>
+                                            <TableCell key={col.id} align='left'>
                                                 <Typography variant="subtitle2" fontWeight="bold">{ col.label }</Typography>
                                             </TableCell>
                                            )) 
@@ -59,7 +59,7 @@ export default function Serving() {
                 {
                     buisness ? (
                         getUserTable().map((item, index) => (
-                            <TableRow >                                       
+                            <TableRow key={index}>                                       
                                 <TableCell align="left">{++index}</TableCell>
                                 <TableCell align="left">NAme</TableCell>
 

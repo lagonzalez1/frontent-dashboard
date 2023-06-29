@@ -5,6 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
 import { useSelector } from 'react-redux';
 import { getServicesAvailable, addResource } from "./Helper";
+import Success from '../Snackbar/Success';
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -37,6 +38,8 @@ export default function AddResource() {
     addResource(values)
     .then(data => {
       console.log(data);
+      return <Success message="success" />
+
     })
     .catch(error => {
       console.log(error);
@@ -69,7 +72,6 @@ export default function AddResource() {
                       variant="outlined"
                       onChange={handleChange}
                       error={touched.title && !!errors.title}
-                      helperText={<ErrorMessage name="title" />}
                     />
                   </Grid>
 
@@ -84,7 +86,6 @@ export default function AddResource() {
                           label="Service"
                           fullWidth
                           error={touched.service_id && !!errors.service_id}
-                          helperText={touched.service_id && errors.service_id}
                           onChange={handleChange}
                           onBlur={handleBlur}
                           >
@@ -106,7 +107,6 @@ export default function AddResource() {
                       onChange={handleChange}
                       variant="outlined"
                       error={touched.description && !!errors.description}
-                      helperText={<ErrorMessage name="description" />}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -119,7 +119,6 @@ export default function AddResource() {
                       fullWidth
                       variant="outlined"
                       error={touched.serveSize && !!errors.serveSize}
-                      helperText={<ErrorMessage name="serveSize" />}
                     />
                   </Grid>
                   <Grid item xs={12}>
@@ -131,7 +130,6 @@ export default function AddResource() {
                       label="Set active"
                       fullWidth
                       error={touched.active && !!errors.active}
-                      helperText={<ErrorMessage name="active" />}
                     />
                   </Grid>
                   
@@ -146,6 +144,9 @@ export default function AddResource() {
           </Formik>
         </DialogContent>
       </Dialog>
+
+
+      
     </Box>
   );
 };

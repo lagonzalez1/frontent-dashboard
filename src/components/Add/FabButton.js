@@ -111,7 +111,6 @@ export default function FabButton () {
                             label="Customer name"
                             placeholder="Customer name"
                             error={touched.fullname && !!errors.fullname}
-                            helperText={touched.fullname && errors.fullname}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
@@ -123,7 +122,6 @@ export default function FabButton () {
                             label="Phone"
                             placeholder="Mobile phone"
                             error={touched.phone && !!errors.phone}
-                            helperText={touched.phone && errors.phone}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
@@ -135,7 +133,6 @@ export default function FabButton () {
                             label="Party size"
                             placeholder="1"
                             error={touched.size && !!errors.size}
-                            helperText={touched.size && errors.size}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
@@ -149,7 +146,6 @@ export default function FabButton () {
                                 name="service_id"
                                 label="Service"
                                 error={touched.service_id && !!errors.service_id}
-                                helperText={touched.service_id && errors.service_id}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                                 >
@@ -171,7 +167,6 @@ export default function FabButton () {
                                 name="resource_id"
                                 label="Resources"
                                 error={touched.resource_id && !!errors.resource_id}
-                                helperText={touched.resource_id && errors.resource_id}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                                 >
@@ -191,7 +186,6 @@ export default function FabButton () {
                             label="Notes"
                             placeholder="Additional notes"
                             error={touched.notes && !!errors.notes}
-                            helperText={touched.notes && errors.notes}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />

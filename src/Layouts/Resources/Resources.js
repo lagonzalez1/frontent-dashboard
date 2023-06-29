@@ -35,7 +35,7 @@ export default function Resources() {
         </Grid>
 
         
-        <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 6, sm: 6, md: 4, lg: 6 }}>
+        <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 6, sm: 4, md: 4, lg: 4 }}>
             {getResourcesAvailable().map((resource) => (
                 <Grid item key={resource.id}>
                     <StyledCardService>

@@ -16,9 +16,7 @@ import { DashboardHeader } from "./DashboardHelper"
 import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
-
-
-
+import ErrorPage from "../Error/Error";
 
 /**
  * 
@@ -52,9 +50,6 @@ export default function Dashboard () {
         }   
     }
 
-
-
-
     useEffect(() => {
         checkAuthStatus();
         // need to load default buisness. 
@@ -63,28 +58,25 @@ export default function Dashboard () {
     },[email])
 
     const RenderLocation = () => {
-
-
         switch(location) {
             case 0:
-            return( <> 
-                <Waitlist />
-                <FabButton />
-            </> );
+                return( <> 
+                    <Waitlist />
+                    <FabButton />
+                    </> );
             case 1:
-            return <Serving />
+                return <Serving />
             case 2:
-                return ( <Resources /> );
+                return <Resources /> ;
             case 3:
-                
-            return (<Customers/>);
+                return <Customers/>;
             case 4: 
-            return ( <Settings />);
+                return <Settings />;
             case 5: 
-            return ( <Help />);
+                return <Help />;
 
             default:
-                console.log("Something went wrong picking render location.")
+                <ErrorPage errorMessage={"Failed to load the current location."} type={404} />
             
         }
     }

@@ -209,7 +209,7 @@ export default function Waitlist () {
                                     <TableRow>
                                         {
                                            columns.map((col) => (
-                                            <TableCell key={col.id} align='left' minWidth={col.minWidth}>
+                                            <TableCell key={col.id} align='left'>
                                                 <Typography variant="subtitle2" fontWeight="bold">{ col.label }</Typography>
                                             </TableCell>
                                            )) 
@@ -221,7 +221,7 @@ export default function Waitlist () {
                 {
                     buisness ? (
                         getUserTable().map((item, index) => (
-                            <TableRow >                                       
+                            <TableRow key={item._id}>                                       
                                 <TableCell align="left">{++index}</TableCell>
                                 <TableCell align="left">
                                     <Typography variant="subtitle2" fontWeight="bold">{item.fullname}</Typography>
