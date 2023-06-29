@@ -1,6 +1,14 @@
 import {styled} from "@mui/material";
+import { DateTime } from "luxon";
+import { getStateData } from "../../auth/Auth";
 import MuiAppBar from '@mui/material/AppBar';
+import BedtimeIcon from '@mui/icons-material/Bedtime';
+import WbTwilightIcon from '@mui/icons-material/WbTwilight';
+import WbSunnyIcon from '@mui/icons-material/WbSunny';
 export const drawerWidth = 240;
+
+
+
 
 export const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -21,3 +29,24 @@ export const AppBar = styled(MuiAppBar, {
 }));
 
 
+
+export const DetermineDaytimeOrEvening = () => {
+
+    const { _ , buisness} = getStateData();
+    const timezone = buisness.timezone;
+    if (!timezone) { return 'No timezone present.';}
+
+
+    const currentTime = DateTime.local().setZone(timezone);
+  
+    const morningThreshold = DateTime.local().set({ hour: 12, minute: 0, second: 0, millisecond: 0 });
+    const eveningThreshold = DateTime.local().set({ hour: 18, minute: 0, second: 0, millisecond: 0 });
+  
+    if (currentTime < morningThreshold) {
+      return <WbTwilightIcon />;
+    } else if (currentTime >= eveningThreshold) {
+      return <BedtimeIcon />
+    } else {
+      return <WbSunnyIcon/>;
+    }
+  };

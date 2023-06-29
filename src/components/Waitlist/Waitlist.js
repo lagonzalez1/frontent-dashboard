@@ -114,7 +114,6 @@ export default function Waitlist () {
                         sx={{ bgcolor: 'background.paper' }}
                     >
                         <ListItem
-                        button
                         id="lock-button"
                         aria-haspopup="listbox"
                         aria-controls="lock-menu"
@@ -181,12 +180,12 @@ export default function Waitlist () {
                         <Stack direction={"row"} spacing={1}>
                             
                             <Tooltip title="Your current location." placement="bottom">
-                                <Button tex variant="outlined" startIcon={<SouthAmericaIcon />}>
+                                <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SouthAmericaIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{buisness ? (buisness.timezone): <Skeleton/> }</Typography>
                                 </Button>
                             </Tooltip>
                             <Tooltip title="The estimated time for the next person that joins your line." placement="right">
-                                <Button tex variant="outlined" startIcon={<AccessAlarmsIcon />}>
+                                <Button sx={{ backgroundColor: 'white'}}  variant="outlined" startIcon={<AccessAlarmsIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>5-10</strong> min wait.</Typography>
                                 </Button>
                             </Tooltip>
