@@ -5,26 +5,26 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import { IconButton } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
+import { useDispatch, useSelector } from 'react-redux';
+import { setSnackbar } from '../../reducers/user';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-export default function Success({message}) {
-    const [open, setOpen] = useState(false);
-
+export default function Success() {
+    const requestMessage = useSelector((state) => state.user.requestMessage)
+    const requestStatus = useSelector((state) => state.user.requestStatus)
+    const dispatch = useDispatch();
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
         return;
         }
-        setOpen(false);
+        dispatch(setSnackbar({requestMessage: null, requestStatus: false}));
     };
 
     const action = (
         <React.Fragment>
-        <Button color="secondary" size="small" onClick={handleClose}>
-            UNDO
-        </Button>
         <IconButton
             size="small"
             aria-label="close"
@@ -38,10 +38,10 @@ export default function Success({message}) {
 
   return (
         <Snackbar
-            open={open}
+            open={requestStatus}
             autoHideDuration={6000}
             onClose={handleClose}
-            message={message}
+            message={requestMessage}
             action={action}
         />
   );

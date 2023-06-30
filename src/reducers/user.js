@@ -6,6 +6,8 @@ const initialState = {
   permisisons: null,
   defaultIndex : null,
   isLoggedIn: false,
+  requestStatus: false,
+  requestMessage: null,
   location: 0,
 };
 
@@ -31,9 +33,14 @@ const userSlice = createSlice({
     },
     setLocation: (state, action) => {
       state.location = action.payload;
+    },
+    setSnackbar: (state, action) => {
+      state.requestMessage = action.payload.requestMessage;
+      state.requestStatus = action.payload.requestStatus;
+      
     }
   },
 });
 
-export const { setUser, logoutUser, setPermisisons, setIndex, setLocation } = userSlice.actions;
+export const { setUser, logoutUser, setPermisisons, setIndex, setLocation, setSnackbar } = userSlice.actions;
 export default userSlice.reducer;

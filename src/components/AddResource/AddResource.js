@@ -3,9 +3,10 @@ import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, Dial
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getServicesAvailable, addResource } from "./Helper";
 import Success from '../Snackbar/Success';
+import { setSnackbar } from '../../reducers/user';
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -26,6 +27,7 @@ const initialValues = {
 export default function AddResource() {
   const [isOpen, setIsOpen] = useState(false);
   const buisness = useSelector((state) => state.buisness);
+  const dispatch = useDispatch();
   const handleOpen = () => {
     setIsOpen(true);
   };
@@ -37,11 +39,11 @@ export default function AddResource() {
   const handleSubmit = (values) => {
     addResource(values)
     .then(data => {
-      console.log(data);
-      return <Success message="success" />
-
+      dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
+      handleClose();
     })
     .catch(error => {
+      dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
       console.log(error);
     })
     

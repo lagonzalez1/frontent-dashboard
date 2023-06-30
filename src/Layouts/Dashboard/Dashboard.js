@@ -17,6 +17,7 @@ import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
 import ErrorPage from "../Error/Error";
+import Success from "../../components/Snackbar/Success";
 
 /**
  * 
@@ -90,6 +91,7 @@ export default function Dashboard () {
                  <Box component="main" id="innerDashboard" sx={{ flexGrow: 1, p: 1 , width : "100%"}}>
                       <DashboardHeader />
                       <RenderLocation />
+                      <Success/>
                  </Box>
                  
             </Box>

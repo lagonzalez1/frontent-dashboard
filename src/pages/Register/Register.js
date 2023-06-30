@@ -99,8 +99,6 @@ export default function Register(props){
     })
     
     function closeServicesModal () { setServicesModal(false); }
-
-
     useEffect(() => {
     }, [])
 
