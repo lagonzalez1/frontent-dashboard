@@ -8,6 +8,9 @@ import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
 import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
+
+
 import { LOCATIONS } from "./SideBarHelper";
 import { useDispatch, useSelector } from "react-redux";
 import { setLocation } from "../../reducers/user";
@@ -119,6 +122,29 @@ export default function SideBar({navState, openNav}) {
               </Tooltip>
             </ListItem>
 
+              <ListItem disablePadding sx={{ display: 'block' }}>
+              <Tooltip title="Services" placement="right">
+                <ListItemButton
+                  sx={{
+                    minHeight: 48,
+                    justifyContent: navState ? 'initial' : 'center',
+                    px: 2.5,
+                  }}
+                  onClick={() => changeLocation(LOCATIONS.Services)}
+                >
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: navState ? 3 : 'auto',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <FactCheckIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' } />
+                  </ListItemIcon>
+                  <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
+                </ListItemButton>
+                </Tooltip>
+              </ListItem>
               
             <ListItem disablePadding sx={{ display: 'block' }}>
             <Tooltip title="Customers" placement="right">
@@ -173,6 +199,7 @@ export default function SideBar({navState, openNav}) {
               </ListItem>
 
         </List>
+        
         <Divider/>
         <List>
               <ListItem disablePadding sx={{ display: 'block' }}>
@@ -192,7 +219,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <HelpRoundedIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' } />
+                    <HelpRoundedIcon  htmlColor={ currentLocation === 6 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>

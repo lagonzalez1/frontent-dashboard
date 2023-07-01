@@ -3,6 +3,7 @@ import { getStateData } from "../../auth/Auth";
 
 export const getServingCount = () => {
     const { _ , buisness } = getStateData();
+    if (!buisness) { return new Error('Buisness data is empty.')}
     const currentList = buisness.currentClients;
     if (!currentList) { return 0;}
     let groupCount = 0;
@@ -26,6 +27,7 @@ export const currentTimePosition = () => {
 
 export const getUserTable = () => {
     const { _ , buisness } = getStateData();
+    if (!buisness) { return new Error('Buisness data is empty.')}
     const currentList = buisness.currentClients;
     if (!currentList) { return [];}
     let table = [];

@@ -3,18 +3,32 @@ import { getAccessToken, getStateData } from "../../auth/Auth";
 
 
 export const getServicesAvailable = () => {
-    const { _, buisness} = getStateData();
-    const services = buisness.services;
-    if ( !services ) { return []; }
-    return services;
-}
+  const { user, buisness } = getStateData();
+
+  if (!user || !buisness) {
+    return []; // or any other appropriate value to indicate the absence of user or buisness
+  }
+  const services = buisness.services;
+  if (!services) {
+    return [];
+  }
+
+  return services;
+};
 
 export const getResourcesAvailable = () => {
-    const { _, buisness} = getStateData();
-    const resources = buisness.resources;
-    if ( !resources ) { return []; }
-    return resources;
-}
+  const { buisness } = getStateData();
+  if (!buisness) {
+    return []; // or any other appropriate value to indicate the absence of buisness
+  }
+  const resources = buisness.resources;
+  if (!resources) {
+    return [];
+  }
+
+  return resources;
+};
+
 
 
 export const addResource = (payload) => {

@@ -8,7 +8,7 @@
  *              
  */
 import axios from "axios";
-import { setBuisness } from "../reducers/buisness";
+import buisness, { setBuisness } from "../reducers/buisness";
 import { setIndex, setUser } from "../reducers/user";
 const TOKEN_KEY = 'access_token';
 const BUISNESS = 'buisness';
@@ -21,7 +21,16 @@ const USER = 'user';
     return { user, buisness };
   }
 
-export const setAccessToken = (accessToken) => {
+  const checkLocalStorage = () => {
+    const user = localStorage.getItem(USER);
+    const buisness = localStorage.getItem(BUISNESS);
+    if (!user || !buisness) {
+      return false
+    }
+    return true;
+  }
+
+  export const setAccessToken = (accessToken) => {
   localStorage.setItem(TOKEN_KEY, accessToken);
   };
   
@@ -49,6 +58,9 @@ export const setAccessToken = (accessToken) => {
   
   export const isAuthenticated = async (dispatch) => {
     
+    if (!checkLocalStorage()) {
+      return false;
+    }
     try {
       const status = await checkAccessToken();
       dispatch(setBuisness(status.buisness));
@@ -56,7 +68,6 @@ export const setAccessToken = (accessToken) => {
       dispatch(setIndex(status.defaultIndex))
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   };

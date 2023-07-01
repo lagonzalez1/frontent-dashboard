@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
 Tooltip, IconButton, Stack, Alert, CardContent, CardMedia, Checkbox , FormControl, Select,
-InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,InputAdornment  } from "@mui/material";
+InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,InputAdornment, Backdrop, CircularProgress, Chip  } from "@mui/material";
 import axios, { AxiosError } from 'axios';
 import { Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
 import { StyledCard, StyledCardService } from "./CardStyle";
-import { checkObjectData } from "./RegisterHelper";
+import { checkObjectData, checkPublicLink, getCountries, getTimeZone, getTimestamp} from "./RegisterHelper";
 import {  HOURS_LIST, WEEK_LIST, WEEK_OBJ } from "../Testing/RegisterTest.js";
 import { useNavigate } from "react-router-dom";
 
@@ -28,22 +28,6 @@ import { useSignIn } from "react-auth-kit";
  * 
 */
 
-const getCountries = (lang = 'en') => {
-    const A = 65
-    const Z = 90
-    const countryName = new Intl.DisplayNames([lang], { type: 'region' });
-    let countries = {}
-    for(let i=A; i<=Z; ++i) {
-        for(let j=A; j<=Z; ++j) {
-            let code = String.fromCharCode(i) + String.fromCharCode(j)
-            let name = countryName.of(code)
-            if (code !== name) {
-                countries[code] = name
-            }
-        }
-    }
-    return countries
-}
 
 
 export default function Register(props){
@@ -54,8 +38,12 @@ export default function Register(props){
     let HOURS = HOURS_LIST();
     let WEEK = WEEK_LIST();
     let WEEK_OBJECT = WEEK_OBJ();
+    let timezone = getTimeZone();
+    let timestamp = getTimestamp();
+
     const country_list = getCountries();
 
+    const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(10);
     const [mode, setMode] = useState(0);
     const [error, setErrors] = useState();
@@ -78,8 +66,8 @@ export default function Register(props){
         mode: 0,
         services: [],
         schedule: {},
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        timestamp: new Date(),
+        timezone: timezone,
+        timestamp: timestamp,
         settings: {}
     })
 
@@ -96,6 +84,7 @@ export default function Register(props){
         mode: false,
         services: false,
         schedule: false,
+        timezone: false
     })
     
     function closeServicesModal () { setServicesModal(false); }
@@ -117,23 +106,39 @@ export default function Register(props){
      * Increment loadbar.
      * Save user buisness data.
      */
-    const buisnessInfo = async () => {
-        // Once database is set up this need to be removed.
-        if(true){
-            setStep((prev) => prev += 22.5); // Next step in register.
-        }else {
-            try {
-                const uniqueLink = await checkPublicLink();
-                console.log(uniqueLink.value);
-                setStep((prev) => prev += 22.5); // Next step in register.
-            }catch {
-                setErrors('Public link is taken, please try again.');
-                return;
-            }       
+    const buisnessInfo = () => {
+        if (!user.publicLink) {
+          setErrors('Missing your public link.');
+          return;
         }
-         
-    }
-
+      
+        setLoading(true);
+      
+        checkPublicLink(user.publicLink)
+          .then((response) => {
+            console.log(response);
+            if (response.status === 200) {
+                setStep((prev) => prev + 22.5); // Next step in register.
+                setLoading(false);
+                return;
+            }
+            else if (response.status === 201) {
+                setErrors(response.data.msg);
+                setLoading(false);
+                return;
+            }
+          })
+          .catch((error) => {
+            setLoading(false)
+            setErrors(error);
+            return;
+          })
+          .finally(() => {
+            setErrors(null);
+            setLoading(false);
+          });
+      };
+      
     /**
      * Decrement loadbar.
      * Go to previous screen.
@@ -208,25 +213,7 @@ export default function Register(props){
     };
 
     
-    /**
-     * 
-     * @returns a promise resolve (Boolean)
-     *          a promise reject (String)
-     */
-    function checkPublicLink () {
-        return new Promise((resolve, reject) => {
-            const publicLink = user.publicLink;
-            axios.post('/unique_link', {link: publicLink})
-            .then((data) => {
-                return resolve(data.status);
-            })
-            .catch((error) => {
-                return reject('Public link is not available, try gain.');
-            })
-        });
-    }
 
-    
 
     /**
      * 
@@ -380,6 +367,16 @@ export default function Register(props){
                             </Grid>
                         </Box>
                         <Button sx={{ mt: 3, width: '100px'}} variant="contained" color="primary" onClick={() => buisnessInfo() }>Next</Button>
+                        { loading ? (
+                            <Backdrop
+                            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                            open={loading}
+                            
+                          >
+                            <CircularProgress color="inherit" />
+                            <Typography variant="body2" sx={{ color: 'white'}}>Checking public link...</Typography>
+                          </Backdrop>
+                        ) : null}
                         </Container>
                     ): null
                 }
@@ -528,7 +525,7 @@ export default function Register(props){
                                     <Container sx={{ pt: 5}}>
                                         <Typography variant="subtitle2" textAlign="left"><strong>Hours *</strong></Typography>
                                         <Grid container spacing={1} justifyContent="space-between">
-                                            <Grid item lg={6} md={6} sm={6}>
+                                            <Grid item lg={6} md={6} sm={12} xs={12}>
                                             <Box sx={{ minWidth: 120 }}>
                                                 <FormControl fullWidth>
                                                     <InputLabel id="start_time_label">start</InputLabel>
@@ -549,7 +546,7 @@ export default function Register(props){
                                                 </FormControl>
                                                 </Box>
                                             </Grid>
-                                            <Grid item lg={6} md={6} sm={6}>
+                                            <Grid item lg={6} md={6} sm={12} xs={12}>
                                             <Box sx={{ minWidth: 120 }}>
                                                 <FormControl fullWidth>
                                                     <InputLabel id="end_time_label">end</InputLabel>
@@ -570,6 +567,8 @@ export default function Register(props){
                                                 </FormControl>
                                                 </Box>
                                             </Grid>
+
+                                            
                                         </Grid>
                                         <Typography sx={{ pt: 2}} variant="subtitle2" textAlign="left"><strong>Week</strong></Typography>
 
@@ -626,7 +625,13 @@ export default function Register(props){
                                             label="Full name" variant="filled"></TextField>
                                             <TextField helperText="Password must container one uppercase, special character and a number." name="password" label="Password" value={user.password} onChange={handlePasswordChange} error={passwordError} type="password" pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="filled"></TextField>
                                             <TextField error={userErrors.email} name="email" label="Email" value={user.email} onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="filled"></TextField>
-                                            
+                                            <Box sx={{ minWidth: 120 }}>
+                                                    <Stack spacing={1}>
+                                                        <Chip label={timezone} variant="outlined" />
+                                                        <Chip label={timestamp} variant="outlined"/>
+                                                    </Stack>
+                                                    
+                                                </Box>
                                         </Stack>
 
                                         <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
@@ -650,7 +655,7 @@ export default function Register(props){
             <N collapseOnSelect expand="lg" fixed="bottom">
                 <Box sx={{ width: '100%', backgroundColor: 'white'}} >
                     <LinearProgress variant="determinate" value={step} />
-                    <Typography sx={{ pt: 1}} variant="subtitle2"><strong>Your business</strong></Typography>
+                    <Typography sx={{ pt: 1}} textAlign='center' variant="subtitle2"><strong>Your business</strong></Typography>
                 </Box>
             </N>
         </>

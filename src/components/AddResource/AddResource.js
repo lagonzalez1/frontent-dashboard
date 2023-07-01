@@ -4,7 +4,8 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { getServicesAvailable, addResource } from "./Helper";
+import { addResource } from "./Helper";
+import { getServicesAvailable } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setSnackbar } from '../../reducers/user';
 
@@ -27,6 +28,7 @@ const initialValues = {
 export default function AddResource() {
   const [isOpen, setIsOpen] = useState(false);
   const buisness = useSelector((state) => state.buisness);
+  const serviceList = getServicesAvailable();
   const dispatch = useDispatch();
   const handleOpen = () => {
     setIsOpen(true);
@@ -91,11 +93,11 @@ export default function AddResource() {
                           onChange={handleChange}
                           onBlur={handleBlur}
                           >
-                          {getServicesAvailable().map((service) => (
+                          {Array.isArray(serviceList) ? serviceList.map((service) => (
                               <MenuItem key={service._id} value={service._id}>
                               {service.title}
                               </MenuItem>
-                          ))}
+                          )):console.log("Service list empty.")}
                           </Field>
                       </>
                       ) : null}

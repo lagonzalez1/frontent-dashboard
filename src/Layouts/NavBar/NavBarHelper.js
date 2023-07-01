@@ -32,7 +32,8 @@ export const AppBar = styled(MuiAppBar, {
 
 export const DetermineDaytimeOrEvening = () => {
 
-    const { _ , buisness} = getStateData();
+    const { user, buisness} = getStateData();
+    if (!user || !buisness) { return null;}
     const timezone = buisness.timezone;
     if (!timezone) { return 'No timezone present.';}
 

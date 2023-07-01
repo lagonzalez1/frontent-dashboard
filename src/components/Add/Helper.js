@@ -7,19 +7,7 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export const getServicesAvailable = () => {
-    const { _, buisness} = getStateData();
-    const services = buisness.services;
-    if ( !services ) { return []; }
-    return services;
-}
 
-export const getResourcesAvailable = () => {
-    const { _, buisness} = getStateData();
-    const resources = buisness.resources;
-    if ( !resources ) { return []; }
-    return resources;
-}
 
 /**
  * 

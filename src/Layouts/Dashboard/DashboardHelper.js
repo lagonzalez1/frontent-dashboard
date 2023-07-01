@@ -1,6 +1,7 @@
 import { styled } from "@mui/material"
 import axios from "axios";
 import { getStateData } from "../../auth/Auth";
+const BUISNESS_INDEX = 'user';
 
 
 export const DashboardHeader = styled('div')(({ theme }) => ({
@@ -24,14 +25,9 @@ export const DashboardHeader = styled('div')(({ theme }) => ({
           reject(new Error('Failed to check access token'));
         });
     });
-  }
-
-
-
-  const BUISNESS_INDEX = 'user';
-  
+  }  
   export const setBuisnessIndex = (index) => {
-    const { user, _} = getStateData();
+    const { user, _ } = getStateData();
     user.defaultIndex = index;
     localStorage.setItem(BUISNESS_INDEX, index)
   }

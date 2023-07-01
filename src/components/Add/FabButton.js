@@ -1,11 +1,12 @@
 import React, { useState, useEffect} from "react";
-import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert} from "@mui/material";
+import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, ListItemAvatar, ListItemButton, ListItemIcon} from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
-import { Transition, getServicesAvailable, getResourcesAvailable, addCustomerWaitlist  } from "./Helper";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
+import { Transition, addCustomerWaitlist  } from "./Helper";
 import { useSelector, useDispatch } from "react-redux";
-
+import { getResourcesAvailable, getServicesAvailable } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { setBuisness } from "../../reducers/buisness";
@@ -14,10 +15,14 @@ import { setBuisness } from "../../reducers/buisness";
 
 
 export default function FabButton () {
+    const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
-    const dispatch = useDispatch();
+
+    
     const buisness = useSelector(state => state.buisness);
+    const serviceList = getServicesAvailable();
+    const resourceList = getResourcesAvailable();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -145,15 +150,17 @@ export default function FabButton () {
                                 id="services"
                                 name="service_id"
                                 label="Service"
-                                error={touched.service_id && !!errors.service_id}
                                 onChange={handleChange}
-                                onBlur={handleBlur}
                                 >
-                                {getServicesAvailable().map((service) => (
+                                { Array.isArray(serviceList) ? serviceList.map((service) => (
                                     <MenuItem key={service._id} value={service._id}>
-                                    {service.title}
+                                        <Stack>
+                                            <Typography variant="body2">{service.title}</Typography>
+                                            <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
+                                        </Stack>
+                            
                                     </MenuItem>
-                                ))}
+                                )):null }
                                 </Field>
                             </>
                             ) : null}
@@ -166,15 +173,16 @@ export default function FabButton () {
                                 id="resources"
                                 name="resource_id"
                                 label="Resources"
-                                error={touched.resource_id && !!errors.resource_id}
                                 onChange={handleChange}
-                                onBlur={handleBlur}
                                 >
-                                {getResourcesAvailable().map((resource) => (
+                                {Array.isArray(resourceList) ? resourceList.map((resource) => (
                                     <MenuItem key={resource._id} value={resource._id}>
-                                    {resource.title}
+                                        <ListItemIcon>
+                                            { resource.serving && resource.active ? <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> : <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> }
+                                        </ListItemIcon>
+                                        <Typography variant="body2">{resource.title} </Typography>
                                     </MenuItem>
-                                ))}
+                                )) : null}
                                 </Field>
                             </>
                             ) : null}

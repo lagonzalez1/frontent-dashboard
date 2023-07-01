@@ -8,11 +8,12 @@ import FullScreenLoader from "../../components/Loader/FullScreenLoader";
 import Resources from "../Resources/Resources";
 import Serving from "../Serving/Serving";
 import Settings from "../Settings/Settings";
+import Services from "../Services/Services";
 import Help from "../Help/Help";
 
 
 import { useSignOut } from "react-auth-kit";
-import { DashboardHeader } from "./DashboardHelper"
+import { DashboardHeader, checkLocalStorage } from "./DashboardHelper"
 import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
@@ -46,17 +47,16 @@ export default function Dashboard () {
                 return;
             }
         }catch(error) {
-            console.log(error)
+            removeUserState();
+            signOut();
             return;
         }   
     }
 
+
     useEffect(() => {
         checkAuthStatus();
-        // need to load default buisness. 
-        // Note Redux refresh causes entire state to be empty.
-
-    },[email])
+    },[])
 
     const RenderLocation = () => {
         switch(location) {
@@ -74,7 +74,9 @@ export default function Dashboard () {
             case 4: 
                 return <Settings />;
             case 5: 
-                return <Help />;
+                return <Services />;
+            case 6: 
+                return <Help /> 
 
             default:
                 <ErrorPage errorMessage={"Failed to load the current location."} type={404} />

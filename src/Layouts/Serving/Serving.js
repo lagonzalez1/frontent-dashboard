@@ -8,6 +8,7 @@ import "../../css/Serving.css";
 
 export default function Serving() {
     const dispatch = useDispatch();
+    const servingList = getUserTable();
     const { groupCount, groupTotalCount } = getServingCount();
     const buisness = useSelector((state) => state.buisness);
 
@@ -57,14 +58,14 @@ export default function Serving() {
                                 <TableBody>
 
                 {
-                    buisness ? (
-                        getUserTable().map((item, index) => (
+                    Array.isArray(servingList) ? 
+                        servingList.map((item, index) => (
                             <TableRow key={index}>                                       
                                 <TableCell align="left">{++index}</TableCell>
-                                <TableCell align="left">NAme</TableCell>
+                                <TableCell align="left">{item.fullname}</TableCell>
 
-                                <TableCell align="left">NAme</TableCell>
-                                <TableCell align="left">NAme</TableCell>
+                                <TableCell align="left">{item.partySize}</TableCell>
+                                <TableCell align="left">{item.timestamp}</TableCell>
                                 <TableCell align="left">NAme</TableCell>
                                 <TableCell align="left">NAme</TableCell>
 
@@ -72,7 +73,7 @@ export default function Serving() {
 
                             </TableRow>
                         ))
-                    ): null
+                    : null
                 }
                                     
                                 </TableBody>

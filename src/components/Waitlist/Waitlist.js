@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { Stack, Typography, Button, List, ListItem, Menu, MenuItem, ListItemText, Grid,
-     IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer, TableBody, Tooltip, Skeleton  } from "@mui/material";
+     IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer, TableBody, Tooltip, Skeleton, CircularProgress  } from "@mui/material";
      
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -9,9 +9,11 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
-
 import LaunchIcon from '@mui/icons-material/Launch';
+
+
 import { useSelector, useDispatch } from "react-redux";
+import { setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, getUserTable, clientOptions, OPTIONS_SELECT } from "./Helpers";
 import { reloadBuisnessData } from "../../hooks/hooks";
 
@@ -25,8 +27,13 @@ export default function Waitlist () {
     const [anchorEl, setAnchorEl] = useState(null);
     const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
+
+
+
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
+
+    const tableData = getUserTable();
     const buisness = useSelector(state => state.buisness);
 
     const handleClickListItem = (event) => {
@@ -35,22 +42,6 @@ export default function Waitlist () {
     const handleClose = () => {
         setAnchorEl(null);
     };
-
-    const handleMenuItemClick = (event, storeState) => {
-        if (storeState === 2) {
-            const link = buisness.publicLink;
-            if (!link) { return setErrors('Public link not available');}
-            setLoading(true)
-            handleOpenNewTab(link);
-            setAnchorEl(null);
-            return;
-        }
-        setLoading(true)
-        requestChangeAccept(storeState, dispatch);
-        setAnchorEl(null);
-        return;
-    };
-
     const handleCloseVert = () =>{
         setAnchorElVert(null);
     }
@@ -58,6 +49,42 @@ export default function Waitlist () {
         setAnchorElVert(event.currentTarget);
     }
 
+    /**
+     * 
+     * @param {*} event 
+     * @param {*} storeState Number 0,1,2 
+     * 2: Represents the last option to click from. Opens tab
+     * 1 and 0: Represent repectively Open appointments and close.
+     * @returns 
+     */
+    const handleMenuItemClick = (event, storeState) => {
+        setLoading(true);
+        if (storeState === 2) {
+            const link = buisness.publicLink;
+            handleOpenNewTab(link);
+            setAnchorEl(null);
+            setLoading(false)
+            return;
+        }
+        try {
+            requestChangeAccept(storeState, dispatch);
+            setAnchorEl(null);
+            setLoading(false)
+        }catch (error){
+            setErrors(error);
+            setAnchorEl(null);
+            setLoading(false)
+            return;
+        }
+    };
+  
+
+    /**
+     * 
+     * @param {*} optionId Type of request
+     * @param {*} clientId Request made on behalf
+     * @returns 
+     */
     const handleOptionChange = (optionId, clientId) => {
         console.log(clientId);
         switch (optionId){
@@ -77,17 +104,15 @@ export default function Waitlist () {
                 console.log('Remove');
                 setAnchorElVert(null);
                 return;
-
         }
         setAnchorElVert(null);
-
     }
 
 
     useEffect(() => {
         reloadBuisnessData(dispatch);
-        return () =>{
-            setLoading(false)
+        return() => {
+            setLoading(false);
         }
     }, [loading])
 
@@ -189,8 +214,6 @@ export default function Waitlist () {
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>5-10</strong> min wait.</Typography>
                                 </Button>
                             </Tooltip>
-
-                            
                         </Stack>
                         
                     </Grid>
@@ -219,8 +242,8 @@ export default function Waitlist () {
                                 <TableBody>
 
                 {
-                    buisness ? (
-                        getUserTable().map((item, index) => (
+                    Array.isArray(tableData) ? (
+                        tableData.map((item, index) => (
                             <TableRow key={item._id}>                                       
                                 <TableCell align="left">{++index}</TableCell>
                                 <TableCell align="left">
