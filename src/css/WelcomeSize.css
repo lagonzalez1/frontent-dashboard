@@ -1,0 +1,28 @@
+
+.number-box {
+    width: 100px;
+    height: 100px;
+    background-color: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .number {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  #selection_card {
+    outline-style: solid;
+    outline-width: 0.1px;
+    outline-color: lightgray;
+    height: 100%;
+  }
+  
+  #selection_card:hover {
+    color: #ffffff; /* Change to your desired text color */
+  }

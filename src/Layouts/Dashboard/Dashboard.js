@@ -12,6 +12,7 @@ import Services from "../Services/Services";
 import Help from "../Help/Help";
 
 
+import { getStateData } from "../../auth/Auth";
 import { useSignOut } from "react-auth-kit";
 import { DashboardHeader, checkLocalStorage } from "./DashboardHelper"
 import { isAuthenticated, removeUserState } from "../../auth/Auth";
@@ -55,10 +56,18 @@ export default function Dashboard () {
 
 
     useEffect(() => {
+        
         checkAuthStatus();
     },[])
 
+    
+    const setLocation = () => {
+        const { user, _ } = getStateData();
+        return user.location;
+    }
+
     const RenderLocation = () => {
+        const location = setLocation();
         switch(location) {
             case 0:
                 return( <> 

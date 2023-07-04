@@ -9,11 +9,15 @@ import { setAccessToken } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 import { setLocation, setUser } from '../../reducers/user';
 
+const LOCAL_ST_USER = 'user';
+
+
 export default function Login() {
     
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const signIn = useSignIn();
+    
 
     const [loading, setLoading] = useState(false);
     const [error, setErrors] = useState(false);
@@ -23,6 +27,7 @@ export default function Login() {
     })
 
     useEffect(() => {
+             
     }, [])
 
     async function loginRequest(data) {

@@ -1,8 +1,12 @@
 import React from "react";
 import { Grid, Skeleton ,Typography, Stack, Tooltip, Button, Table, 
-    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, Container } from "@mui/material";
+    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, Container, IconButton, Icon } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EditNoteIcon from '@mui/icons-material/EditNote';
+
 import { useSelector, useDispatch } from "react-redux";
-import  { getServingCount, getUserTable, columns, clientOptions } from "./Helper";
+import  { getServingCount, getUserTable, columns } from "./Helper";
+import {  findResource, findService } from "../../hooks/hooks";
 import "../../css/Serving.css";
 
 
@@ -61,13 +65,56 @@ export default function Serving() {
                     Array.isArray(servingList) ? 
                         servingList.map((item, index) => (
                             <TableRow key={index}>                                       
-                                <TableCell align="left">{++index}</TableCell>
-                                <TableCell align="left">{item.fullname}</TableCell>
+                                <TableCell align="left">
+                                    <Typography variant="subtitle2" fontWeight="bolder">
+                                    {++index}
+                                    </Typography> 
+                                    </TableCell>
+                                <TableCell align="left">
+                                <Typography variant="subtitle2" fontWeight="bolder">
+                                    {item.fullname}
+                                </Typography>
+                                </TableCell>
 
-                                <TableCell align="left">{item.partySize}</TableCell>
-                                <TableCell align="left">{item.timestamp}</TableCell>
-                                <TableCell align="left">NAme</TableCell>
-                                <TableCell align="left">NAme</TableCell>
+                                <TableCell align="left"> 
+                                    <Typography variant="subtitle2" fontWeight="bolder">{item.partySize}</Typography>
+                                
+                                </TableCell>
+                                <TableCell align="left"> 
+                                <Typography variant="subtitle2" fontWeight="bolder">
+                                        { item.serviceTag &&  'Service: '+ findService(item.serviceTag).title }
+                                    </Typography>
+
+                                    <Typography variant="subtitle2" fontWeight="bolder">
+                                        { item.resourceTag && 'Resource: ' + findResource(item.resourceTag).title }
+                                    </Typography>
+                                </TableCell>
+                                <TableCell align="left">
+                                <Typography variant="subtitle2" fontWeight="bolder">
+                                    {item.serveTime ? ( item.serveTime.hours >= 1 ? (`${item.serveTime.hours} Hr ${item.serveTime.minutes} Min.`): (`${item.serveTime.minutes} Min.`)): (null) } 
+
+                                </Typography>
+
+                                </TableCell>
+                                <TableCell align="left">
+                                <Stack
+                                        direction="row"
+                                        spacing={1}
+                                    >
+                                        <IconButton>
+                                            <Tooltip title="Checkout" placement="left">
+                                                <CheckCircleIcon htmlColor="#4CBB17"/>
+                                            </Tooltip>                                            
+                                        </IconButton>
+
+                                        <IconButton>
+                                            <Tooltip title="Edit" placement="right">
+                                                <EditNoteIcon />
+                                            </Tooltip>  
+                                        </IconButton>
+                                       
+                                    </Stack>
+                                </TableCell>
 
 
 

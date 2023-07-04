@@ -14,7 +14,7 @@ import FactCheckIcon from '@mui/icons-material/FactCheck';
 import { LOCATIONS } from "./SideBarHelper";
 import { useDispatch, useSelector } from "react-redux";
 import { setLocation } from "../../reducers/user";
-import { DrawerHeader, Drawer , drawerWidth,openedMixin, closedMixin } from "./SideBarHelper";
+import { DrawerHeader, Drawer } from "./SideBarHelper";
 
 
 export default function SideBar({navState, openNav}) {

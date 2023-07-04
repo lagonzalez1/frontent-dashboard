@@ -34,20 +34,12 @@ export const theme = createTheme({
             opposite: '#000000'
         }
     },
-    typography: {
-        fontFamily: [
-          'Raleway'
-        ].join(','),
-      },
+    
 });
 
 export const darkTheme = createTheme({
     palette: {
         mode: 'dark'
     },
-    typography: {
-        fontFamily: [
-          'Nunito'
-        ].join(','),
-      },
+
 })

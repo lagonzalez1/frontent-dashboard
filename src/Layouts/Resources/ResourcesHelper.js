@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { styled } from '@mui/system';
 import { Card } from '@mui/material';
 import { getStateData } from '../../auth/Auth';
@@ -5,6 +6,7 @@ import { getStateData } from '../../auth/Auth';
 
 export const getServicesAvailable = () => {
   const { _, buisness} = getStateData();
+  if ( !buisness ) { return new Error('No buisness data found.');}
   const services = buisness.services;
   if ( !services ) { return []; }
   return services;
@@ -12,9 +14,47 @@ export const getServicesAvailable = () => {
 
 export const getResourcesAvailable = () => {
   const { _, buisness} = getStateData();
+  if ( !buisness ) { return new Error('No buisness data found.');}
   const resources = buisness.resources;
   if ( !resources ) { return []; }
   return resources;
+}
+
+
+
+export const findServingSize = (id) => {
+  const { _, buisness} = getStateData();
+  if ( !buisness ) { return new Error('No buisness data found.');}
+  const clients = buisness.currentClients;
+  for (var client of clients){
+    if (client.resourceTag === id) {
+      return client.partySize;
+    }
+  }
+  return 0;
+}
+
+export const findResourceTag = (id) => {
+  const { _, buisness} = getStateData();
+  if ( !buisness ) { return new Error('No buisness data found.');}
+  const employees = buisness.employees;
+  if ( !employees) { return new Error('No employees');}
+  for (var employee of employees) {
+    if (employee.resourceTag === id){
+      return employee;
+    }
+  }
+  return new Error('Employee no longer exist.');
+}
+
+export const update = async (form) => {
+  const { user, buisness} = getStateData();
+  const id = user.id;
+  const bId = buisness._id;
+  const data = { ...form, id, bId};
+  console.log(data);
+  // Create request here to update resource. 
+  
 }
 
 export const StyledCardService = styled(Card)(({ theme }) => ({
@@ -23,13 +63,16 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
     boxShadow: theme.shadows[1],
     '&:hover': {
       // Styles to apply when the card is hovered over
-      transform: 'translateY(-3px)',
+      transform: 'translateY(-2px)',
       boxShadow: theme.shadows[2],
       backgroundColor: theme.palette.lightprop.main,
       color: theme.palette.dark.main,
       
     },
   }));
+
+
+
 
   function stringToColor(string) {
     let hash = 0;

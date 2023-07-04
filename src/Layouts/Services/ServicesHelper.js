@@ -1,22 +1,21 @@
 import { styled } from '@mui/system';
 import { Card } from '@mui/material';
-import { getStateData } from '../../auth/Auth';
 
 
 
 export const StyledCardService = styled(Card)(({ theme }) => ({
-    // Default styles for the card
-    transition: '0.2s',
-    boxShadow: theme.shadows[1],
-    '&:hover': {
-      // Styles to apply when the card is hovered over
-      transform: 'translateY(-3px)',
-      boxShadow: theme.shadows[2],
-      backgroundColor: theme.palette.lightprop.main,
-      color: theme.palette.dark.main,
-      
-    },
-  }));
+  // Default styles for the card
+  transition: '0.2s',
+  boxShadow: theme.shadows[1],
+  '&:hover': {
+    // Styles to apply when the card is hovered over
+    transform: 'translateY(-2px)',
+    boxShadow: theme.shadows[2],
+    backgroundColor: theme.palette.lightprop.main,
+    color: theme.palette.dark.main,
+    
+  },
+}));
 
   function stringToColor(string) {
     let hash = 0;

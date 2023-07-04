@@ -11,7 +11,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 import LaunchIcon from '@mui/icons-material/Launch';
 
-
+import {  findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, getUserTable, clientOptions, OPTIONS_SELECT } from "./Helpers";
@@ -21,7 +21,6 @@ import { reloadBuisnessData } from "../../hooks/hooks";
 
 
 export default function Waitlist () {
-
     const dispatch = useDispatch();
     const [anchorElVert, setAnchorElVert] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -58,24 +57,16 @@ export default function Waitlist () {
      * @returns 
      */
     const handleMenuItemClick = (event, storeState) => {
-        setLoading(true);
         if (storeState === 2) {
             const link = buisness.publicLink;
             handleOpenNewTab(link);
             setAnchorEl(null);
-            setLoading(false)
+            setLoading(true);
             return;
         }
-        try {
-            requestChangeAccept(storeState, dispatch);
-            setAnchorEl(null);
-            setLoading(false)
-        }catch (error){
-            setErrors(error);
-            setAnchorEl(null);
-            setLoading(false)
-            return;
-        }
+        requestChangeAccept(storeState, dispatch);
+        setAnchorEl(null);
+        setLoading(true);
     };
   
 
@@ -245,10 +236,12 @@ export default function Waitlist () {
                     Array.isArray(tableData) ? (
                         tableData.map((item, index) => (
                             <TableRow key={item._id}>                                       
-                                <TableCell align="left">{++index}</TableCell>
+                                <TableCell align="left" fontWeight="bold">{++index}</TableCell>
                                 <TableCell align="left">
-                                    <Typography variant="subtitle2" fontWeight="bold">{item.fullname}</Typography>
-                                    <Typography variant="caption" fontWeight="light">{item.attached}</Typography>
+                                    <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
+                                    <Typography fontWeight="normal" variant="caption">
+                                        { item.serviceTag && findService(item.serviceTag).title }
+                                    </Typography>
                             
                                 </TableCell>
                                 <TableCell align="left">
@@ -256,7 +249,11 @@ export default function Waitlist () {
                                 </TableCell>
 
                                 <TableCell align="left">
-                                    <Typography variant="subtitle2" fontWeight="bold">{item.attached}</Typography>
+                                    
+
+                                    <Typography fontWeight="bold" variant="body2">
+                                        { item.resourceTag && findResource(item.resourceTag).title }
+                                    </Typography>
                                 </TableCell>
                                 <TableCell align="left">
                                     <Typography variant="subtitle2" fontWeight="bold">

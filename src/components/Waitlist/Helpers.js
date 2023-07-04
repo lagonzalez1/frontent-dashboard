@@ -12,7 +12,7 @@ const ENDPOINT_ACCEPTING = '/api/internal/update_accepting'
 const MINUTES_IN_HOUR = 60;
 
 export const handleOpenNewTab = (endpoint) => {
-    const url = 'http://localhost:3000/'+endpoint;
+    const url = 'http://localhost:3000/welcome/'+endpoint;
     window.open(url, '_blank');
 };
 
