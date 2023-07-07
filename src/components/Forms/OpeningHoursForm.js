@@ -18,12 +18,15 @@ const OpeningHoursForm = () => {
   };
 
   return (
+
+
+    
     <Formik
       initialValues={{ timezone: '' }}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ errors, touched }) => (
+      {({ errors, touched, values, handleChange}) => (
         <Form>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -33,7 +36,8 @@ const OpeningHoursForm = () => {
                   labelId="timezone-label"
                   name="timezone"
                   label="Timezone"
-                  autoComplete="off"
+                  value={values.timezone}
+                  onChange={handleChange}
                 >
                   <MenuItem value="UTC">UTC</MenuItem>
                   <MenuItem value="PST">PST</MenuItem>
@@ -45,26 +49,23 @@ const OpeningHoursForm = () => {
               )}
             </Grid>
             <Grid item xs={12}>
-            <Stack direction="column">
-                {
-                  buisness ? Object.entries(buisness.schedule).map(([key, value]) => {
-                    if (key === '_id') {
-                      return;
-                    }
-                    if (!value.start || !value.end){
-                        return <Typography key={key}>
-                        <strong>{key}</strong>: { 'Off' }
-                      </Typography>;
-                    }
-                    return (
-                    <Typography key={key}>
-                      <strong>{key}</strong>: {value.start + ' - ' + value.end }
-                    </Typography>
-                    )
-                    
-                  })
-                  :null
-                }
+              <Stack direction="column">
+                {buisness.schedule &&
+                    Object.entries(buisness.schedule).map(([key, value]) => {
+                      if(key === '_id') { return; }
+                      if (!value.start || !value.end) {
+                        return (
+                          <Typography key={key}>
+                            <strong>{key}</strong>: {'Off'}
+                          </Typography>
+                        );
+                      }
+                      return (
+                        <Typography key={key}>
+                          <strong>{key}</strong>: {value.start + ' - ' + value.end}
+                        </Typography>
+                      );
+                    })}
               </Stack>
             </Grid>
             <Grid item xs={12}>

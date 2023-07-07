@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { buisnessForms} from "./WelcomeHelper";
+import { getMax} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSize.css";
 
@@ -13,25 +13,32 @@ import "../../css/WelcomeSize.css";
 export default function Welcome() {
 
     const { link } = useParams();
-    const [services, setServices] = useState();
 
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [size,setSize] = useState(0);
+    const [size,setSize] = useState(1);
     const [maxSize, setMaxSize] = useState(0);
 
     const navigate = useNavigate();
 
 
     const getBuisnessForm = () => {
-        buisnessForms(link)
+        getMax(link)
         .then(data => {
-            setServices(data.services);
             setMaxSize(data.serveMax);
         })
         .catch(error => {
             console.log(error);
         })
+    }
+
+    const setDataAndContinue = () => {
+        const object = {
+            partySize: size
+        }
+        localStorage.setItem('client', JSON.stringify(object));
+        navigate(`/welcome/${link}/details`);
+
     }
     
     useEffect(() => {
@@ -42,7 +49,7 @@ export default function Welcome() {
     }, [])
    
     const handleChange = (event, value) => {
-        if (value === 5){
+        if (value === 6){
             setOpen(true);
             setSize(value);
         }else {
@@ -82,8 +89,8 @@ export default function Welcome() {
                             >
                             {Array(6).fill().map((_, index) => (
                                 <ToggleButton
-                                value={index}
-                                key={index}                               
+                                value={index+1}
+                                key={index+1}                               
                                 >
                                     <strong>{index + 1}{index === 5 ? '+' : ''}</strong>
                                 </ToggleButton>
@@ -103,12 +110,16 @@ export default function Welcome() {
 
                         <Typography sx={{ pt: 3}} variant="body2" fontWeight="bold">Current wait time 8 min.</Typography>
                         <Container sx={{ pt: 3}}>
-                            <Button fullWidth={true} sx={{p: 1}} variant="contained" color="primary" onClick={() => console.log(size)}>
-                                Next
+                            <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
+                                <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
+                                    Next
+                                </Typography>
                             </Button> 
                         </Container>
                                     
                     </CardContent>
+
+
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
                         <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                     </CardActions>

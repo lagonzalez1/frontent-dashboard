@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack } from "@mui/material";
+import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, Divider } from "@mui/material";
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -63,11 +63,15 @@ export default function Welcome({ path }) {
                     { !open ? <Alert severity="warning">
                         <Typography variant="body2" fontWeight="bold">This waitlist is closed at the moment.</Typography>
                     </Alert>: null}
-                    <Button disabled={!open} rounded fullWidth={true} sx={{p: 1}} variant="contained" color="primary" onClick={() => startJoinList()}>
+                    <Button disabled={!open} rounded fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
+                    <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
                         Join waitlist
+                    </Typography>
                     </Button>
                     
                     </Stack>
+                    <Divider />
+
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
                         <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>

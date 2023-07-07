@@ -9,6 +9,8 @@ import Login from './pages/Login/Login';
 import Welcome from './pages/Welcome/Welcome';
 import WelcomeSize from "./pages/Welcome/WelcomeSize";
 import { RequireAuth } from "react-auth-kit";
+import WelcomeDetails from './pages/Welcome/WelcomeDetails';
+import Waiting from './pages/Waiting/Waiting';
 
 
 function App() {
@@ -30,7 +32,9 @@ function App() {
           <Route path='/Login' element={<Login />}></Route>
           <Route path={'/welcome/:link'} element={<Welcome />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/size'} element={<WelcomeSize />}></Route> { /** Check if business open. Advance if so. */}
-
+          <Route path={'/welcome/:link/details'} element={<WelcomeDetails />}></Route> { /** Check if business open. Advance if so. */}
+          <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
+          <Route path={'/welcome/:link/waitlist'}></Route>
 
           <Route path={'/Dashboard'} element={
               <RequireAuth loginPath={'/Login'}>
