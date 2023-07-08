@@ -155,6 +155,7 @@ export default function Waitlist () {
                         'aria-labelledby': 'lock-button',
                         role: 'listbox',
                         }}
+                        
                     >
                         
 
@@ -224,7 +225,7 @@ export default function Waitlist () {
                                         {
                                            columns.map((col) => (
                                             <TableCell key={col.id} align='left'>
-                                                <Typography variant="subtitle2" fontWeight="bold">{ col.label }</Typography>
+                                                <Typography variant="subtitle2">{ col.label }</Typography>
                                             </TableCell>
                                            )) 
                                         }

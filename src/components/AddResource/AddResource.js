@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem   } from '@mui/material';
+import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton   } from '@mui/material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
@@ -9,6 +9,7 @@ import { getServicesAvailable } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setSnackbar } from '../../reducers/user';
 import { setBuisness} from "../../reducers/buisness";
+import CloseIcon from "@mui/icons-material/Close"
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -59,7 +60,21 @@ export default function AddResource() {
         <AddIcon/>
       </Fab>
       <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>Add a resource</DialogTitle>
+        <DialogTitle>
+          Add a resource
+          <IconButton
+                    aria-label="close"
+                    onClick={handleClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton>
+        </DialogTitle>
         <DialogContent >
           <Formik
             initialValues={initialValues}

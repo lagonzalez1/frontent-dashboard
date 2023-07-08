@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogActions, DialogTitle, DialogContent, Switch, Button,
 Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel } from '@mui/material';
-import { getResourcesAvailable, StyledCardService, stringAvatar,
+import { getResourcesTotal, StyledCardService, stringAvatar,
     StyledTableCell, findResourceTag, findServingSize, update } from "./ResourcesHelper"; 
 import { getEmployeeList, findClient, getResourceData } from "../../hooks/hooks";
 import AddResource from "../../components/AddResource/AddResource.js";
@@ -11,7 +11,7 @@ import { useSelector } from "react-redux";
 import buisness from "../../reducers/buisness";
 
 export default function Resources() {
-    const resourceList = getResourcesAvailable();
+    const {active, unactive} = getResourcesTotal();
     const employeeList = useSelector((state) => state.buisness.employees);
     const resourceData = useSelector((state) => state.buisness.resources);
 
@@ -63,8 +63,8 @@ export default function Resources() {
             <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                 <Stack direction={'row'} sx={{alignItems: 'center'}} spacing={2}>
                     <Typography variant="h6"><strong> Available resources</strong></Typography>
-                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> 4 Active</Typography>
-                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> 0 Unavailable</Typography>
+                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> {active} Active</Typography>
+                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> {unactive} Unavailable</Typography>
                 </Stack>
                 
             </Grid>

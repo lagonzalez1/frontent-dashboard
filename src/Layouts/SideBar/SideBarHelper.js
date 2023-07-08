@@ -1,8 +1,22 @@
-import { styled} from "@mui/material";
+import { styled } from "@mui/material";
 import MuiDrawer from '@mui/material/Drawer';
-
+import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 
 export const drawerWidth = 240;
+
+
+export const BootstrapTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} arrow classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .${tooltipClasses.arrow}`]: {
+    color: theme.palette.common.black,
+  },
+  [`& .${tooltipClasses.tooltip}`]: {
+    backgroundColor: theme.palette.common.black,
+    fontSize: theme.typography.pxToRem(14),
+  },
+  
+}));
 
 export const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',

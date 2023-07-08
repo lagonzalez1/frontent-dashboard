@@ -71,6 +71,25 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
     },
   }));
 
+  export const getResourcesTotal = () => {
+      const { _, buisness} = getStateData();
+      const services = buisness.services;
+      const active = 0;
+      const unactive = 0;
+      for (var service in services) {
+        switch (service.active){
+          case true:
+            active += 1;
+            continue;
+          case false:
+            unactive += 1;
+            continue;  
+        }
+      
+      }
+      return {active, unactive}
+  }
+
 
 
 

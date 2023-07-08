@@ -3,17 +3,18 @@ import { Grid, Typography, Stack,CardContent,Avatar, Container, CardActionArea, 
     , Modal, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton } from '@mui/material';
 import AddService from "../../components/AddService/AddService.js";
 import CloseIcon from "@mui/icons-material/Close"
-import {  StyledCardService, stringAvatar } from "./ServicesHelper.js"; 
+import {  StyledCardService, stringAvatar, getServicesTotal } from "./ServicesHelper.js"; 
 import { getServicesAvailable } from "../../hooks/hooks.js";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 export default function Services() {
-    const serviceList = getServicesAvailable();
+
+    const {active, unactive} = getServicesTotal();
     const [service, setService] = useState();
     const [open, setOpen] = useState(false);
-
+    const serviceList = getServicesAvailable(); 
     
     const validationSchema = Yup.object().shape({
         title: Yup.string().required('Title is required'),
@@ -55,8 +56,8 @@ export default function Services() {
             <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                 <Stack direction={'row'} sx={{alignItems: 'center'}} spacing={2}>
                     <Typography variant="h6"><strong> Available Services</strong></Typography>
-                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> 4 Active</Typography>
-                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> 0 Unavailable</Typography>
+                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> {active} Active</Typography>
+                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> {unactive} Unavailable</Typography>
                 </Stack>
                 
             </Grid>

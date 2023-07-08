@@ -61,7 +61,7 @@ const Customers = () => {
           
         </Grid>
       </Grid>
-      <Grid sx={{pt: 1}} container>
+      <Grid sx={{pt: 1}} container  spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
         <Grid item xs={12} sm={12} md={6} lg={6}>
           <Stack direction="row" spacing={1}>
             <TextField

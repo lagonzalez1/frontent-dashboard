@@ -1,20 +1,19 @@
 import React from "react";
-import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip} from "@mui/material";
+import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip, Typography} from "@mui/material";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
-import CheckBoxRoundedIcon from '@mui/icons-material/CheckBoxRounded';
-import WidgetsRoundedIcon from '@mui/icons-material/WidgetsRounded';
-import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
-import SettingsRoundedIcon from '@mui/icons-material/SettingsRounded';
-import HelpRoundedIcon from '@mui/icons-material/HelpRounded';
-import FactCheckIcon from '@mui/icons-material/FactCheck';
-
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 
 import { LOCATIONS } from "./SideBarHelper";
 import { useDispatch, useSelector } from "react-redux";
 import { setLocation } from "../../reducers/user";
-import { DrawerHeader, Drawer } from "./SideBarHelper";
+import { DrawerHeader, Drawer, BootstrapTooltip  } from "./SideBarHelper";
 
 
 export default function SideBar({navState, openNav}) {
@@ -46,7 +45,7 @@ export default function SideBar({navState, openNav}) {
         <List>
 
             <ListItem disablePadding sx={{ display: 'block' }}>
-            <Tooltip title="Dashboard" placement="right">
+            <BootstrapTooltip title="Dashboard" placement="right">
               <ListItemButton
                 color="info"
                 sx={{
@@ -65,16 +64,16 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <AccessTimeRoundedIcon htmlColor={ currentLocation === 0 ? '#ffc34d' : '' } />
+                  <AccessTimeOutlinedIcon htmlColor={ currentLocation === 0 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
-              </Tooltip>
+              </BootstrapTooltip>
             </ListItem>
 
 
             <ListItem disablePadding sx={{ display: 'block' }}>
-            <Tooltip title="Serving" placement="right">
+            <BootstrapTooltip title="Serving" placement="right">
               <ListItemButton
                 sx={{
                   minHeight: 48,
@@ -90,16 +89,16 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckBoxRoundedIcon  htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
+                  <CheckBoxOutlinedIcon htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
-              </Tooltip>
+              </BootstrapTooltip>
             </ListItem>
 
 
             <ListItem disablePadding sx={{ display: 'block' }}>
-            <Tooltip title="Resources" placement="right">
+            <BootstrapTooltip title="Resources" placement="right">
               <ListItemButton
                 sx={{
                   minHeight: 48,
@@ -115,15 +114,15 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <WidgetsRoundedIcon htmlColor={ currentLocation === 2 ? '#ffc34d' : '' } />
+                  <WidgetsOutlinedIcon htmlColor={ currentLocation === 2 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Resources"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
-              </Tooltip>
+              </BootstrapTooltip>
             </ListItem>
 
               <ListItem disablePadding sx={{ display: 'block' }}>
-              <Tooltip title="Services" placement="right">
+              <BootstrapTooltip title="Services" placement="right">
                 <ListItemButton
                   sx={{
                     minHeight: 48,
@@ -139,15 +138,15 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <FactCheckIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' } />
+                    <FactCheckOutlinedIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>
-                </Tooltip>
+                </BootstrapTooltip>
               </ListItem>
               
             <ListItem disablePadding sx={{ display: 'block' }}>
-            <Tooltip title="Customers" placement="right">
+            <BootstrapTooltip title="Customers" placement="right">
               <ListItemButton
                 sx={{
                   minHeight: 48,
@@ -163,11 +162,11 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <PeopleRoundedIcon  htmlColor={ currentLocation === 3 ? '#ffc34d' : '' }/>
+                  <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 3 ? '#ffc34d' : '' }/>
                 </ListItemIcon>
                 <ListItemText primary={"Customers"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
-              </Tooltip>
+              </BootstrapTooltip>
             </ListItem>
 
           
@@ -175,7 +174,7 @@ export default function SideBar({navState, openNav}) {
         <Divider />
         <List>
               <ListItem disablePadding sx={{ display: 'block' }}>
-              <Tooltip title="Settings" placement="right">
+              <BootstrapTooltip title="Settings" placement="right">
                 <ListItemButton
                   sx={{
                     minHeight: 48,
@@ -191,11 +190,11 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <SettingsRoundedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
+                    <SettingsOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>
-                </Tooltip>
+                </BootstrapTooltip>
               </ListItem>
 
         </List>
@@ -203,7 +202,7 @@ export default function SideBar({navState, openNav}) {
         <Divider/>
         <List>
               <ListItem disablePadding sx={{ display: 'block' }}>
-              <Tooltip title="Help" placement="right">
+              <BootstrapTooltip title="Help" placement="right">
                 <ListItemButton
                   sx={{
                     minHeight: 48,
@@ -219,11 +218,11 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <HelpRoundedIcon  htmlColor={ currentLocation === 6 ? '#ffc34d' : '' } />
+                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 6 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>
-                </Tooltip>
+                </BootstrapTooltip>
               </ListItem>
 
         </List>

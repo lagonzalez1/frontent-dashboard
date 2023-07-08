@@ -1,7 +1,36 @@
 import { styled } from '@mui/system';
 import { Card } from '@mui/material';
+import { getStateData } from '../../auth/Auth';
 
 
+export const getServicesTotal  = () => {
+    const { _, buisness} = getStateData();
+    if ( !buisness ) { return new Error('No buisness data found.');}
+    const services = buisness.services;
+    let active = 0;
+    let unactive = 0;
+    for(var service of services) {
+      
+      switch(service.active){
+        case true:
+          active += 1;
+          continue;
+        case false:
+          unactive += 1;
+          continue
+      }
+    }
+    return {active , unactive};
+  
+}
+
+export const getServicesAvailable = () => {
+  const { _, buisness} = getStateData();
+  if ( !buisness ) { return new Error('No buisness data found.');}
+  const services = buisness.services;
+  if ( !services ) { return []; }
+  return services;
+}
 
 export const StyledCardService = styled(Card)(({ theme }) => ({
   // Default styles for the card
