@@ -7,12 +7,13 @@ import { getEmployeeList, findClient, getResourceData } from "../../hooks/hooks"
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import { useSelector } from "react-redux";
+import buisness from "../../reducers/buisness";
 
 export default function Resources() {
     const resourceList = getResourcesAvailable();
-    const employeeList = getEmployeeList();
-    const resourceData = getResourceData();
-    console.log(resourceData);
+    const employeeList = useSelector((state) => state.buisness.employees);
+    const resourceData = useSelector((state) => state.buisness.resources);
 
     const [dialog, setDialog] = useState(false);
     const [resource, setResource] = useState({});
@@ -49,8 +50,6 @@ export default function Resources() {
 
     const saveResourceAt = async () => {
         if (!form){ return; }
-        console.log("form data is okay");
-
         update(form);
       };
 
@@ -76,7 +75,7 @@ export default function Resources() {
 
         
         <Grid container style={styles.container} sx={{ pt: 2}} spacing={1} columns={{ xs: 1, sm: 2, md: 2, lg: 2 }}>
-            { Array.isArray(resourceData) ? resourceData.map((resource) => (
+            { resourceData? resourceData.map((resource) => (
                 <Grid item key={resource._id}>
                     <StyledCardService onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>

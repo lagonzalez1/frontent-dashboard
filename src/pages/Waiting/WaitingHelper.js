@@ -4,11 +4,11 @@ import axios from "axios";
 
 
 
-export const getIdentifierData = (link, unid, timestamp) => {
+export const getIdentifierData = (link, unid) => {
     return new Promise((resolve, reject) => {
-        axios.get('/api/external/identifierRequest',{ params: {link, unid, timestamp} } )
+        axios.get('/api/external/identifierRequest',{ params: {link, unid} } )
         .then(response => {
-            resolve(response.data);
+            resolve(response);
         })
         .catch(error => {
             reject(error);
@@ -16,6 +16,14 @@ export const getIdentifierData = (link, unid, timestamp) => {
     });
 }
 
-export const leaveWaitlistRequest = () => {
-
+export const leaveWaitlistRequest = (link, unid) => {
+    return new Promise((resolve, reject) => {
+        axios.delete('/api/external/removeRequest', {params: { link, unid}})
+        .then(response => {
+            resolve(response);
+        }) 
+        .catch(error => {
+            reject(error);
+        })
+    })
 }

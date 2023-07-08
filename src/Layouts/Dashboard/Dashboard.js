@@ -36,7 +36,6 @@ export default function Dashboard () {
 
     const [openNav, setOpenNav] = useState(false);
     const email = useSelector((state) => state.user.email);
-    const location = useSelector((state) => state.user.location);
 
     async function checkAuthStatus() {
         try {
@@ -61,13 +60,10 @@ export default function Dashboard () {
     },[])
 
     
-    const setLocation = () => {
-        const { user, _ } = getStateData();
-        return user.location;
-    }
+    
 
     const RenderLocation = () => {
-        const location = setLocation();
+        const location = useSelector((state) => state.user.location);
         switch(location) {
             case 0:
                 return( <> 

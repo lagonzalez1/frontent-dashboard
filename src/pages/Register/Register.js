@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
 Tooltip, IconButton, Stack, Alert, CardContent, CardMedia, Checkbox , FormControl, Select,
-InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText,InputAdornment, Backdrop, CircularProgress, Chip  } from "@mui/material";
+InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, 
+InputAdornment, Backdrop, CircularProgress, Chip, Paper  } from "@mui/material";
 import axios, { AxiosError } from 'axios';
-import { Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
+import {  Navbar as N} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ControlPointRoundedIcon from '@mui/icons-material/ControlPointRounded';
 import { StyledCard, StyledCardService } from "./CardStyle";
 import { checkObjectData, checkPublicLink, getCountries, getTimeZone, getTimestamp} from "./RegisterHelper";
 import {  HOURS_LIST, WEEK_LIST, WEEK_OBJ } from "../Testing/RegisterTest.js";
 import { useNavigate } from "react-router-dom";
+
+import { useDispatch } from 'react-redux';
+import {setUser as SETUSER} from "../../reducers/user";
+import { setAccessToken } from "../../auth/Auth";
 
 import LIST_IMG from "../../assets/images/listhd.png";
 import CAL_IMG from "../../assets/images/calendarsd.png";
@@ -34,6 +39,7 @@ export default function Register(props){
 
     const navigate = useNavigate();
     const signIn = useSignIn();
+    const dispatch = useDispatch();
 
     let HOURS = HOURS_LIST();
     let WEEK = WEEK_LIST();
@@ -60,7 +66,7 @@ export default function Register(props){
         buisnessWebsite: '',
         buisnessName: '',
         publicLink: '',
-        role: '',
+        role: 'Admin',
         buisnessAddress: '',
         country: '',
         mode: 0,
@@ -88,7 +94,9 @@ export default function Register(props){
     })
     
     function closeServicesModal () { setServicesModal(false); }
+
     useEffect(() => {
+
     }, [])
 
    
@@ -116,16 +124,16 @@ export default function Register(props){
       
         checkPublicLink(user.publicLink)
           .then((response) => {
-            console.log(response);
-            if (response.status === 200) {
-                setStep((prev) => prev + 22.5); // Next step in register.
-                setLoading(false);
-                return;
-            }
-            else if (response.status === 201) {
-                setErrors(response.data.msg);
-                setLoading(false);
-                return;
+            switch (response.status){
+                case 200:
+                    setStep((prev) => prev + 22.5); // Next step in register.
+                    setErrors();
+                    setLoading(false);
+                    return;
+                case 201:
+                    setErrors(response.data.msg);
+                    setLoading(false);
+                    return;
             }
           })
           .catch((error) => {
@@ -133,10 +141,6 @@ export default function Register(props){
             setErrors(error);
             return;
           })
-          .finally(() => {
-            setErrors(null);
-            setLoading(false);
-          });
       };
       
     /**
@@ -242,6 +246,7 @@ export default function Register(props){
      * Submit to backend.
      */
     const submitBuisnessInfo = () => {
+        setLoading(true);
         const {status, missing} = checkObjectData(user);
         if (!status){
             const data = JSON.stringify(user);
@@ -249,6 +254,7 @@ export default function Register(props){
             formData.append('RegisterData',data);
             registerBuisness(formData)
             .then(response => {
+                console.log(response.status);
                 if (response.status === 200){
                     signIn({
                         token: response.data.token,
@@ -256,27 +262,26 @@ export default function Register(props){
                         tokenType: "Bearer",
                         authState: { id: response.data.id },
                     })
+                    setAccessToken(response.data.accessToken);
+                    dispatch(SETUSER({ id: response.data.id, email: response.data.email}));
+                    setLoading(false);
                     navigate('/Dashboard');
                     return;
                 }else {
+                    setLoading(false);
                     setErrors('Status: ' + response.status + 'Unable to proccess request at the moment.');
                     return;
                 }
             })
             .catch(error => {
-                if (error && error instanceof AxiosError){
-                    setErrors('Axios: ' + error);
-                    return;
-                }else if (error && error instanceof Error){
-                    setErrors('Error: ' + error);
-                    return;
-                }
-                setErrors('Error: ' + error);
+                console.log(error);
+                setErrors('Axios: ' + error.response.data.msg);
+                setLoading(false);
                 return;
             })
         }else {
-            console.log(missing);
             displayErrors(missing);
+            setLoading(false);
             setStep(10);
             return;
         }
@@ -287,11 +292,12 @@ export default function Register(props){
         <>  
             
             <Container className="container" sx={{ pt: 5, pb: 5}}>       
-                {error ? (<Alert severity="error">{error}</Alert>): null}         
                 { step === 10 ?(
                         <Container className="content_container" sx={{ p: 3}}>
                         <Box sx={{ flexGrow: 1, p: 1}}>
                             <Typography variant="h3">Tell us about your business.</Typography>
+                            {error ? (<Alert severity="error">{error}</Alert>): null}         
+
                             <Grid
                                 sx={{ pt: 2, p: 2}}
                                 spacing={2}
@@ -354,9 +360,9 @@ export default function Register(props){
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>Select your role (optional)</strong></Typography>
+                                        <Typography variant="body2"><strong>Your role</strong></Typography>
                                     </FormHelperText>
-                                    <TextField name="role" variant="filled" value={user.role} onChange={e => setUser((prev) => ({ ...prev, role: e.target.value}))} fullWidth/>
+                                    <TextField disabled={true} name="role" variant="filled" value={user.role} onChange={e => setUser((prev) => ({ ...prev, role: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
@@ -366,7 +372,7 @@ export default function Register(props){
                                 </Grid>
                             </Grid>
                         </Box>
-                        <Button sx={{ mt: 3, width: '100px'}} variant="contained" color="primary" onClick={() => buisnessInfo() }>Next</Button>
+                        <Button sx={{ mt: 3, width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => buisnessInfo() }>Next</Button>
                         { loading ? (
                             <Backdrop
                             sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -385,7 +391,7 @@ export default function Register(props){
                     (
                         <Container className="content_container" sx={{ p: 3}}>
                             <Box sx={{ flexGrow: 1, p: 1}}>
-                                <Typography variant="h3">How would you like to use LOGO?</Typography>
+                                <Typography variant="h3">How would you like to use {user.buisnessName}?</Typography>
                             </Box>
 
                             <Container sx={{ pt: 5}}>
@@ -396,7 +402,7 @@ export default function Register(props){
                                     alignItems="stretch"
                                     spacing={2}
                                 >
-                                    <Grid item xs={12} sm={12} md={4}>
+                                    <Grid item xs={12} sm={6} md={4}>
                                         <StyledCard sx={{ backgroundColor: mode === 0 ? '#ffc34d': '',boxShadow: mode === 1 ? 3: 0 }}  onClick={() => handleCardClick(0) } id="selection_card">
                                                 <CardContent>
                                                     <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Set up waitlist</strong></Typography>
@@ -413,7 +419,7 @@ export default function Register(props){
                                                 
                                         </StyledCard>
                                     </Grid>
-                                    <Grid item xs={12} sm={12} md={4}>
+                                    <Grid item xs={12} sm={6} md={4}>
                                     <StyledCard sx={{ backgroundColor: mode === 1 ? '#ffc34d': '',boxShadow: mode === 1 ? 3: 0 }} id="selection_card" onClick={() => handleCardClick(1) } >
                                             <CardContent>
                                                 <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Analytics</strong></Typography>
@@ -429,7 +435,7 @@ export default function Register(props){
                                             
                                         </StyledCard>
                                     </Grid>
-                                    <Grid item xs={12} sm={12} md={4}>
+                                    <Grid item xs={12} sm={6} md={4}>
                                         <StyledCard sx={{ backgroundColor: mode === 2 ? '#ffc34d': '',boxShadow: mode === 2 ? 3: 0 }} id="selection_card" onClick={() => handleCardClick(2) }>
                                             <CardContent>
                                                 <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Analytics + Advertisments</strong></Typography>
@@ -449,8 +455,8 @@ export default function Register(props){
                                 </Grid>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
                                 <Stack sx={{ pt: 3}} direction="row" spacing={2}>
-                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => durationInfo() }>Next</Button>
+                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => durationInfo() }>Next</Button>
                                 </Stack>
                                 </Box>
                                 
@@ -507,8 +513,8 @@ export default function Register(props){
                             </Box>
                             <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
                                 <Stack sx={{ pt: 3}} direction="row" spacing={2}>
-                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                    <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
+                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
                                 </Stack>
                             </Box>
                             
@@ -603,8 +609,8 @@ export default function Register(props){
                                 </Box>
                                 <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
                                     <Stack sx={{ pt: 3}} direction="row" spacing={2}>
-                                        <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                        <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
+                                        <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                        <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
                                     </Stack>
                                 </Box>
                                 
@@ -617,6 +623,8 @@ export default function Register(props){
                         <Container className='content_container'>
                             <Box sx={{ pl: 2, pr: 2}}>
                                 <Typography variant="h3">Finally, Login information, Last step!</Typography>
+                                {error ? (<Alert severity="error">{error}</Alert>): null}         
+
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} md={4} lg={4}></Grid>
                                         <Grid item xs={12} md={4} lg={4}>
@@ -628,16 +636,31 @@ export default function Register(props){
                                             <Box sx={{ minWidth: 120 }}>
                                                     <Stack spacing={1}>
                                                         <Chip label={timezone} variant="outlined" />
-                                                        <Chip label={timestamp} variant="outlined"/>
+                                                        <Tooltip placement="bottom" title="If time does not match your current time, please turn off any VPN you might be using.">
+                                                            <Chip label={timestamp} variant="outlined"/>
+                                                        </Tooltip>
                                                     </Stack>
-                                                    
                                                 </Box>
                                         </Stack>
 
                                         <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
                                             <Stack sx={{ pt: 3}} direction="row" spacing={2}>
-                                                <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                                <Button sx={{ width: '100px'}} variant="contained" color="primary" onClick={() => submitBuisnessInfo() }>submit</Button>
+
+                                                {loading ? (
+                                                    <Backdrop
+                                                    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                                                    open={loading}
+                                                    >   
+                                                            <CircularProgress color="inherit" />
+                                                            <Typography variant="body2" sx={{ color: 'white'}}>Checking values...</Typography>
+                                                       
+                                                  </Backdrop>
+                                                ):
+                                                <>
+                                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => submitBuisnessInfo() }>submit</Button>
+                                                </>
+                                                }
                                             </Stack>
                                         </Box>
 

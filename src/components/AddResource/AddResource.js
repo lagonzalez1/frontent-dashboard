@@ -8,6 +8,7 @@ import { addResource } from "./Helper";
 import { getServicesAvailable } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setSnackbar } from '../../reducers/user';
+import { setBuisness} from "../../reducers/buisness";
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -42,6 +43,7 @@ export default function AddResource() {
     addResource(values)
     .then(data => {
       dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
+      dispatch(setBuisness(data.buisness))
       handleClose();
     })
     .catch(error => {

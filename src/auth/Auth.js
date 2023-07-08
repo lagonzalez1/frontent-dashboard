@@ -9,7 +9,7 @@
  */
 import axios from "axios";
 import buisness, { setBuisness } from "../reducers/buisness";
-import { setIndex, setUser } from "../reducers/user";
+import { setIndex, setLocation, setUser } from "../reducers/user";
 const TOKEN_KEY = 'access_token';
 const BUISNESS = 'buisness';
 const USER = 'user';
@@ -65,7 +65,8 @@ const USER = 'user';
       const status = await checkAccessToken();
       dispatch(setBuisness(status.buisness));
       dispatch(setUser({ id: status.id, email: status.email}))
-      dispatch(setIndex(status.defaultIndex))
+      dispatch(setIndex(status.defaultIndex));
+      dispatch(setLocation(0))
       return true;
     } catch (error) {
       return false;

@@ -67,7 +67,7 @@ export default function Services() {
 
         
         <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 6, sm: 4, md: 4, lg: 4 }}>
-            {Array.isArray(serviceList) ? serviceList.map((service) => (
+            { service ? serviceList.map((service) => (
                 <Grid item key={service.id}>
                     <StyledCardService onClick={() => handleClick(service)}>
                         <CardActionArea>
@@ -99,7 +99,7 @@ export default function Services() {
                     </StyledCardService>
                 
                 </Grid>
-            )): console.log(serviceList)}
+            )): null}
         </Grid>
 
         <Dialog open={open} onClose={handleClose}>

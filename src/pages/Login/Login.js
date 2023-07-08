@@ -10,8 +10,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setLocation, setUser } from '../../reducers/user';
 import { DateTime } from "luxon";
 
-const LOCAL_ST_USER = 'user';
-
 
 export default function Login() {
     
@@ -19,7 +17,6 @@ export default function Login() {
     const navigate = useNavigate();
     const signIn = useSignIn();
     
-
     const [loading, setLoading] = useState(false);
     const [error, setErrors] = useState(false);
     const [credentials, setCredentials] = useState({
@@ -52,13 +49,17 @@ export default function Login() {
                         authState: { id: response.data.id },
                     });
                     
-                    console.log(response.data.accessToken)
                     setAccessToken(response.data.accessToken);
                     dispatch(setUser({ id: response.data.id, email: response.data.email}))
                     navigate('/Dashboard');
                     setLoading(false);
                     return;
-                }else {
+                }
+                else if (response.status === 203){
+                    setErrors(response.data.msg);
+                    setLoading(false);
+                }
+                else {
                     setErrors('Status: ' + response.status + 'Unable to proccess request at the moment.');
                     setLoading(false);
                     return;
