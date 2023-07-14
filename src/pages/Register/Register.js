@@ -119,19 +119,21 @@ export default function Register(props){
           setErrors('Missing your public link.');
           return;
         }
-      
         setLoading(true);
-      
         checkPublicLink(user.publicLink)
           .then((response) => {
             switch (response.status){
                 case 200:
-                    setStep((prev) => prev + 22.5); // Next step in register.
+                    setStep((prev) => prev + 22.5);
                     setErrors();
                     setLoading(false);
                     return;
                 case 201:
                     setErrors(response.data.msg);
+                    setLoading(false);
+                    return;
+                default:
+                    setErrors(response.status);
                     setLoading(false);
                     return;
             }
@@ -391,7 +393,7 @@ export default function Register(props){
                     (
                         <Container className="content_container" sx={{ p: 3}}>
                             <Box sx={{ flexGrow: 1, p: 1}}>
-                                <Typography variant="h3">How would you like to use {user.buisnessName}?</Typography>
+                                <Typography variant="h3">How would you like to use "{user.buisnessName}"?</Typography>
                             </Box>
 
                             <Container sx={{ pt: 5}}>
