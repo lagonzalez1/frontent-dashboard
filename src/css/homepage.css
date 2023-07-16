@@ -10,3 +10,13 @@
 .section_uses {
     padding: 50px 0 50px 0;
 }
+
+
+
+#service_cards {
+    outline-style: solid;
+    outline-width: 0.1px;
+    outline-color: lightgray;
+    align-items: center;
+    align-content: center;
+}
