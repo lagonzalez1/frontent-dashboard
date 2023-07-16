@@ -25,17 +25,42 @@ export default function Navbar(props) {
         <>
             <N collapseOnSelect expand="lg" bg="light" variant="light" id="app_bar" fixed="top">
                 <Container>
-                    <N.Brand href="/"><RocketTwoToneIcon /> <strong>Logo</strong></N.Brand>
+                        <Typography fontWeight='bold'>
+                        <RocketTwoToneIcon />
+                            Schedule
+                        </Typography>
+                    
                     <N.Toggle aria-controls="responsive-navbar-nav" />
                     <N.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link onClick={() => navigate('/Products')}>Features</Nav.Link>
-                        <Nav.Link onClick={() => navigate('/Pricing')}>Pricing</Nav.Link>
-                        <Nav.Link onClick={() => navigate('/Resources')}>Resources</Nav.Link>
+                        <Nav.Link onClick={() => navigate('/Products')}>
+                            <Typography>
+                                Features
+                            </Typography>
+
+                        </Nav.Link>
+                        <Nav.Link onClick={() => navigate('/Pricing')}>
+                            <Typography>
+                                Pricing
+                            </Typography>
+                        </Nav.Link>
+                        <Nav.Link onClick={() => navigate('/Resources')}>
+                            <Typography>
+                                Resources
+                            </Typography>
+                        </Nav.Link>
                     </Nav>
                     <Nav>
-                        <Nav.Link onClick={() => navigate('/Login')}><strong>Login</strong></Nav.Link>
-                        <Nav.Link eventKey={2} onClick={() => navigate('/Register')}> <strong>Register</strong></Nav.Link>
+                        <Nav.Link onClick={() => navigate('/Login')}>
+                            <Typography>
+                                Login
+                            </Typography>
+                        </Nav.Link>
+                        <Nav.Link eventKey={2} onClick={() => navigate('/Register')}> 
+                            <Typography>
+                                Register
+                            </Typography>
+                        </Nav.Link>
                     </Nav>
                     </N.Collapse>
                 </Container>
