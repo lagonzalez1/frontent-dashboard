@@ -33,9 +33,9 @@ export const requestChangeAccept = (accepting, dispatch) => {
     const email = user.email;
     const b_id = business._id;
     const headers = { headers: {'x-access-token': accessToken} }
-    const currentTime = DateTime.local().setZone(business.timezone);
+    const currentDate = DateTime.local().setZone(business.timezone).toISO();
     const requestBody = {
-        currentTime,
+        currentDate,
         accessToken,
         email: email,
         b_id,
@@ -74,7 +74,7 @@ export const getUserTable = () => {
       }
   
       const currentTime = DateTime.local().setZone(timezone);
-      const sorted = appointments.sort(sortBaseTime);
+      const sorted = appointments.sort(sortBaseTime); //Not yet implemented
   
       const wait = appointments.map((client) => {
         const luxonDateTime = DateTime.fromJSDate(new Date(client.timestamp));
@@ -107,7 +107,19 @@ function sortBaseTime (a,b) {
     return 0;
 }
 
-
+export const acceptingRejecting = () => {
+    const { user, business} = getStateData();
+    const currentDate = new DateTime.local().setZone(business.timezone);
+    // Check if its false 
+    if (business.accepting_override.accepting === true){
+      const lastOverrideDate = DateTime.fromJSDate(business.accepting_override.lastDate).setZone(business.timezone);
+      if (currentDate.hasSame(lastOverrideDate, 'day')){
+        return business.accepting_override.accepting;
+      }else {
+        return business.accepting;
+      }
+    }
+} 
 
 
 /*

@@ -12,17 +12,17 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 /**
  * 
  * @param {Object} payload
- * @returns Promise         Returns buisness with the newly created data.
+ * @returns Promise         Returns business with the newly created data.
  *                  
  */
 export const addCustomerWaitlist = (payload) => {
     return new Promise((resolve, reject) => {
-      const { user, buisness } = getStateData();
+      const { user, business } = getStateData();
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       const id = user.id;
-      const b_id = buisness._id;
-      const timezone = buisness.timezone;
+      const b_id = business._id;
+      const timezone = business.timezone;
       const data = { id, b_id, timezone, ...payload };
       axios
         .post('/api/internal/create_client', data, headers)

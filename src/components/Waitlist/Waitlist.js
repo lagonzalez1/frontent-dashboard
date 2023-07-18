@@ -14,7 +14,8 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import {  findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
-import { handleOpenNewTab, requestChangeAccept, options, columns, getUserTable, clientOptions, OPTIONS_SELECT } from "./Helpers";
+import { handleOpenNewTab, requestChangeAccept, options, columns, getUserTable, clientOptions, OPTIONS_SELECT,
+    acceptingRejecting } from "./Helpers";
 import { reloadBusinessData } from "../../hooks/hooks";
 
 
@@ -33,6 +34,7 @@ export default function Waitlist () {
     const openVert = Boolean(anchorElVert);
 
     const tableData = getUserTable();
+    const accepting = acceptingRejecting();
     const business = useSelector((state) => state.business);
 
     const handleClickListItem = (event) => {
@@ -137,11 +139,11 @@ export default function Waitlist () {
                         aria-expanded={open ? 'true' : undefined}
                         onClick={handleClickListItem}
                         >
-                        {business.accepting ? 
+                        {accepting ? 
                         <FiberManualRecordIcon fontSize="small" htmlColor="#00FF00"/>:
                         <FiberManualRecordIcon fontSize="small" htmlColor="#FF0000"/>} 
                         <ListItemText
-                            primary={ business.accepting ? 'Open' : 'Close'}
+                            primary={ accepting ? 'Open' : 'Close'}
                         />
                         <KeyboardArrowDownIcon/>
                         </ListItem>
@@ -158,9 +160,7 @@ export default function Waitlist () {
                         
                     >
                         
-
-
-                        { business.accepting ? 
+                        { accepting ? 
                         (<MenuItem
                             key={0}
                             onClick={(event) => handleMenuItemClick(event, 0)}
@@ -172,7 +172,7 @@ export default function Waitlist () {
                             key={1}
                             onClick={(event) => handleMenuItemClick(event, 1)}
                             >
-                                {options[1]}
+                            {options[1]}
                             </MenuItem>
                         }
                         <MenuItem
@@ -267,12 +267,10 @@ export default function Waitlist () {
                                         spacing={1}
                                     >
                                         <IconButton >
-                                            <NotificationsIcon htmlColor="#FF0000"/>
-                                            
+                                            <NotificationsIcon htmlColor="#FF0000"/>                                           
                                         </IconButton>
                                         <IconButton>
                                             <CheckCircleIcon htmlColor="#4CBB17"/>
-                                            
                                         </IconButton>
                                         <IconButton
                                                 aria-label="more"
@@ -291,7 +289,6 @@ export default function Waitlist () {
                                                 anchorEl={anchorElVert}
                                                 open={openVert}
                                                 onClose={handleCloseVert}
-                                                
                                             >
                                                 {
                                                 clientOptions.map((option) => (
