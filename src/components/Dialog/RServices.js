@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton } from "@mui/material";
-import { Delete as DeleteIcon } from "@mui/icons-material/DeleteIcon";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const RService = ({ open, onClose, data }) => {
   const handleClose = () => {
