@@ -13,7 +13,7 @@ import { columns } from './CustomerHelper';
 
 const Customers = () => {
 
-  const buisness = useSelector((state) => state.buisness);
+  const business = useSelector((state) => state.business);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [searchTerm, setSearchTerm] = React.useState('');
 
@@ -53,7 +53,7 @@ const Customers = () => {
 
         <Grid item xs={12} md={6} sm={12} lg={6}>
         <Stack>
-            <Typography variant="body2">{buisness ? buisness.buisnessName: <Skeleton/> }</Typography>
+            <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
             <Typography variant="h5"><strong>Customers</strong></Typography>
         </Stack>
         </Grid>

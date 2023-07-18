@@ -1,15 +1,15 @@
-import { configureStore, applyMiddleware  } from '@reduxjs/toolkit';
+import { configureStore  } from '@reduxjs/toolkit';
 import userReducer from '../reducers/user';
-import buisnessReducer from '../reducers/buisness';
+import businessReducer from '../reducers/business';
 
 
 const saveToLocalStorage = (store) => (next) => (action) => {
   const result = next(action); // Call the next middleware or reducer
 
   // Save user and business data to local storage
-  const { user, buisness } = store.getState();
+  const { user, business } = store.getState();
   localStorage.setItem('user', JSON.stringify(user));
-  localStorage.setItem('buisness', JSON.stringify(buisness));
+  localStorage.setItem('business', JSON.stringify(business));
 
   return result;
 };
@@ -17,7 +17,7 @@ const saveToLocalStorage = (store) => (next) => (action) => {
 const store = configureStore({
   reducer: {
     user: userReducer,
-    buisness: buisnessReducer,
+    business: businessReducer,
   },
   middleware:  (getDefaultMiddleware) =>
   getDefaultMiddleware().concat(saveToLocalStorage),

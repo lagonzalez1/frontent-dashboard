@@ -41,7 +41,7 @@ export default function WelcomeDetails() {
     const [loading, setLoading] = useState(false);
 
 
-    const buisnessForm = () => {
+    const businessForm = () => {
         getBuisnessForm(link)
         .then(data => {
             setInputs(data.inputFields);
@@ -54,7 +54,7 @@ export default function WelcomeDetails() {
     }
 
     useEffect(() => {
-        buisnessForm();
+        businessForm();
         return() => {
             setLoading(false)
         }

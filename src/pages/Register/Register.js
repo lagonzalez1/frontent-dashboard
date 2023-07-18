@@ -63,11 +63,11 @@ export default function Register(props){
         fullName: '',
         email: '',
         password: '',
-        buisnessWebsite: '',
-        buisnessName: '',
+        businessWebsite: '',
+        businessName: '',
         publicLink: '',
         role: 'Admin',
-        buisnessAddress: '',
+        businessAddress: '',
         country: '',
         mode: 0,
         services: [],
@@ -81,11 +81,11 @@ export default function Register(props){
         fullName: false,
         email: false,
         password: false,
-        buisnessWebsite: false,
-        buisnessName: false,
+        businessWebsite: false,
+        businessName: false,
         publicLink: false,
         role: false,
-        buisnessAddress: false,
+        businessAddress: false,
         country: false,
         mode: false,
         services: false,
@@ -112,9 +112,9 @@ export default function Register(props){
 
     /**
      * Increment loadbar.
-     * Save user buisness data.
+     * Save user business data.
      */
-    const buisnessInfo = () => {
+    const businessInfo = () => {
         if (!user.publicLink) {
           setErrors('Missing your public link.');
           return;
@@ -232,13 +232,13 @@ export default function Register(props){
     }
 
 
-    async function registerBuisness(data) {
+    async function registerBusiness(data) {
         const config = {
             headers: {
                 'Content-type': 'application/json' 
             }
         }         
-        const response = await axios.post('/api/external/register_buisness', data, config)
+        const response = await axios.post('/api/external/register_business', data, config)
         return response;
     } 
 
@@ -247,14 +247,14 @@ export default function Register(props){
     /**
      * Submit to backend.
      */
-    const submitBuisnessInfo = () => {
+    const submitBusinessInfo = () => {
         setLoading(true);
         const {status, missing} = checkObjectData(user);
         if (!status){
             const data = JSON.stringify(user);
             const formData = new FormData();
             formData.append('RegisterData',data);
-            registerBuisness(formData)
+            registerBusiness(formData)
             .then(response => {
                 console.log(response.status);
                 if (response.status === 200){
@@ -312,16 +312,16 @@ export default function Register(props){
                             >
                                 <Grid item sm={12} xs={12} md={6}>
                                 <FormHelperText id="component-helper-text">
-                                    <Typography variant="body2"><strong>Buisness name *</strong></Typography>
+                                    <Typography variant="body2"><strong>Business name *</strong></Typography>
                                 </FormHelperText>
                                     <TextField 
-                                    name="buisnessName" error={userErrors.buisnessName}  id="buisness-name" variant="filled" value={user.buisnessName} onChange={e => setUser((prev) => ({ ...prev, buisnessName: e.target.value}))} fullWidth/>
+                                    name="businessName" error={userErrors.businessName}  id="business-name" variant="filled" value={user.businessName} onChange={e => setUser((prev) => ({ ...prev, businessName: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
                                         <Typography variant="body2"><strong>Company website (optional)</strong></Typography>
                                     </FormHelperText>
-                                    <TextField error={userErrors.buisnessWebsite}  name="buisnessWebsite" variant="filled" value={user.buisnessWebsite} onChange={e => setUser((prev) => ({ ...prev, buisnessWebsite: e.target.value}))} fullWidth/>
+                                    <TextField error={userErrors.businessWebsite}  name="businessWebsite" variant="filled" value={user.businessWebsite} onChange={e => setUser((prev) => ({ ...prev, businessWebsite: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
@@ -368,13 +368,13 @@ export default function Register(props){
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>Buisness address (optional)</strong></Typography>
+                                        <Typography variant="body2"><strong>business address (optional)</strong></Typography>
                                     </FormHelperText>
-                                    <TextField name="buisnessAddress" value={user.buisnessAddress} onChange={e => setUser((prev) => ({ ...prev, buisnessAddress: e.target.value}))}  variant="filled" fullWidth/>
+                                    <TextField name="businessAddress" value={user.businessAddress} onChange={e => setUser((prev) => ({ ...prev, businessAddress: e.target.value}))}  variant="filled" fullWidth/>
                                 </Grid>
                             </Grid>
                         </Box>
-                        <Button sx={{ mt: 3, width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => buisnessInfo() }>Next</Button>
+                        <Button sx={{ mt: 3, width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => businessInfo() }>Next</Button>
                         { loading ? (
                             <Backdrop
                             sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -393,7 +393,7 @@ export default function Register(props){
                     (
                         <Container className="content_container" sx={{ p: 3}}>
                             <Box sx={{ flexGrow: 1, p: 1}}>
-                                <Typography variant="h3">How would you like to use "{user.buisnessName}"?</Typography>
+                                <Typography variant="h3">How would you like to use "{user.businessName}"?</Typography>
                             </Box>
 
                             <Container sx={{ pt: 5}}>
@@ -425,7 +425,7 @@ export default function Register(props){
                                     <StyledCard sx={{ backgroundColor: mode === 1 ? '#ffc34d': '',boxShadow: mode === 1 ? 3: 0 }} id="selection_card" onClick={() => handleCardClick(1) } >
                                             <CardContent>
                                                 <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Analytics</strong></Typography>
-                                                <Typography sx={{ textAlign: 'left',  pt: 2}} variant="subtitle2" color="dark">View buisness trends.</Typography>
+                                                <Typography sx={{ textAlign: 'left',  pt: 2}} variant="subtitle2" color="dark">View business trends.</Typography>
                                                 <Typography sx={{ textAlign: 'left', pt: 0}} variant="body2" color="dark">$</Typography>
                                                 <CardMedia
                                                 component="img"
@@ -441,7 +441,7 @@ export default function Register(props){
                                         <StyledCard sx={{ backgroundColor: mode === 2 ? '#ffc34d': '',boxShadow: mode === 2 ? 3: 0 }} id="selection_card" onClick={() => handleCardClick(2) }>
                                             <CardContent>
                                                 <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Analytics + Advertisments</strong></Typography>
-                                                <Typography sx={{ textAlign: 'left',  pt: 2}} variant="subtitle2" color="dark">View buisness trends and advertise.</Typography>
+                                                <Typography sx={{ textAlign: 'left',  pt: 2}} variant="subtitle2" color="dark">View business trends and advertise.</Typography>
                                                 <Typography sx={{ textAlign: 'left', pt: 0}} variant="body2" color="dark">$$</Typography>
                                                 <CardMedia
                                                 component="img"
@@ -660,7 +660,7 @@ export default function Register(props){
                                                 ):
                                                 <>
                                                     <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => submitBuisnessInfo() }>submit</Button>
+                                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => submitBusinessInfo() }>submit</Button>
                                                 </>
                                                 }
                                             </Stack>

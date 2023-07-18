@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Skeleton ,Typography, Stack, Tooltip, Button, Table, 
     TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, Container, IconButton, Icon } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -12,9 +12,10 @@ import "../../css/Serving.css";
 
 export default function Serving() {
     const dispatch = useDispatch();
-    const servingList = getUserTable();
-    const { groupCount, groupTotalCount } = getServingCount();
-    const buisness = useSelector((state) => state.buisness);
+    const business = useSelector((state) => state.business);
+
+    let servingList = getUserTable();
+    let { groupCount, groupTotalCount } = getServingCount();
 
 
     return(
@@ -22,7 +23,7 @@ export default function Serving() {
             <Grid container>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack>
-                            <Typography variant="body2">{buisness ? buisness.buisnessName: <Skeleton/> }</Typography>
+                            <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
                             <Typography variant="h5"><strong>Serving</strong></Typography>
                         </Stack>
                         
@@ -34,7 +35,7 @@ export default function Serving() {
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
                     <Tooltip title="How many people are in the establishment." placement="right">
                                 <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{buisness ? (groupCount + ` Party ( ${groupTotalCount} People)` ): <Skeleton/> }</Typography>
+                                    <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{business ? (groupCount + ` Party ( ${groupTotalCount} People)` ): <Skeleton/> }</Typography>
                                 </Button>
                             </Tooltip>
                         

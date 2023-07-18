@@ -8,7 +8,7 @@ import { addResource } from "./Helper";
 import { getServicesAvailable } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setSnackbar } from '../../reducers/user';
-import { setBuisness} from "../../reducers/buisness";
+import { setBusiness} from "../../reducers/business";
 import CloseIcon from "@mui/icons-material/Close"
 
 const validationSchema = Yup.object({
@@ -29,7 +29,7 @@ const initialValues = {
 
 export default function AddResource() {
   const [isOpen, setIsOpen] = useState(false);
-  const buisness = useSelector((state) => state.buisness);
+  const business = useSelector((state) => state.business);
   const serviceList = getServicesAvailable();
   const dispatch = useDispatch();
   const handleOpen = () => {
@@ -44,7 +44,7 @@ export default function AddResource() {
     addResource(values)
     .then(data => {
       dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
-      dispatch(setBuisness(data.buisness))
+      dispatch(setBusiness(data.business))
       handleClose();
     })
     .catch(error => {
@@ -97,7 +97,7 @@ export default function AddResource() {
                   </Grid>
 
                   <Grid item xs={12}>
-                  {buisness ? (
+                  {business ? (
                       <>
                           <InputLabel id="services">Services</InputLabel>
                           <Field

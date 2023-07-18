@@ -4,13 +4,12 @@ import { getStateData } from '../../auth/Auth';
 
 
 export const getServicesTotal  = () => {
-    const { _, buisness} = getStateData();
-    if ( !buisness ) { return new Error('No buisness data found.');}
-    const services = buisness.services;
+    const { _, business} = getStateData();
+    if ( !business ) { return new Error('No business data found.');}
+    const services = business.services;
     let active = 0;
     let unactive = 0;
     for(var service of services) {
-      
       switch(service.active){
         case true:
           active += 1;
@@ -25,9 +24,9 @@ export const getServicesTotal  = () => {
 }
 
 export const getServicesAvailable = () => {
-  const { _, buisness} = getStateData();
-  if ( !buisness ) { return new Error('No buisness data found.');}
-  const services = buisness.services;
+  const { _, business} = getStateData();
+  if ( !business ) { return new Error('No business data found.');}
+  const services = business.services;
   if ( !services ) { return []; }
   return services;
 }

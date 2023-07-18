@@ -5,15 +5,15 @@ import * as Yup from 'yup';
 import { useSelector } from 'react-redux';
 
 const validationSchema = Yup.object().shape({
-  buisnessName: Yup.string(),
-  buisnessWebsite: Yup.string(),
-  buisnessAddress: Yup.string(),
-  buisnessPhone: Yup.string()
+  businessName: Yup.string(),
+  businessWebsite: Yup.string(),
+  businessAddress: Yup.string(),
+  businessPhone: Yup.string()
 });
 
 const BusinessForm = () => {
   
-  const buisness = useSelector((state) => state.buisness);
+  const business = useSelector((state) => state.business);
 
   const handleSubmit = (values) => {
     console.log(values);
@@ -21,10 +21,10 @@ const BusinessForm = () => {
   };
 
   const initialValue = {
-        buisnessName: buisness.buisnessName,
-        buisnessWebsite: buisness.buisnessWebsite,
-        buisnessAddress: buisness.buisnessAddress,
-        buisnessPhone: buisness.buisnessPhone,
+        businessName: business.businessName,
+        businessWebsite: business.businessWebsite,
+        businessAddress: business.businessAddress,
+        businessPhone: business.businessPhone,
   }
 
   return (
@@ -39,40 +39,40 @@ const BusinessForm = () => {
             <Grid item xs={12}>
               <Stack spacing={2}>
                 <Field
-                  name="buisnessName"
+                  name="businessName"
                   as={TextField}
                   label="Business Name"
                   variant="outlined"
                   fullWidth
-                  error={touched.buisnessName && !!errors.buisnessName}
-                  helperText={touched.buisnessName && errors.buisnessName}
+                  error={touched.businessName && !!errors.businessName}
+                  helperText={touched.businessName && errors.businessName}
                 />
                 <Field
-                  name="buisnessWebsite"
+                  name="businessWebsite"
                   as={TextField}
                   label="Business Website"
                   variant="outlined"
                   fullWidth
-                  error={touched.buisnessWebsite && !!errors.buisnessWebsite}
-                  helperText={touched.buisnessWebsite && errors.buisnessWebsite}
+                  error={touched.businessWebsite && !!errors.businessWebsite}
+                  helperText={touched.businessWebsite && errors.businessWebsite}
                 />
                 <Field
-                  name="buisnessAddress"
+                  name="businessAddress"
                   as={TextField}
                   label="Business Address"
                   variant="outlined"
                   fullWidth
-                  error={touched.buisnessAddress && !!errors.buisnessAddress}
-                  helperText={touched.buisnessAddress && errors.buisnessAddress}
+                  error={touched.businessAddress && !!errors.businessAddress}
+                  helperText={touched.businessAddress && errors.businessAddress}
                 />
                 <Field
-                  name="buisnessPhone"
+                  name="businessPhone"
                   as={TextField}
                   label="Business Phone"
                   variant="outlined"
                   fullWidth
-                  error={touched.buisnessPhone && !!errors.buisnessPhone}
-                  helperText={touched.buisnessPhone && errors.buisnessPhone}
+                  error={touched.businessPhone && !!errors.businessPhone}
+                  helperText={touched.businessPhone && errors.businessPhone}
                 />
               </Stack>
             </Grid>

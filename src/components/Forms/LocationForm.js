@@ -12,7 +12,7 @@ const validationSchema = Yup.object().shape({
 
 const LocationForm = () => {
 
-  const buisness = useSelector((state) => state.buisness);
+  const business = useSelector((state) => state.business);
 
   const handleSubmit = (values) => {
     console.log(values);
@@ -20,8 +20,8 @@ const LocationForm = () => {
   };
 
   const initialValue = {
-    locationUrl : buisness.publicLink,
-    companyLogo: buisness.img
+    locationUrl : business.publicLink,
+    companyLogo: business.img
   }
 
   return (

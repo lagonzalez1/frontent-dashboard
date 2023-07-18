@@ -5,7 +5,7 @@ import { Card } from '@mui/material';
 export const allowClientJoin = (time,link) => {
     return new Promise((resolve, reject) => {
       axios
-        .get('/api/external/buisnessState', { params: { link, time } })
+        .get('/api/external/businessState', { params: { link, time } })
         .then((response) => {
           resolve(response);
         })
@@ -32,7 +32,7 @@ export const allowClientJoin = (time,link) => {
   export const getBuisnessForm = (link) => {
     return new Promise((resolve, reject) => {
       axios
-      .get('/api/external/buisnessForm', { params: {link} })
+      .get('/api/external/businessForm', { params: {link} })
       .then((response) => {
         resolve(response.data);
       })

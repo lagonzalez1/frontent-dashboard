@@ -10,7 +10,7 @@ const validationSchema = Yup.object().shape({
 
 const OpeningHoursForm = () => {
 
-  const buisness = useSelector((state) => state.buisness);
+  const business = useSelector((state) => state.business);
 
   const handleSubmit = (values) => {
     console.log(values);
@@ -50,8 +50,8 @@ const OpeningHoursForm = () => {
             </Grid>
             <Grid item xs={12}>
               <Stack direction="column">
-                {buisness.schedule &&
-                    Object.entries(buisness.schedule).map(([key, value]) => {
+                {business.schedule &&
+                    Object.entries(business.schedule).map(([key, value]) => {
                       if(key === '_id') { return; }
                       if (!value.start || !value.end) {
                         return (

@@ -32,12 +32,10 @@ export const AppBar = styled(MuiAppBar, {
 
 export const DetermineDaytimeOrEvening = () => {
 
-    const { user, buisness} = getStateData();
-    if (!user || !buisness) { return null;}
-    const timezone = buisness.timezone;
+    const { user, business} = getStateData();
+    if (!user || !business) { return null;}
+    const timezone = business.timezone;
     if (!timezone) { return 'No timezone present.';}
-
-
     const currentTime = DateTime.local().setZone(timezone);
   
     const morningThreshold = DateTime.local().set({ hour: 12, minute: 0, second: 0, millisecond: 0 });

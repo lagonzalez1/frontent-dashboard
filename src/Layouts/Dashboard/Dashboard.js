@@ -4,7 +4,6 @@ import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
 import Waitlist from "../../components/Waitlist/Waitlist";
 import FabButton from "../../components/Add/FabButton";
-import FullScreenLoader from "../../components/Loader/FullScreenLoader";
 import Resources from "../Resources/Resources";
 import Serving from "../Serving/Serving";
 import Settings from "../Settings/Settings";
@@ -12,9 +11,8 @@ import Services from "../Services/Services";
 import Help from "../Help/Help";
 
 
-import { getStateData } from "../../auth/Auth";
 import { useSignOut } from "react-auth-kit";
-import { DashboardHeader, checkLocalStorage } from "./DashboardHelper"
+import { DashboardHeader } from "./DashboardHelper"
 import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
@@ -35,12 +33,10 @@ export default function Dashboard () {
     const signOut = useSignOut();
 
     const [openNav, setOpenNav] = useState(false);
-    const email = useSelector((state) => state.user.email);
 
     async function checkAuthStatus() {
         try {
             const isAuth = await isAuthenticated(dispatch);
-            console.log(isAuth)
             if (!isAuth) {
                 removeUserState();
                 signOut();
@@ -54,8 +50,7 @@ export default function Dashboard () {
     }
 
 
-    useEffect(() => {
-        
+    useEffect(() => { 
         checkAuthStatus();
     },[])
 

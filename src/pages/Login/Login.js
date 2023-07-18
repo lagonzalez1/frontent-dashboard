@@ -24,10 +24,6 @@ export default function Login() {
         password: '',
     })
 
-    useEffect(() => {
-             
-    }, [])
-
     async function loginRequest(data) {
         const response = await axios.post('/api/external/login', data)
         return response;

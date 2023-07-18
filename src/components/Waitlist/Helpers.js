@@ -22,18 +22,20 @@ export const handleOpenNewTab = (endpoint) => {
  * @param {Number} accepting    0: open client store 
  *                              1: close client store 
  * @param {*} dispatch          useSDispatch hook from redux
+ *                              Get current time and update the override, at the start of a new day
+ *                              the client will be abel to override to go back to schedule by checking the current date. 
  */
 export const requestChangeAccept = (accepting, dispatch) => {
-    const { user , buisness} = getStateData();
+    const { user , business} = getStateData();
     const accessToken = getAccessToken();
-    if (!user || !buisness || !accessToken) { return new Error('User, buisness, token might be missing.') }
+    if (!user || !business || !accessToken) { return new Error('User, business, token might be missing.') }
     const id = user.id;
     const email = user.email;
-    const b_id = buisness._id;
+    const b_id = business._id;
     const headers = { headers: {'x-access-token': accessToken} }
-    
+    const currentTime = DateTime.local().setZone(business.timezone);
     const requestBody = {
-        id: id,
+        currentTime,
         accessToken,
         email: email,
         b_id,
@@ -51,22 +53,22 @@ export const requestChangeAccept = (accepting, dispatch) => {
 /**
  * NEDS ATTENTION: sort function not being utilized.
  *                 Sort based on columns buttons ?
- * @returns Sorted buisness table, decending order based on timestamp.
+ * @returns Sorted business table, decending order based on timestamp.
  * 
  */
 export const getUserTable = () => {
     try {
-      const { user, buisness } = getStateData();
-      if (!user || !buisness) {
-        return new Error('User, buisness, or token might be missing.');
+      const { user, business } = getStateData();
+      if (!user || !business) {
+        return new Error('User, business, or token might be missing.');
       }
   
-      const appointments = buisness.currentClients;
+      const appointments = business.currentClients;
       if (!appointments) {
         return [];
       }
   
-      const timezone = buisness.timezone;
+      const timezone = business.timezone;
       if (!timezone) {
         return new Error('No timezone to validate.');
       }

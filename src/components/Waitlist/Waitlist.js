@@ -15,7 +15,7 @@ import {  findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, getUserTable, clientOptions, OPTIONS_SELECT } from "./Helpers";
-import { reloadBuisnessData } from "../../hooks/hooks";
+import { reloadBusinessData } from "../../hooks/hooks";
 
 
 
@@ -33,7 +33,7 @@ export default function Waitlist () {
     const openVert = Boolean(anchorElVert);
 
     const tableData = getUserTable();
-    const buisness = useSelector(state => state.buisness);
+    const business = useSelector((state) => state.business);
 
     const handleClickListItem = (event) => {
         setAnchorEl(event.currentTarget);
@@ -58,7 +58,7 @@ export default function Waitlist () {
      */
     const handleMenuItemClick = (event, storeState) => {
         if (storeState === 2) {
-            const link = buisness.publicLink;
+            const link = business.publicLink;
             handleOpenNewTab(link);
             setAnchorEl(null);
             setLoading(true);
@@ -101,7 +101,7 @@ export default function Waitlist () {
 
 
     useEffect(() => {
-        reloadBuisnessData(dispatch);
+        reloadBusinessData(dispatch);
         return() => {
             setLoading(false);
         }
@@ -118,7 +118,7 @@ export default function Waitlist () {
                 >
                     <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack>
-                            <Typography variant="body2">{buisness ? buisness.buisnessName: <Skeleton/> }</Typography>
+                            <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
                             <Typography variant="h5"><strong>Waitlist</strong></Typography>
                         </Stack>
                         
@@ -137,11 +137,11 @@ export default function Waitlist () {
                         aria-expanded={open ? 'true' : undefined}
                         onClick={handleClickListItem}
                         >
-                        {buisness.accepting ? 
+                        {business.accepting ? 
                         <FiberManualRecordIcon fontSize="small" htmlColor="#00FF00"/>:
                         <FiberManualRecordIcon fontSize="small" htmlColor="#FF0000"/>} 
                         <ListItemText
-                            primary={ buisness.accepting ? 'Open' : 'Close'}
+                            primary={ business.accepting ? 'Open' : 'Close'}
                         />
                         <KeyboardArrowDownIcon/>
                         </ListItem>
@@ -160,7 +160,7 @@ export default function Waitlist () {
                         
 
 
-                        { buisness.accepting ? 
+                        { business.accepting ? 
                         (<MenuItem
                             key={0}
                             onClick={(event) => handleMenuItemClick(event, 0)}
@@ -198,7 +198,7 @@ export default function Waitlist () {
                             
                             <Tooltip title="Your current location." placement="bottom">
                                 <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SouthAmericaIcon />}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{buisness ? (buisness.timezone): <Skeleton/> }</Typography>
+                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? (business.timezone): <Skeleton/> }</Typography>
                                 </Button>
                             </Tooltip>
                             <Tooltip title="The estimated time for the next person that joins your line." placement="right">

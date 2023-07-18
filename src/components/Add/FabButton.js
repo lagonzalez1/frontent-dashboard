@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getResourcesAvailable, getServicesAvailable } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { setBuisness } from "../../reducers/buisness";
+import { setBusiness } from "../../reducers/business";
 
 
 
@@ -20,7 +20,7 @@ export default function FabButton () {
     const [errors, setError] = useState();
 
     
-    const buisness = useSelector(state => state.buisness);
+    const business = useSelector(state => state.business);
     const serviceList = getServicesAvailable();
     const resourceList = getResourcesAvailable();
 
@@ -39,7 +39,7 @@ export default function FabButton () {
     const handleSubmit = (payload) => {
         addCustomerWaitlist(payload, dispatch)
         .then(data => {
-            dispatch(setBuisness(data.buisness));
+            dispatch(setBusiness(data.business));
             handleClose();
         })
         .catch(error => {
@@ -142,7 +142,7 @@ export default function FabButton () {
                             onBlur={handleBlur}
                             />
 
-                            {buisness ? (
+                            {business ? (
                             <>
                                 <InputLabel id="services">Services</InputLabel>
                                 <Field
@@ -165,7 +165,7 @@ export default function FabButton () {
                             </>
                             ) : null}
 
-                            {buisness ? (
+                            {business ? (
                             <>
                                 <InputLabel id="resources">Resources</InputLabel>
                                 <Field

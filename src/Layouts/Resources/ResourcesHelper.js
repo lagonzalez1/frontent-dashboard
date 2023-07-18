@@ -5,17 +5,17 @@ import { getStateData } from '../../auth/Auth';
 
 
 export const getServicesAvailable = () => {
-  const { _, buisness} = getStateData();
-  if ( !buisness ) { return new Error('No buisness data found.');}
-  const services = buisness.services;
+  const { _, business} = getStateData();
+  if ( !business ) { return new Error('No business data found.');}
+  const services = business.services;
   if ( !services ) { return []; }
   return services;
 }
 
 export const getResourcesAvailable = () => {
-  const { _, buisness} = getStateData();
-  if ( !buisness ) { return new Error('No buisness data found.');}
-  const resources = buisness.resources;
+  const { _, business} = getStateData();
+  if ( !business ) { return new Error('No business data found.');}
+  const resources = business.resources;
   if ( !resources ) { return []; }
   return resources;
 }
@@ -23,9 +23,9 @@ export const getResourcesAvailable = () => {
 
 
 export const findServingSize = (id) => {
-  const { _, buisness} = getStateData();
-  if ( !buisness ) { return new Error('No buisness data found.');}
-  const clients = buisness.currentClients;
+  const { _, business} = getStateData();
+  if ( !business ) { return new Error('No business data found.');}
+  const clients = business.currentClients;
   for (var client of clients){
     if (client.resourceTag === id) {
       return client.partySize;
@@ -35,9 +35,9 @@ export const findServingSize = (id) => {
 }
 
 export const findResourceTag = (id) => {
-  const { _, buisness} = getStateData();
-  if ( !buisness ) { return new Error('No buisness data found.');}
-  const employees = buisness.employees;
+  const { _, business} = getStateData();
+  if ( !business ) { return new Error('No business data found.');}
+  const employees = business.employees;
   if ( !employees) { return new Error('No employees');}
   for (var employee of employees) {
     if (employee.resourceTag === id){
@@ -48,9 +48,9 @@ export const findResourceTag = (id) => {
 }
 
 export const update = async (form) => {
-  const { user, buisness} = getStateData();
+  const { user, business} = getStateData();
   const id = user.id;
-  const bId = buisness._id;
+  const bId = business._id;
   const data = { ...form, id, bId};
   console.log(data);
   // Create request here to update resource. 
@@ -72,8 +72,8 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
   }));
 
   export const getResourcesTotal = () => {
-      const { _, buisness} = getStateData();
-      const services = buisness.services;
+      const { _, business} = getStateData();
+      const services = business.services;
       const active = 0;
       const unactive = 0;
       for (var service in services) {

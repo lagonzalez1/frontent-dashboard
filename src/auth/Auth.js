@@ -8,23 +8,23 @@
  *              
  */
 import axios from "axios";
-import buisness, { setBuisness } from "../reducers/buisness";
+import { setBusiness } from "../reducers/business";
 import { setIndex, setLocation, setUser } from "../reducers/user";
 const TOKEN_KEY = 'access_token';
-const BUISNESS = 'buisness';
+const BUSINESS = 'business';
 const USER = 'user';
 
 
   export const getStateData = () => {
-    const buisness = JSON.parse(localStorage.getItem(BUISNESS));
+    const business = JSON.parse(localStorage.getItem(BUSINESS));
     const user = JSON.parse(localStorage.getItem(USER));
-    return { user, buisness };
+    return { user, business };
   }
 
   const checkLocalStorage = () => {
     const user = localStorage.getItem(USER);
-    const buisness = localStorage.getItem(BUISNESS);
-    if (!user || !buisness) {
+    const business = localStorage.getItem(BUSINESS);
+    if (!user || !business) {
       return false
     }
     return true;
@@ -42,8 +42,8 @@ const USER = 'user';
     localStorage.removeItem(TOKEN_KEY);
   };
 
-  export const removeBuisnessState = () => {
-    localStorage.removeItem(BUISNESS);
+  export const removeBusinessState = () => {
+    localStorage.removeItem(BUSINESS);
   }
 
   export const removeUser = () => {
@@ -53,17 +53,22 @@ const USER = 'user';
   export const removeUserState = () => {
     removeUser();
     removeAccessToken();
-    removeBuisnessState();
+    removeBusinessState();
   }
   
+
+  /**
+   * 
+   * @param {Redux Obj} dispatch  Sync available data to store. 
+   * @returns                     Boolean: Aauthenticate state. 
+   */
   export const isAuthenticated = async (dispatch) => {
-    
     if (!checkLocalStorage()) {
       return false;
     }
     try {
       const status = await checkAccessToken();
-      dispatch(setBuisness(status.buisness));
+      dispatch(setBusiness(status.business));
       dispatch(setUser({ id: status.id, email: status.email}))
       dispatch(setIndex(status.defaultIndex));
       dispatch(setLocation(0))
@@ -84,6 +89,7 @@ const USER = 'user';
     const email = user.email;
     try {
       const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: {'x-access-token': token} });
+      console.log(response.data);
       return response.data;
     } catch (error) {
       console.log(error);

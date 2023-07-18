@@ -2,18 +2,18 @@ import React, { useState } from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogActions, DialogTitle, DialogContent, Switch, Button,
 Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel } from '@mui/material';
 import { getResourcesTotal, StyledCardService, stringAvatar,
-    StyledTableCell, findResourceTag, findServingSize, update } from "./ResourcesHelper"; 
-import { getEmployeeList, findClient, getResourceData } from "../../hooks/hooks";
+ findResourceTag, findServingSize, update } from "./ResourcesHelper"; 
+import { findClient } from "../../hooks/hooks";
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useSelector } from "react-redux";
-import buisness from "../../reducers/buisness";
+import business from "../../reducers/business";
 
 export default function Resources() {
     const {active, unactive} = getResourcesTotal();
-    const employeeList = useSelector((state) => state.buisness.employees);
-    const resourceData = useSelector((state) => state.buisness.resources);
+    const employeeList = useSelector((state) => state.business.employees);
+    const resourceData = useSelector((state) => state.business.resources);
 
     const [dialog, setDialog] = useState(false);
     const [resource, setResource] = useState({});

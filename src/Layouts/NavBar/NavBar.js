@@ -14,11 +14,12 @@ export default function NavBar({ navState, openNav }) {
 
     
     const signOut = useSignOut();
-    const buisness = useSelector((state) => state.buisness);
-
-
+    const business = useSelector((state) => state.business);
+    const user = useSelector((state) => state.user);
+    console.log(user);
+    console.log(business);
     const LiveClock = () => {
-      const timezone = buisness.timezone;
+      const timezone = business.timezone;
       const [currentTime, setCurrentTime] = useState(DateTime.local().setZone(timezone));
     
       useEffect(() => {

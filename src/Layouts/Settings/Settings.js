@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Container,Paper, Typography, Divider, Grid, Stack, List,ListItemButton, ListItemText, ListItem } from "@mui/material";
 import LocationForm from "../../components/Forms/LocationForm";
 import OpeningHoursForm from "../../components/Forms/OpeningHoursForm";
-import BusinessForm from "../../components/Forms/BuisnessForm";
+import BusinessForm from "../../components/Forms/BusinessForm";
 import PaymentForm from "../../components/Forms/PaymentForm";
 import { getResourceList, getServiceList } from "./SettingsHelper";
 import { useSelector } from "react-redux";
@@ -12,11 +12,11 @@ import RService from "../../components/Dialog/RServices";
 
 export default function Settings() {
 
-    const buisness = useSelector((state) => state.buisness);
+    const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (buisness){
+        if (business){
             setLoading(false);
         }
     }, [loading])
@@ -50,7 +50,7 @@ export default function Settings() {
                                         Location
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        Your location name {'Buisness name'} is displayed across many areas including on your online pages and messages to client
+                                        Your location name {'Business name'} is displayed across many areas including on your online pages and messages to client
                                     </Typography>
                                 </Stack>
                             </Grid>
@@ -66,7 +66,7 @@ export default function Settings() {
                                         Hours
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        Your location name {'Buisness name'} is displayed across many areas including on your online pages and messages to client
+                                        Your location name {'Business name'} is displayed across many areas including on your online pages and messages to client
                                     </Typography>
                                 </Stack>
                             </Grid>
@@ -76,11 +76,11 @@ export default function Settings() {
                         </Grid>
 
                         <Divider sx={{backgroundColor: 'lightgray'}} />
-                        <Grid container id="buisness">
+                        <Grid container id="business">
                             <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
-                                        Buisness info
+                                        Business info
                                     </Typography>
                                     <Typography variant="subtitle2">
                                     Your business info is displayed on your online pages and messages to client

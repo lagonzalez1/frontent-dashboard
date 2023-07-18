@@ -1,12 +1,15 @@
 import { getStateData } from "../../auth/Auth";
 import { DateTime } from "luxon";
+const MINUTES_IN_HOUR = 60;
 
 
 export const getServingCount = () => {
-    const { _ , buisness } = getStateData();
-    if (!buisness) { return new Error('Buisness data is empty.')}
-    const currentList = buisness.currentClients;
-    if (!currentList) { return 0;}
+    const { _ , business } = getStateData();
+    console.log(business);
+    if (!business) { return new Error('Buisness data is empty.')}
+    const currentList = business.currentClients;
+    console.log(currentList);
+    if (currentList.length === 0) { return { groupCount: 0 ,groupTotalCount: 0} }
     let groupCount = 0;
     let groupTotalCount = 0;
     for (var object of currentList) {
@@ -18,36 +21,33 @@ export const getServingCount = () => {
 }
 
 export const currentTimePosition = () => {
-    const { _ , buisness} = getStateData();
-    const timezone = buisness.timezone;
+    const { _ , business} = getStateData();
+    const timezone = business.timezone;
     if (!timezone) { return 'No timezone present.';}
 
 }
 
 
-
-
-const MINUTES_IN_HOUR = 60;
 export const getUserTable = () => {
     try {
-      const { user, buisness } = getStateData();
-      if (!user || !buisness) {
+      const { user, business } = getStateData();
+      if (!user || !business) {
         return [];
       }
   
-      const appointments = buisness.currentClients;
+      const appointments = business.currentClients;
       if (!appointments) {
         return [];
       }
   
-      const timezone = buisness.timezone;
+      const timezone = business.timezone;
       if (!timezone) {
         return [];
       }
   
       const currentTime = DateTime.local().setZone(timezone);
   
-      const wait = appointments.map((client) => {
+        const wait = appointments.map((client) => {
         const luxonDateTime = DateTime.fromJSDate(new Date(client.status.serveTime));
         const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
         const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;

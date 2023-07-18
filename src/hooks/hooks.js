@@ -2,21 +2,21 @@
 import axios from "axios";
 import { DateTime } from "luxon";
 import { getStateData, getAccessToken } from "../auth/Auth";
-import { setBuisness } from "../reducers/buisness";
-let GET_BUISNESS = '/api/internal/reload_buisness/'
+import { setBusiness } from "../reducers/business";
+let GET_BUSINESS = '/api/internal/reload_business/'
 
 
-export const reloadBuisnessData = (dispatch) => {
-    const { user, buisness } = getStateData();
-    if (!user  || !buisness ) { return new Error('Data not found.')}
+export const reloadBusinessData = (dispatch) => {
+    const { user, _ } = getStateData();
+    if (!user ) { return new Error('Data not found.')}
     const accessToken = getAccessToken();
     const headers = { headers: {'x-access-token': accessToken} }
     const id = user.id;
-    const bid = buisness._id;
-    const ENDPOINT = GET_BUISNESS + id + '/' + bid;
+    const ENDPOINT = GET_BUSINESS + id;
     axios.get(ENDPOINT, headers)
     .then(response => {
-        dispatch(setBuisness(response.data.buisness));
+        console.log(response.data);
+        dispatch(setBusiness(response.data.business));
         return;
     })
     .catch(error => {
@@ -27,17 +27,17 @@ export const reloadBuisnessData = (dispatch) => {
 }
 
 export const getEmployeeList = () => {
-    const { _ , buisness} = getStateData();
-    if (!buisness) { return new Error('Buisness data is empty.'); }
-    const employees = buisness.employees;
+    const { _ , business} = getStateData();
+    if (!business) { return new Error('business data is empty.'); }
+    const employees = business.employees;
     if (!employees){ return new Error('No employees found.'); }
     return employees;
 }
 
 export const findEmployee = (id) => {
-    const { _ , buisness} = getStateData();
-    if (!buisness) { return new Error('Buisness data is empty.'); }
-    const employees = buisness.employees;
+    const { _ , business} = getStateData();
+    if (!business) { return new Error('business data is empty.'); }
+    const employees = business.employees;
     if (!employees) { return new Error('No employees.')}
     for (var employee of employees){
         if ( employee._id === id){
@@ -50,12 +50,12 @@ export const findEmployee = (id) => {
 
 
 export const getClientsByResource = (id, resourceTag) => {
-    const { _ , buisness} = getStateData();
-    if (!buisness) { return new Error('Buisness data is empty.'); }
-    const timezone = buisness.timezone;
+    const { _ , business} = getStateData();
+    if (!business) { return new Error('business data is empty.'); }
+    const timezone = business.timezone;
     if (!timezone) { return new Error('No timezone available.')}
     const timestampNow = DateTime.now().setZone(timezone);
-    const clientList = buisness.currentClients;
+    const clientList = business.currentClients;
     const list = [];
     console.log(id)
     console.log(resourceTag)
@@ -73,14 +73,14 @@ export const getClientsByResource = (id, resourceTag) => {
 
 
 export const getResourceData = () => {
-    const { _ , buisness} = getStateData();
-    if (!buisness) { return []}
-    const timezone = buisness.timezone;
+    const { _ , business} = getStateData();
+    if (!business) { return []}
+    const timezone = business.timezone;
     if (!timezone) { return []}
 
     const timestampNow = DateTime.now().setZone(timezone);
-    const clientList = buisness.currentClients;
-    let resources = buisness.resources;
+    const clientList = business.currentClients;
+    let resources = business.resources;
     for (var client of clientList) {
         const timestamp = DateTime.fromISO(client.timestamp, { zone: 'utc' });
         const timestampInTimezone = timestamp.setZone(timezone);
@@ -112,9 +112,9 @@ export const getResourceData = () => {
  *  
  */
 export const findClient = (id) => {
-    const { _ , buisness} = getStateData();
-    if (!buisness) { return [] }
-    const clients = buisness.currentClients;
+    const { _ , business} = getStateData();
+    if (!business) { return [] }
+    const clients = business.currentClients;
     if ( !clients) { return [] }
     for( var client of clients) {
         if (client._id === id) {
@@ -132,9 +132,9 @@ export const findClient = (id) => {
  *  
  */
 export const findResource = (id) => {
-    const { _ , buisness} = getStateData();
-    if (!buisness) { return new Error('Buisness data is empty.'); }
-    const resources = buisness.resources;
+    const { _ , business} = getStateData();
+    if (!business) { return new Error('business data is empty.'); }
+    const resources = business.resources;
     for (var resource of resources){
         if ( resource._id === id){
             return resource;
@@ -150,9 +150,9 @@ export const findResource = (id) => {
  *  
  */
 export const findService = (id) => {
-    const { _ , buisness} = getStateData();
-    if (!buisness) { return new Error('Buisness data is empty.'); }
-    const services = buisness.services;
+    const { _ , business} = getStateData();
+    if (!business) { return new Error('business data is empty.'); }
+    const services = business.services;
     for (var service of services){
         if ( service._id === id){
             return service;
@@ -163,18 +163,18 @@ export const findService = (id) => {
 
 
 export const getServicesAvailable = () => {
-    const { _, buisness} = getStateData();
-    if (!buisness) { return new Error('Buisness data ais empty.'); }
-    const services = buisness.services;
+    const { _, business} = getStateData();
+    if (!business) { return new Error('business data ais empty.'); }
+    const services = business.services;
     if ( !services ) { return []; }
     return services;
   }
 
 
 export const getResourcesAvailable = () => {
-    const { _, buisness} = getStateData();
-    if (!buisness) { return new Error('Buisness data is empty.');}
-    const resources = buisness.resources;
+    const { _, business} = getStateData();
+    if (!business) { return new Error('business data is empty.');}
+    const resources = business.resources;
     if ( !resources ) { return []; }
     return resources;
 }
