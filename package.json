@@ -2,7 +2,6 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3001",
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
@@ -29,14 +28,14 @@
     "react-intersection-observer": "^9.5.2",
     "react-redux": "^8.1.0",
     "react-router-dom": "^6.11.2",
-    "react-scripts": "4.0.3",
+    "react-scripts": "^5.0.1",
     "unsplash-js": "^7.0.18",
     "web-vitals": "^2.1.4",
     "webfontloader": "^1.6.28",
     "yup": "^1.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -58,5 +57,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
