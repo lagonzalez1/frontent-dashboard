@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import {Container, Nav, Navbar as N, NavDropdown} from 'react-bootstrap';
 
@@ -21,6 +22,17 @@ export default function Navbar(props) {
         }
      }, [props])
 
+
+    const requestToBackend = () => {
+        axios.get('/api/external/data')
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+
     return (
         <>
             <N collapseOnSelect expand="lg" bg="light" variant="light" id="app_bar" fixed="top">
@@ -33,7 +45,7 @@ export default function Navbar(props) {
                     <N.Toggle aria-controls="responsive-navbar-nav" />
                     <N.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav.Link onClick={() => navigate('/Products')}>
+                        <Nav.Link onClick={() => requestToBackend()}>
                             <Typography>
                                 Features
                             </Typography>
