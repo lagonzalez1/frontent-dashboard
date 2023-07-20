@@ -20,7 +20,7 @@ export default function FabButton () {
     const [errors, setError] = useState();
 
     
-    const business = useSelector(state => state.business);
+    const business = useSelector((state) => state.business);
     const serviceList = getServicesAvailable();
     const resourceList = getResourcesAvailable();
 

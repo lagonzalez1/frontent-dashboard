@@ -1,4 +1,4 @@
-import React, {  useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
@@ -35,6 +35,7 @@ export default function Dashboard () {
     const [openNav, setOpenNav] = useState(false);
 
     async function checkAuthStatus() {
+        console.log("called");
         try {
             const isAuth = await isAuthenticated(dispatch);
             if (!isAuth) {
@@ -51,6 +52,7 @@ export default function Dashboard () {
 
 
     useEffect(() => { 
+        console.log("called");
         checkAuthStatus();
     },[])
 

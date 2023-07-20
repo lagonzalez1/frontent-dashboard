@@ -28,14 +28,12 @@ export default function Waitlist () {
     const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
 
-
-
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
+    const business = useSelector((state) => state.business);
 
     const tableData = getUserTable();
-    const accepting = acceptingRejecting();
-    const business = useSelector((state) => state.business);
+    let accepting = acceptingRejecting();
 
     const handleClickListItem = (event) => {
         setAnchorEl(event.currentTarget);
@@ -43,7 +41,7 @@ export default function Waitlist () {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const handleCloseVert = () =>{
+    const handleCloseVert = () => {
         setAnchorElVert(null);
     }
     const handleOpenVert = (event) => {
@@ -59,16 +57,30 @@ export default function Waitlist () {
      * @returns 
      */
     const handleMenuItemClick = (event, storeState) => {
+        event.preventDefault();
+        
         if (storeState === 2) {
             const link = business.publicLink;
             handleOpenNewTab(link);
             setAnchorEl(null);
-            setLoading(true);
+            setLoading(false);
             return;
         }
-        requestChangeAccept(storeState, dispatch);
-        setAnchorEl(null);
         setLoading(true);
+        requestChangeAccept(storeState)
+        .then(response => {
+            dispatch(setSnackbar({ requestMessage: response.msg, requestStatus: true }));
+            setLoading(false);
+            setAnchorEl(null);
+            return;
+        })
+        .catch(error => {
+            dispatch(setSnackbar({ requestMessage: error.msg, requestStatus: false }));
+            setLoading(false);
+            setAnchorEl(null);
+            return;
+        })
+        
     };
   
 

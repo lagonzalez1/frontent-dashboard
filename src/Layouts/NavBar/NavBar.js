@@ -15,9 +15,7 @@ export default function NavBar({ navState, openNav }) {
     
     const signOut = useSignOut();
     const business = useSelector((state) => state.business);
-    const user = useSelector((state) => state.user);
-    console.log(user);
-    console.log(business);
+    
     const LiveClock = () => {
       const timezone = business.timezone;
       const [currentTime, setCurrentTime] = useState(DateTime.local().setZone(timezone));

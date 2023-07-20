@@ -8,6 +8,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import { getStateData, getAccessToken } from "../../auth/Auth";
 import { setSnackbar } from "../../reducers/user";
 
+// Current data
+
 const ENDPOINT_ACCEPTING = '/api/internal/update_accepting' 
 const MINUTES_IN_HOUR = 60;
 
@@ -15,7 +17,6 @@ export const handleOpenNewTab = (endpoint) => {
     const url = 'http://localhost:3000/welcome/'+endpoint;
     window.open(url, '_blank');
 };
-
 
 /**
  * 
@@ -25,30 +26,36 @@ export const handleOpenNewTab = (endpoint) => {
  *                              Get current time and update the override, at the start of a new day
  *                              the client will be abel to override to go back to schedule by checking the current date. 
  */
-export const requestChangeAccept = (accepting, dispatch) => {
-    const { user , business} = getStateData();
+export const requestChangeAccept = (accepting) => {
+  const { user, business } = getStateData();
+  return new Promise((resolve, reject) => {
     const accessToken = getAccessToken();
-    if (!user || !business || !accessToken) { return new Error('User, business, token might be missing.') }
-    const id = user.id;
+    if (!user || !business || !accessToken) {
+      reject(new Error('User, business, token might be missing.'));
+      return;
+    }
+
     const email = user.email;
     const b_id = business._id;
-    const headers = { headers: {'x-access-token': accessToken} }
+    const headers = { headers: { 'x-access-token': accessToken } };
     const currentDate = DateTime.local().setZone(business.timezone).toISO();
     const requestBody = {
-        currentDate,
-        accessToken,
-        email: email,
-        b_id,
-        accepting
+      currentDate,
+      accessToken,
+      email: email,
+      b_id,
+      accepting
     };
+
     axios.put(ENDPOINT_ACCEPTING, requestBody, headers)
-    .then(response => {
-        dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}))
-    })
-    .catch(error => {
-        dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
-    });
-}
+      .then(response => {
+        resolve(response.data); // Resolve the promise with the response data
+      })
+      .catch(error => {
+        reject(error); // Reject the promise with the error
+      });
+  });
+};
 
 /**
  * NEDS ATTENTION: sort function not being utilized.
@@ -57,8 +64,9 @@ export const requestChangeAccept = (accepting, dispatch) => {
  * 
  */
 export const getUserTable = () => {
+  const { user, business } = getStateData();
+
     try {
-      const { user, business } = getStateData();
       if (!user || !business) {
         return new Error('User, business, or token might be missing.');
       }
@@ -73,10 +81,10 @@ export const getUserTable = () => {
         return new Error('No timezone to validate.');
       }
   
-      const currentTime = DateTime.local().setZone(timezone);
-      const sorted = appointments.sort(sortBaseTime); //Not yet implemented
+        const currentTime = DateTime.local().setZone(timezone);
+        const sorted = appointments.sort(sortBaseTime); //Not yet implemented
   
-      const wait = appointments.map((client) => {
+        const wait = appointments.map((client) => {
         const luxonDateTime = DateTime.fromJSDate(new Date(client.timestamp));
         const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
         const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
@@ -107,24 +115,38 @@ function sortBaseTime (a,b) {
     return 0;
 }
 
+
+
+// Might need a buffer to aaccept appointments a bit earlier.
 export const acceptingRejecting = () => {
-    const { user, business} = getStateData();
-    const currentDate = new DateTime.local().setZone(business.timezone);
-    // Check if its false 
-    if (business.accepting_override.accepting === true){
-      const lastOverrideDate = DateTime.fromJSDate(business.accepting_override.lastDate).setZone(business.timezone);
-      if (currentDate.hasSame(lastOverrideDate, 'day')){
-        return business.accepting_override.accepting;
-      }else {
-        return business.accepting;
+    const { user, business } = getStateData();
+
+    let currentDate = DateTime.local().setZone(business.timezone);
+    let weekday = currentDate.weekdayLong;
+    let currentSchedule = business.schedule[weekday];
+    
+    const override = business.accepting_override;
+    // Check if override is active for the same day.
+    if(override.lastDate){
+      const overrideDate = DateTime.fromJSDate(new Date(override.lastDate));
+      if (overrideDate.hasSame(currentDate, 'day')){
+        return override.accepting;
       }
+    }
+    if (currentSchedule.start === '' || currentSchedule.end === ''){
+      return false;
+    }
+    const start = DateTime.fromFormat(currentSchedule.start, "HH:mm");
+    const end = DateTime.fromFormat(currentSchedule.end,"HH:mm");
+    // Check if current time is within start and end.
+    if ( currentDate >= start && currentDate <= end){
+      return true;
     }
 } 
 
 
 /*
     STATIC VARIABLES
-
 */
 
 export const options = [

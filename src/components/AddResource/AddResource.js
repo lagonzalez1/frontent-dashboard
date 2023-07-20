@@ -16,7 +16,7 @@ const validationSchema = Yup.object({
   service_id: Yup.string(),
   description: Yup.string(),
   serveSize: Yup.number().required('Serve size is required'),
-  active: Yup.boolean()
+  active: Yup.boolean(),
 });
 
 const initialValues = {
@@ -25,6 +25,7 @@ const initialValues = {
   description: '',
   serveSize: 1,
   active: false,
+  public: false
 };
 
 export default function AddResource() {
@@ -59,7 +60,7 @@ export default function AddResource() {
       <Fab color="primary" onClick={handleOpen}>
         <AddIcon/>
       </Fab>
-      <Dialog open={isOpen} onClose={handleClose} fullWidth maxWidth="sm">
+      <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="sm">
         <DialogTitle>
           Add a resource
           <IconButton
@@ -89,9 +90,9 @@ export default function AddResource() {
                       name="title"
                       as={TextField}
                       label="Title"
-                      fullWidth
                       variant="outlined"
                       onChange={handleChange}
+                      fullWidth={true}
                       error={touched.title && !!errors.title}
                     />
                   </Grid>
@@ -105,7 +106,7 @@ export default function AddResource() {
                           id="services"
                           name="service_id"
                           label="Service"
-                          fullWidth
+                          fullWidth={true}
                           error={touched.service_id && !!errors.service_id}
                           onChange={handleChange}
                           onBlur={handleBlur}
@@ -123,8 +124,8 @@ export default function AddResource() {
                     <Field
                       name="description"
                       as={TextField}
+                      fullWidth={true}
                       label="Description"
-                      fullWidth
                       onChange={handleChange}
                       variant="outlined"
                       error={touched.description && !!errors.description}
@@ -134,10 +135,10 @@ export default function AddResource() {
                     <Field
                       name="serveSize"
                       as={TextField}
+                      fullWidth={true}
                       label="Serve size"
                       type="number"
                       onChange={handleChange}
-                      fullWidth
                       variant="outlined"
                       error={touched.serveSize && !!errors.serveSize}
                     />
@@ -147,9 +148,9 @@ export default function AddResource() {
                       name="active"
                       type="checkbox"
                       as={TextField}
+                      fullWidth={true}
                       onChange={handleChange}
                       label="Set active"
-                      fullWidth
                       error={touched.active && !!errors.active}
                     />
                   </Grid>

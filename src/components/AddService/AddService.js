@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import {
   Fab,
-  Modal,
   TextField,
-  Button,
-  Dialog, Box, IconButton, DialogTitle, DialogContentText, DialogContent, DialogActions
+  Button, Checkbox, 
+  Dialog, Box, IconButton, DialogTitle, DialogContent, DialogActions, Select, InputLabel, MenuItem, Stack, FormLabel, Grid
 } from '@mui/material';
 
 import makeStyles from "@emotion/styled"
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-
+import { useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { submitService } from './Helper';
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -39,11 +39,15 @@ const validationSchema = Yup.object().shape({
   description: Yup.string().required('Description is required'),
   duration: Yup.number().required('Duration is required'),
   cost: Yup.number(),
+  public: Yup.boolean(),
+  active: Yup.boolean(),
+  employeeTag: Yup.string()
 });
 
 const AddService = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const employees = useSelector((state) => state.business.employees);
 
   const handleOpen = () => {
     setOpen(true);
@@ -54,7 +58,13 @@ const AddService = () => {
   };
 
   const handleSubmit = (values) => {
-    console.log(values); // Handle form submission logic here
+    submitService(values)
+    .then(response => {
+        console.log(response)
+    })
+    .catch(error => {
+      console.log(error)
+    }) 
     setOpen(false);
   };
 
@@ -67,9 +77,11 @@ const AddService = () => {
         open={open}
         onClose={handleClose}
         className={classes.modal}
+        maxWidth={'xs'}
+        fullWidth={true}
       >
         <DialogTitle>
-            Add a resource
+            Add a service
             <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -90,36 +102,45 @@ const AddService = () => {
               description: '',
               duration: '',
               cost: '',
-              resourceId: '',
+              employeeTag: '',
+              public: false,
+              active: false
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            <Form>
+            {({handleChange ,touched, errors}) => (
+              <Form>
+              <Stack spacing={1}>
               <Field
                 as={TextField}
                 name="title"
                 label="Title"
-                fullWidth
+                fullWidth={true}
                 margin="normal"
                 variant="outlined"
+                onChange={handleChange}
+                error={touched.title && !!errors.title}
                 helperText={<ErrorMessage name="title" />}
               />
               <Field
                 as={TextField}
                 name="description"
                 label="Description"
-                fullWidth
+                fullWidth={true}
+                onChange={handleChange}
                 margin="normal"
                 variant="outlined"
+                error={touched.description && !!errors.description}
                 helperText={<ErrorMessage name="description" />}
               />
               <Field
                 as={TextField}
                 name="duration"
                 label="Duration"
-                fullWidth
+                fullWidth={true}
                 margin="normal"
+                error={touched.duration && !!errors.duration}
                 variant="outlined"
                 helperText={<ErrorMessage name="duration" />}
               />
@@ -127,24 +148,60 @@ const AddService = () => {
                 as={TextField}
                 name="cost"
                 label="Cost"
-                fullWidth
+                fullWidth={true}
+                error={touched.cost && !!errors.cost}
+                onChange={handleChange}
                 margin="normal"
                 variant="outlined"
                 helperText={<ErrorMessage name="cost" />}
               />
-              
-              
+              <InputLabel id="employeeTag">Attach employee?</InputLabel>
+              <Field 
+                as={Select} 
+                id="employeeTag"
+                name="employeeTag"
+                handleChange={handleChange}
+                fullWidth={true}
+              >
+                {employees.map((employee) => (
+                  <MenuItem key={employee._id} value={employee._id}>
+                    {employee.fullname}
+                  </MenuItem>
+                ))}
+              </Field>
+
+              <Grid container>
+                <Grid item>
+                  <FormLabel id="active">Set active ?</FormLabel>
+                  <Field
+                      id="active"
+                      name="active"
+                      type="checkbox"
+                      as={Checkbox}
+                      onChange={handleChange}
+                      label="Set active"                      
+                    />
+                </Grid>
+                <Grid item>
+                  <FormLabel id="public">Set public?</FormLabel>
+                  <Field
+                    id="public"
+                    name="public"
+                    type="checkbox"
+                    as={Checkbox}
+                    onChange={handleChange}
+                    label="Set public"             
+                  />
+                </Grid>
+              </Grid>
+            
+              <Button fullWidth={true} variant="contained" type="submit">Submit</Button>
+              </Stack>
             </Form>
+            )}
+
           </Formik>
           <DialogActions>
-          <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.submitButton}
-              >
-                save
-              </Button>
           </DialogActions>
         </DialogContent>
       </Dialog>
