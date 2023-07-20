@@ -27,14 +27,9 @@ export const handleOpenNewTab = (endpoint) => {
  *                              the client will be abel to override to go back to schedule by checking the current date. 
  */
 export const requestChangeAccept = (accepting) => {
-  const { user, business } = getStateData();
   return new Promise((resolve, reject) => {
+    const { user, business } = getStateData();
     const accessToken = getAccessToken();
-    if (!user || !business || !accessToken) {
-      reject(new Error('User, business, token might be missing.'));
-      return;
-    }
-
     const email = user.email;
     const b_id = business._id;
     const headers = { headers: { 'x-access-token': accessToken } };
@@ -65,12 +60,7 @@ export const requestChangeAccept = (accepting) => {
  */
 export const getUserTable = () => {
   const { user, business } = getStateData();
-
-    try {
-      if (!user || !business) {
-        return new Error('User, business, or token might be missing.');
-      }
-  
+    try {  
       const appointments = business.currentClients;
       if (!appointments) {
         return [];
@@ -120,7 +110,6 @@ function sortBaseTime (a,b) {
 // Might need a buffer to aaccept appointments a bit earlier.
 export const acceptingRejecting = () => {
     const { user, business } = getStateData();
-
     let currentDate = DateTime.local().setZone(business.timezone);
     let weekday = currentDate.weekdayLong;
     let currentSchedule = business.schedule[weekday];

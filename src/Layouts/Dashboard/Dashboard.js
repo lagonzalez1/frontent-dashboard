@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
 import Waitlist from "../../components/Waitlist/Waitlist";
@@ -31,11 +31,12 @@ import Success from "../../components/Snackbar/Success";
 export default function Dashboard () {
     const dispatch = useDispatch();
     const signOut = useSignOut();
+    const [loading, setLoading] = useState(true);
+    const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
 
     const [openNav, setOpenNav] = useState(false);
 
     async function checkAuthStatus() {
-        console.log("called");
         try {
             const isAuth = await isAuthenticated(dispatch);
             if (!isAuth) {
@@ -47,17 +48,17 @@ export default function Dashboard () {
             removeUserState();
             signOut();
             return;
-        }   
+        }finally{
+            setLoading(false);
+            setAuthCompleted(true)
+        }
     }
 
 
     useEffect(() => { 
-        console.log("called");
         checkAuthStatus();
     },[])
 
-    
-    
 
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
@@ -94,7 +95,7 @@ export default function Dashboard () {
                 <SideBar navState={openNav} openNav={setOpenNav} />
                  <Box component="main" id="innerDashboard" sx={{ flexGrow: 1, p: 1 , width : "100%"}}>
                       <DashboardHeader />
-                      <RenderLocation />
+                      {loading && !authCompleted ? <CircularProgress /> : <RenderLocation />}
                       <Success/>
                  </Box>
                  
