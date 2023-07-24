@@ -1,20 +1,26 @@
 import React, { useState } from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, CardActionArea, TextField
-    , Modal, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton } from '@mui/material';
+    , Modal, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, Select, TableContainer, Table, TableCell,
+Paper, Switch, TableBody, FormControl, MenuItem, TableRow, TableHead, FormControlLabel, InputLabel, Divider } from '@mui/material';
 import AddService from "../../components/AddService/AddService.js";
 import CloseIcon from "@mui/icons-material/Close"
-import {  StyledCardService, stringAvatar, getServicesTotal } from "./ServicesHelper.js"; 
+import {  StyledCardService, stringAvatar, getServicesTotal, getEmployeeTags, removeExistingEmployees } from "./ServicesHelper.js"; 
 import { getServicesAvailable } from "../../hooks/hooks.js";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
 
 export default function Services() {
 
+    const [dialog, setDialog] = useState(false);
     const {active, unactive} = getServicesTotal();
-    const [service, setService] = useState();
-    const [open, setOpen] = useState(false);
+    const [service, setService] = useState(null);
     const serviceList = getServicesAvailable(); 
+
+    const [form, setForm] = useState({
+        serviceId: null,
+        employeeId: null,
+        active: null,
+        public: null
+    })
     
     const styles = {
         container: {
@@ -28,15 +34,20 @@ export default function Services() {
 
 
     const handleClick = (service) => {
-        setOpen(true);
+        setDialog(true);
         setService(service);
-        // Here i want to add employee or set the mode.
-        // Put request.
+        setForm((prev) =>({...prev, serviceId: service._id, active: service.active, public: service.public}));
+
     }
     const handleClose = () =>{
-        setOpen(false);
+        setDialog(false);
         setService(null);
 
+    }
+
+
+    const handleUpdateService = () => {
+        console.log( form );
     }
 
     return(
@@ -93,6 +104,93 @@ export default function Services() {
                 </Grid>
             )): null}
         </Grid>
+
+        <Dialog maxWidth={'xs'} fullWidth={'xs'}  open={dialog} onClose={handleClose}>
+        <DialogTitle>
+            <IconButton
+                    aria-label="close"
+                    onClick={handleClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton> 
+                Service- <strong>
+
+            { service ? service.title: null } </strong></DialogTitle>
+            <DialogContent>
+
+                <Stack spacing={2}>
+                        <Divider />
+                        <Typography variant="body2" textAlign={'left'}>
+                            
+                        </Typography>
+                        <FormControlLabel
+                        sx={{ marginLeft: 0}}
+                            control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                            label={ form && form.active ? 'Active' : 'Unavailable'}
+                        /> 
+
+                        <FormControlLabel
+                            sx={{ marginLeft: 0}}
+                            control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
+                            label={ form && form.public ? 'Public' : 'Not public'}
+                        /> 
+                        <Divider />
+
+                        <Typography variant={"body2"} textAlign={'left'}>Add a new employee to service.</Typography>
+
+                        <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
+                            {service && removeExistingEmployees(service.employeeTags).map((employee, index) => (
+                            <MenuItem key={index} value={employee._id}>
+                                {employee.fullname}
+                            </MenuItem>
+                            ))}
+                        </Select>
+                        <Divider />
+                    
+                        <Typography variant={"body2"} textAlign={'left'}>Current employees assigned to this service.</Typography>
+                            <TableContainer labelId="" component={Paper}>
+                                <Table>
+                                
+                                    <TableHead>
+                                        
+                                        <TableRow>
+                                            <TableCell>
+                                                #
+                                            </TableCell>
+                                            <TableCell>
+                                                Employee
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {
+                                        service && getEmployeeTags(service.employeeTags).map((employee, index) => {
+                                            return (
+                                                <TableRow>
+                                                    <TableCell >{++index}</TableCell>
+                                                    <TableCell >{employee.fullname}</TableCell>
+                                                </TableRow>
+                                            )
+                                        })
+                                            
+                                        }
+                                    </TableBody>
+                                </Table>
+                                                    
+                                </TableContainer>  
+                    </Stack>
+
+            </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" onClick={() => handleUpdateService()} > Save</Button>
+                </DialogActions> 
+        </Dialog>
 
       
         <AddService/>

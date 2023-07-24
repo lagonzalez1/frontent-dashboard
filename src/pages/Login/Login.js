@@ -7,7 +7,7 @@ import { useSignIn } from "react-auth-kit";
 import { setAccessToken } from "../../auth/Auth";
 
 import { useSelector, useDispatch } from 'react-redux';
-import { setLocation, setUser } from '../../reducers/user';
+import { setLocation, setPermisisons, setUser } from '../../reducers/user';
 import { DateTime } from "luxon";
 
 
@@ -50,7 +50,7 @@ export default function Login() {
                     });
                     
                     setAccessToken(response.data.accessToken);
-                    dispatch(setUser({ id: response.data.id, email: response.data.email}))
+                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions}));
                     navigate('/Dashboard');
                     setLoading(false);
                     return;

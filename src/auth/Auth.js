@@ -18,6 +18,7 @@ const USER = 'user';
   export const getStateData = () => {
     const business = JSON.parse(localStorage.getItem(BUSINESS));
     const user = JSON.parse(localStorage.getItem(USER));
+    
     return { user, business };
   }
 

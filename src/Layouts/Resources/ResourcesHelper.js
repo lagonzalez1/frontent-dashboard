@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { styled } from '@mui/system';
 import { Card } from '@mui/material';
-import { getStateData } from '../../auth/Auth';
+import { getAccessToken, getStateData } from '../../auth/Auth';
 
 
 export const getServicesAvailable = () => {
@@ -40,21 +40,31 @@ export const findResourceTag = (id) => {
   const employees = business.employees;
   if ( !employees) { return new Error('No employees');}
   for (var employee of employees) {
-    if (employee.resourceTag === id){
+    if (employee._id === id){
       return employee;
     }
   }
   return new Error('Employee no longer exist.');
 }
 
-export const update = async (form) => {
-  const { user, business} = getStateData();
-  const id = user.id;
-  const bId = business._id;
-  const data = { ...form, id, bId};
-  console.log(data);
-  // Create request here to update resource. 
-  
+export const updateResources = async (form) => {
+  return new Promise((resolve, rejects) => {
+    const { user, business} = getStateData();
+    const accessToken = getAccessToken();
+    const headers = { headers: { 'x-access-token': accessToken } };
+    const bId = business._id;
+    const data = { ...form, bId};
+    axios.put('/api/internal/update_resources', data, headers)
+    .then(response => {
+      if (response.status === 200){
+        resolve(response.data.msg)
+      }
+      rejects(response.data.msg)
+    })
+    .catch(error => {
+        rejects(error);
+    })
+  })  
 }
 
 export const StyledCardService = styled(Card)(({ theme }) => ({

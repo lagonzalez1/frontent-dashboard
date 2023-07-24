@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   id: null,
   email: null,
-  permisisons: null,
+  permissions: null,
   defaultIndex : null,
   isLoggedIn: false,
   requestStatus: false,
@@ -19,17 +19,16 @@ const userSlice = createSlice({
       state.email = action.payload.email;
       state.id = action.payload.id;
       state.isLoggedIn = true;
+      state.permissions = action.payload.permissions;
     },
     logoutUser: (state) => {
       state.email = null;
       state.id = null;
       state.isLoggedIn = false;
+      state.permissions = null;
     },
     setIndex: (state, action) => {
       state.defaultIndex = action.payload;
-    },
-    setPermisisons: (state, action) => {
-      state.permisisons = action.payload;
     },
     setLocation: (state, action) => {
       state.location = action.payload;

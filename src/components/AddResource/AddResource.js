@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton   } from '@mui/material';
+import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton, Stack, Divider   } from '@mui/material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { addResource } from "./Helper";
-import { getServicesAvailable } from "../../hooks/hooks";
+import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setSnackbar } from '../../reducers/user';
 import { setBusiness} from "../../reducers/business";
@@ -17,6 +17,7 @@ const validationSchema = Yup.object({
   description: Yup.string(),
   serveSize: Yup.number().required('Serve size is required'),
   active: Yup.boolean(),
+  publicValue:  Yup.boolean(),
 });
 
 const initialValues = {
@@ -25,7 +26,7 @@ const initialValues = {
   description: '',
   serveSize: 1,
   active: false,
-  public: false
+  publicValue: false
 };
 
 export default function AddResource() {
@@ -33,6 +34,8 @@ export default function AddResource() {
   const business = useSelector((state) => state.business);
   const serviceList = getServicesAvailable();
   const dispatch = useDispatch();
+
+
   const handleOpen = () => {
     setIsOpen(true);
   };
@@ -45,7 +48,7 @@ export default function AddResource() {
     addResource(values)
     .then(data => {
       dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
-      dispatch(setBusiness(data.business))
+      reloadBusinessData(dispatch)
       handleClose();
     })
     .catch(error => {
@@ -60,7 +63,7 @@ export default function AddResource() {
       <Fab color="primary" onClick={handleOpen}>
         <AddIcon/>
       </Fab>
-      <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="sm">
+      <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="xs">
         <DialogTitle>
           Add a resource
           <IconButton
@@ -76,7 +79,7 @@ export default function AddResource() {
                     <CloseIcon />
                 </IconButton>
         </DialogTitle>
-        <DialogContent >
+        <DialogContent>
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -84,8 +87,8 @@ export default function AddResource() {
           >
             {({ errors, touched, handleBlur, handleChange }) => (
               <Form>
-                <Grid sx={{ pt: 2}} container spacing={2}>
-                  <Grid item xs={12}>
+                <Stack spacing={2}>
+                  
                     <Field
                       name="title"
                       as={TextField}
@@ -95,9 +98,9 @@ export default function AddResource() {
                       fullWidth={true}
                       error={touched.title && !!errors.title}
                     />
-                  </Grid>
+         
 
-                  <Grid item xs={12}>
+                  
                   {business ? (
                       <>
                           <InputLabel id="services">Services</InputLabel>
@@ -119,8 +122,9 @@ export default function AddResource() {
                           </Field>
                       </>
                       ) : null}
-                  </Grid>
-                  <Grid item xs={12}>
+                  
+           
+
                     <Field
                       name="description"
                       as={TextField}
@@ -130,8 +134,10 @@ export default function AddResource() {
                       variant="outlined"
                       error={touched.description && !!errors.description}
                     />
-                  </Grid>
-                  <Grid item xs={12}>
+           
+
+                  
+                  
                     <Field
                       name="serveSize"
                       as={TextField}
@@ -142,8 +148,9 @@ export default function AddResource() {
                       variant="outlined"
                       error={touched.serveSize && !!errors.serveSize}
                     />
-                  </Grid>
-                  <Grid item xs={12}>
+                  
+           
+
                     <Field
                       name="active"
                       type="checkbox"
@@ -153,9 +160,21 @@ export default function AddResource() {
                       label="Set active"
                       error={touched.active && !!errors.active}
                     />
-                  </Grid>
+
+                    <Field
+                      name="publicValue"
+                      type="checkbox"
+                      as={TextField}
+                      fullWidth={true}
+                      onChange={handleChange}
+                      label="Set public"
+                      error={touched.publicValue && !!errors.publicValue}
+                    />  
+
+
+                  </Stack>
                   
-                </Grid>
+                
                 <DialogActions>
 
                   <Button variant="contained" type="submit">Save</Button>

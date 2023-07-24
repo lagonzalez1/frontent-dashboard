@@ -1,27 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogActions, DialogTitle, DialogContent, Switch, Button,
-Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel } from '@mui/material';
+Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel, Divider, Slide } from '@mui/material';
 import { getResourcesTotal, StyledCardService, stringAvatar,
- findResourceTag, findServingSize, update } from "./ResourcesHelper"; 
-import { findClient } from "../../hooks/hooks";
+ findResourceTag, findServingSize, updateResources } from "./ResourcesHelper"; 
+import { findClient, reloadBusinessData } from "../../hooks/hooks";
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import business from "../../reducers/business";
+import { setSnackbar } from "../../reducers/user";
 
 export default function Resources() {
     const {active, unactive} = getResourcesTotal();
+
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
-
+    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
     const [dialog, setDialog] = useState(false);
     const [resource, setResource] = useState({});
     
     const [form, setForm] = useState({
         resourceId: null,
         employeeId: null,
-        toggle: null
+        active: null,
+        publicValue: null
     })
 
     const styles = {
@@ -37,21 +41,37 @@ export default function Resources() {
     const handleResourceClick = (object) => {
         setDialog(true);
         setResource(object);
-        setForm((prev) => ({...prev, resourceId: object._id, toggle: object.active }))
+        setForm({ resourceId: object._id, active: object.active, employeeId: object.employeeTag, publicValue: object.public });
     }
     const handleCloseDialog = () => {
         setDialog(false)
         setResource({});
         setForm({
+            publicValue: null,
             resourceId: null,
             employeeId: null,
-            toggle: null});
+            active: null});
     }
 
-    const saveResourceAt = async () => {
+    const handleUpdateResource = async () => {
+        setLoading(true);
         if (!form){ return; }
-        update(form);
+        console.log(form);
+        updateResources(form)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
+            setLoading(false)
+            handleCloseDialog();
+        })
+        .catch(error => {
+            dispatch(setSnackbar(error))
+        })
+        
       };
+
+      useEffect(() => {
+        reloadBusinessData(dispatch)
+      }, [loading])
 
     
 
@@ -77,7 +97,8 @@ export default function Resources() {
         <Grid container style={styles.container} sx={{ pt: 2}} spacing={1} columns={{ xs: 1, sm: 2, md: 2, lg: 2 }}>
             { resourceData? resourceData.map((resource) => (
                 <Grid item key={resource._id}>
-                    <StyledCardService onClick={() => handleResourceClick(resource)}>
+                    <Slide direction="up" in={resourceData ? true: false} mountOnEnter unmountOnExit>
+                        <StyledCardService onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>
                         <CardContent>
                             <Stack direction="row" spacing={2} sx={{ alignItems: 'center'}}>
@@ -89,7 +110,7 @@ export default function Resources() {
                                 { ' ' + resource.title}
                             </Typography>
                             <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
-                                    Assigned: {findResourceTag(resource._id).fullname}
+                                    Assigned: {findResourceTag(resource.employeeTag).fullname}
                             </Typography>
                             <Stack direction="row" spacing={1}>
                                 
@@ -103,20 +124,21 @@ export default function Resources() {
                                 
                             </Stack>
                                 <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
-                                    Max: {resource.serveSize}
+                                    Max: {resource.size}
                                 </Typography>
                             </Container>
                             </Stack>    
                         </CardContent>   
                         </CardActionArea> 
-                    </StyledCardService>
+                        </StyledCardService>
+                    </Slide>
                 
                 </Grid>
             )): null}
         </Grid>
 
 
-        <Dialog maxWidth={'sm'} fullWidth={'sm'}  open={dialog} onClose={handleCloseDialog}>
+        <Dialog maxWidth={'xs'} fullWidth={true}  open={dialog} onClose={handleCloseDialog}>
         <DialogTitle>
             <IconButton
                     aria-label="close"
@@ -130,24 +152,15 @@ export default function Resources() {
                     >
                     <CloseIcon />
                 </IconButton> 
-            { resource ? resource.title: null }</DialogTitle>
+                Resource - <strong>
+            { resource ? resource.title: null }</strong></DialogTitle>
+
+
             <DialogContent>
-          
-            <Grid direction="row"
-                justifyContent="space-between"
-                alignItems="center" 
-                container  
-                rowSpacing={2}>
-
-
-
-                <Grid item >
-                <Stack spacing={1}>
-
-                <FormControlLabel
-                        control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.toggle} onChange={e => setForm((item) => ({...item, toggle: e.target.checked}) ) } />}
-                        label={ form && form.toggle ? 'Active' : 'Unavailable'}
-                    />  
+                <Stack spacing={2}>
+                { resource.attached ? (
+                    <>
+                    <Typography variant="subtitle1" textAlign={'left'}>Current clients</Typography>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
@@ -178,17 +191,53 @@ export default function Resources() {
                         </Table>
                         
                     </TableContainer>   
-                    </Stack>
-                </Grid>
+                    <Divider />
+                    <Typography variant="subtitle1" textAlign={'left'}>Current clients</Typography>
+                    <TableContainer component={Paper}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>
+                                        Name
+                                    </TableCell>
+                                    <TableCell>
+                                        Party size
+                                    </TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {
+                                resource.attached ? resource.attached.map((id) => {
+                                    const client = findClient(id);
+                                    return (
+                                        <TableRow>
+                                            <TableCell>{client.fullname}</TableCell>
+                                            <TableCell>{ client.partySize } </TableCell>
+                                        </TableRow>
+                                    )
+                                }):
+                                null 
+                                    
+                                }
+                            </TableBody>
+                        </Table>
+                        
+                    </TableContainer>   
+                    <Divider />
+                    </>
+                )
 
-                <Grid item>
-                    <Stack spacing={1}>
-                    <Typography variant="subtitle1" textAlign={'left'}>Assigned: {findResourceTag(resource._id).fullname} </Typography>
-                    <FormControl sx={{ m: 1, width: 300 }}>
-                    <InputLabel id="select-employee-tag">Employee</InputLabel>
+                :null}
+                    
 
+                    <Divider />
+                    <Typography variant="body2" textAlign={'left'}>
+                        Employee assigned to resource.
+                    </Typography>
+                    <FormControl fullWidth={true}>
+                    
                     <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
-                        <MenuItem value="">None</MenuItem>
+                        <MenuItem value="NONE">None</MenuItem>
                         {employeeList.map((employee, index) => (
                         <MenuItem key={index} value={employee._id}>
                             {employee.fullname}
@@ -196,17 +245,22 @@ export default function Resources() {
                         ))}
                     </Select>
                     </FormControl>
-                    </Stack>
-                    
-                </Grid>
+                    <Divider />
 
-            </Grid>
+                    <FormControlLabel
+                        control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                        label={ form && form.active ? 'Active' : 'Unavailable'}
+                    />  
+                    <FormControlLabel
+                        control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.publicValue} onChange={e => setForm((item) => ({...item, publicValue: e.target.checked}) ) } />}
+                        label={ form && form.publicValue ? 'Public' : 'Not public'}
+                    />  
 
-
-          
+                
+                    </Stack>  
             </DialogContent>
                 <DialogActions>
-                    <Button variant="contained" onClick={() => saveResourceAt()} > Save</Button>
+                    <Button variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
                 </DialogActions> 
         </Dialog>
 

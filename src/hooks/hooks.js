@@ -17,7 +17,6 @@ export const reloadBusinessData = (dispatch) => {
     .then(response => {
         console.log(response.data);
         dispatch(setBusiness(response.data.business));
-        return;
     })
     .catch(error => {
         console.log(error);
@@ -46,6 +45,8 @@ export const findEmployee = (id) => {
     }
     return new Error('Employee no longer exist.');
 }
+
+
 
 
 

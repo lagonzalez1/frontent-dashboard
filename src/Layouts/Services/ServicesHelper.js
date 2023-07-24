@@ -1,6 +1,7 @@
 import { styled } from '@mui/system';
 import { Card } from '@mui/material';
 import { getStateData } from '../../auth/Auth';
+import { findEmployee, getEmployeeList } from '../../hooks/hooks';
 
 
 
@@ -22,6 +23,30 @@ export const getServicesTotal  = () => {
     }
     return {active , unactive};
   
+}
+
+export const getEmployeeTags = (employeeTags) => {
+    let employees = []
+    if (employeeTags.length === 0) { return [];}
+    for (var id of employeeTags) {
+      const employee = findEmployee(id)
+      employees.push(employee);
+    }
+    return employees
+}
+
+export const removeExistingEmployees = (employeeIds) => {
+    let currentEmployees = getEmployeeList();
+    if (employeeIds.length === 0) { return currentEmployees;}
+    let result = []
+    const filtered = currentEmployees.filter((obj) => {
+      if (Object.keys(obj).includes('_id') ) {
+        return !employeeIds.every((id) => obj['_id'].includes(id) );
+      }
+      result.push(obj);
+      return true
+    })
+    return result;
 }
 
 export const getServicesAvailable = () => {
