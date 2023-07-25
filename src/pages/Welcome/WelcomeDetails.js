@@ -67,7 +67,6 @@ export default function WelcomeDetails() {
             const { isAccepting } = response.data;
             console.log(isAccepting);
             if (isAccepting){
-                
                 externalWaitlistRequest(values);
             }else{
                 setLoading(false);
@@ -89,14 +88,13 @@ export default function WelcomeDetails() {
         let partySize = clientStorage.partySize;
         let payload = { ...values, link, timestamp, partySize}
 
-
-
         checkDuplicatesRequest(values.email, link)
-        .then((responseDuplicates) => {
-            if(responseDuplicates.duplicate) {
+        .then((response) => {
+            if(response.duplicate === true) {
                 setLoading(false);
-                navigate(`/welcome/${link}/visits/${responseDuplicates.identifier}`);
+                navigate(`/welcome/${link}/visits/${response.identifier}`);
             }else{
+                // Make the real request to backend.
                 return waitlistRequest(payload);
             }
         })

@@ -1,7 +1,9 @@
+import axios from 'axios';
 import { styled } from '@mui/system';
 import { Card } from '@mui/material';
-import { getStateData } from '../../auth/Auth';
+import { getAccessToken, getStateData } from '../../auth/Auth';
 import { findEmployee, getEmployeeList } from '../../hooks/hooks';
+
 
 
 
@@ -25,6 +27,8 @@ export const getServicesTotal  = () => {
   
 }
 
+
+
 export const getEmployeeTags = (employeeTags) => {
     let employees = []
     if (employeeTags.length === 0) { return [];}
@@ -47,6 +51,42 @@ export const removeExistingEmployees = (employeeIds) => {
       return true
     })
     return result;
+}
+
+export const updateService = (data) => {
+  const { user, business} = getStateData();
+  const accessToken = getAccessToken();
+  const payload = { ...data, bid: business._id}
+  const headers = { headers: { 'x-access-token': accessToken } };
+  return new Promise((resolve, reject) => {
+      axios.put('/api/internal/update_service', payload, headers)
+      .then(response => {
+        if(response.status === 200) {
+          resolve(response.data.msg);
+        }
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
+}
+
+export const removeEmployeeTag = (data) => {
+  const { user, business} = getStateData();
+  const accessToken = getAccessToken();
+  const payload = { ...data, bid: business._id}
+  const headers = { headers: { 'x-access-token': accessToken } };
+  return new Promise((resolve, reject) => {
+    axios.put('/api/internal/service_remove_tag',payload, headers)
+      .then(response => {
+        if(response.status === 200) {
+          resolve(response.data.msg);
+        }
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
 }
 
 export const getServicesAvailable = () => {

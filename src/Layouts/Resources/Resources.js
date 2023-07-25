@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef} from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogActions, DialogTitle, DialogContent, Switch, Button,
-Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel, Divider, Slide } from '@mui/material';
+Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel, Divider, Slide, Box, CircularProgress } from '@mui/material';
 import { getResourcesTotal, StyledCardService, stringAvatar,
- findResourceTag, findServingSize, updateResources } from "./ResourcesHelper"; 
+ findResourceTag, findServingSize, updateResources, removeResourceTag } from "./ResourcesHelper"; 
 import { findClient, reloadBusinessData } from "../../hooks/hooks";
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useSelector, useDispatch } from "react-redux";
-import business from "../../reducers/business";
 import { setSnackbar } from "../../reducers/user";
 
 export default function Resources() {
@@ -28,14 +27,16 @@ export default function Resources() {
         publicValue: null
     })
 
+    
+    
+
     const styles = {
         container: {
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          justifyContent: 'left',
-          alignItems: 'center',
-        },
+          display: 'flex', // Set the container's display to flex
+          flexDirection: 'row', // Set the main axis to be horizontal
+          flexWrap: 'wrap', // Allow the items to wrap to the next row if there's not enough space
+          justifyContent: 'flex-start', // Start the items from the left (you can adjust this to center or space-between if needed)
+        }
       };
 
     const handleResourceClick = (object) => {
@@ -69,17 +70,18 @@ export default function Resources() {
         
       };
 
+      
+
       useEffect(() => {
-        reloadBusinessData(dispatch)
+        reloadBusinessData(dispatch);
       }, [loading])
 
-    
+
+
 
     return(
         <>
-        <Grid container
-            spacing={2}    
-        >
+        <Grid container spacing={2}>
             <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                 <Stack direction={'row'} sx={{alignItems: 'center'}} spacing={2}>
                     <Typography variant="h6"><strong> Available resources</strong></Typography>
@@ -89,28 +91,27 @@ export default function Resources() {
                 
             </Grid>
             <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'right'}}>
-            
             </Grid>
         </Grid>
 
         
-        <Grid container style={styles.container} sx={{ pt: 2}} spacing={1} columns={{ xs: 1, sm: 2, md: 2, lg: 2 }}>
-            { resourceData? resourceData.map((resource) => (
-                <Grid item key={resource._id}>
+        <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
+            { resourceData? resourceData.map((resource, index) => (
+                <Grid item key={resource._id} xs={4} sm={4} md={4} lg={3}>
                     <Slide direction="up" in={resourceData ? true: false} mountOnEnter unmountOnExit>
                         <StyledCardService onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>
                         <CardContent>
-                            <Stack direction="row" spacing={2} sx={{ alignItems: 'center'}}>
+                            <Stack direction="row" spacing={1} sx={{ alignItems: 'center'}}>
                             <Avatar {...stringAvatar(resource.title)} />
-                            <Container>    
+                            <Box sx={{ paddingLeft: 1, paddingRight: 1}}>    
                             <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
                             {resource.active ? (<FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/>):
                              (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
                                 { ' ' + resource.title}
                             </Typography>
                             <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
-                                    Assigned: {findResourceTag(resource.employeeTag).fullname}
+                                    Assigned: {findResourceTag(resource.employeeTag)}
                             </Typography>
                             <Stack direction="row" spacing={1}>
                                 
@@ -126,7 +127,7 @@ export default function Resources() {
                                 <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
                                     Max: {resource.size}
                                 </Typography>
-                            </Container>
+                            </Box>
                             </Stack>    
                         </CardContent>   
                         </CardActionArea> 
@@ -155,7 +156,12 @@ export default function Resources() {
                 Resource - <strong>
             { resource ? resource.title: null }</strong></DialogTitle>
 
-
+            {loading ? (
+                <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <CircularProgress />
+              </DialogContent>
+              
+            ):
             <DialogContent>
                 <Stack spacing={2}>
                 { resource.attached ? (
@@ -181,6 +187,9 @@ export default function Resources() {
                                         <TableRow>
                                             <TableCell >{client.fullname}</TableCell>
                                             <TableCell>{ client.partySize } </TableCell>
+                                            <TableCell>
+                                               
+                                            </TableCell>
                                         </TableRow>
                                     )
                                 }):
@@ -213,6 +222,9 @@ export default function Resources() {
                                         <TableRow>
                                             <TableCell>{client.fullname}</TableCell>
                                             <TableCell>{ client.partySize } </TableCell>
+                                            <TableCell>
+
+                                            </TableCell>
                                         </TableRow>
                                     )
                                 }):
@@ -259,6 +271,9 @@ export default function Resources() {
                 
                     </Stack>  
             </DialogContent>
+            }
+
+
                 <DialogActions>
                     <Button variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
                 </DialogActions> 

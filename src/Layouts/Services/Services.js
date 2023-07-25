@@ -1,19 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, CardActionArea, TextField
     , Modal, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, Select, TableContainer, Table, TableCell,
-Paper, Switch, TableBody, FormControl, MenuItem, TableRow, TableHead, FormControlLabel, InputLabel, Divider } from '@mui/material';
+Paper, Switch, TableBody, FormControl, MenuItem, TableRow, TableHead, FormControlLabel, InputLabel, Divider, Box, Tooltip, CircularProgress } from '@mui/material';
 import AddService from "../../components/AddService/AddService.js";
 import CloseIcon from "@mui/icons-material/Close"
-import {  StyledCardService, stringAvatar, getServicesTotal, getEmployeeTags, removeExistingEmployees } from "./ServicesHelper.js"; 
-import { getServicesAvailable } from "../../hooks/hooks.js";
+import {  StyledCardService, stringAvatar, getServicesTotal, getEmployeeTags, removeExistingEmployees, removeEmployeeTag, updateService } from "./ServicesHelper.js"; 
+import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks.js";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useDispatch, useSelector } from "react-redux";
+import { setSnackbar } from "../../reducers/user";
+
 
 export default function Services() {
 
     const [dialog, setDialog] = useState(false);
     const {active, unactive} = getServicesTotal();
-    const [service, setService] = useState(null);
-    const serviceList = getServicesAvailable(); 
+    const [service, setService] = useState({});
+    const [loading, setLoading] = useState(false);
+
+
+    const serviceList = useSelector((state) => state.business.services);
+    const dispatch = useDispatch();
+    
 
     const [form, setForm] = useState({
         serviceId: null,
@@ -40,15 +49,49 @@ export default function Services() {
 
     }
     const handleClose = () =>{
+        setService({});
         setDialog(false);
-        setService(null);
-
+        setForm({serviceId: null,
+            employeeId: null,
+            active: null,
+            public: null})
     }
 
 
     const handleUpdateService = () => {
-        console.log( form );
+        setLoading(true);
+        updateService(form)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
+            setLoading(false)
+            handleClose();
+        })
+        .catch(error => {
+            dispatch(setSnackbar(error))
+            setLoading(false);
+        })
+
     }
+
+    const removeEmployeeService = (id, serviceId) => {
+        setLoading(true);
+        if (!id) { return; }
+        const data = { employeeId: id, serviceId: serviceId}
+        removeEmployeeTag(data)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
+            setLoading(false)
+            handleClose();
+        })
+        .catch(error => {
+            dispatch(setSnackbar(error))
+            setLoading(false)
+        })
+    }
+
+    useEffect(() => {
+        reloadBusinessData(dispatch);
+    },[loading])
 
     return(
         <>
@@ -70,21 +113,21 @@ export default function Services() {
         </Grid>
 
         
-        <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 3, md: 3, sm: 3, lg: 2 }} columns={{ xs: 6, sm: 4, md: 4, lg: 4 }}>
+        <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             { serviceList ? serviceList.map((service) => (
-                <Grid item key={service._id}>
+                <Grid item key={service._id} xs={4} sm={4} md={4} lg={3}>
                     <StyledCardService onClick={() => handleClick(service)}>
                         <CardActionArea>
                         <CardContent>
-                            <Stack direction="row" spacing={2}>
-                                <Avatar {...stringAvatar(service.title)} />
-                            <Container>    
+                            <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center'}}> 
+                            <Avatar {...stringAvatar(service.title)} />
+                            <Box sx={{ paddingLeft: 1, paddingRight: 1}}>    
                             <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
                             {service.active ? (<FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/>):
                              (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
                                 { ' ' + service.title}
                             </Typography>
-                            <Stack direction="row" spacing={1}>
+                            <Stack>
                                 <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
                                     Duration: {service.duration}
                                 </Typography>
@@ -95,7 +138,8 @@ export default function Services() {
                                     Public: {service.public ? 'True': 'False'}
                                 </Typography>
                             </Stack>
-                            </Container>
+                            </Box>
+
                             </Stack>    
                         </CardContent>  
                         </CardActionArea>  
@@ -105,7 +149,7 @@ export default function Services() {
             )): null}
         </Grid>
 
-        <Dialog maxWidth={'xs'} fullWidth={'xs'}  open={dialog} onClose={handleClose}>
+        <Dialog  maxWidth={'xs'} fullWidth={'xs'}  open={dialog} onClose={handleClose}>
         <DialogTitle>
             <IconButton
                     aria-label="close"
@@ -122,6 +166,14 @@ export default function Services() {
                 Service- <strong>
 
             { service ? service.title: null } </strong></DialogTitle>
+
+
+            {loading ? (
+                <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <CircularProgress />
+              </DialogContent>
+              
+            ): (
             <DialogContent>
 
                 <Stack spacing={2}>
@@ -134,7 +186,6 @@ export default function Services() {
                             control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
                             label={ form && form.active ? 'Active' : 'Unavailable'}
                         /> 
-
                         <FormControlLabel
                             sx={{ marginLeft: 0}}
                             control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
@@ -145,16 +196,18 @@ export default function Services() {
                         <Typography variant={"body2"} textAlign={'left'}>Add a new employee to service.</Typography>
 
                         <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
-                            {service && removeExistingEmployees(service.employeeTags).map((employee, index) => (
+                        {service.employeeTags && removeExistingEmployees(service.employeeTags).map((employee, index) => (
                             <MenuItem key={index} value={employee._id}>
                                 {employee.fullname}
                             </MenuItem>
-                            ))}
+                            ))
+                        }
                         </Select>
+                        { service.employeeTags ? (
+                            <>
                         <Divider />
-                    
                         <Typography variant={"body2"} textAlign={'left'}>Current employees assigned to this service.</Typography>
-                            <TableContainer labelId="" component={Paper}>
+                            <TableContainer component={Paper}>
                                 <Table>
                                 
                                     <TableHead>
@@ -166,6 +219,9 @@ export default function Services() {
                                             <TableCell>
                                                 Employee
                                             </TableCell>
+                                            <TableCell>
+                                                Actions
+                                            </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -175,6 +231,15 @@ export default function Services() {
                                                 <TableRow>
                                                     <TableCell >{++index}</TableCell>
                                                     <TableCell >{employee.fullname}</TableCell>
+                                                    <TableCell>
+                                                    <Tooltip title="Remove employee from service.">
+
+                                                    <IconButton onClick={() => removeEmployeeService(employee._id, service._id)} aria-label="delete">
+                                                        <DeleteIcon />
+                                                    </IconButton> 
+                                                    </Tooltip>
+                                                    </TableCell>
+                                                    
                                                 </TableRow>
                                             )
                                         })
@@ -183,10 +248,16 @@ export default function Services() {
                                     </TableBody>
                                 </Table>
                                                     
-                                </TableContainer>  
+                            </TableContainer>  
+                        </>
+                        ):null}
+                        
+                        
                     </Stack>
 
             </DialogContent>
+            )}
+
                 <DialogActions>
                     <Button variant="contained" onClick={() => handleUpdateService()} > Save</Button>
                 </DialogActions> 

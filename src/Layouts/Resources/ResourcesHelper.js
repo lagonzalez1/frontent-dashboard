@@ -41,11 +41,13 @@ export const findResourceTag = (id) => {
   if ( !employees) { return new Error('No employees');}
   for (var employee of employees) {
     if (employee._id === id){
-      return employee;
+      return employee.fullname;
     }
   }
-  return new Error('Employee no longer exist.');
+  return 'None';
 }
+
+
 
 export const updateResources = async (form) => {
   return new Promise((resolve, rejects) => {
@@ -77,7 +79,6 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
       boxShadow: theme.shadows[2],
       backgroundColor: theme.palette.lightprop.main,
       color: theme.palette.dark.main,
-      
     },
   }));
 

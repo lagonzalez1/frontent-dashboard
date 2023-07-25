@@ -71,6 +71,8 @@ export default function Welcome({ path }) {
                         (<>
                         <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
                         <Stack spacing={3}>
+
+                        
                         <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography>
                         
                         
