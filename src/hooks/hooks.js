@@ -105,6 +105,64 @@ export const getResourceData = () => {
 }
 
 
+/**
+ *  @returns Sorted business table, decending order based on timestamp.
+ */
+const MINUTES_IN_HOUR = 60;
+export const getUserTable = () => {
+    const { user, business } = getStateData();
+      try {
+          const clients = business.currentClients;
+          if (!clients) {
+            return [];
+          }
+          const timezone = business.timezone;
+          if (!timezone) {
+            return new Error('No timezone to validate.');
+          }
+          // Compare the current date to each client.
+          const currentTime = DateTime.local().setZone(timezone);
+          let currentDates = [];
+          for (var client of clients) {
+            const clientDate = new DateTime.fromJSDate(new Date(client.timestamp));
+            if ( currentTime.hasSame(clientDate, 'day')){
+              currentDates.push(client);
+            }
+          }
+          const sorted = currentDates.sort(sortBaseTime); //Sorted based on time since all equal dates. 
+          
+          // Add waittime key and values
+          const wait = sorted.map((client) => {
+          const luxonDateTime = DateTime.fromJSDate(new Date(client.timestamp));
+          const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
+          const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
+          const hours = Math.floor(diffHours);
+          const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
+          return {
+            ...client,
+            waittime: { hours, minutes },
+          };
+        });
+    
+        return wait;
+      } catch (error) {
+        // Handle the error here
+        console.error(error);
+        return new Error(error); // Return an empty array or any other appropriate value
+      }
+  };
+
+    function sortBaseTime (a,b) {
+        if (a.timestamp < b.timestamp){
+            return -1
+        }
+        if(a.timestamp > b.timestamp){
+            return 1;
+        }
+        return 0;
+    }
+
+
 
 /**
  * 

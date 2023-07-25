@@ -11,7 +11,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
 
 export default function Resources() {
-    const {active, unactive} = getResourcesTotal();
+    const {active, inactive} = getResourcesTotal();
 
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
@@ -45,7 +45,7 @@ export default function Resources() {
         setForm({ resourceId: object._id, active: object.active, employeeId: object.employeeTag, publicValue: object.public });
     }
     const handleCloseDialog = () => {
-        setDialog(false)
+        setDialog(false);
         setResource({});
         setForm({
             publicValue: null,
@@ -86,7 +86,7 @@ export default function Resources() {
                 <Stack direction={'row'} sx={{alignItems: 'center'}} spacing={2}>
                     <Typography variant="h6"><strong> Available resources</strong></Typography>
                     <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> {active} Active</Typography>
-                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> {unactive} Unavailable</Typography>
+                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> {inactive} Unavailable k</Typography>
                 </Stack>
                 
             </Grid>
@@ -97,7 +97,7 @@ export default function Resources() {
         
         <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
             { resourceData? resourceData.map((resource, index) => (
-                <Grid item key={resource._id} xs={4} sm={4} md={4} lg={3}>
+                <Grid item key={resource._id} xs={4} sm={4} md={4} lg={1}>
                     <Slide direction="up" in={resourceData ? true: false} mountOnEnter unmountOnExit>
                         <StyledCardService onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>
@@ -121,8 +121,7 @@ export default function Resources() {
                                 <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
                                     Serving: {findServingSize(resource._id) }
                                 </Typography>
-                                
-                                
+                                   
                             </Stack>
                                 <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
                                     Max: {resource.size}

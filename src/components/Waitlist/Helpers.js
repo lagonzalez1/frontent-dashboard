@@ -5,13 +5,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import CancelIcon from '@mui/icons-material/Cancel';
 import EditIcon from '@mui/icons-material/Edit';
+import NorthRoundedIcon from '@mui/icons-material/NorthRounded';
+import SouthRoundedIcon from '@mui/icons-material/SouthRounded';
 import { getStateData, getAccessToken } from "../../auth/Auth";
 import { setSnackbar } from "../../reducers/user";
 
 // Current data
 
 const ENDPOINT_ACCEPTING = '/api/internal/update_accepting' 
-const MINUTES_IN_HOUR = 60;
+
 
 export const handleOpenNewTab = (endpoint) => {
     const url = 'http://localhost:3000/welcome/'+endpoint;
@@ -52,58 +54,32 @@ export const requestChangeAccept = (accepting) => {
   });
 };
 
-/**
- * NEDS ATTENTION: sort function not being utilized.
- *                 Sort based on columns buttons ?
- * @returns Sorted business table, decending order based on timestamp.
- * 
- */
-export const getUserTable = () => {
+
+export const removeClient = (id) => {
   const { user, business } = getStateData();
-    try {  
-      const appointments = business.currentClients;
-      if (!appointments) {
-        return [];
-      }
-  
-      const timezone = business.timezone;
-      if (!timezone) {
-        return new Error('No timezone to validate.');
-      }
-  
-        const currentTime = DateTime.local().setZone(timezone);
-        const sorted = appointments.sort(sortBaseTime); //Not yet implemented
-  
-        const wait = appointments.map((client) => {
-        const luxonDateTime = DateTime.fromJSDate(new Date(client.timestamp));
-        const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
-        const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
-        const hours = Math.floor(diffHours);
-        const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
-        return {
-          ...client,
-          waittime: { hours, minutes },
-        };
+  const accessToken = getAccessToken();
+  const payload = { clientId: id, bId: business._id };
+  const headers = { headers: { 'x-access-token': accessToken } };
+  return new Promise((resolve, reject) => {
+    axios.put('/api/internal/remove_client', payload, headers)
+      .then((response) => {
+        // If the request is successful, resolve the promise with the response data
+        if ( response.status === 200) {
+          resolve(response.data.msg);
+        }
+        reject(response.data.msg)
+      })
+      .catch((error) => {
+        // If there's an error, reject the promise with the error object
+        reject(error);
       });
-  
-      return wait;
-    } catch (error) {
-      // Handle the error here
-      console.error(error);
-      return new Error(error); // Return an empty array or any other appropriate value
-    }
-  };
+  });
+};
+
+
   
 
-function sortBaseTime (a,b) {
-    if (a.timestamp < b.timestamp){
-        return -1
-    }
-    if(a.timestamp > b.timestamp){
-        return 1;
-    }
-    return 0;
-}
+
 
 
 
@@ -153,15 +129,17 @@ export const columns = [
 ];
 
 export const clientOptions = [
+    {id: 'move-up', label: 'Move up', icon: <NorthRoundedIcon/>},
+    {id: 'move-down', label: 'Move down', icon: <SouthRoundedIcon/>},
     {id: 'no-show', label: 'No show', icon: <CancelIcon/>},
-    {id: 'move', label: 'Move', icon: <SwapVertIcon/>},
     {id: 'edit', label: 'Edit', icon: <EditIcon/>},
     {id: 'remove', label: 'Remove', icon: <DeleteIcon/>},
 ]
 
 export const OPTIONS_SELECT = {
     NO_SHOW: 'no-show',
-    MOVE: 'move',
+    MOVE_UP: 'move-up',
+    MOVE_DOWN: 'move-down',
     EDIT: 'edit',
     REMOVE: 'remove'
 }

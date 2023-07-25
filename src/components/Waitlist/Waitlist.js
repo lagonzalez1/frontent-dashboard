@@ -14,15 +14,21 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import {  findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
-import { handleOpenNewTab, requestChangeAccept, options, columns, getUserTable, clientOptions, OPTIONS_SELECT,
-    acceptingRejecting } from "./Helpers";
-import { reloadBusinessData } from "../../hooks/hooks";
+import { handleOpenNewTab, requestChangeAccept, options, columns, clientOptions, OPTIONS_SELECT,
+    acceptingRejecting, 
+    removeClient} from "./Helpers";
+import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
 
 
 export default function Waitlist () {
+
     const dispatch = useDispatch();
+    const tableData = getUserTable();
+    let accepting = acceptingRejecting();
+
+
     const [anchorElVert, setAnchorElVert] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [errors, setErrors] = useState(null);
@@ -32,8 +38,6 @@ export default function Waitlist () {
     const openVert = Boolean(anchorElVert);
     const business = useSelector((state) => state.business);
 
-    const tableData = getUserTable();
-    let accepting = acceptingRejecting();
 
     const handleClickListItem = (event) => {
         setAnchorEl(event.currentTarget);
@@ -101,13 +105,29 @@ export default function Waitlist () {
                 console.log("Edit");
                 setAnchorElVert(null);
                 return;
-            case OPTIONS_SELECT.MOVE:
-                console.log("Move");
+            case OPTIONS_SELECT.MOVE_UP:
+                console.log("up");
+                setAnchorElVert(null);
+                return;
+            case OPTIONS_SELECT.MOVE_DOWN:
+                console.log("down");
                 setAnchorElVert(null);
                 return;
             case OPTIONS_SELECT.REMOVE:
-                console.log('Remove');
-                setAnchorElVert(null);
+                setLoading(true);
+                removeClient(clientId)
+                .then(response => {
+                    console.log(response)
+                    dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                })
+                .catch(error => {
+                    console.log(error);
+                    dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+                })
+                .finally(() => {
+                    setLoading(false);
+                    setAnchorElVert(null);
+                })
                 return;
         }
         setAnchorElVert(null);
@@ -278,11 +298,12 @@ export default function Waitlist () {
                                         direction="row"
                                         spacing={1}
                                     >
-                                        <IconButton >
-                                            <NotificationsIcon htmlColor="#FF0000"/>                                           
-                                        </IconButton>
+                                        
                                         <IconButton>
                                             <CheckCircleIcon htmlColor="#4CBB17"/>
+                                        </IconButton>
+                                        <IconButton >
+                                            <NotificationsIcon htmlColor="#FF0000"/>                                           
                                         </IconButton>
                                         <IconButton
                                                 aria-label="more"
