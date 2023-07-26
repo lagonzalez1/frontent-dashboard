@@ -115,7 +115,7 @@ export default function Services() {
         
         <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             { serviceList ? serviceList.map((service) => (
-                <Grid item key={service._id} xs={4} sm={4} md={4} lg={3}>
+                <Grid item key={service._id} xs={4} sm={4} md={4} lg={1}>
                     <StyledCardService onClick={() => handleClick(service)}>
                         <CardActionArea>
                         <CardContent>

@@ -15,8 +15,9 @@ import {  findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, clientOptions, OPTIONS_SELECT,
-    acceptingRejecting, 
-    removeClient} from "./Helpers";
+    acceptingRejecting, getTableData,
+    removeClient,
+    moveClientDown} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
@@ -84,7 +85,6 @@ export default function Waitlist () {
             setAnchorEl(null);
             return;
         })
-        
     };
   
 
@@ -111,6 +111,8 @@ export default function Waitlist () {
                 return;
             case OPTIONS_SELECT.MOVE_DOWN:
                 console.log("down");
+                const res = moveClientDown(clientId, tableData);
+                console.log(res);
                 setAnchorElVert(null);
                 return;
             case OPTIONS_SELECT.REMOVE:
@@ -132,7 +134,6 @@ export default function Waitlist () {
         }
         setAnchorElVert(null);
     }
-
 
     useEffect(() => {
         reloadBusinessData(dispatch);

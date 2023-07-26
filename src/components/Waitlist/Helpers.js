@@ -55,6 +55,28 @@ export const requestChangeAccept = (accepting) => {
 };
 
 
+
+
+export const moveClientDown = (clientId, list) => {
+    const { user, business } = getStateData();
+    if (list.length < 2) { return list; }
+    const timezone = business.timezone;
+    console.log(list)
+    list.forEach(function(client, index) {
+      if (client._id === clientId){
+          const next = index + 1;
+          const clientBelow = list[next];
+          console.log(clientBelow)
+          const clientBelowTimestamp = DateTime.fromJSDate(new Date(clientBelow.timestamp));
+          const timestampBelow = clientBelowTimestamp.plus(5);
+          console.log("Timestamp before: " + clientBelowTimestamp.toString() )
+          console.log("Timestamp after: " + timestampBelow.toString() )
+      }
+    })
+    
+}
+
+
 export const removeClient = (id) => {
   const { user, business } = getStateData();
   const accessToken = getAccessToken();

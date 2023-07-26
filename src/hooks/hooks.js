@@ -113,6 +113,7 @@ export const getUserTable = () => {
     const { user, business } = getStateData();
       try {
           const clients = business.currentClients;
+          const type = business.tables.dashboard;
           if (!clients) {
             return [];
           }
@@ -121,15 +122,25 @@ export const getUserTable = () => {
             return new Error('No timezone to validate.');
           }
           // Compare the current date to each client.
-          const currentTime = DateTime.local().setZone(timezone);
           let currentDates = [];
-          for (var client of clients) {
-            const clientDate = new DateTime.fromJSDate(new Date(client.timestamp));
-            if ( currentTime.hasSame(clientDate, 'day')){
-              currentDates.push(client);
+          let sorted = null;
+          const currentTime = DateTime.local().setZone(timezone);
+
+
+
+            if(type) {
+                for (var client of clients) {
+                    const clientDate = new DateTime.fromJSDate(new Date(client.timestamp));
+                    if ( currentTime.hasSame(clientDate, 'day')){
+                        currentDates.push(client);
+                    }
+                }
+                sorted = currentDates.sort(sortBaseTime);
+            }else {
+                sorted = clients;
             }
-          }
-          const sorted = currentDates.sort(sortBaseTime); //Sorted based on time since all equal dates. 
+              
+   
           
           // Add waittime key and values
           const wait = sorted.map((client) => {
