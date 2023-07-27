@@ -104,30 +104,47 @@ export const getResourceData = () => {
     return resources
 }
 
+/*
+    Handle all error codes and route to correct destination.
+                            REJECTS:    
+ *                              400 -> Bad Request, missing tokens.
+ *                              401 -> Unauthenticated try again.
+ *                              403 -> Reject sign out.
+*/
+export const handleErrorCodes = (error) => {  
+    //
+}
+
 
 /**
+ * 
+ * Dependancies: 
+ * TYPE:
+ * True: Find all current (date) clients. 
+ * False: Return all possiblle clients in list
+ * 
+ * 
  *  @returns Sorted business table, decending order based on timestamp.
  */
 const MINUTES_IN_HOUR = 60;
 export const getUserTable = () => {
     const { user, business } = getStateData();
       try {
-          const clients = business.currentClients;
-          const type = business.tables.dashboard;
-          if (!clients) {
-            return [];
-          }
-          const timezone = business.timezone;
-          if (!timezone) {
-            return new Error('No timezone to validate.');
-          }
-          // Compare the current date to each client.
-          let currentDates = [];
-          let sorted = null;
-          const currentTime = DateTime.local().setZone(timezone);
+            const clients = business.currentClients;
+            const type = business.tables.dashboard;
+            if (!clients) {
+                return [];
+            }
+            const timezone = business.timezone;
+            if (!timezone) {
+                return new Error('No timezone to validate.');
+            }
+            // Compare the current date to each client.
+            let currentDates = [];
+            let sorted = null;
+            const currentTime = DateTime.local().setZone(timezone);
 
-
-
+            
             if(type) {
                 for (var client of clients) {
                     const clientDate = new DateTime.fromJSDate(new Date(client.timestamp));
@@ -137,42 +154,43 @@ export const getUserTable = () => {
                 }
                 sorted = currentDates.sort(sortBaseTime);
             }else {
-                sorted = clients;
+                sorted = clients.sort(sortBaseTime);
             }
-              
-   
-          
-          // Add waittime key and values
-          const wait = sorted.map((client) => {
-          const luxonDateTime = DateTime.fromJSDate(new Date(client.timestamp));
-          const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
-          const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
-          const hours = Math.floor(diffHours);
-          const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
-          return {
-            ...client,
-            waittime: { hours, minutes },
-          };
-        });
-    
-        return wait;
+            
+            // Add wait time in {hour, minute}
+            const wait = sorted.map((client) => {
+            const luxonDateTime = DateTime.fromJSDate(new Date(client.timestampOrigin));
+            const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
+            const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
+            const hours = Math.floor(diffHours);
+            const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
+            return {
+                ...client,
+                waittime: { hours, minutes },
+            };
+            });
+            return wait;
       } catch (error) {
-        // Handle the error here
-        console.error(error);
-        return new Error(error); // Return an empty array or any other appropriate value
+            // Handle the error here
+            console.error(error);
+            return new Error(error); // Return an empty array or any other appropriate value
       }
   };
 
-    function sortBaseTime (a,b) {
-        if (a.timestamp < b.timestamp){
-            return -1
-        }
-        if(a.timestamp > b.timestamp){
-            return 1;
-        }
-        return 0;
+  function sortBaseTime(a, b) {
+    const timestampA = DateTime.fromISO(a.timestamp);
+    const timestampB = DateTime.fromISO(b.timestamp);
+  
+    if (timestampA < timestampB) {
+      console.log(timestampA.toString());
+      return -1;
     }
-
+    if (timestampA > timestampB) {
+      console.log(timestampB.toString());
+      return 1;
+    }
+    return 0;
+  }
 
 
 /**

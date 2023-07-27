@@ -55,25 +55,115 @@ export const requestChangeAccept = (accepting) => {
 };
 
 
-
-
-export const moveClientDown = (clientId, list) => {
+/**
+ * 
+ * @param {String} clientId  
+ * @param {Array} list 
+ * @returns           Promise:
+ *                    Logic: Get current client and manipulate timestamp to reflect 1-5ms below client.
+ *                    Grab ref to client timestamp below.
+ */
+export const moveClientUp = (clientId) => {
+  return new Promise((resolve, reject) => {
     const { user, business } = getStateData();
+    const list = business.currentClients;
+    // No change to be made since list to small.
     if (list.length < 2) { return list; }
     const timezone = business.timezone;
-    console.log(list)
-    list.forEach(function(client, index) {
-      if (client._id === clientId){
-          const next = index + 1;
-          const clientBelow = list[next];
-          console.log(clientBelow)
-          const clientBelowTimestamp = DateTime.fromJSDate(new Date(clientBelow.timestamp));
-          const timestampBelow = clientBelowTimestamp.plus(5);
-          console.log("Timestamp before: " + clientBelowTimestamp.toString() )
-          console.log("Timestamp after: " + timestampBelow.toString() )
-      }
-    })
+    let clientAbove = null;
+    // Find client below.
+    for (let index = 0; index < list.length; index++) {
+        const client = list[index];
+        if (client._id === clientId) {
+            const next = index - 1;
+            // Ensure there is a client below
+            if (list[next] !== undefined || list[next] !== null) {
+                clientAbove = list[next];
+                console.log("Clicked:", client)
+            }
+          break; // Exit the loop when the desired client is found
+        }
+    }
+    if(clientAbove === null || clientAbove === undefined){
+      return resolve('No changes made');
+    }
     
+    if (clientAbove !== null) {
+      console.log("To swap: ", clientAbove);
+      const clientAboveTimestamp = DateTime.fromISO(clientAbove.timestamp).setZone(timezone);
+      const swapTimestamp = clientAboveTimestamp.minus({minute: 1}).setZone(timezone);
+      console.log("Timestamp before: " + clientAboveTimestamp.toISO() )
+      console.log("Timestamp after: " + swapTimestamp.toISO() )
+      const accessToken = getAccessToken();
+      const headers = { headers: { 'x-access-token': accessToken } };
+      const payload = { clientId, bId: business._id, swapTimestamp}
+      axios.put('/api/internal/update_timestamp', payload, headers)
+      .then(response => {
+        resolve(response.data.msg);
+      })
+      .catch(error => {
+        reject(error);
+      })
+      
+    }
+  });
+}
+
+
+
+
+/**
+ * 
+ * @param {String} clientId  
+ * @param {Array} list 
+ * @returns           Promise:
+ *                    Logic: Get current client and manipulate timestamp to reflect 1-5ms below client.
+ *                    Grab ref to client timestamp below.
+ */
+export const moveClientDown = (clientId) => {
+  return new Promise((resolve, reject) => {
+    const { user, business } = getStateData();
+    const list = business.currentClients;
+    // No change to be made since list to small.
+    if (list.length < 2) { return list; }
+    const timezone = business.timezone;
+    let clientBelow = null;
+    // Find client below.
+    for (let index = 0; index < list.length; index++) {
+        const client = list[index];
+        if (client._id === clientId) {
+            const next = index + 1;
+            // Ensure there is a client below
+            if (list[next] !== undefined || list[next] !== null) {
+                clientBelow = list[next];
+                console.log("Clicked:", client)
+            }
+          break; // Exit the loop when the desired client is found
+        }
+    }
+    if(clientBelow === null || clientBelow === undefined){
+      return resolve('No changes made');
+    }
+    
+    if (clientBelow !== null) {
+      console.log("To swap: ", clientBelow);
+      const clientBelowTimestamp = DateTime.fromISO(clientBelow.timestamp).setZone(timezone);
+      const swapTimestamp = clientBelowTimestamp.plus({minute: 1}).setZone(timezone);
+      console.log("Timestamp before: " + clientBelowTimestamp.toISO() )
+      console.log("Timestamp after: " + swapTimestamp.toISO() )
+      const accessToken = getAccessToken();
+      const headers = { headers: { 'x-access-token': accessToken } };
+      const payload = { clientId, bId: business._id, swapTimestamp}
+      axios.put('/api/internal/update_timestamp',payload, headers)
+      .then(response => {
+        resolve(response.data.msg);
+      })
+      .catch(error => {
+        reject(error);
+      })
+      
+    }
+  });
 }
 
 

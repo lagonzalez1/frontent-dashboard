@@ -14,10 +14,9 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import {  findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
-import { handleOpenNewTab, requestChangeAccept, options, columns, clientOptions, OPTIONS_SELECT,
-    acceptingRejecting, getTableData,
-    removeClient,
-    moveClientDown} from "./Helpers";
+import { handleOpenNewTab, requestChangeAccept, options, columns, 
+    clientOptions, OPTIONS_SELECT, acceptingRejecting, getTableData,
+    removeClient, moveClientDown} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
@@ -34,6 +33,7 @@ export default function Waitlist () {
     const [anchorEl, setAnchorEl] = useState(null);
     const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [clientId, setClientId] = useState();
 
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
@@ -47,9 +47,11 @@ export default function Waitlist () {
         setAnchorEl(null);
     };
     const handleCloseVert = () => {
+        setClientId(null)
         setAnchorElVert(null);
     }
-    const handleOpenVert = (event) => {
+    const handleOpenVert = (event, id) => {
+        setClientId(id);
         setAnchorElVert(event.currentTarget);
     }
 
@@ -94,26 +96,23 @@ export default function Waitlist () {
      * @param {*} clientId Request made on behalf
      * @returns 
      */
-    const handleOptionChange = (optionId, clientId) => {
+    const handleOptionChange = (optionId) => {
         console.log(clientId);
+        console.log(optionId);
         switch (optionId){
             case OPTIONS_SELECT.NO_SHOW:
-                console.log("No show")
-                setAnchorElVert(null);
+                handleCloseVert();
                 return;
             case OPTIONS_SELECT.EDIT:
-                console.log("Edit");
-                setAnchorElVert(null);
+                handleCloseVert();
                 return;
             case OPTIONS_SELECT.MOVE_UP:
-                console.log("up");
-                setAnchorElVert(null);
+                handleCloseVert();
                 return;
             case OPTIONS_SELECT.MOVE_DOWN:
-                console.log("down");
-                const res = moveClientDown(clientId, tableData);
+                const res = moveClientDown(clientId,tableData);
                 console.log(res);
-                setAnchorElVert(null);
+                handleCloseVert();
                 return;
             case OPTIONS_SELECT.REMOVE:
                 setLoading(true);
@@ -128,11 +127,11 @@ export default function Waitlist () {
                 })
                 .finally(() => {
                     setLoading(false);
-                    setAnchorElVert(null);
+                    handleCloseVert();
+
                 })
                 return;
         }
-        setAnchorElVert(null);
     }
 
     useEffect(() => {
@@ -268,7 +267,8 @@ export default function Waitlist () {
 
                 {
                     Array.isArray(tableData) ? (
-                        tableData.map((item, index) => (
+                        tableData.map((item, index) => {
+                            return (
                             <TableRow key={item._id}>                                       
                                 <TableCell align="left" fontWeight="bold">{++index}</TableCell>
                                 <TableCell align="left">
@@ -283,8 +283,6 @@ export default function Waitlist () {
                                 </TableCell>
 
                                 <TableCell align="left">
-                                    
-
                                     <Typography fontWeight="bold" variant="body2">
                                         { item.resourceTag && findResource(item.resourceTag).title }
                                     </Typography>
@@ -311,7 +309,7 @@ export default function Waitlist () {
                                                 id="long-button"
                                                 aria-expanded={openVert ? 'true' : undefined}
                                                 aria-haspopup="true"
-                                                onClick={handleOpenVert}
+                                                onClick={(event) => handleOpenVert(event, item._id)}
                                                 >
                                             <MoreVertIcon  />
                                         </IconButton>
@@ -321,24 +319,26 @@ export default function Waitlist () {
                                                 'aria-labelledby': 'long-button',
                                                 }}
                                                 anchorEl={anchorElVert}
-                                                open={openVert}
+                                                open={clientId === item._id}
                                                 onClose={handleCloseVert}
                                             >
                                                 {
-                                                clientOptions.map((option) => (
-                                                    <MenuItem key={`${option.id}-${item._id}`} onClick={() => handleOptionChange(option.id, item._id)}>
-                                                    <ListItemIcon>
-                                                            {option.icon}
-                                                        </ListItemIcon>
-                                                        {option.label}
-                                                    </MenuItem>
-                                                ))
+                                                clientOptions.map((option) => {
+                                                    return (
+                                                        <MenuItem key={`${option.id}-${item._id}`} onClick={ () => handleOptionChange(option.id) }>
+                                                            <ListItemIcon>
+                                                                {option.icon}
+                                                            </ListItemIcon>
+                                                            {option.label}
+                                                        </MenuItem>
+                                                    )
+                                                })
                                                 }  
                                             </Menu>     
                                     </Stack>
                                 </TableCell>            
                             </TableRow>
-                        ))
+                        )}) 
                     ): null
                 }
                                     

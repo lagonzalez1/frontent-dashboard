@@ -6,7 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { Transition, addCustomerWaitlist  } from "./Helper";
 import { useSelector, useDispatch } from "react-redux";
-import { getResourcesAvailable, getServicesAvailable } from "../../hooks/hooks";
+import { getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { setBusiness } from "../../reducers/business";
@@ -43,8 +43,7 @@ export default function FabButton () {
             handleClose();
         })
         .catch(error => {
-            setError('Error found: ' + error);
-            console.log(error);
+            setError('Error found : ' + error);
         });
     }
 
