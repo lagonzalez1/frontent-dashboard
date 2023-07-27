@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, InputLabel, Select, MenuItem, Alert } from "@mui/material";
+    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, InputLabel, Select, MenuItem, Alert, Divider } from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
 import { allowClientJoin, getBuisnessForm, waitlistRequest,checkDuplicatesRequest } from "./WelcomeHelper";
@@ -76,14 +76,14 @@ export default function WelcomeDetails() {
         }catch(error) {
             setLoading(false);
             redirectBack();
-            console.log('error');
+            console.log(error);
         }
     }
 
 
     const externalWaitlistRequest = (values) => {
 
-        const clientStorage = JSON.parse(localStorage.getItem('client'));
+        const clientStorage = JSON.parse(sessionStorage.getItem('client'));
         let timestamp = DateTime.local().toUTC();
         let partySize = clientStorage.partySize;
         let payload = { ...values, link, timestamp, partySize}
@@ -215,7 +215,7 @@ export default function WelcomeDetails() {
                                 )
                                 :null
                             }
-                             
+                             <Divider/>
                              <Button sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                             { loading ? (<CircularProgress />) :
                              <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>

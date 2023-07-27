@@ -36,7 +36,7 @@ export default function Waiting() {
 
     useEffect(() => {
         loadUser();
-    }, [])
+    }, [loading])
 
 
     const copyToClipboardHandler = () => {
@@ -63,27 +63,17 @@ export default function Waiting() {
     }
 
     const loadUser = () => {
-        const timestamp = DateTime.local().toUTC().toString();
-        getIdentifierData(link, unid)
+        const timestamp = DateTime.local().toUTC();
+        getIdentifierData(link, unid, timestamp)
         .then(response => {
-            console.log(response);
-            if(response.status === 201){
-                setLoading(false);
-                setErrors(response.data.msg);
-                return;
-            }
-            if(response.status === 203){
-                setLoading(false);
-                setErrors(response.data.msg);
-                return;
-            }
-            setTitles(response.data.positionTitles);
-            setUser(response.data.client);
-            setLoading(false);
+            setTitles(response.positionTitles);
+            setUser(response.client);
         })
         .catch(error => {
-            setLoading(false);
             setErrors('Error: ' + error);
+        })
+        .finally(() => {
+            setLoading(false);
         })
     }
 

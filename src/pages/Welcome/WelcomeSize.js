@@ -36,8 +36,8 @@ export default function Welcome() {
         const object = {
             partySize: size
         }
-        localStorage.setItem('client', JSON.stringify(object));
-        navigate(`/welcome/${link}/details`);
+        sessionStorage.setItem('client', JSON.stringify(object));
+        navigate(`/welcome/${link}/extras`);
 
     }
     

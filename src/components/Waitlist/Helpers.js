@@ -9,6 +9,7 @@ import NorthRoundedIcon from '@mui/icons-material/NorthRounded';
 import SouthRoundedIcon from '@mui/icons-material/SouthRounded';
 import { getStateData, getAccessToken } from "../../auth/Auth";
 import { setSnackbar } from "../../reducers/user";
+import { findClient } from "../../hooks/hooks";
 
 // Current data
 
@@ -19,6 +20,28 @@ export const handleOpenNewTab = (endpoint) => {
     const url = 'http://localhost:3000/welcome/'+endpoint;
     window.open(url, '_blank');
 };
+
+
+
+export const requestNoShow = (clientId) => {
+  return new Promise((resolve, reject) => {
+    const { user, business } = getStateData();
+    const accessToken = getAccessToken();
+    const headers = { headers: { 'x-access-token': accessToken } };
+    const payload = { bId: business._id, clientId}
+    axios.put('/api/internal/noShow', payload, headers)
+    .then(response => {
+      if(response.status === 200){
+        resolve(response.data)
+      }
+      resolve(response.data.msg);
+    })
+    .error(error => {
+      reject(error.status);
+    })
+
+  })
+}
 
 /**
  * 
@@ -67,37 +90,36 @@ export const requestChangeAccept = (accepting) => {
 export const moveClientUp = (clientId, currentClients) => {
   return new Promise((resolve, reject) => {
     const { user, business } = getStateData();
-    const list = currentClients
+    const list = currentClients;
     // No change to be made since list to small.
     if (list.length < 2) { return list; }
     const timezone = business.timezone;
     let clientAbove = null;
+    let clientTimestamp = null;
     // Find client below.
     for (let index = 0; index < list.length; index++) {
         const client = list[index];
         if (client._id === clientId) {
             const next = index - 1;
+            clientTimestamp = DateTime.fromISO(client.timestamp).setZone(timezone);
             // Ensure there is a client below
             if (list[next] !== undefined || list[next] !== null) {
                 clientAbove = list[next];
-                console.log("Clicked:", client)
+                console.log("SELECTED: " + list[index].fullname +  " -  SELECTED: " +  list[next].fullname)
             }
           break; // Exit the loop when the desired client is found
         }
     }
+    console.log("Client Selected: ", clientAbove)
     if(clientAbove === null || clientAbove === undefined){
       return resolve('No changes made');
     }
-    
-    if (clientAbove !== null) {
-      console.log("To swap: ", clientAbove);
+    if (clientAbove !== null && clientTimestamp !== null) {
       const clientAboveTimestamp = DateTime.fromISO(clientAbove.timestamp).setZone(timezone);
-      const swapTimestamp = clientAboveTimestamp.minus({minute: 1}).setZone(timezone);
-      console.log("Timestamp before: " + clientAboveTimestamp.toISO() )
-      console.log("Timestamp after: " + swapTimestamp.toISO() )
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
-      const payload = { clientId, bId: business._id, swapTimestamp}
+
+      const payload = { clientId, clientTimestamp, clientSwapId: clientAbove._id ,bId: business._id, clientSwapTimestamp :clientAboveTimestamp}
       axios.put('/api/internal/update_timestamp', payload, headers)
       .then(response => {
         if(response.status === 200){
@@ -116,11 +138,7 @@ export const moveClientUp = (clientId, currentClients) => {
   });
 }
 
-
-
-
 /**
- *  This is not workinhg!!!
  * @param {String} clientId  
  * @param {Array} list 
  * @returns           Promise:
@@ -135,34 +153,32 @@ export const moveClientDown = (clientId, currentClients) => {
     if (list.length < 2) { return list; }
     const timezone = business.timezone;
     let clientBelow = null;
+    let clientTimestamp = null;
     console.log("LIST: ", list)
     // Find client below.
     for (let index = 0; index < list.length; index++) {
         const client = list[index];
         if (client._id === clientId) {
             const next = index + 1;
+            clientTimestamp = DateTime.fromISO(client.timestamp).setZone(timezone);
             // Ensure there is a client below
             if (list[next] !== undefined || list[next] !== null) {
                 clientBelow = list[next];
-                console.log("Comparing a " + list[index].fullname +  "-  Comparing b " +  list[next].fullname)
+                console.log("SELECTED: " + list[index].fullname +  " -  SELECTED: " +  list[next].fullname)
             }
           break; // Exit the loop when the desired client is found
         }
     }
+    console.log("Client Selected: ", clientBelow)
     if(clientBelow === null || clientBelow === undefined){
       return resolve('No changes made');
     }
-    if (clientBelow !== null) {
-      console.log("Comparing below client: ", clientBelow)
-      console.log("Comparing below client Date: ", DateTime.fromISO(clientBelow.timestamp).setZone(timezone).toString() )
-      const clientBelowTimestamp = DateTime.fromISO(clientBelow.timestamp).setZone(timezone);
-      const swapTimestamp = clientBelowTimestamp.plus({minute: 1}).setZone(timezone);
-
-      console.log("Swap new timestamp: ", DateTime.fromFormat(swapTimestamp).toString() )
+    if (clientBelow !== null && clientTimestamp !== null) {
+      const clientSwapTimestamp = DateTime.fromISO(clientBelow.timestamp).setZone(timezone);
 
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
-      const payload = { clientId, bId: business._id, swapTimestamp}
+      const payload = { clientId, clientTimestamp, bId: business._id, clientSwapTimestamp, clientSwapId: clientBelow._id}
       axios.put('/api/internal/update_timestamp',payload, headers)
       .then(response => {
         if(response.status === 200){

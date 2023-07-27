@@ -8,7 +8,10 @@ export const getIdentifierData = (link, unid) => {
     return new Promise((resolve, reject) => {
         axios.get('/api/external/identifierRequest',{ params: {link, unid} } )
         .then(response => {
-            resolve(response);
+            if(response.status === 200){
+                resolve(response.data);
+            }
+            resolve(response.data.msg);
         })
         .catch(error => {
             reject(error);

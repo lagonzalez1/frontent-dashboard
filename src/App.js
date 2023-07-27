@@ -11,6 +11,7 @@ import WelcomeSize from "./pages/Welcome/WelcomeSize";
 import { RequireAuth } from "react-auth-kit";
 import WelcomeDetails from './pages/Welcome/WelcomeDetails';
 import Waiting from './pages/Waiting/Waiting';
+import WelcomeExtras from './pages/Welcome/WelcomeExtras';
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path={'/welcome/:link'} element={<Welcome />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/size'} element={<WelcomeSize />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/details'} element={<WelcomeDetails />}></Route> { /** Check if business open. Advance if so. */}
+          <Route path={'/welcome/:link/extras'} element={<WelcomeExtras />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
           <Route path={'/welcome/:link/waitlist'}></Route>
 

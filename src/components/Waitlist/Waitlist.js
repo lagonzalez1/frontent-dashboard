@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT, acceptingRejecting, getTableData,
-    removeClient, moveClientDown, moveClientUp} from "./Helpers";
+    removeClient, moveClientDown, moveClientUp, requestNoShow} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
@@ -101,18 +101,36 @@ export default function Waitlist () {
         console.log(optionId);
         switch (optionId){
             case OPTIONS_SELECT.NO_SHOW:
-                handleCloseVert();
+                setLoading(true)
+                requestNoShow(clientId)
+                .then(response => {
+                    dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                    setLoading(false)
+                })  
+                .catch(error => {
+                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+                    setLoading(false)
+                })
+                .finally(() => {
+                    setLoading(true)
+                    handleCloseVert();
+                })
+
                 return;
             case OPTIONS_SELECT.EDIT:
                 handleCloseVert();
                 return;
             case OPTIONS_SELECT.MOVE_UP:
+                setLoading(true)
                 moveClientUp(clientId,tableData)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                    setLoading(false)
+
                 })  
                 .catch(error => {
                     dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+                    setLoading(false)
 
                 })
                 .finally(() => {
@@ -121,18 +139,19 @@ export default function Waitlist () {
                 })
                 return;
             case OPTIONS_SELECT.MOVE_DOWN:
+                setLoading(true)
                 moveClientDown(clientId,tableData)
                 .then(response => {
-                    dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                    dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
+                    setLoading(false)
                 })  
                 .catch(error => {
-                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
-
+                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}));
+                    setLoading(false)
                 })
                 .finally(() => {
                     setLoading(true)
                     handleCloseVert();
-
                 })
                 
                 return;
@@ -142,13 +161,16 @@ export default function Waitlist () {
                 .then(response => {
                     console.log(response)
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                    setLoading(false)
+
                 })
                 .catch(error => {
                     console.log(error);
                     dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+                    setLoading(false)
                 })
                 .finally(() => {
-                    setLoading(false);
+                    setLoading(true);
                     handleCloseVert();
 
                 })
@@ -162,6 +184,14 @@ export default function Waitlist () {
             setLoading(false);
         }
     }, [loading])
+
+    const sendClientServing = (clientId) => {
+        console.log(clientId)
+    }
+
+    const sendClientNotification = (clientId) => {
+        console.log(clientId)
+    }
 
 
     return (
@@ -320,10 +350,10 @@ export default function Waitlist () {
                                         spacing={1}
                                     >
                                         
-                                        <IconButton>
+                                        <IconButton onClick={() => sendClientServing(item._id)}>
                                             <CheckCircleIcon htmlColor="#4CBB17"/>
                                         </IconButton>
-                                        <IconButton >
+                                        <IconButton onClick={() => sendClientNotification(item._id)}>
                                             <NotificationsIcon htmlColor="#FF0000"/>                                           
                                         </IconButton>
                                         <IconButton

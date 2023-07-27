@@ -15,6 +15,22 @@ export const allowClientJoin = (time,link) => {
     });
   };
 
+  export const getExtras = (link) => {
+    return new Promise((resolve, reject) => {
+      axios
+      .get('/api/external/buisnessExtras', { params: {link} })
+      .then((response) => {
+        if (response.status === 200) {
+          resolve(response.data);
+        }
+        resolve(response.data.msg);
+      })
+      .catch((error) => {
+        reject(error);
+      })
+    })
+  }
+
 
   export const getMax = (link) => {
     return new Promise((resolve, reject) => {

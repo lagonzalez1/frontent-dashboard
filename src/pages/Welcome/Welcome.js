@@ -57,14 +57,14 @@ export default function Welcome({ path }) {
         return() => {
             setLoading(false)
         }
-    }, [])
+    }, [loading])
 
 
     return (
         <>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
                 <Card sx={{ minWidth: 475, textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
-                    { loading ? (<CircularProgress/> ): 
+                    { loading ? <CircularProgress/> : 
                     (<>
                     <CardContent>
                     {errors ? (<Alert severity="error">{errors}</Alert>):
@@ -73,7 +73,7 @@ export default function Welcome({ path }) {
                         <Stack spacing={3}>
 
                         
-                        <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography>
+                        { !open ? null: <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography>}
                         
                         
                         { !open ? <Alert severity="warning">
