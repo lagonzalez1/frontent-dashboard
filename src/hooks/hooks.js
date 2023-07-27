@@ -182,11 +182,9 @@ export const getUserTable = () => {
     const timestampB = DateTime.fromISO(b.timestamp);
   
     if (timestampA < timestampB) {
-      console.log(timestampA.toString());
       return -1;
     }
     if (timestampA > timestampB) {
-      console.log(timestampB.toString());
       return 1;
     }
     return 0;

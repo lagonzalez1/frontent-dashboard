@@ -46,6 +46,7 @@ export const requestChangeAccept = (accepting) => {
 
     axios.put(ENDPOINT_ACCEPTING, requestBody, headers)
       .then(response => {
+        
         resolve(response.data); // Resolve the promise with the response data
       })
       .catch(error => {
@@ -63,10 +64,10 @@ export const requestChangeAccept = (accepting) => {
  *                    Logic: Get current client and manipulate timestamp to reflect 1-5ms below client.
  *                    Grab ref to client timestamp below.
  */
-export const moveClientUp = (clientId) => {
+export const moveClientUp = (clientId, currentClients) => {
   return new Promise((resolve, reject) => {
     const { user, business } = getStateData();
-    const list = business.currentClients;
+    const list = currentClients
     // No change to be made since list to small.
     if (list.length < 2) { return list; }
     const timezone = business.timezone;
@@ -99,7 +100,13 @@ export const moveClientUp = (clientId) => {
       const payload = { clientId, bId: business._id, swapTimestamp}
       axios.put('/api/internal/update_timestamp', payload, headers)
       .then(response => {
-        resolve(response.data.msg);
+        if(response.status === 200){
+          resolve(response.data.msg);
+        }
+        else{
+          resolve(response.data.msg);
+        }
+        
       })
       .catch(error => {
         reject(error);
@@ -113,21 +120,22 @@ export const moveClientUp = (clientId) => {
 
 
 /**
- * 
+ *  This is not workinhg!!!
  * @param {String} clientId  
  * @param {Array} list 
  * @returns           Promise:
  *                    Logic: Get current client and manipulate timestamp to reflect 1-5ms below client.
  *                    Grab ref to client timestamp below.
  */
-export const moveClientDown = (clientId) => {
+export const moveClientDown = (clientId, currentClients) => {
   return new Promise((resolve, reject) => {
     const { user, business } = getStateData();
-    const list = business.currentClients;
+    const list = currentClients
     // No change to be made since list to small.
     if (list.length < 2) { return list; }
     const timezone = business.timezone;
     let clientBelow = null;
+    console.log("LIST: ", list)
     // Find client below.
     for (let index = 0; index < list.length; index++) {
         const client = list[index];
@@ -136,7 +144,7 @@ export const moveClientDown = (clientId) => {
             // Ensure there is a client below
             if (list[next] !== undefined || list[next] !== null) {
                 clientBelow = list[next];
-                console.log("Clicked:", client)
+                console.log("Comparing a " + list[index].fullname +  "-  Comparing b " +  list[next].fullname)
             }
           break; // Exit the loop when the desired client is found
         }
@@ -144,27 +152,33 @@ export const moveClientDown = (clientId) => {
     if(clientBelow === null || clientBelow === undefined){
       return resolve('No changes made');
     }
-    
     if (clientBelow !== null) {
-      console.log("To swap: ", clientBelow);
+      console.log("Comparing below client: ", clientBelow)
+      console.log("Comparing below client Date: ", DateTime.fromISO(clientBelow.timestamp).setZone(timezone).toString() )
       const clientBelowTimestamp = DateTime.fromISO(clientBelow.timestamp).setZone(timezone);
       const swapTimestamp = clientBelowTimestamp.plus({minute: 1}).setZone(timezone);
-      console.log("Timestamp before: " + clientBelowTimestamp.toISO() )
-      console.log("Timestamp after: " + swapTimestamp.toISO() )
+
+      console.log("Swap new timestamp: ", DateTime.fromFormat(swapTimestamp).toString() )
+
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       const payload = { clientId, bId: business._id, swapTimestamp}
       axios.put('/api/internal/update_timestamp',payload, headers)
       .then(response => {
-        resolve(response.data.msg);
+        if(response.status === 200){
+          resolve(response.data.msg);
+        }else{
+          resolve(response.data.msg);
+        }
       })
       .catch(error => {
         reject(error);
       })
-      
     }
-  });
+
+  })
 }
+
 
 
 export const removeClient = (id) => {

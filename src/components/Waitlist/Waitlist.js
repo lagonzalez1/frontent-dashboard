@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT, acceptingRejecting, getTableData,
-    removeClient, moveClientDown} from "./Helpers";
+    removeClient, moveClientDown, moveClientUp} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
@@ -107,12 +107,34 @@ export default function Waitlist () {
                 handleCloseVert();
                 return;
             case OPTIONS_SELECT.MOVE_UP:
-                handleCloseVert();
+                moveClientUp(clientId,tableData)
+                .then(response => {
+                    dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                })  
+                .catch(error => {
+                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+
+                })
+                .finally(() => {
+                    setLoading(true)
+                    handleCloseVert();
+                })
                 return;
             case OPTIONS_SELECT.MOVE_DOWN:
-                const res = moveClientDown(clientId,tableData);
-                console.log(res);
-                handleCloseVert();
+                moveClientDown(clientId,tableData)
+                .then(response => {
+                    dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                })  
+                .catch(error => {
+                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+
+                })
+                .finally(() => {
+                    setLoading(true)
+                    handleCloseVert();
+
+                })
+                
                 return;
             case OPTIONS_SELECT.REMOVE:
                 setLoading(true);
@@ -123,7 +145,7 @@ export default function Waitlist () {
                 })
                 .catch(error => {
                     console.log(error);
-                    dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
                 })
                 .finally(() => {
                     setLoading(false);
