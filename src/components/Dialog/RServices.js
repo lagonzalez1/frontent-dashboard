@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const RService = ({ open, onClose, data }) => {
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+  useEffect(() => {
+    setOpenDialog(true)
+  }, [open])
+
+
   const handleClose = () => {
     onClose();
   };
@@ -14,7 +22,7 @@ const RService = ({ open, onClose, data }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={openDialog} onClose={handleClose}>
       <DialogTitle>Dialog Title</DialogTitle>
       <DialogContent>
         <TextField label="Title" fullWidth />

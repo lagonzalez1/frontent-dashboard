@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container,Paper, Typography, Divider, Grid, Stack, List,ListItemButton, ListItemText, ListItem } from "@mui/material";
+import { Box, Container,Paper, Typography, Divider, Grid, Stack } from "@mui/material";
 import LocationForm from "../../components/Forms/LocationForm";
 import OpeningHoursForm from "../../components/Forms/OpeningHoursForm";
 import BusinessForm from "../../components/Forms/BusinessForm";
 import PaymentForm from "../../components/Forms/PaymentForm";
-import { getResourceList, getServiceList } from "./SettingsHelper";
 import { useSelector } from "react-redux";
-import RService from "../../components/Dialog/RServices";
 import ExtrasForm from "../../components/Forms/ExtrasForm";
 import ClientForm from "../../components/Forms/ClientForm";
 import TableForm from "../../components/Forms/TableForm";
+import ResourceServiceForm from "../../components/Forms/ResourceServiceForm";
 
 
 
 export default function Settings() {
 
     const business = useSelector((state) => state.business);
+
+
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -25,14 +26,7 @@ export default function Settings() {
     }, [loading])
 
 
-    const serviceSelected = (service) => {
-
-        return (
-            <>
-                <RService open={true} data={service}/>
-            </>
-        )
-    }
+    
 
 
 
@@ -165,36 +159,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                    <Typography fontWeight='bold' variant="body2">
-                                        Resources
-                                    </Typography>
-                                <List>
-                                {
-                                    getResourceList().map((item) => (
-                                        <ListItem disablePadding>
-                                            <ListItemButton>
-                                                <ListItemText primary={item.title} secondary={item.description} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                      ))
-                                }
-
-                                
-                                </List>
-                                <Typography fontWeight='bold' variant="body2">
-                                        Services
-                                    </Typography>
-                                <List>
-                                {
-                                    getServiceList().map((item) => (
-                                        <ListItem disablePadding>
-                                            <ListItemButton onClick={() => serviceSelected(item) }>
-                                                <ListItemText primary={item.title} secondary={item.description} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                      ))
-                                }
-                                </List>
+                                <ResourceServiceForm/>
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
