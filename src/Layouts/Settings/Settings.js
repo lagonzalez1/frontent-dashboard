@@ -7,6 +7,9 @@ import PaymentForm from "../../components/Forms/PaymentForm";
 import { getResourceList, getServiceList } from "./SettingsHelper";
 import { useSelector } from "react-redux";
 import RService from "../../components/Dialog/RServices";
+import ExtrasForm from "../../components/Forms/ExtrasForm";
+import ClientForm from "../../components/Forms/ClientForm";
+import TableForm from "../../components/Forms/TableForm";
 
 
 
@@ -54,7 +57,7 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid xs={12} md={6} sm={12} lg={6}>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <LocationForm />
                             </Grid>
                         </Grid>
@@ -70,8 +73,25 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid xs={12} md={6} sm={12} lg={6}>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <OpeningHoursForm/>
+                            </Grid>
+                        </Grid>
+
+                        <Divider sx={{backgroundColor: 'lightgray'}} />
+                        <Grid container id="presentation">
+                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                                <Stack>
+                                    <Typography fontWeight='bold' variant="h6">
+                                        System
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                    Appointment system settings, choose how your will manage your waitlist.
+                                </Typography>
+                                </Stack>
+                            </Grid>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                                <TableForm/>
                             </Grid>
                         </Grid>
 
@@ -87,10 +107,47 @@ export default function Settings() {
                                 </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid xs={12} md={6} sm={12} lg={6}>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <BusinessForm/>
                             </Grid>
                         </Grid>
+
+
+                        <Divider sx={{backgroundColor: 'lightgray'}} />
+                        <Grid container id="presentation">
+                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                                <Stack>
+                                    <Typography fontWeight='bold' variant="h6">
+                                        Client signup page
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                    Allows you to control what your client can see when joining your waitlist
+                                </Typography>
+                                </Stack>
+                            </Grid>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                                <ExtrasForm/>
+                            </Grid>
+                        </Grid>
+
+                        <Divider sx={{backgroundColor: 'lightgray'}} />
+                        <Grid container id="presentation">
+                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                                <Stack>
+                                    <Typography fontWeight='bold' variant="h6">
+                                        Client form 
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                    Allows you to control what information your clients give you
+                                </Typography>
+                                </Stack>
+                            </Grid>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                                <ClientForm/>
+                            </Grid>
+                        </Grid>
+
+
                         <Divider sx={{backgroundColor: 'lightgray'}} />
 
                         <Grid container id="payment">
@@ -107,7 +164,7 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid xs={12} md={6} sm={12} lg={6}>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                     <Typography fontWeight='bold' variant="body2">
                                         Resources
                                     </Typography>
@@ -150,11 +207,10 @@ export default function Settings() {
                                     </Typography>
                                     <Typography variant="subtitle2">
                                         Thank you for the continuous support by paying for this service.
-
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid xs={12} md={6} sm={12} lg={6}>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 Free
                             </Grid>
                         </Grid>

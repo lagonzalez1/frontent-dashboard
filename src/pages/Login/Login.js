@@ -51,11 +51,12 @@ export default function Login() {
                     
                     setAccessToken(response.data.accessToken);
                     dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions}));
+                    // Set business ref ?
                     navigate('/Dashboard');
                     setLoading(false);
                     return;
                 }
-                else if (response.status === 203){
+                else if (response.status === 403){
                     setErrors(response.data.msg);
                     setLoading(false);
                 }
@@ -68,15 +69,7 @@ export default function Login() {
             })
             .catch(error => {
                 setLoading(false);
-                if (error && error instanceof AxiosError){
-                    setErrors('Axios: ' + error);
-                    return;
-                }else if (error && error instanceof Error){
-                    setErrors('Error: ' + error);
-                    return;
-                }
-                setErrors('Error: ' + error);
-                return;
+                setErrors(error);
             })
         }
         else {

@@ -131,7 +131,7 @@ export const getUserTable = () => {
     const { user, business } = getStateData();
       try {
             const clients = business.currentClients;
-            const type = business.tables.dashboard;
+            const type = business.system.equalDate;
             if (!clients) {
                 return [];
             }

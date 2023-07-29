@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState} from 'react';
 import { TextField, Button, Grid, Stack } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { getAccessToken } from '../../auth/Auth';
+import { setSnackbar } from '../../reducers/user';
 
 const validationSchema = Yup.object().shape({
-  businessName: Yup.string(),
+  businessName: Yup.string().required(),
   businessWebsite: Yup.string(),
   businessAddress: Yup.string(),
   businessPhone: Yup.string()
@@ -13,11 +16,25 @@ const validationSchema = Yup.object().shape({
 
 const BusinessForm = () => {
   
+  const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
-
+  const dispatch = useDispatch();
+  
   const handleSubmit = (values) => {
-    console.log(values);
-    // Perform further actions with the form values
+    setLoading(true);
+    const accessToken = getAccessToken();
+    const headers = { headers: {'x-access-token': accessToken}}
+    const payload = { ...values, b_id: business._id}
+    axios.put('/api/internal/update_business', payload, headers)
+    .then(response => {
+      dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
+    })
+    .catch(error => {
+      dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
+    })
+    .finally(() => {
+      setLoading(false);
+    })
   };
 
   const initialValue = {
@@ -77,8 +94,8 @@ const BusinessForm = () => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button type="submit" variant="outlined" color="primary">
-                sync
+              <Button sx={{ borderRadius: 15}} type="submit" variant="contained" color="primary">
+                Save
               </Button>
             </Grid>
           </Grid>

@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { setBusiness } from './business';
+import { access } from 'fs';
 
 const initialState = {
   id: null,
@@ -6,8 +8,10 @@ const initialState = {
   permissions: null,
   defaultIndex : null,
   isLoggedIn: false,
+  businessRef: null,
   requestStatus: false,
   requestMessage: null,
+  requestType: null,
   location: 0,
 };
 
@@ -36,10 +40,13 @@ const userSlice = createSlice({
     setSnackbar: (state, action) => {
       state.requestMessage = action.payload.requestMessage;
       state.requestStatus = action.payload.requestStatus;
-      
+      state.requestType = action.payload.requestType;
+    },
+    setBusinessRef: (state, action) => {
+      state.businessRef = action.payload;
     }
   },
 });
 
-export const { setUser, logoutUser, setPermisisons, setIndex, setLocation, setSnackbar } = userSlice.actions;
+export const { setUser, logoutUser, setPermisisons, setIndex, setLocation, setSnackbar, setBusinessRef } = userSlice.actions;
 export default userSlice.reducer;

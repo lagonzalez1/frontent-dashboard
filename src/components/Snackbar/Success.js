@@ -15,6 +15,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 export default function Success() {
     const requestMessage = useSelector((state) => state.user.requestMessage)
     const requestStatus = useSelector((state) => state.user.requestStatus)
+    const requestType = useSelector((state) => state.user.requestType)
     const dispatch = useDispatch();
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {

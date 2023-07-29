@@ -10,6 +10,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from "react-auth-kit";
 import { Provider } from 'react-redux';
 import store from "./store/store"
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon'
 
 
 
@@ -25,7 +27,9 @@ root.render(
     >
       <ThemeProvider theme={theme}>
         <Provider store={store}>
-          <App />
+          <LocalizationProvider dateAdapter={AdapterLuxon}>
+            <App />
+          </LocalizationProvider>
         </Provider>
       </ThemeProvider>
     </AuthProvider>
