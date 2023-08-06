@@ -9,7 +9,7 @@ import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks.js";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from "react-redux";
-import { setSnackbar } from "../../reducers/user";
+import { setReload, setSnackbar } from "../../reducers/user";
 
 
 export default function Services() {
@@ -87,11 +87,14 @@ export default function Services() {
             dispatch(setSnackbar(error))
             setLoading(false)
         })
+        .finally(() =>{
+            dispatch(setReload(true));
+        })
     }
 
     useEffect(() => {
-        reloadBusinessData(dispatch);
-    },[loading])
+        
+    },[])
 
     return(
         <>

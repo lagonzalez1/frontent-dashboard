@@ -1,7 +1,7 @@
 
 import axios from "axios";
 import { DateTime } from "luxon";
-import { getStateData, getAccessToken } from "../auth/Auth";
+import { getStateData, getAccessToken, getHeaders } from "../auth/Auth";
 import { setBusiness } from "../reducers/business";
 let GET_BUSINESS = '/api/internal/reload_business/'
 
@@ -43,10 +43,80 @@ export const findEmployee = (id) => {
             return employee;
         }
     }
-    return new Error('Employee no longer exist.');
+    return {fullname: 'NA'}
+}
+
+export const requestNoShow = (clientId) => {
+    return new Promise((resolve, reject) => {
+      const { user, business } = getStateData();
+      const accessToken = getAccessToken();
+      const headers = { headers: { 'x-access-token': accessToken } };
+      const payload = { bId: business._id, clientId}
+      axios.put('/api/internal/noShow', payload, headers)
+      .then(response => {
+        if(response.status === 200){
+          resolve(response.data)
+        }
+        resolve(response.data.msg);
+      })
+      .error(error => {
+        reject(error.status);
+      })
+  
+    })
+  }
+
+
+  export const getAnalyticsClients = (payload) => {
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const header = getHeaders();
+        axios.post('/api/internal/analytics_data', payload, header)
+        .then(response => {
+            resolve(response.data.payload);
+        })
+        .catch(error => {
+            reject(error.response.data);
+        })
+        
+    })
+  } 
+
+  export const completeClientAppointment = (client) => {
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const header = getHeaders();
+        const currentTime = DateTime.local().setZone(business.timezone).toISO();
+        const payload = {client: {...client}, b_id: business._id, currentTime}
+        axios.post('/api/internal/complete_appointment', payload, header)
+        .then(response => {
+            resolve(response.data);
+        })
+        .catch(error => {
+            reject(error.response.data);
+        })
+        
+    })
 }
 
 
+export const moveClientServing = (clientId) => {
+    return new Promise((resolve, reject) => {
+      const { user, business } = getStateData();
+      const headers = getHeaders();
+      const currentTime = new DateTime.local().setZone(business.timezone).toISO();
+      const payload = { clientId, currentTime, b_id: business._id, isServing: true}
+      console.log(currentTime);
+      axios.post('/api/internal/client_to_serving', payload, headers)
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.response.data);
+      }) 
+      
+    })
+  }
 
 
 
@@ -116,6 +186,67 @@ export const handleErrorCodes = (error) => {
 }
 
 
+const MINUTES_IN_HOUR = 60;
+export const getServingTable = () => {
+    const { user, business } = getStateData();
+    try {
+            let currentClients = business.currentClients;
+            let clients = [];
+            for (var client of currentClients){
+                if (client.status.serving === true) {
+                    clients.push(client);
+                }
+            }
+            const type = business.system.equalDate;
+            if (!clients) {
+                return [];
+            }
+            const timezone = business.timezone;
+            if (!timezone) {
+                return new Error('No timezone to validate.');
+            }
+            // Compare the current date to each client.
+            let currentDates = [];
+            let sorted = null;
+            const currentTime = DateTime.local().setZone(timezone);
+
+
+            if(type) {
+                for (var client of clients) {
+                    const clientDate = new DateTime.fromJSDate(new Date(client.timestamp));
+                    if ( currentTime.hasSame(clientDate, 'day')){
+                        currentDates.push(client);
+                    }
+                }
+                sorted = currentDates.sort(sortBaseTime);
+            }else {
+                sorted = clients.sort(sortBaseTime);
+            }
+            
+            // Add wait time in {hour, minute}
+            const wait = sorted.map((client) => {
+            const luxonDateTime = DateTime.fromJSDate(new Date(client.status.serve_time));
+            const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
+            const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
+            const hours = Math.floor(diffHours);
+            const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
+            return {
+                ...client,
+                waittime: { hours, minutes },
+            };
+            });
+            return wait;
+      } catch (error) {
+            // Handle the error here
+            console.error(error);
+            return new Error(error); // Return an empty array or any other appropriate value
+      }
+};
+
+
+
+
+
 /**
  * 
  * Dependancies: 
@@ -126,11 +257,16 @@ export const handleErrorCodes = (error) => {
  * 
  *  @returns Sorted business table, decending order based on timestamp.
  */
-const MINUTES_IN_HOUR = 60;
 export const getUserTable = () => {
     const { user, business } = getStateData();
-      try {
-            const clients = business.currentClients;
+    try {
+            let currentClients = business.currentClients;
+            let clients = [];
+            for (var client of currentClients){
+                if (client.status.serving === false) {
+                    clients.push(client);
+                }
+            }
             const type = business.system.equalDate;
             if (!clients) {
                 return [];
@@ -175,7 +311,7 @@ export const getUserTable = () => {
             console.error(error);
             return new Error(error); // Return an empty array or any other appropriate value
       }
-  };
+};
 
   function sortBaseTime(a, b) {
     const timestampA = DateTime.fromISO(a.timestamp);
@@ -226,7 +362,7 @@ export const findResource = (id) => {
             return resource;
         }
     }
-    return { error: 'No resource found.'}
+    return { title: 'NA'}
 }   
 
 /**
@@ -244,7 +380,7 @@ export const findService = (id) => {
             return service;
         }
     }
-    return { error: 'No service found.'}
+    return { title: 'NA'}
 }   
 
 

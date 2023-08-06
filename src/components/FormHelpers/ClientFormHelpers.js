@@ -5,14 +5,12 @@ import axios from "axios";
 
 export const validationSchema = Yup.object().shape({
     email: Yup.boolean(),
-    phone: Yup.boolean(),
     notes: Yup.boolean(),
     service: Yup.boolean(),
 });
 
 export const LABELS = {
     email: 'Ask client for email',
-    phone: 'Ask client for phone number',
     notes: 'Ask client for notes ',
     service: 'Ask client for option to select a service',
 }

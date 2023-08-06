@@ -73,7 +73,7 @@ export const allowClientJoin = (time,link) => {
   export const checkDuplicatesRequest = (email, link) => {
     return new Promise((resolve, reject) => {
       axios
-      .get('/api/external/checkDuplicates', { params: {link, email} })
+      .post('/api/external/checkDuplicates', {link, email} )
       .then((response) => {
         resolve(response.data);
       })

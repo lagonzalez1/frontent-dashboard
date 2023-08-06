@@ -1,10 +1,14 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
-export default function DateSelect() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [selectedOption, setSelectedOption] = React.useState('Today');
+export default function DateSelect({set}) {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedOption, setSelectedOption] = useState('Today');
+
+  useEffect(() => {
+    set(selectedOption);
+  }, [])
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -16,6 +20,7 @@ export default function DateSelect() {
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
+    set(option)
     handleClose();
   };
 

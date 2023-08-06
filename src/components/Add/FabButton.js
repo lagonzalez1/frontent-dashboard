@@ -7,10 +7,11 @@ import CloseIcon from '@mui/icons-material/Close';
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { Transition, addCustomerWaitlist  } from "./Helper";
 import { useSelector, useDispatch } from "react-redux";
-import { getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
+import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { setBusiness } from "../../reducers/business";
+import { setReload, setSnackbar } from "../../reducers/user";
 
 
 
@@ -24,6 +25,7 @@ export default function FabButton () {
     const business = useSelector((state) => state.business);
     const serviceList = getServicesAvailable();
     const resourceList = getResourcesAvailable();
+    const employeeList = getEmployeeList();
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -38,37 +40,46 @@ export default function FabButton () {
     }, [])
 
     const handleSubmit = (payload) => {
-        addCustomerWaitlist(payload, dispatch)
-        .then(data => {
-            dispatch(setBusiness(data.business));
-            handleClose();
+        addCustomerWaitlist(payload)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
         })
         .catch(error => {
-            setError('Error found : ' + error);
-        });
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
+        })
+        .finally(() => {
+            dispatch(setReload(true));
+            handleClose();
+        })
     }
 
     const initialValues = {
         fullname: '',
+        email: '',
         phone: '',
         size: '',
         service_id: '',
         resource_id: '',
+        employee_id: '',
         notes: ''
       };
-    
+      
+      const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;    
       const validationSchema = Yup.object({
         fullname: Yup.string().required('Full name is required'),
-        phone: Yup.string().required('Phone number is required'),
+        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format XXX-XXX-XXXX')
+        .required('Phone number is required'),
+        email: Yup.string().required(),
         size: Yup.number().default(1),
         service_id: Yup.string(),
+        employee_id: Yup.string(),
         resource_id: Yup.string(),
         notes: Yup.string()
       });
 
     return(
         <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-            <Fab onClick={ handleClickOpen} color="primary" aria-label="add">
+            <Fab onClick={ () =>  handleClickOpen()} color="primary" aria-label="add">
                 <AddIcon />
             </Fab>
 
@@ -108,7 +119,7 @@ export default function FabButton () {
                     >
                     {({ errors, touched, handleChange, handleBlur }) => (
                         <Form>
-                        <Stack sx={{ pt: 1 }} direction="column" spacing={3}>
+                        <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                             <Field
                             as={TextField}
                             id="fullname"
@@ -119,13 +130,23 @@ export default function FabButton () {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
+                            <Field
+                            as={TextField}
+                            id="email"
+                            name="email"
+                            label="Customer email"
+                            placeholder="Email"
+                            error={touched.email && !!errors.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            />
 
                             <Field
                             as={TextField}
                             id="phone"
                             name="phone"
                             label="Phone"
-                            placeholder="Mobile phone"
+                            placeholder="xxx-xxx-xxxx"
                             error={touched.phone && !!errors.phone}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -181,6 +202,25 @@ export default function FabButton () {
                                             { resource.serving && resource.active ? <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> : <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> }
                                         </ListItemIcon>
                                         <Typography variant="body2">{resource.title} </Typography>
+                                    </MenuItem>
+                                )) : null}
+                                </Field>
+                            </>
+                            ) : null}
+
+                        {business ? (
+                            <>
+                                <InputLabel id="employees">Employee preference</InputLabel>
+                                <Field
+                                as={Select}
+                                id="employee_id"
+                                name="employee_id"
+                                label="Employees"
+                                onChange={handleChange}
+                                >
+                                {Array.isArray(employeeList) ? employeeList.map((employee) => (
+                                    <MenuItem key={employee._id} value={employee._id}>
+                                        <Typography variant="body2">{employee.fullname} </Typography>
                                     </MenuItem>
                                 )) : null}
                                 </Field>

@@ -9,10 +9,11 @@ import {
 import makeStyles from "@emotion/styled"
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { submitService } from './Helper';
+import { setReload, setSnackbar } from '../../reducers/user';
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -48,6 +49,7 @@ const AddService = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const employees = useSelector((state) => state.business.employees);
+  const dispatch = useDispatch();
 
   const handleOpen = () => {
     setOpen(true);
@@ -60,12 +62,15 @@ const AddService = () => {
   const handleSubmit = (values) => {
     submitService(values)
     .then(response => {
-        console.log(response)
+        dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
     })
     .catch(error => {
-      console.log(error)
-    }) 
-    setOpen(false);
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+
+    })
+    .finally(() => {
+      dispatch(setReload(true))
+    })
   };
 
   return (

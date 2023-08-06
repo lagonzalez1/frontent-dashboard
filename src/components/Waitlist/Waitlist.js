@@ -11,21 +11,24 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 import LaunchIcon from '@mui/icons-material/Launch';
 
-import {  findResource, findService } from "../../hooks/hooks";
+import {  findClient, findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
-import { setSnackbar } from "../../reducers/user";
+import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
-    clientOptions, OPTIONS_SELECT, acceptingRejecting, getTableData,
-    removeClient, moveClientDown, moveClientUp, requestNoShow} from "./Helpers";
+    clientOptions, OPTIONS_SELECT, acceptingRejecting,
+    removeClient, moveClientDown, moveClientUp, requestNoShow, moveClientServing} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
 
 
-export default function Waitlist () {
-
+export default function Waitlist ({setClient}) {
+    
     const dispatch = useDispatch();
-    const tableData = getUserTable();
+    const business = useSelector((state) => state.business);
+    const reload = useSelector((state) => state.reload);
+
+    let tableData = getUserTable();
     let accepting = acceptingRejecting();
 
 
@@ -37,7 +40,6 @@ export default function Waitlist () {
 
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
-    const business = useSelector((state) => state.business);
 
 
     const handleClickListItem = (event) => {
@@ -65,7 +67,6 @@ export default function Waitlist () {
      */
     const handleMenuItemClick = (event, storeState) => {
         event.preventDefault();
-        
         if (storeState === 2) {
             const link = business.publicLink;
             handleOpenNewTab(link);
@@ -77,15 +78,17 @@ export default function Waitlist () {
         requestChangeAccept(storeState)
         .then(response => {
             dispatch(setSnackbar({ requestMessage: response.msg, requestStatus: true }));
-            setLoading(false);
             setAnchorEl(null);
             return;
         })
         .catch(error => {
             dispatch(setSnackbar({ requestMessage: error.msg, requestStatus: false }));
-            setLoading(false);
             setAnchorEl(null);
             return;
+        })
+        .finally(() => {
+            dispatch(setReload(true))
+            handleCloseVert();
         })
     };
   
@@ -97,8 +100,6 @@ export default function Waitlist () {
      * @returns 
      */
     const handleOptionChange = (optionId) => {
-        console.log(clientId);
-        console.log(optionId);
         switch (optionId){
             case OPTIONS_SELECT.NO_SHOW:
                 setLoading(true)
@@ -112,12 +113,14 @@ export default function Waitlist () {
                     setLoading(false)
                 })
                 .finally(() => {
-                    setLoading(true)
+                    dispatch(setReload(true))
                     handleCloseVert();
                 })
 
                 return;
             case OPTIONS_SELECT.EDIT:
+                const client = findClient(clientId);
+                setClient({payload: client, open: true, fromComponent: 'Waitlist'})
                 handleCloseVert();
                 return;
             case OPTIONS_SELECT.MOVE_UP:
@@ -134,7 +137,7 @@ export default function Waitlist () {
 
                 })
                 .finally(() => {
-                    setLoading(true)
+                    dispatch(setReload(true))
                     handleCloseVert();
                 })
                 return;
@@ -150,7 +153,7 @@ export default function Waitlist () {
                     setLoading(false)
                 })
                 .finally(() => {
-                    setLoading(true)
+                    dispatch(setReload(true))
                     handleCloseVert();
                 })
                 
@@ -170,7 +173,7 @@ export default function Waitlist () {
                     setLoading(false)
                 })
                 .finally(() => {
-                    setLoading(true);
+                    dispatch(setReload(true))
                     handleCloseVert();
 
                 })
@@ -179,14 +182,24 @@ export default function Waitlist () {
     }
 
     useEffect(() => {
-        reloadBusinessData(dispatch);
+        tableData = getUserTable();
         return() => {
-            setLoading(false);
+            dispatch(setReload(false));
         }
-    }, [loading])
+    }, [reload])
 
     const sendClientServing = (clientId) => {
-        console.log(clientId)
+        moveClientServing(clientId)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
+        .finally(() => {
+            console.log("RELOAD")
+            dispatch(setReload(true));
+        })
     }
 
     const sendClientNotification = (clientId) => {
@@ -326,7 +339,7 @@ export default function Waitlist () {
                                 <TableCell align="left">
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
                                     <Typography fontWeight="normal" variant="caption">
-                                        { item.serviceTag && findService(item.serviceTag).title }
+                                        { item.serviceTag ? findService(item.serviceTag).title: null }
                                     </Typography>
                             
                                 </TableCell>
@@ -336,7 +349,7 @@ export default function Waitlist () {
 
                                 <TableCell align="left">
                                     <Typography fontWeight="bold" variant="body2">
-                                        { item.resourceTag && findResource(item.resourceTag).title }
+                                        { item.resourceTag ? findResource(item.resourceTag).title : null }
                                     </Typography>
                                 </TableCell>
                                 <TableCell align="left">

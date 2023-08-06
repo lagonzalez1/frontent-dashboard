@@ -5,17 +5,41 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
 import { useSelector, useDispatch } from "react-redux";
-import  { getServingCount, getUserTable, columns } from "./Helper";
-import {  findResource, findService } from "../../hooks/hooks";
+import  { getServingCount, getUserTable, columns, completeClientAppointment } from "./Helper";
+import {  findResource, findService, getServingTable } from "../../hooks/hooks";
 import "../../css/Serving.css";
+import { setReload, setSnackbar } from "../../reducers/user";
 
 
-export default function Serving() {
+export default function Serving({setClient}) {
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
 
-    let servingList = getUserTable();
+    let servingList = getServingTable();
     let { groupCount, groupTotalCount } = getServingCount();
+
+    useEffect(() => {
+        
+    }, [])
+
+    const checkoutClient = (client) => {
+        console.log(client);
+        completeClientAppointment(client)
+        .then(response => {
+            console.log(response);
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+        }).catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
+        .finally(() => {
+            dispatch(setReload(true))
+        })
+    }
+
+    const displayClientInformation = (client) => {
+        console.log(client);
+        setClient({payload: client, open: true, fromComponent: 'Serving'})
+    }
 
 
     return(
@@ -54,7 +78,7 @@ export default function Serving() {
                                         {
                                            columns.map((col) => (
                                             <TableCell key={col.id} align='left'>
-                                                <Typography variant="subtitle2" fontWeight="bold">{ col.label }</Typography>
+                                                <Typography variant="subtitle2">{ col.label }</Typography>
                                             </TableCell>
                                            )) 
                                         }
@@ -82,17 +106,17 @@ export default function Serving() {
                                 
                                 </TableCell>
                                 <TableCell align="left"> 
-                                <Typography variant="subtitle2" fontWeight="bolder">
-                                        { item.serviceTag &&  'Service: '+ findService(item.serviceTag).title }
+                                    <Typography variant="subtitle2" fontWeight="bolder">
+                                        {'Service: '+ findService(item.serviceTag).title }
                                     </Typography>
 
                                     <Typography variant="subtitle2" fontWeight="bolder">
-                                        { item.resourceTag && 'Resource: ' + findResource(item.resourceTag).title }
+                                        {'Resource: ' + findResource(item.resourceTag).title }
                                     </Typography>
                                 </TableCell>
                                 <TableCell align="left">
                                 <Typography variant="subtitle2" fontWeight="bolder">
-                                    {item.serveTime ? ( item.serveTime.hours >= 1 ? (`${item.serveTime.hours} Hr ${item.serveTime.minutes} Min.`): (`${item.serveTime.minutes} Min.`)): (null) } 
+                                    {item.waittime ? ( item.waittime.hours >= 1 ? (`${item.waittime.hours} Hr ${item.waittime.minutes} Min.`): (`${item.waittime.minutes} Min.`)): (null) } 
 
                                 </Typography>
 
@@ -102,13 +126,13 @@ export default function Serving() {
                                         direction="row"
                                         spacing={1}
                                     >
-                                        <IconButton>
+                                        <IconButton onClick={() => checkoutClient(item)}>
                                             <Tooltip title="Checkout" placement="left">
                                                 <CheckCircleIcon htmlColor="#4CBB17"/>
                                             </Tooltip>                                            
                                         </IconButton>
 
-                                        <IconButton>
+                                        <IconButton onClick={() => displayClientInformation(item)}>
                                             <Tooltip title="Edit" placement="right">
                                                 <EditNoteIcon />
                                             </Tooltip>  

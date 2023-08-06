@@ -64,7 +64,7 @@ export const updateResources = async (form) => {
       rejects(response.data.msg)
     })
     .catch(error => {
-        rejects(error);
+        rejects(error.response.data);
     })
   })  
 }
@@ -88,7 +88,6 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
       let active = 0;
       let inactive = 0;
       for (const resource of resources) {
-        console.log(resource.active)
         if (resource.active === true) {
           active += 1;
         } 

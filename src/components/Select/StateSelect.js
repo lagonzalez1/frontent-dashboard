@@ -1,9 +1,13 @@
 import React, { useState, useEffect} from 'react';
 import { Button, ButtonGroup, Menu, MenuItem } from '@mui/material';
 
-export default function DateSelect() {
+export default function DateSelect({set}) {
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedOption, setSelectedOption] = useState('any-status');
+  const [selectedOption, setSelectedOption] = useState('all');
+
+  useEffect(() => {
+    set(selectedOption);
+  }, [])
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -15,6 +19,7 @@ export default function DateSelect() {
 
   const handleOptionSelect = (option) => {
     setSelectedOption(option);
+    set(option)
     handleClose();
   };
 
@@ -34,11 +39,9 @@ export default function DateSelect() {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={() => handleOptionSelect('any-status')}>Any status</MenuItem>
-        <MenuItem onClick={() => handleOptionSelect('serving')}>Serving</MenuItem>
-        <MenuItem onClick={() => handleOptionSelect('completed')}>Completed</MenuItem>
-        <MenuItem onClick={() => handleOptionSelect('flagged')}>Flag</MenuItem>
-        <MenuItem onClick={() => handleOptionSelect('no-show ')}>No show</MenuItem>
+        <MenuItem onClick={() => handleOptionSelect('all')}>Any status</MenuItem>
+        <MenuItem onClick={() => handleOptionSelect('flag')}>Flag</MenuItem>
+        <MenuItem onClick={() => handleOptionSelect('no-show')}>No show</MenuItem>
 
       </Menu>
     </div>

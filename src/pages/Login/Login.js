@@ -33,15 +33,14 @@ export default function Login() {
         return response;
     }
 
-	const handleSubmit = (e) => {
-        e.preventDefault();
+	const handleSubmit = () => {
         setLoading(true);
         if ( credentials.email && credentials.password ){
             const data = { email: credentials.email, password: credentials.password };
             loginRequest(data)
             .then(response => {
+                console.log(response);
                 if (response.status === 200){
-                    console.log(response.data);
                     signIn({
                         token: response.data.token,
                         expiresIn: response.data.expiration,
@@ -56,20 +55,12 @@ export default function Login() {
                     setLoading(false);
                     return;
                 }
-                else if (response.status === 403){
-                    setErrors(response.data.msg);
-                    setLoading(false);
-                }
-                else {
-                    setErrors('Status: ' + response.status + 'Unable to proccess request at the moment.');
-                    setLoading(false);
-                    return;
-                }
-                
+                setErrors(response.data.msg);
+                setLoading(false);
             })
             .catch(error => {
                 setLoading(false);
-                setErrors(error);
+                setErrors(error.response.data.msg);
             })
         }
         else {
@@ -133,7 +124,7 @@ export default function Login() {
                     variant="contained"
                     color="primary"
                     sx={{ mt: 3, mb: 2 }}
-                    onClick={ (e) => handleSubmit(e) }
+                    onClick={ () => handleSubmit() }
                 >
                     Sign In
                 </Button>

@@ -8,7 +8,7 @@ import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useSelector, useDispatch } from "react-redux";
-import { setSnackbar } from "../../reducers/user";
+import { setReload, setSnackbar } from "../../reducers/user";
 
 export default function Resources() {
     const {active, inactive} = getResourcesTotal();
@@ -57,7 +57,6 @@ export default function Resources() {
     const handleUpdateResource = async () => {
         setLoading(true);
         if (!form){ return; }
-        console.log(form);
         updateResources(form)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
@@ -65,7 +64,10 @@ export default function Resources() {
             handleCloseDialog();
         })
         .catch(error => {
-            dispatch(setSnackbar(error))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
+        .finally(() => {
+            dispatch(setReload(true))
         })
         
       };
@@ -73,8 +75,8 @@ export default function Resources() {
       
 
       useEffect(() => {
-        reloadBusinessData(dispatch);
-      }, [loading])
+        
+      }, [])
 
 
 
@@ -86,7 +88,7 @@ export default function Resources() {
                 <Stack direction={'row'} sx={{alignItems: 'center'}} spacing={2}>
                     <Typography variant="h6"><strong> Available resources</strong></Typography>
                     <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> {active} Active</Typography>
-                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> {inactive} Unavailable k</Typography>
+                    <Typography variant="caption"> <FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/> {inactive} Unavailable</Typography>
                 </Stack>
                 
             </Grid>

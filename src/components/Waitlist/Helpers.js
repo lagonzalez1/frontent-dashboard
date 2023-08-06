@@ -7,7 +7,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import EditIcon from '@mui/icons-material/Edit';
 import NorthRoundedIcon from '@mui/icons-material/NorthRounded';
 import SouthRoundedIcon from '@mui/icons-material/SouthRounded';
-import { getStateData, getAccessToken } from "../../auth/Auth";
+import { getStateData, getAccessToken, getHeaders } from "../../auth/Auth";
 import { setSnackbar } from "../../reducers/user";
 import { findClient } from "../../hooks/hooks";
 
@@ -77,6 +77,24 @@ export const requestChangeAccept = (accepting) => {
       });
   });
 };
+
+export const moveClientServing = (clientId) => {
+  return new Promise((resolve, reject) => {
+    const { user, business } = getStateData();
+    const headers = getHeaders();
+    const currentTime = new DateTime.local().setZone(business.timezone).toISO();
+    const payload = { clientId, currentTime, b_id: business._id, isServing: true}
+    console.log(currentTime);
+    axios.post('/api/internal/client_to_serving', payload, headers)
+    .then(response => {
+      resolve(response.data);
+    })
+    .catch(error => {
+      reject(error.response.data);
+    }) 
+    
+  })
+}
 
 
 /**
@@ -266,8 +284,8 @@ export const columns = [
     { id: 'name', label: 'Name', minWidth: 150 },
     { id: 'size', label: 'Party size', minWidth: 50 },
     { id: 'resource', label: 'Resource', minWidth: 50 },
-    { id: 'wait', label: 'Time waited', minWidth: 50 },
-    { id: 'actions', label: '', minWidth: 170 },
+    { id: 'wait', label: 'Time waited', minWidth: 40 },
+    { id: 'actions', label: '', minWidth: 160 },
 ];
 
 export const clientOptions = [

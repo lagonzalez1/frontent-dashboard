@@ -38,6 +38,13 @@ const USER = 'user';
   export const getAccessToken = () => {
     return localStorage.getItem(TOKEN_KEY);
   };
+
+  export const getHeaders = () => {
+    if (localStorage.getItem(TOKEN_KEY)){
+      const token = localStorage.getItem(TOKEN_KEY)
+      return {header: {'x-access-token': token }}
+    }
+  }
   
   export const removeAccessToken = () => {
     localStorage.removeItem(TOKEN_KEY);

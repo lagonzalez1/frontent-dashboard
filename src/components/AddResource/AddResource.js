@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addResource } from "./Helper";
 import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
-import { setSnackbar } from '../../reducers/user';
+import { setReload, setSnackbar } from '../../reducers/user';
 import { setBusiness} from "../../reducers/business";
 import CloseIcon from "@mui/icons-material/Close"
 
@@ -48,12 +48,13 @@ export default function AddResource() {
     addResource(values)
     .then(data => {
       dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
-      reloadBusinessData(dispatch)
       handleClose();
     })
     .catch(error => {
       dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
-      console.log(error);
+    })
+    .finally(() => {
+      dispatch(setReload(true))
     })
     
   };

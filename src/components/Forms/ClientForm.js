@@ -21,7 +21,6 @@ export default function ClientForm() {
 
     const initialValues = {
         email: settings.email,
-        phone: settings.phone,
         notes: settings.notes,
         service: settings.service,
     };

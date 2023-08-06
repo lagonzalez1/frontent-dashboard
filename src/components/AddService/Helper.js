@@ -23,7 +23,7 @@ export const submitService = (data) => {
       }
     })
     .catch(errors => {
-      reject(errors);
+      reject(errors.response.data);
     })
 })
 }

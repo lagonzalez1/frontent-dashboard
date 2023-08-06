@@ -9,6 +9,8 @@ import ExtrasForm from "../../components/Forms/ExtrasForm";
 import ClientForm from "../../components/Forms/ClientForm";
 import TableForm from "../../components/Forms/TableForm";
 import ResourceServiceForm from "../../components/Forms/ResourceServiceForm";
+import AddEmployeeForm from "../../components/Forms/AddEmployeeForm";
+import EmployeeTable from "../../components/Employee/EmployeeTable";
 
 
 
@@ -103,6 +105,27 @@ export default function Settings() {
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <BusinessForm/>
+                            </Grid>
+                        </Grid>
+
+                        <Divider sx={{backgroundColor: 'lightgray'}} />
+
+                        <Grid container id="payment">
+                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                                <Stack>
+                                    <Typography fontWeight='bold' variant="h6">
+                                        Add employees
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                        Employees will be able to login in and make changes depending on the permission level set.
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                        Only root user will be able to add new employees.
+                                    </Typography>
+                                </Stack>
+                            </Grid>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                                <EmployeeTable/>
                             </Grid>
                         </Grid>
 

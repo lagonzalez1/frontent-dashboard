@@ -12,9 +12,13 @@ import { DateTime } from "luxon";
 
 export default function WelcomeDetails() {
 
+    
+    const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+
     const validationSchema = Yup.object({
         fullname: Yup.string().required('Full Name is required'),
-        phoneNumber: Yup.string().required('Phone Number is required'),
+        phoneNumber: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format xxx-xx-xxxx')
+        .required('Phone number is required'),
         email: Yup.string().email('Invalid email').required('Email is required'),
         service: Yup.string()
     });
@@ -87,9 +91,10 @@ export default function WelcomeDetails() {
         let timestamp = DateTime.local().toUTC();
         let partySize = clientStorage.partySize;
         let payload = { ...values, link, timestamp, partySize}
-
+        console.log(payload);
         checkDuplicatesRequest(values.email, link)
         .then((response) => {
+            console.log(response);
             if(response.duplicate === true) {
                 setLoading(false);
                 navigate(`/welcome/${link}/visits/${response.identifier}`);
@@ -159,6 +164,7 @@ export default function WelcomeDetails() {
                                         id="phoneNumber"
                                         name="phoneNumber"
                                         label="Phone Number"
+                                        placeholder="xxx-xxx-xxxx"
                                         value={formik.values.phoneNumber}
                                         onChange={formik.handleChange}
                                         error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
