@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { getStateData, getAccessToken } from "../../auth/Auth";
+import { getStateData, getAccessToken, getHeaders } from "../../auth/Auth";
 import axios from "axios";
 
 export const validationSchemaService = Yup.object().shape({
@@ -13,6 +13,37 @@ export const validationSchemaResource = Yup.object().shape({
     duration: Yup.number().max(500),
     description: Yup.string()
 });
+
+
+export const requestRemoveResource = (payload) => {
+  return new Promise((resolve, reject) => {
+    const { user, business} = getStateData();
+    const headers = getHeaders();
+    const data = { ...payload, b_id: business._id }
+    axios.post('/api/internal/remove_resource', data, headers)
+    .then(response => {
+      reject(response.data.msg)
+    })
+    .catch(error => {
+      reject(error)
+    })
+  })
+}
+
+export const requestRemoveService = (payload) => {
+  return new Promise((resolve, reject) => {
+    const { user, business} = getStateData();
+    const headers = getHeaders();
+    const data = { ...payload, b_id: business._id }
+    axios.post('/api/internal/remove_service', data, headers)
+    .then(response => {
+      reject(response.data.msg)
+    })
+    .catch(error => {
+      reject(error)
+    })
+  })
+}
 
 
 

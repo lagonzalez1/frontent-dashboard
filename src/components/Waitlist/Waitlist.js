@@ -10,19 +10,21 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 import LaunchIcon from '@mui/icons-material/Launch';
+import EditIcon from '@mui/icons-material/Edit';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 import {  findClient, findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT, acceptingRejecting,
-    removeClient, moveClientDown, moveClientUp, requestNoShow, moveClientServing} from "./Helpers";
+    removeClient, moveClientDown, moveClientUp, requestNoShow, moveClientServing, requestBusinessState} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
 
 
-export default function Waitlist ({setClient}) {
+export default function Waitlist ({setClient, setEditClient}) {
     
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
@@ -118,11 +120,6 @@ export default function Waitlist ({setClient}) {
                 })
 
                 return;
-            case OPTIONS_SELECT.EDIT:
-                const client = findClient(clientId);
-                setClient({payload: client, open: true, fromComponent: 'Waitlist'})
-                handleCloseVert();
-                return;
             case OPTIONS_SELECT.MOVE_UP:
                 setLoading(true)
                 moveClientUp(clientId,tableData)
@@ -181,12 +178,24 @@ export default function Waitlist ({setClient}) {
         }
     }
 
+    const openClientDrawer = (item) => {
+        console.log(item);
+        setClient({payload: item, open: true, fromComponent: 'Waitlist'});
+    }
+
+    const editClientInfo = (item) => {
+        setEditClient({payload: item, open: true, fromComponent: 'Waitlist'})
+    }
+
     useEffect(() => {
         tableData = getUserTable();
         return() => {
             dispatch(setReload(false));
         }
     }, [reload])
+
+
+
 
     const sendClientServing = (clientId) => {
         moveClientServing(clientId)
@@ -197,7 +206,6 @@ export default function Waitlist ({setClient}) {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            console.log("RELOAD")
             dispatch(setReload(true));
         })
     }
@@ -334,8 +342,16 @@ export default function Waitlist ({setClient}) {
                     Array.isArray(tableData) ? (
                         tableData.map((item, index) => {
                             return (
-                            <TableRow key={item._id}>                                       
-                                <TableCell align="left" fontWeight="bold">{++index}</TableCell>
+                            <TableRow key={item._id}>
+                                     
+                                <TableCell align="left">
+                                    <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'left'}>
+                                        <IconButton onClick={() => openClientDrawer(item)}>
+                                            <InfoOutlinedIcon fontSize="small" /> 
+                                        </IconButton>
+                                        <Typography>{++index}</Typography>                                   
+                                    </Stack>
+                                </TableCell>
                                 <TableCell align="left">
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
                                     <Typography fontWeight="normal" variant="caption">
@@ -364,10 +380,13 @@ export default function Waitlist ({setClient}) {
                                     >
                                         
                                         <IconButton onClick={() => sendClientServing(item._id)}>
-                                            <CheckCircleIcon htmlColor="#4CBB17"/>
+                                            <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                         </IconButton>
                                         <IconButton onClick={() => sendClientNotification(item._id)}>
-                                            <NotificationsIcon htmlColor="#FF0000"/>                                           
+                                            <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
+                                        </IconButton>
+                                        <IconButton onClick={() => editClientInfo(item)}>
+                                            <EditIcon fontSize="small" />
                                         </IconButton>
                                         <IconButton
                                                 aria-label="more"
@@ -376,8 +395,12 @@ export default function Waitlist ({setClient}) {
                                                 aria-haspopup="true"
                                                 onClick={(event) => handleOpenVert(event, item._id)}
                                                 >
-                                            <MoreVertIcon  />
+                                            <MoreVertIcon fontSize="small"  />
                                         </IconButton>
+
+                        
+                                
+
                                             <Menu
                                                 id="long-menu"
                                                 MenuListProps={{

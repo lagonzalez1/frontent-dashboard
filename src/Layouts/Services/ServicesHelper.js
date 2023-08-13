@@ -131,15 +131,15 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
     return color;
   }
   
-  export function stringAvatar(name) {
+  export const stringAvatar = (name) => {
     let initials = '';
+    if (!name) {return; }
   
     if (name.includes(' ')) {
       initials = `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`;
     } else {
       initials = name[0];
     }
-  
     return {
       sx: {
         bgcolor: stringToColor(name),

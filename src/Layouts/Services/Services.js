@@ -33,13 +33,12 @@ export default function Services() {
     
     const styles = {
         container: {
-          width: '100%',
-          height: '100%',
-          display: 'flex',
-          justifyContent: 'left',
-          alignItems: 'center',
-        },
-      };
+          display: 'flex', // Set the container's display to flex
+          flexDirection: 'row', // Set the main axis to be horizontal
+          flexWrap: 'wrap', // Allow the items to wrap to the next row if there's not enough space
+          justifyContent: 'flex-start', // Start the items from the left (you can adjust this to center or space-between if needed)
+        }
+    };
 
 
     const handleClick = (service) => {
@@ -92,8 +91,7 @@ export default function Services() {
         })
     }
 
-    useEffect(() => {
-        
+    useEffect(() => {        
     },[])
 
     return(
@@ -119,11 +117,11 @@ export default function Services() {
         <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
             { serviceList ? serviceList.map((service) => (
                 <Grid item key={service._id} xs={4} sm={4} md={4} lg={1}>
-                    <StyledCardService onClick={() => handleClick(service)}>
+                    <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleClick(service)}>
                         <CardActionArea>
                         <CardContent>
                             <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center'}}> 
-                            <Avatar {...stringAvatar(service.title)} />
+                            {service ? <Avatar {...stringAvatar(service.title)} />: null}
                             <Box sx={{ paddingLeft: 1, paddingRight: 1}}>    
                             <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
                             {service.active ? (<FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/>):
@@ -131,13 +129,13 @@ export default function Services() {
                                 { ' ' + service.title}
                             </Typography>
                             <Stack>
-                                <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
+                                <Typography color="#878686" variant="body2" component="p">
                                     Duration: {service.duration}
                                 </Typography>
-                                <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
+                                <Typography color="#878686" variant="body2" component="p">
                                     Cost: {service.cost}
                                 </Typography>
-                                <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
+                                <Typography color="#878686" variant="body2" component="p">
                                     Public: {service.public ? 'True': 'False'}
                                 </Typography>
                             </Stack>
@@ -199,7 +197,8 @@ export default function Services() {
                         <Typography variant={"body2"} textAlign={'left'}>Add a new employee to service.</Typography>
 
                         <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
-                        {service.employeeTags && removeExistingEmployees(service.employeeTags).map((employee, index) => (
+                        {
+                            service.employeeTags && removeExistingEmployees(service.employeeTags).map((employee, index) => (
                             <MenuItem key={index} value={employee._id}>
                                 {employee.fullname}
                             </MenuItem>

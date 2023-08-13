@@ -1,103 +1,112 @@
 import React, { useState, useEffect} from "react";
-import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, 
-    ListItemAvatar, ListItemButton, ListItemIcon} from "@mui/material";
+import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Slide, Typography, Stack, Select, MenuItem, InputLabel, Alert, 
+     ListItemIcon, Box, Container, CircularProgress} from "@mui/material";
 
-import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
-import { Transition, addCustomerWaitlist  } from "./Helper";
 import { useSelector, useDispatch } from "react-redux";
 import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { setBusiness } from "../../reducers/business";
 import { setReload, setSnackbar } from "../../reducers/user";
+import { requestClientEdit } from "./EditClientHelper";
 
 
+export default function EditClient({setEditClient, editClient}) {
 
 
-export default function FabButton () {
-    const dispatch = useDispatch();
-    const [open, setOpen] = useState(false);
-    const [errors, setError] = useState();
-
-    
     const business = useSelector((state) => state.business);
     const serviceList = getServicesAvailable();
     const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
+    const dispatch = useDispatch();
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+
+    const [payload, setPayload] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-
-    }, [])
-
-    const handleSubmit = (payload) => {
-        addCustomerWaitlist(payload)
-        .then(response => {
-            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
-        })
-        .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
-        })
-        .finally(() => {
-            dispatch(setReload(true));
-            handleClose();
-        })
-    }
+        console.log(editClient)
+        setPayload(editClient.payload);
+        return () => {
+            if (editClient.payload === null) {
+                return <></>;
+            }
+            console.log("return payload empty");
+        }
+    }, [editClient]);
 
     const initialValues = {
-        fullname: '',
-        email: '',
-        phone: '',
-        size: '',
-        service_id: '',
-        resource_id: '',
-        employee_id: '',
-        notes: ''
+        _id: payload ? payload._id : '',
+        fullname: payload ? payload.fullname : '',
+        email: payload ? payload.email: '',
+        phone: payload ? payload.phone : '',
+        size: payload ? payload.partySize: 1,
+        service_id: payload ? payload.serviceTag : '',
+        resource_id: payload ? payload.resourceTag: '',
+        employee_id: payload ? payload.employeeTag: '',
+        notes: payload ? payload.notes : ''
       };
       
       const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;    
       const validationSchema = Yup.object({
         fullname: Yup.string().required('Full name is required'),
-        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format XXX-XXX-XXXX')
+        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format xxx-xxx-xxxx')
         .required('Phone number is required'),
-        email: Yup.string().required(),
-        size: Yup.number().default(1),
+        email: Yup.string(),
+        size: Yup.number(),
         service_id: Yup.string(),
         employee_id: Yup.string(),
         resource_id: Yup.string(),
         notes: Yup.string()
       });
 
-    return(
-        <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-            <Fab onClick={ () =>  handleClickOpen()} color="primary" aria-label="add">
-                <AddIcon />
-            </Fab>
+    const Transition = React.forwardRef(function Transition(props, ref) {
+        return <Slide direction="up" ref={ref} {...props} />;
+    });
 
+
+    const handleSubmit = (data) => {
+        console.log(data);
+        setLoading(true);
+        // To edit search by email or phone number
+        // on complete close closeDrawer()
+        requestClientEdit(data)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(setSnackbar({ requestMessage: error.response.msg, requestStatus: true} ))
+        })
+        .finally(() => {
+            setLoading(false);
+            dispatch(setReload(true));
+            closeDialog();
+        })
+    }
+
+    const closeDialog = () => {
+        setEditClient({payload: null, open: false});
+    }
+
+    return(
+        <> 
+            <Box>
             <Dialog
-                open={open}
+                open={editClient ? editClient.open : false}
                 TransitionComponent={Transition}
-                keepMounted
-                onClose={handleClose}
-                aria-describedby="addClient"
+                onClose={closeDialog}
                 maxWidth={'xs'}
                 fullWidth={true}
             >
-                <DialogTitle> <Typography variant="h6" fontWeight="bold">{"Add Customer to waitlist"}
-                
+                <DialogTitle> <Typography variant="h6" fontWeight="bold">
+                    {"Edit client"}
                 </Typography> 
                 <IconButton
                     aria-label="close"
-                    onClick={handleClose}
+                    onClick={closeDialog}
                     sx={{
                         position: 'absolute',
                         right: 8,
@@ -108,10 +117,12 @@ export default function FabButton () {
                     <CloseIcon />
                 </IconButton>
                 </DialogTitle>
+
+                {loading ? (
+                <Container sx={{ p: 2}}>
+                    <CircularProgress />
+                </Container>) : 
                 <DialogContent>
-
-                    { errors ? <Alert severity="error">{errors}</Alert>: null }
-
                     <Formik
                     initialValues={initialValues}
                     onSubmit={handleSubmit}
@@ -219,6 +230,7 @@ export default function FabButton () {
                                 name="employee_id"
                                 label="Employees"
                                 onChange={handleChange}
+
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
@@ -250,8 +262,12 @@ export default function FabButton () {
                     </Formik>
 
                 </DialogContent>
+                }
 
             </Dialog>
-        </Box>
+            </Box>
+
+        
+        </>
     )
 }

@@ -71,12 +71,14 @@ export const requestNoShow = (clientId) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
-        axios.post('/api/internal/analytics_data', payload, header)
+        const data = { ...payload, bid: business._id}
+        axios.post('/api/internal/analytics_data', data, header)
         .then(response => {
-            resolve(response.data.payload);
+            resolve(response.data);
         })
         .catch(error => {
-            reject(error.response.data);
+            console.log(error);
+            reject("Error cannot hit analytics.");
         })
         
     })
@@ -186,6 +188,8 @@ export const handleErrorCodes = (error) => {
 }
 
 
+
+// This can be made into a backend request.
 const MINUTES_IN_HOUR = 60;
 export const getServingTable = () => {
     const { user, business } = getStateData();
@@ -209,7 +213,6 @@ export const getServingTable = () => {
             let currentDates = [];
             let sorted = null;
             const currentTime = DateTime.local().setZone(timezone);
-
 
             if(type) {
                 for (var client of clients) {
@@ -296,6 +299,7 @@ export const getUserTable = () => {
             // Add wait time in {hour, minute}
             const wait = sorted.map((client) => {
             const luxonDateTime = DateTime.fromJSDate(new Date(client.timestampOrigin));
+
             const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
             const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
             const hours = Math.floor(diffHours);

@@ -1,23 +1,74 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, Divider } from "@mui/material";
+import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, Chip, Divider, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { allowClientJoin } from "./WelcomeHelper";
+import { allowClientJoin, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 
 
-export default function Welcome({ path }) {
+export default function Welcome() {
 
     const { link } = useParams();
     const [open, setOpen] = useState(false);
     const [listSize, setListSize] = useState(null);
+
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState();
+    const [args, setArgs] = useState();
+    const [schedule, setSchedule] = useState({});
+
     const navigate = useNavigate();
 
 
     
+
+
+    const startJoinList = () => {
+        navigate(`/welcome/${link}/size`);
+    }
+
+
+    useEffect(() => {
+        checkBuisnessState();
+        getBusinessArgs();
+        getBusinessSchedule();
+        return () => {
+            if (args && open){
+                setLoading(false);
+            }
+        }
+    }, [])
+
+    const getBusinessSchedule = () => {
+        setLoading(true);
+        requestBusinessSchedule(link)
+        .then(response => {
+            setSchedule(response);
+        })
+        .catch(error => {
+            console.log(error);
+            setErrors('Error found when collecting arguments.')
+        })
+        
+    }
+
+
+    const getBusinessArgs = () => {
+        setLoading(true);
+        requestBusinessArguments(link)
+        .then(response => {
+            setArgs(response);
+            
+        })
+        .catch(error => {
+            console.log(error);
+            setErrors('Error found when collecting arguments.')
+        })
+        
+    }
+
+
     const checkBuisnessState = () => {
         const currentTime = DateTime.local().toISO();
         allowClientJoin(currentTime, link)
@@ -47,17 +98,56 @@ export default function Welcome({ path }) {
     }
 
 
-    const startJoinList = () => {
-        navigate(`/welcome/${link}/size`);
-    }
+    const CheckBusinessArguments = () => {
+        
+        if (open === false) {
+            return (
+                <>
+                    <Typography variant="h6" fontWeight='bold'>
+                            This waitlist is currently closed.
+                    </Typography>
 
-
-    useEffect(() => {
-        checkBuisnessState();
-        return() => {
-            setLoading(false)
+                    <Container sx={{ justifyContent: 'center', justifyItems: 'center'}}>
+                    <List dense={true}>
+                            {
+                                schedule ? Object.keys(schedule).map((item, key) => {
+                                    if(item === "_id"){
+                                        return null;
+                                    }
+                                    return (
+                                        <ListItem key={key}>
+                                            <ListItemText 
+                                                primary={item}
+                                                secondary={
+                                                    schedule[item].start + " - " + schedule[item].end
+                                                }
+                                            />
+                                        </ListItem>
+                                    )
+                                }): null
+                            }
+                    </List>
+                    </Container>
+                </>
+            )
         }
-    }, [loading])
+
+        return(
+            <>
+            {args.present.position ? <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography> : null}
+            <br/>
+            <Button disabled={!open} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
+                <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
+                    Join waitlist
+                </Typography>
+            </Button>
+            </>
+        )
+
+
+    }
+    
+    
 
 
     return (
@@ -67,28 +157,13 @@ export default function Welcome({ path }) {
                     { loading ? <CircularProgress/> : 
                     (<>
                     <CardContent>
-                    {errors ? (<Alert severity="error">{errors}</Alert>):
-                        (<>
-                        <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
-                        <Stack spacing={3}>
-
-                        
-                        { !open ? null: <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography>}
-                        
-                        
-                        { !open ? <Alert severity="warning">
-                            <Typography variant="body2" fontWeight="bold">This waitlist is closed at the moment.</Typography>
-                        </Alert>: null}
-                        <Button disabled={!open} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
-                        <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
-                            Join waitlist
+                        <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
+                            {link}
                         </Typography>
-                        </Button>
-                        
-                        </Stack>
-                        <Divider />
-                        </>)
-                    }
+                        <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
+                        <CheckBusinessArguments />
+            
+
                     </CardContent>
                     </>
                     )}

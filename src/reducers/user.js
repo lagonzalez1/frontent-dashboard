@@ -13,7 +13,7 @@ const initialState = {
   requestStatus: false,
   requestMessage: null,
   requestType: null,
-  location: 0,
+  location: null,
 };
 
 const userSlice = createSlice({

@@ -61,16 +61,22 @@ const Customers = () => {
     const payload = {bid: business._id, sort, stateSort, currentTime}
     getAnalyticsClients(payload)
     .then(response => {
-      setData(response);
+
+      if(response.status === 200){
+        setData(response.payload);
+
+      }
+      else {
+        console.log(response);
+      }
     })
     .catch(error => {
+      console.log(error);
       dispatch(setSnackbar({requestMessage: "Error", requestStatus: true}))
     })
     
   }
 
-  console.log(sort);
-  console.log(stateSort);
 
 
 

@@ -15,6 +15,7 @@ export default function Resources() {
 
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
+
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const [dialog, setDialog] = useState(false);
@@ -37,7 +38,7 @@ export default function Resources() {
           flexWrap: 'wrap', // Allow the items to wrap to the next row if there's not enough space
           justifyContent: 'flex-start', // Start the items from the left (you can adjust this to center or space-between if needed)
         }
-      };
+    };
 
     const handleResourceClick = (object) => {
         setDialog(true);
@@ -100,8 +101,7 @@ export default function Resources() {
         <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
             { resourceData? resourceData.map((resource, index) => (
                 <Grid item key={resource._id} xs={4} sm={4} md={4} lg={1}>
-                    <Slide direction="up" in={resourceData ? true: false} mountOnEnter unmountOnExit>
-                        <StyledCardService onClick={() => handleResourceClick(resource)}>
+                        <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>
                         <CardContent>
                             <Stack direction="row" spacing={1} sx={{ alignItems: 'center'}}>
@@ -112,20 +112,19 @@ export default function Resources() {
                              (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
                                 { ' ' + resource.title}
                             </Typography>
-                            <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
-                                    Assigned: {findResourceTag(resource.employeeTag)}
+                            <Typography color="#878686" variant="body2" component="p">
+                                    Assigned: { findResourceTag(resource.employeeTag) }
                             </Typography>
                             <Stack direction="row" spacing={1}>
-                                
-                            <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
-                                    Waitlist: {resource.waitlist ? 1 : 0}
+                                <Typography color="#878686" variant="body2" component="p">
+                                    Serving: {findServingSize(resource._id).fullname }
                                 </Typography>
-                                <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
-                                    Serving: {findServingSize(resource._id) }
+                                <Typography color="#878686" variant="body2" component="p">
+                                    Serving size: {findServingSize(resource._id).partySize }
                                 </Typography>
                                    
                             </Stack>
-                                <Typography color="#9C9B9B" fontWeight="bold" variant="caption" component="p">
+                                <Typography color="#878686" variant="body2" component="p">
                                     Max: {resource.size}
                                 </Typography>
                             </Box>
@@ -133,7 +132,6 @@ export default function Resources() {
                         </CardContent>   
                         </CardActionArea> 
                         </StyledCardService>
-                    </Slide>
                 
                 </Grid>
             )): null}

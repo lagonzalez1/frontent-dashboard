@@ -1,11 +1,18 @@
 import React, {useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { Box, Swtich , Paper, Slide, Alert, Card, CardContent, Typography, Stack, Container, Button, Divider, CardActions,
-    AlertTitle, Dialog, DialogContent, DialogTitle, DialogContentText, DialogActions, ButtonBase, Snackbar, CircularProgress, Link} from "@mui/material";
-import { getIdentifierData, leaveWaitlistRequest } from "./WaitingHelper.js";
+    AlertTitle, Dialog, DialogContent, DialogTitle, RadioGroup, FormControlLabel, Radio, DialogActions, ButtonBase, Snackbar, CircularProgress, Link, 
+Collapse, IconButton, DialogContentText} from "@mui/material";
+import { Formik, Form } from 'formik';
+import * as Yup from 'yup';
+
+import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus } from "./WaitingHelper.js";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
-import { useNavigate } from "react-router-dom";
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import CloseIcon from "@mui/icons-material/Close";
+import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
+import WatchLaterIcon from '@mui/icons-material/WatchLater';
+import { useNavigate, useParams } from "react-router-dom";
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
 
@@ -13,30 +20,74 @@ export default function Waiting() {
 
     const { link, unid } = useParams();
     const navigate = useNavigate();
-    const [checked, setChecked] = useState(false);
+    
+    const [alert, setAlert] = useState(false);
+    const [message, setMessage] = useState(null);
+
+
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState(null);
     const [user, setUser] = useState({});
     const [open, setOpen] = useState(false);
     const [titles, setTitles] = useState({});
-    const [openSnack, setOpenSnack] = useState(false);
+    const [status, setStatus] = useState(false);
 
+    const [openStatus, setOpenStatus ] = useState(false);
+    const [openSnack, setOpenSnack] = useState(false);
+    const [args, setArgs] = useState(null);
+
+    const [clientStatus, setClientStatus] = useState({
+        here: false,
+        parking: false,
+        late: false
+    })
+
+
+    function isOnlyOneTrue(obj) {
+        const trueValues = Object.values(obj).filter(value => value === true);
+        return trueValues.length === 1;
+      }
 
     const closeSnack = () => {
         setOpenSnack(false);
     }
 
-    const handleChange = () => {
-        setChecked((prev) => !prev);
-    } 
 
     const handleClose = () => {
         setOpen(false);
     }
 
+    const handleStatusClose = () => {
+        setOpenStatus(false);
+        setClientStatus({here: false, parking: false, late: false});
+    }
+
     useEffect(() => {
+
         loadUser();
-    }, [loading])
+        getBusinessArgs();
+        return () => {
+            if (args && user) {
+                setLoading(false);
+            }
+        }
+    }, [])
+
+
+    const getBusinessArgs = () => {
+        setLoading(true);
+        requestBusinessArguments(link)
+        .then(response => {
+            setArgs(response);
+        })
+        .catch(error => {
+            console.log(error);
+            setErrors('Error found when collecting arguments.')
+        })
+        .finally(() => {
+            setLoading(false);
+        })
+    }
 
 
     const copyToClipboardHandler = () => {
@@ -47,10 +98,19 @@ export default function Waiting() {
         .catch(error => {
             console.log(error);
         })
+        .finally(() => {
+            setLoading(false);
+        })
     }
 
     const navigateToWaitlist = () => {
-        navigate(`/welcome/${link}/waitlist`);
+        if (args.present.waitlist === true) {
+            navigate(`/welcome/${link}/waitlist`);
+        }
+        else {
+            setAlert(true);
+            setMessage('Waitlist is currently disabled for this business.');
+        }
     }
 
     async function copyToClipboard () {
@@ -63,11 +123,20 @@ export default function Waiting() {
     }
 
     const loadUser = () => {
+        setLoading(true);
         const timestamp = DateTime.local().toUTC();
         getIdentifierData(link, unid, timestamp)
         .then(response => {
-            setTitles(response.positionTitles);
-            setUser(response.client);
+            if (response.status === 201){
+                console.log(response);
+                setTitles(response.data.msg);
+                setUser({});
+            }
+            if(response.status === 200) {
+                setTitles(response.data.positionTitles);
+                setUser(response.data.client); 
+                setStatus(response.data.statusTrigger); 
+            }
         })
         .catch(error => {
             setErrors('Error: ' + error);
@@ -88,10 +157,61 @@ export default function Waiting() {
     }
 
 
+    const statusRequest = () =>{
+        if (!isOnlyOneTrue(clientStatus)){
+            handleStatusClose();
+            setAlert(true);
+            setMessage('Please only select one status button.');
+            return;
+        }
+        const payload = { unid, link, ...clientStatus}
+        requestClientStatus(payload)
+        .then(response => {
+            setMessage(response);
+        })
+        .catch(error => {
+            setMessage(error)
+        })
+        .finally(() => {
+            setAlert(true);
+            handleStatusClose();
+        })
+
+
+    }
+
+
+
     return(
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-                    <Card sx={{ minWidth: 465, textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3, pl: 2, pr: 2 }}>
+                    <Card sx={{ minWidth: 350, maxWidth: 475, textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
+                        
+                    <Box sx={{ width: '100%' }}>
+                    <Collapse in={alert}>
+                        <Alert
+                        action={
+                            <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            size="small"
+                            onClick={() => {
+                                setAlert(false);
+                                setMessage(null);
+                            }}
+                            >
+                            <CloseIcon fontSize="inherit" />
+                            </IconButton>
+                        }
+                        sx={{ mb: 2 }}
+                        >
+                        {message}
+                        </Alert>
+                    </Collapse>
+                    
+                    </Box>
+
+
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
 
@@ -114,13 +234,26 @@ export default function Waiting() {
                             }
 
                             <Typography variant="h4" fontWeight="bold" > {titles ? titles.title : ''} </Typography>
-                            <Typography variant="body1" gutterBottom> {titles ? titles.desc : ''}</Typography>
-                            {errors ? (null) : 
-                            <Button onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
-                                <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
-                                </Typography>
+                            <Typography variant="body2"> {titles ? titles.desc : ''}</Typography>
+                            
+                            {
+                                status ? (
+                                <>
+                                <Divider />
+                                <Button onClick={() => setOpenStatus(true)} variant="outlined" color="success" sx={{ borderRadius: 10}}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>Status
+                                    </Typography>
                                 </Button>
+                                </>
+                                ) : 
+                                <>
+                                <Button onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
+                                    <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
+                                    </Typography>
+                                </Button>
+                                </>
                             }
+
                             <Divider />
                             {errors ? (null) : 
                             <Container sx={{ textAlign: 'left'}}>
@@ -139,7 +272,7 @@ export default function Waiting() {
                             <Container sx={{ justifyContent: 'left',  alignItems: 'left', display: 'flex'}}>
                                 <Stack direction={'row'} spacing={1}>
                                     <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => copyToClipboardHandler()}>share link</Button>
-                                    <Button disabled={errors ? true: false}variant="info" onClick={() => navigateToWaitlist() }> View waitlist</Button>
+                                    <Button disabled={errors ? true: false} variant="info" onClick={() => navigateToWaitlist() }> View waitlist</Button>
                                     <Button disabled={errors ? true: false} variant="info" onClick={() => setOpen(true)}> Leave waitlist</Button>
                                 </Stack>
                             </Container>
@@ -156,17 +289,28 @@ export default function Waiting() {
             </Box>
 
             <Dialog
+                id="leave_dialog"
                 open={open}
                 onClose={handleClose}
-                
             >
             <DialogTitle>
-                Remove myself from waitlist.  
+                <Typography variant="subtitle2">Leave waitlist ?</Typography>  
+                <IconButton
+                    aria-label="close"
+                    onClick={handleClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton>
             </DialogTitle>
             <DialogContent>
-                    
-                <Stack spacing={2}>
-                    
+
+                <Stack direction="row" spacing={2}>
                     <Button sx={{ borderRadius: 10, color: 'white'}} variant="contained" color="primary" onClick={handleClose}>No</Button>
                     <Button sx={{ borderRadius: 10}} variant="outlined" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
                 </Stack>
@@ -174,6 +318,48 @@ export default function Waiting() {
             </DialogContent>
             <DialogActions>
                 
+            </DialogActions>
+            </Dialog>
+
+            <Dialog
+                id="status_dialog"
+                open={openStatus}
+                onClose={handleStatusClose}
+                minWidth={'xs'}
+                maxWidth={'sm'}
+            >
+            <DialogTitle>
+                <Typography variant="h6" fontWeight={'bold'}>Set status</Typography>  
+                <IconButton
+                    aria-label="close"
+                    onClick={handleStatusClose}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton>
+            </DialogTitle>
+
+            <DialogContent>
+                <Divider />
+                <DialogContentText>
+                    <Typography variant="body2" gutterBottom>Let us know where you are at!</Typography>  
+                </DialogContentText>
+                
+                <Container sx={{ width: '100%'}}>
+                <Stack spacing={2}>
+                    <Button size="large" color="primary" sx={{ borderRadius: 10}} variant={clientStatus.late ? "contained" : "outlined"} startIcon={<WatchLaterIcon /> } onClick={() => setClientStatus((prev) => ({...prev, late: !clientStatus.late})) }>Late</Button>
+                    <Button size="large"  color="primary"sx={{ borderRadius: 10}} variant={clientStatus.here ? "contained" : "outlined"}  startIcon={<EmojiPeopleIcon /> } onClick={() => setClientStatus((prev) => ({...prev, here: !clientStatus.here})) }>Here</Button>
+                    <Button size="large"  color="primary" sx={{ borderRadius: 10}} variant={clientStatus.parking ? "contained" : "outlined"}  startIcon={<DirectionsCarFilledIcon /> } onClick={() => setClientStatus((prev) => ({...prev, parking: !clientStatus.parking})) }>Parking</Button>
+                </Stack>
+                </Container>
+            </DialogContent>
+            <DialogActions>
+                <Button sx={{ borderRadius: 10, color: 'black'}} variant="text" onClick={() => statusRequest() }>Update</Button>
             </DialogActions>
             </Dialog>
 

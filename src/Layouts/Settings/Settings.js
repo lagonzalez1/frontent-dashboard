@@ -49,7 +49,7 @@ export default function Settings() {
                                         Location
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        Your location name {'Business name'} is displayed across many areas including on your online pages and messages to client
+                                        Your location name <strong>{business && business.publicLink }</strong> is displayed across many areas including on your online pages and messages to client
                                     </Typography>
                                 </Stack>
                             </Grid>
@@ -65,7 +65,8 @@ export default function Settings() {
                                         Hours
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        Your location name {'Business name'} is displayed across many areas including on your online pages and messages to client
+                                        Your business timezone is crutial information to allow clients within the correct region to join your waitlist.
+                                        Your business hours are crutial for your waitlist to work properly. Please take the time to fill this out correctly.
                                     </Typography>
                                 </Stack>
                             </Grid>

@@ -1,18 +1,19 @@
 import React, {useState , useEffect} from "react";
 import { Formik, Form, Field } from 'formik';
 
-import { Typography, ListItem, ListItemText, List, ListItemButton, Dialog, DialogTitle, 
-    DialogContent, Stack, TextField, Button ,IconButton, DialogActions, Divider, Box } from "@mui/material";
+import { Typography, ListItem, ListItemText, List, ListItemButton, Dialog, DialogTitle, Checkbox,
+    DialogContent, Stack, TextField, Button ,IconButton, DialogActions, Divider, Box, CircularProgress, Container } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { validationSchemaService, validationSchemaResource, updateResource, updateService } from "../FormHelpers/ResourceServiceFormHelper";
+import { validationSchemaService, validationSchemaResource, updateResource, updateService, requestRemoveService, requestRemoveResource } from "../FormHelpers/ResourceServiceFormHelper";
 import { useSelector, useDispatch } from "react-redux";
-import { setSnackbar } from "../../reducers/user";
+import { setReload, setSnackbar } from "../../reducers/user";
 
 
 export default function ResourceServiceForm () {
 
     const [resourceDialog, setResourceDialog] = useState(false)
     const [servicesDialog, setServiceDialog] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const [resourceId, setResourceId] = useState(null)
     const [serviceId, setServiceId] = useState(null)
@@ -44,6 +45,24 @@ export default function ResourceServiceForm () {
     }
 
     const serviceSubmit = (value) => {
+        setLoading(true);
+        if (value.delete === true) {
+            console.log(serviceId);
+            const payload = { ...value, serviceId }
+
+            requestRemoveService(payload)
+            .then(response => {
+                dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+            })
+            .catch(error => {
+                dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+            })
+            .finally(() => {
+                dispatch(setReload(true))
+                setLoading(false);
+            })
+            return;
+        }
         const payload = { ...value, serviceId }
         updateService(payload)
         .then(response => {
@@ -53,12 +72,32 @@ export default function ResourceServiceForm () {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            // Load
+            dispatch(setReload(true))
+            setLoading(false);
+
         })
 
     }
     const resourceSubmit = (value) => {
+        setLoading(true);
+        if (value.delete === true) {
+            console.log(resourceId);
+            const payload = { ...value, resourceId }
+            requestRemoveResource(payload)
+            .then(response => {
+                dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+            })
+            .catch(error => {
+                dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+            })
+            .finally(() => {
+                dispatch(setReload(true))
+                setLoading(false);
+            })
+            return;
+        }
         const payload = { ...value, resourceId }
+
         updateResource(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
@@ -67,7 +106,9 @@ export default function ResourceServiceForm () {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            // Load
+            dispatch(setReload(true))
+            setLoading(false);
+
         })
     }
 
@@ -75,14 +116,16 @@ export default function ResourceServiceForm () {
 
     const initialValuesServices = { 
         title: '',
-        size: 0
+        size: 0,
+        delete: false,
     }
 
 
     const initialValuesResources = { 
         title: '',
         description: '',
-        duration: 0
+        duration: 0,
+        delete: false
     }
 
     
@@ -96,7 +139,7 @@ export default function ResourceServiceForm () {
             {
                 resources ? resources.map((item) => (
                     <ListItem disablePadding>
-                        <ListItemButton onClick={() => openResourceDialog(true) }>
+                        <ListItemButton onClick={() => openResourceDialog(item) }>
                             <ListItemText primary={item.title} secondary={item.description} />
                         </ListItemButton>
                     </ListItem>
@@ -105,7 +148,7 @@ export default function ResourceServiceForm () {
 
             
             </List>
-            <Typography fontWeight='bold' variant="body2">
+                <Typography fontWeight='bold' variant="body2">
                     Services
                 </Typography>
             <List>
@@ -145,7 +188,11 @@ export default function ResourceServiceForm () {
                             </strong>
 
                         </DialogTitle>
-
+                         {loading ? (
+                            <Container sx={{p: 2}}>
+                                <CircularProgress />
+                            </Container>
+                         ) : 
                         <DialogContent>
                             <Box>
                         <Typography variant="caption"></Typography>
@@ -155,7 +202,7 @@ export default function ResourceServiceForm () {
                         validationSchema={validationSchemaService}
                         onSubmit={serviceSubmit}
                         >
-                    {({errors, touched}) => (
+                    {({errors, touched, values, setFieldValue}) => (
                         <Form>
                         <Stack spacing={2}>
                             <Field
@@ -177,6 +224,29 @@ export default function ResourceServiceForm () {
                                 error={touched.size && !!errors.size}
                                 helperText={touched.size && errors.size}
                             />
+                            <Box sx={{ textAlign: 'left'}}>
+                            <Stack direction="row" alignContent={'center'} alignItems={'center'}>
+
+                                <Typography variant="body2">Delete service ?</Typography>
+                                <Field
+                                    key={'deleteService'}
+                                    type="checkbox"
+                                    as={Checkbox}
+                                    name={'delete'}
+                                    checked={values.delete}   
+                                    onChange={(event) => {
+                                        setFieldValue(`delete`, event.target.checked)
+                                    }}                             
+                                    control={
+                                        <Checkbox
+                                            color="primary"
+                                        />
+                                    }
+                                    />
+                            </Stack>
+                            
+                            </Box>
+                                
                         <Button variant='contained' type="submit"  sx={{borderRadius: 15}}>
                             Save
                         </Button>
@@ -187,7 +257,8 @@ export default function ResourceServiceForm () {
                     )}
                     </Formik>
                     </Box>
-                </DialogContent>
+                        </DialogContent>
+                        }
                 
 
 
@@ -223,7 +294,11 @@ export default function ResourceServiceForm () {
 
                     </DialogTitle>
                     
-
+                    { loading ? (
+                    <Container sx={{p: 2}}>
+                        <CircularProgress />
+                    </Container>
+                    ) : 
                     <DialogContent>
                     <Typography variant="caption"></Typography>
                     <Divider/>
@@ -233,7 +308,7 @@ export default function ResourceServiceForm () {
                     onSubmit={resourceSubmit}
 
                     >
-                {({errors, touched}) => (
+                {({errors, touched, values, setFieldValue}) => (
                     <Form>
                     <Stack spacing={2}>
                         <Field
@@ -265,6 +340,28 @@ export default function ResourceServiceForm () {
                             error={touched.duration && !!errors.duration}
                             helperText={touched.duration && errors.duration}
                         />
+                        <Box sx={{ textAlign: 'left'}}>
+                            <Stack direction="row" alignContent={'center'} alignItems={'center'}>
+                            <Typography variant="body2">Delete resource ?</Typography>
+                                <Field
+                                    key={'deleteResource'}
+                                    type="checkbox"
+                                    as={Checkbox}
+                                    name={'delete'}
+                                    checked={values.delete}    
+                                    onChange={(event) => {
+                                        setFieldValue(`delete`, event.target.checked)
+                                    }}                            
+                                    control={
+                                        <Checkbox
+                                            color="primary"
+                                        
+                                        />
+                                    }
+                                    />
+                            </Stack>
+                        </Box>
+                        
                     <Button variant='contained' type="submit"  sx={{borderRadius: 15}}>
                         Save
                     </Button>
@@ -275,11 +372,8 @@ export default function ResourceServiceForm () {
                 )}
                 </Formik>
                     
-                </DialogContent>
-
-
-                
-
+                    </DialogContent>
+                    }
 
             </Dialog>
         

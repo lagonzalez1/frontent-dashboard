@@ -31,6 +31,30 @@ export const allowClientJoin = (time,link) => {
     })
   }
 
+  export const requestBusinessArguments = (link) => {
+    return new Promise((resolve, reject) => {
+        axios.get(`/api/external/businessArgs`, {params: {link}})
+        .then(response => {
+            resolve(response.data.payload);
+        }) 
+        .catch(error => {
+            reject(error);
+        })
+    })
+  }
+
+  export const requestBusinessSchedule = (link) => {
+    return new Promise((resolve, reject) => {
+        axios.get(`/api/external/businessSchedule`, {params: {link}})
+        .then(response => {
+            resolve(response.data.schedule);
+        }) 
+        .catch(error => {
+            reject(error);
+        })
+    })
+  }
+
 
   export const getMax = (link) => {
     return new Promise((resolve, reject) => {

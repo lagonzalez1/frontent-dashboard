@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { setSnackbar } from '../../reducers/user';
 import { getAccessToken } from '../../auth/Auth';
+import { useNavigate, useParams } from "react-router-dom";
 
 
 const validationSchema = Yup.object().shape({
@@ -15,8 +16,13 @@ const validationSchema = Yup.object().shape({
 
 const LocationForm = () => {
 
+
+
   const business = useSelector((state) => state.business);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+
   const [errors, setErrors] = useState(null);
   const [loading, setLoading] = useState(false);
   
@@ -46,6 +52,20 @@ const LocationForm = () => {
       })
   };
 
+
+  const openWaitList = (endpoint) => {
+    const url = `http://localhost:3000/welcome/${business.publicLink}/waitlist`
+    window.open(url, '_blank');
+  };
+
+  const navigateToWaitlist = () => {
+    // Check if allowed to.
+    if (business) {
+      openWaitList();
+    }
+    console.log("Business public link undefined.");
+}
+
   const initialValue = {
     locationUrl : business.publicLink,
     companyLogo: business.img
@@ -69,7 +89,6 @@ const LocationForm = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Field
-                
                 name="locationUrl"
                 as={TextField}
                 label="Location URL"
@@ -80,23 +99,17 @@ const LocationForm = () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <input
-                type="file"
-                accept="image/*"
-                disabled={true}
-                onChange={(event) => {
-                  setFieldValue('companyLogo', event.currentTarget.files[0]);
-                }}
-              />
-              {touched.companyLogo && errors.companyLogo && (
-                <div style={{ color: 'red' }}>{errors.companyLogo}</div>
-              )}
+            <Button variant='outlined' size={'small'} onClick={() => navigateToWaitlist()} sx={{borderRadius: 15}}>
+                Show waitlist
+            </Button>
             </Grid>
+
             <Grid item xs={12}>
               
-            <Button variant='contained' type="submit" sx={{borderRadius: 15}}>
+              
+            <Button variant='contained' size={'small'}  type="submit" sx={{borderRadius: 15}}>
                 {loading ? <CircularProgress color='white'/> : 'Save'}
-              </Button>
+            </Button>
             </Grid>
           </Grid>
         </Form>

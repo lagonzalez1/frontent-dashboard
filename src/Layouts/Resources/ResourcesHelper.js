@@ -27,11 +27,11 @@ export const findServingSize = (id) => {
   if ( !business ) { return new Error('No business data found.');}
   const clients = business.currentClients;
   for (var client of clients){
-    if (client.resourceTag === id) {
-      return client.partySize;
+    if (client.resourceTag === id && client.status.serving === true) {
+      return client;
     }
   }
-  return 0;
+  return {fullname: 'NA', partySize: 0};
 }
 
 export const findResourceTag = (id) => {

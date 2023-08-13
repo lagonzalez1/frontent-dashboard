@@ -22,6 +22,22 @@ export const handleOpenNewTab = (endpoint) => {
 };
 
 
+export const requestBusinessState = () => {
+  return new Promise((resolve, reject) => {
+    const { user, business } = getStateData();
+    const time = new DateTime.local().setZone(business.timezone).toISO();
+    const headers = getHeaders();
+    axios.get(`/api/internal/businessState/${business._id}/${time}`, headers)
+    .then(response => {
+      resolve(response.data.isAccepting);
+    })
+    .catch(error => {
+      reject(error.response.msg);
+    })
+  })
+}
+
+
 
 export const requestNoShow = (clientId) => {
   return new Promise((resolve, reject) => {
@@ -266,7 +282,10 @@ export const acceptingRejecting = () => {
     // Check if current time is within start and end.
     if ( currentDate >= start && currentDate <= end){
       return true;
+    }else {
+      return false;
     }
+
 } 
 
 
@@ -280,7 +299,7 @@ export const options = [
     'Go to check-in '
   ];
 export const columns = [
-    { id: 'position', label: '#', minWidth: 10 },
+    { id: 'position', label: '#', minWidth: 5 },
     { id: 'name', label: 'Name', minWidth: 150 },
     { id: 'size', label: 'Party size', minWidth: 50 },
     { id: 'resource', label: 'Resource', minWidth: 50 },
@@ -292,7 +311,6 @@ export const clientOptions = [
     {id: 'move-up', label: 'Move up', icon: <NorthRoundedIcon/>},
     {id: 'move-down', label: 'Move down', icon: <SouthRoundedIcon/>},
     {id: 'no-show', label: 'No show', icon: <CancelIcon/>},
-    {id: 'edit', label: 'Edit', icon: <EditIcon/>},
     {id: 'remove', label: 'Remove', icon: <DeleteIcon/>},
 ]
 

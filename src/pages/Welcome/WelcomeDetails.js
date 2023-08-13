@@ -90,7 +90,7 @@ export default function WelcomeDetails() {
         const clientStorage = JSON.parse(sessionStorage.getItem('client'));
         let timestamp = DateTime.local().toUTC();
         let partySize = clientStorage.partySize;
-        let payload = { ...values, link, timestamp, partySize}
+        let payload = { ...values, link, timestamp, partySize, ...clientStorage}
         console.log(payload);
         checkDuplicatesRequest(values.email, link)
         .then((response) => {

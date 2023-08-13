@@ -20,6 +20,7 @@ import Customers from "../Customers/Customers";
 import ErrorPage from "../Error/Error";
 import Success from "../../components/Snackbar/Success";
 import { reloadBusinessData } from "../../hooks/hooks";
+import EditClient from "../../components/Dialog/EditClient";
 
 
 /**
@@ -27,7 +28,16 @@ import { reloadBusinessData } from "../../hooks/hooks";
  * Strucutre:
  *          Have the user change the retrived state from mongo by only storing into local storage.
  *          User makes a request. Update all from localStorage.
- *              =
+ *             
+ */
+
+
+
+/**
+ * Drawer: implement status
+ * Welcome: Implement status checks
+ *          Implement view waitlist.
+ *          
  */
 
 
@@ -40,6 +50,8 @@ export default function Dashboard () {
 
     const [openNav, setOpenNav] = useState(false);
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
+    const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
+
 
     async function checkAuthStatus() {
         setLoading(true);
@@ -63,24 +75,20 @@ export default function Dashboard () {
 
 
     useEffect(() => { 
+        console.log("CALL 1")
         checkAuthStatus();
+        console.log(editClient);
     },[reload])
-
-
-    useEffect(() => {
-        console.log(client);
-    }, [client])
 
 
 
 
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
-        console.log("ENTER point 2");
         switch(location) {
             case 0:
                 return( <> 
-                    <Waitlist setClient={setClient} />
+                    <Waitlist setClient={setClient} setEditClient={setEditClient} />
                     <FabButton />
                     </> );
             case 1:
@@ -101,6 +109,8 @@ export default function Dashboard () {
             
         }
     }
+
+
     
 
     return (
@@ -120,7 +130,9 @@ export default function Dashboard () {
                        : <RenderLocation />}
                       <Success/>
                  </Box>      
-                 <Drawer setClient={setClient} client={client} />   
+                 { client.open ? <Drawer setClient={setClient} client={client} />  : null}
+                 { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }
+
             </Box>
 
         </>

@@ -1,14 +1,15 @@
 import React, { useEffect, useState} from 'react';
-import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box } from '@mui/material';
+import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import {requestEmployeeChange } from "../FormHelpers/AddNewEmployeeFormHelper";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { getAccessToken } from '../../auth/Auth';
-import { setSnackbar } from '../../reducers/user';
+import { setReload, setSnackbar } from '../../reducers/user';
 import { StyledCardService } from '../../pages/Register/CardStyle';
 
+import { useFormikContext } from 'formik';
 
 
 
@@ -19,7 +20,8 @@ import { StyledCardService } from '../../pages/Register/CardStyle';
 export default function AddEmployeeForm({employee}) {
 
     const business = useSelector((state) => state.business);
-
+    const [loading, setLoading] = useState(false);
+    const dispatch = useDispatch();
 
     const WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -30,9 +32,9 @@ export default function AddEmployeeForm({employee}) {
         }
     }, [employee])
 
-    const initialValues = { 
+    let initialValues = { 
         fullname: employee ? employee.fullname: '',
-        employeePassword: employee ? employee.employeePassword: '',
+        employeePassword: '',
         employeeUsername : employee ? employee.employeeUsername: '',
         permissionLevel: employee ? employee.permissionLevel: '',
         resourceTag: '',
@@ -48,9 +50,9 @@ export default function AddEmployeeForm({employee}) {
         }
     }
     const validationSchema = Yup.object().shape({
-        fullname: Yup.string().required(),
-        employeeUsername: Yup.string().required(),
-        employeePassword: Yup.string().required(),
+        fullname: Yup.string().required("First last name required."),
+        employeeUsername: Yup.string().required("Username is required to login.").min(6),
+        employeePassword: Yup.string().min(6),
         permissionLevel: Yup.number().required().max(3).min(0),
         resourceTag: Yup.string(),
         serviceTag: Yup.string(),
@@ -69,30 +71,35 @@ export default function AddEmployeeForm({employee}) {
 
     // Two potential submits, EDIT and NEW
     const handleSubmit = (values) => {
-        requestEmployeeChange(values)
+        setLoading(true);
+        const payload = {...values, originalUsername: employee.employeeUsername}
+        requestEmployeeChange(payload)
         .then(res => {
             console.log(res);
+            dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
         })
         .catch(error => {
-            console.log(error);
+            dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
         })
-    };
-
-
-    const handleCheckBoxChange = (day) => (event) => {
-        console.log("DAY", day)
-        console.log("STATUSS: ", event.target.checked);
-        initialValues.setFieldValue(`schedule.${day}`, event.target.checked);
-    };
+        .finally(() => {
+            setLoading(false);
+            dispatch(setReload(true))
+        })
+    }
     
     return (
     <Box sx={{ pt: 2}}>
+    {loading ? (
+        <Container sx={{p: 2}}>
+            <CircularProgress />
+        </Container>
+    ) :  
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ errors, touched }) => (
+      {({ errors, touched, values, setFieldValue }) => (
         <Form>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -152,24 +159,27 @@ export default function AddEmployeeForm({employee}) {
                     { WEEK.map((day, index) => {
                         return(
                             <>
-                                <Grid item xs={6} md={4} lg={2}>
-                                    <Card sx={{ p: 1, textAlign: 'center'}}>
-                                    <Checkbox
-                                        key={day}
-                                        control={
-                                          <Checkbox
-                                            checked={initialValues.schedule[day]}
-                                            onChange={handleCheckBoxChange(day)}
-                                            name={`schedule.${day}`}
+                            <Grid item xs={6} md={4} lg={2}>
+                                <Card sx={{ p: 1, textAlign: 'center'}}>
+                                <Field
+                                    key={day}
+                                    type="checkbox"
+                                    as={Checkbox}
+                                    name={`schedule.${day}`}
+                                    checked={values.schedule[day]}
+                                    onChange={(event) => {
+                                        setFieldValue(`schedule.${day}`, event.target.checked)
+                                    }}                                    
+                                    control={
+                                        <Checkbox
                                             color="primary"
-                                          />
-                                        }
-                                        label={day}
                                         />
-                                    <Typography variant="caption" color="gray">{day}</Typography>
-                                    </Card>
-
-                                </Grid>
+                                    }
+                                    label={day}
+                                    />
+                                <Typography variant="caption" color="gray">{day}</Typography>
+                                </Card>
+                            </Grid>
                             </>
                         )
                     })}
@@ -187,6 +197,7 @@ export default function AddEmployeeForm({employee}) {
         </Form>
       )}
     </Formik>
+    }
     </Box>
     
     )

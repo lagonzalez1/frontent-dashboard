@@ -1,11 +1,13 @@
 import React, {useState} from "react";
 import { Table, TableCell, TableHead, TableBody, Button, Typography, Container
     ,TableRow, Box, Stack, Modal, Dialog, DialogTitle, DialogContent, Divider, IconButton} from "@mui/material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AddEmployeeForm from "../Forms/AddEmployeeForm";
 import CloseIcon from "@mui/icons-material/Close"
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { requestRemoveEmployee } from "../FormHelpers/AddNewEmployeeFormHelper";
+import { setReload, setSnackbar } from "../../reducers/user";
 
 
 // Show table of employees
@@ -14,10 +16,9 @@ export default function EmployeeTable() {
 
     const employees = useSelector((state) => state.business.employees);
 
-
     const [employeeDialog, setEmployeeDialog] = useState(false);
-    const [employee, setEmployee] = useState(null)
-
+    const [employee, setEmployee] = useState(null);
+    const dispatch = useDispatch();
 
 
     const showEmployeeModal = () => {
@@ -32,11 +33,18 @@ export default function EmployeeTable() {
     }
 
     const removeEmployee = (id) => {
-        console.log("Remove employee", id);
+        requestRemoveEmployee(id)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
+        })
+        .finally(() => {
+            dispatch(setReload(true))
+        })
     }
     const editEmployee = (employee) => {
-        // Launch dialog and pass payload to AddEmployeeForm
-        console.log(employee);
         setEmployee(employee);
         setEmployeeDialog(true);
     }
@@ -53,10 +61,6 @@ export default function EmployeeTable() {
 
                             <TableCell>
                                 Fullname
-                            </TableCell>
-
-                            <TableCell>
-                                Username
                             </TableCell>
                             <TableCell>
                                 Permission lvl.
@@ -78,9 +82,6 @@ export default function EmployeeTable() {
                                         </TableCell>
                                         <TableCell>
                                             {employee.fullname}
-                                        </TableCell>
-                                        <TableCell>
-                                            {employee.employeeUsername}
                                         </TableCell>
                                         <TableCell>
                                             {employee.permissionLevel}
