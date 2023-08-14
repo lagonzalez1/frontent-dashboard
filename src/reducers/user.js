@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { setBusiness } from './business';
-import { access } from 'fs';
 
 const initialState = {
   id: null,
