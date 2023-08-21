@@ -4,22 +4,6 @@ import { DateTime } from "luxon";
 const MINUTES_IN_HOUR = 60;
 
 
-export const getServingCount = () => {
-    const { _ , business } = getStateData();
-    if (!business) { return new Error('Buisness data is empty.')}
-    const currentList = business.currentClients;
-    console.log(currentList);
-    if (currentList.length === 0) { return { groupCount: 0 ,groupTotalCount: 0} }
-    let groupCount = 0;
-    let groupTotalCount = 0;
-    for (var object of currentList) {
-        if (object.status.serving === true){
-            groupCount += 1;
-            console.log(object.partySize);
-        }   groupTotalCount += object.partySize;
-    }
-    return { groupCount, groupTotalCount };
-}
 
 export const currentTimePosition = () => {
     const { _ , business} = getStateData();

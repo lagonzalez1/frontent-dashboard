@@ -52,7 +52,10 @@ export default function AddEmployeeForm({employee}) {
     const validationSchema = Yup.object().shape({
         fullname: Yup.string().required("First last name required."),
         employeeUsername: Yup.string().required("Username is required to login.").min(6),
-        employeePassword: Yup.string().min(6),
+        employeePassword: Yup.string().min(6).matches(
+          /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+          'Password must contain at least one uppercase letter, one number, and one special character'
+        ),
         permissionLevel: Yup.number().required().max(3).min(0),
         resourceTag: Yup.string(),
         serviceTag: Yup.string(),

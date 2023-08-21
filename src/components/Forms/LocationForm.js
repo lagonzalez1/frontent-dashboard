@@ -27,6 +27,11 @@ const LocationForm = () => {
   const [loading, setLoading] = useState(false);
   
   const handleSubmit = (values) => {
+    if (!checkValidString(values.locationUrl)){
+      setErrors('Public link cannot include special or spaces.');
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     axios.get('/api/internal/unique_link/'+ values.locationUrl )
       .then((response) => {
@@ -52,9 +57,14 @@ const LocationForm = () => {
       })
   };
 
+  const checkValidString = (input) => {
+    const pattern = /^[a-zA-Z0-9_]+$/;
+    return pattern.test(input);
+}
+
 
   const openWaitList = (endpoint) => {
-    const url = `http://localhost:3000/welcome/${business.publicLink}/waitlist`
+    const url = `https://waitonline.us/welcome/${business.publicLink}/waitlist`
     window.open(url, '_blank');
   };
 
@@ -108,7 +118,7 @@ const LocationForm = () => {
               
               
             <Button variant='contained' size={'small'}  type="submit" sx={{borderRadius: 15}}>
-                {loading ? <CircularProgress color='white'/> : 'Save'}
+                {loading ? <CircularProgress /> : 'Save'}
             </Button>
             </Grid>
           </Grid>

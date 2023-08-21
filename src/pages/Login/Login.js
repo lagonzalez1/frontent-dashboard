@@ -73,7 +73,12 @@ export default function Login() {
 	return(
         <>
             <Container sx={{ pt: 1, p: 2}}>
-                <Box
+                <Grid container>
+                    <Grid item>
+                        
+                    </Grid>
+                    <Grid item>
+                    <Box
                 sx={{
                 my: 8,
                 mx: 4,
@@ -87,6 +92,9 @@ export default function Login() {
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign in
+                </Typography>
+                <Typography component="subtitle2" variant="caption">
+                    (Root user)
                 </Typography>
                 <Box component="form" noValidate sx={{ mt: 1 }}>
                     {error ? (<Alert severity="error">{error}</Alert>): null}
@@ -117,13 +125,13 @@ export default function Login() {
                                 loading={loading}
                                 variant="outlined"
                                 disabled
-                                sx={{ mt: 3, mb: 2 }}
+                                sx={{ mt: 3, mb: 2, borderRadius: 15 }}
                                 > Sign In</LoadingButton>): 
                 <Button
                     fullWidth
                     variant="contained"
                     color="primary"
-                    sx={{ mt: 3, mb: 2 }}
+                    sx={{ mt: 3, mb: 2, borderRadius: 15 }}
                     onClick={ () => handleSubmit() }
                 >
                     Sign In
@@ -131,26 +139,28 @@ export default function Login() {
                 }
                 <Grid container>
                     <Grid item xs>
-                    <Link href="#" variant="body2">
+                    <Link href="#" variant="caption">
                         Forgot password?
                     </Link>
                     </Grid>
                     <Grid item xs>
-                        <Link href="/Register" variant="body2">
-                            {"Don't have an account? Sign Up"}
+                        <Link href="/Register" variant="caption">
+                            {"Don't have an account? Register now!"}
                         </Link>
                     </Grid>
                 </Grid>
-                <Typography pt={2} variant="body2" color="text.secondary" align="center">
+                <Typography pt={2} variant="caption" color="text.secondary" align="center">
                     {'Copyright © '}
-                    <Link color="inherit" href="/Home">
-                        Your Website
+                    <Link color="inherit" href="/">
+                        waitonline.us
                     </Link>{' '}
                     {new Date().getFullYear()}
                     {'.'}
                     </Typography>
                 </Box>
-            </Box>
+                </Box>
+                    </Grid>
+                </Grid>
             </Container>
 
         </>

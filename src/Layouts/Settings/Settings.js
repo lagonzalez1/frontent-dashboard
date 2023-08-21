@@ -83,7 +83,7 @@ export default function Settings() {
                                         System
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                    Appointment system settings, choose how your will manage your waitlist.
+                                        Appointment system settings, choose how your will manage your waitlist.
                                 </Typography>
                                 </Stack>
                             </Grid>
@@ -175,7 +175,7 @@ export default function Settings() {
                                         Resources and services
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        A resource can be for exmaple a 'table 1' in a restaurant establishment.
+                                        Common example are, Table 1, Seat 1.
                                     </Typography>
                                     <Typography variant="subtitle2">
                                         A service can be for example a 'mens haircut' that last 30 min. 

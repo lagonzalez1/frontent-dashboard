@@ -21,80 +21,69 @@ export default function Welcome() {
     const navigate = useNavigate();
 
 
-    
-
-
     const startJoinList = () => {
         navigate(`/welcome/${link}/size`);
     }
 
 
     useEffect(() => {
-        checkBuisnessState();
-        getBusinessArgs();
-        getBusinessSchedule();
-        return () => {
-            if (args && open){
-                setLoading(false);
-            }
-        }
+        //checkBuisnessState();
+        //getBusinessArgs();
+        //getBusinessSchedule();
+        gatherBusinessData();
+
     }, [])
 
-    const getBusinessSchedule = () => {
+
+    const gatherBusinessData = () => {
         setLoading(true);
-        requestBusinessSchedule(link)
-        .then(response => {
-            setSchedule(response);
-        })
-        .catch(error => {
-            console.log(error);
-            setErrors('Error found when collecting arguments.')
-        })
-        
-    }
-
-
-    const getBusinessArgs = () => {
-        setLoading(true);
-        requestBusinessArguments(link)
-        .then(response => {
-            setArgs(response);
-            
-        })
-        .catch(error => {
-            console.log(error);
-            setErrors('Error found when collecting arguments.')
-        })
-        
-    }
-
-
-    const checkBuisnessState = () => {
         const currentTime = DateTime.local().toISO();
-        allowClientJoin(currentTime, link)
-        .then(response => {
-            switch (response.status) {
-                case 200:
-                    if (response.data.isAccepting){
-                        setOpen(true)
-                        setListSize(response.data.waitlistLength);
-                        setLoading(false);
-                    }else {
-                        setOpen(false);
-                        setLoading(false);
-                    }
-                    return;
-                case 203:
-                    setOpen(false);
-                    setErrors(response.data.msg);
+       
+        // Execute both requests concurrently using Promise.all()
+        Promise.all([
+            requestBusinessSchedule(link),
+            requestBusinessArguments(link),
+            allowClientJoin(currentTime, link)
+        ])
+        .then(([scheduleResponse, argsResponse, stateResponse]) => {
+            setSchedule(scheduleResponse);
+            setArgs(argsResponse);
+            if (stateResponse.status === 200){
+                if (stateResponse.data.isAccepting){
+                    setOpen(true)
+                    setListSize(stateResponse.data.waitlistLength);
                     setLoading(false);
-                    return;
+                }else {
+                    setOpen(false);
+                    setLoading(false);
+                }
+                return;
+            }
+            if (stateResponse.status === 203){
+                setOpen(false);
+                setErrors(stateResponse.data.msg);
+                setLoading(false);
+                return;
+            }
+            if (stateResponse.status === 404){
+                setOpen(false);
+                setErrors(stateResponse.data.msg);
+                setLoading(false);
+                return;
             }
         })
         .catch(error => {
-            console.log(error)
-            setLoading(false);
+            console.log(error);
+            if (error.response.status === 404) {
+                setErrors('This business does not exist.');
+            }
+            else {
+                setErrors('Error found when collecting data.');
+            }
         })
+        .finally(() => {
+            setLoading(false);
+        });
     }
 
 
@@ -134,7 +123,7 @@ export default function Welcome() {
 
         return(
             <>
-            {args.present.position ? <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography> : null}
+            {args ? <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography> : null}
             <br/>
             <Button disabled={!open} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
                 <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
@@ -156,6 +145,7 @@ export default function Welcome() {
                 <Card sx={{ minWidth: 465, textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
                     { loading ? <CircularProgress/> : 
                     (<>
+                    {errors ? <Alert color="error">{errors}</Alert>: null}
                     <CardContent>
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             {link}

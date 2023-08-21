@@ -246,6 +246,52 @@ export const getServingTable = () => {
       }
 };
 
+export const getServingCount = () => {
+    const { user, business } = getStateData();
+    try {
+            let currentClients = business.currentClients;
+            let clients = [];
+            for (var client of currentClients){
+                if (client.status.serving === true) {
+                    clients.push(client);
+                }
+            }
+            const type = business.system.equalDate;
+            if (!clients) {
+                return [];
+            }
+            const timezone = business.timezone;
+            if (!timezone) {
+                return new Error('No timezone to validate.');
+            }
+            // Compare the current date to each client.
+            let currentDates = [];
+            let sorted = null;
+            const currentTime = DateTime.local().setZone(timezone);
+
+            if(type) {
+                for (var client of clients) {
+                    const clientDate = new DateTime.fromJSDate(new Date(client.timestamp));
+                    if ( currentTime.hasSame(clientDate, 'day')){
+                        currentDates.push(client);
+                    }
+                }
+                sorted = currentDates.sort(sortBaseTime);
+            }else {
+                sorted = clients.sort(sortBaseTime);
+            }
+            let count = 0;
+            for (var object of sorted) {
+                count += object.partySize;
+            }
+            return {groupCount : sorted.length, groupTotalCount: count};
+      } catch (error) {
+            // Handle the error here
+            console.error(error);
+            return new Error(error); // Return an empty array or any other appropriate value
+      }
+};
+
 
 
 

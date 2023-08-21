@@ -12,7 +12,7 @@ export const getTimeZone = () => {
 }
 
 export const getTimestamp = () => {
-  const currentDate = DateTime.local().toISO();
+  const currentDate = DateTime.local().toFormat('MM/dd/yy hh:mm a');
   return currentDate;
 };
 

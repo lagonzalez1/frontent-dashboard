@@ -23,6 +23,10 @@ import "./Register.css";
 import ServicesGrid from "../../components/Service/ServicesGrid";
 import { useSignIn } from "react-auth-kit";
 
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+
+
 
 /** 
  * Option 2: 
@@ -92,6 +96,12 @@ export default function Register(props){
         schedule: false,
         timezone: false
     })
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handlePasswordToggle = () => {
+        setShowPassword(prevShowPassword => !prevShowPassword);
+    };
     
     function closeServicesModal () { setServicesModal(false); }
 
@@ -110,6 +120,11 @@ export default function Register(props){
         setUser((prev) => ({...prev, mode: mode}))
     }
 
+    const checkValidString = (input) => {
+        const pattern = /^[a-zA-Z0-9_]+$/;
+        return pattern.test(input);
+    }
+
     /**
      * Increment loadbar.
      * Save user business data.
@@ -119,30 +134,35 @@ export default function Register(props){
           setErrors('Missing your public link.');
           return;
         }
-        setLoading(true);
-        checkPublicLink(user.publicLink)
-          .then((response) => {
-            switch (response.status){
-                case 200:
-                    setStep((prev) => prev + 22.5);
-                    setErrors();
-                    setLoading(false);
-                    return;
-                case 201:
-                    setErrors(response.data.msg);
-                    setLoading(false);
-                    return;
-                default:
-                    setErrors(response.status);
-                    setLoading(false);
-                    return;
-            }
-          })
-          .catch((error) => {
-            setLoading(false)
-            setErrors(error);
+        if (!checkValidString(user.publicLink)){
+            setErrors('Public link cannot include special or spaces.');
             return;
-          })
+        }else {
+            setLoading(true);
+            checkPublicLink(user.publicLink)
+              .then((response) => {
+                switch (response.status){
+                    case 200:
+                        setStep((prev) => prev + 22.5);
+                        setErrors();
+                        setLoading(false);
+                        return;
+                    case 201:
+                        setErrors(response.data.msg);
+                        setLoading(false);
+                        return;
+                    default:
+                        setErrors(response.status);
+                        setLoading(false);
+                        return;
+                }
+              })
+              .catch((error) => {
+                setLoading(false)
+                setErrors(error);
+                return;
+              })
+        }
       };
       
     /**
@@ -293,7 +313,7 @@ export default function Register(props){
     return(
         <>  
             
-            <Container className="container" sx={{ pt: 5, pb: 5}}>       
+            <Container className="container" sx={{ pt: 5, pb: 3}}>       
                 { step === 10 ?(
                         <Container className="content_container" sx={{ p: 3}}>
                         <Box sx={{ flexGrow: 1, p: 1}}>
@@ -312,10 +332,11 @@ export default function Register(props){
                             >
                                 <Grid item sm={12} xs={12} md={6}>
                                 <FormHelperText id="component-helper-text">
-                                    <Typography variant="body2"><strong>Business name *</strong></Typography>
+                                    <Typography variant="subtitle2"><strong>Business name *</strong></Typography>
                                 </FormHelperText>
                                     <TextField 
-                                    name="businessName" error={userErrors.businessName}  id="business-name" variant="filled" value={user.businessName} onChange={e => setUser((prev) => ({ ...prev, businessName: e.target.value}))} fullWidth/>
+                                    name="businessName" error={userErrors.businessName}  id="business-name" variant="filled" value={user.businessName} 
+                                    onChange={e => setUser((prev) => ({ ...prev, businessName: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
@@ -326,7 +347,9 @@ export default function Register(props){
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
                                         <Typography variant="body2"><strong>Choose public link*</strong>
-                                        <Tooltip title="Here is the link where your customers will be able to join.">
+                                        <Tooltip title="This link will allow users to join.
+                                                        Only use underscore _ if needed to split input. 
+                                                        Ex. BusinessName_LA">
                                             <IconButton>
                                                 <InfoOutlinedIcon fontSize="small" />
                                             </IconButton>
@@ -335,7 +358,7 @@ export default function Register(props){
                                         </Typography>
                                     </FormHelperText>
                                     <TextField error={userErrors.publicLink} InputProps={{
-                                            startAdornment: <InputAdornment position="start">/welcome/</InputAdornment>,
+                                            startAdornment: <InputAdornment position="start">waitonline.us/welcome/</InputAdornment>,
                                         }} name="publicLink" variant="filled" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
@@ -368,7 +391,7 @@ export default function Register(props){
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
-                                        <Typography variant="body2"><strong>business address (optional)</strong></Typography>
+                                        <Typography variant="body2"><strong>Business address (optional)</strong></Typography>
                                     </FormHelperText>
                                     <TextField name="businessAddress" value={user.businessAddress} onChange={e => setUser((prev) => ({ ...prev, businessAddress: e.target.value}))}  variant="filled" fullWidth/>
                                 </Grid>
@@ -633,8 +656,19 @@ export default function Register(props){
                                         <Stack direction="column" sx={{ pt: 2}} spacing={2}>
                                             <TextField error={userErrors.fullName} name="fullName" value={user.fullName} onChange={e => (setUser((prev) => ({...prev, fullName: e.target.value}) )) }
                                             label="Full name" variant="filled"></TextField>
-                                            <TextField helperText="Password must container one uppercase, special character and a number." name="password" label="Password" value={user.password} onChange={handlePasswordChange} error={passwordError} type="password" pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="filled"></TextField>
-                                            <TextField error={userErrors.email} name="email" label="Email" value={user.email} onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="filled"></TextField>
+                                            <TextField helperText="Password must container one uppercase, special character and a number." name="password" 
+                                            label="Password" value={user.password} onChange={handlePasswordChange} error={passwordError} type={ showPassword ? "text": "password"} 
+                                            InputProps={{ endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton onClick={handlePasswordToggle}>
+                                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )}} 
+                                            pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="filled"></TextField>
+                                            <TextField error={userErrors.email} name="email" label="Email" value={user.email} 
+                                            
+                                            onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="filled"></TextField>
                                             <Box sx={{ minWidth: 120 }}>
                                                     <Stack spacing={1}>
                                                         <Chip label={timezone} variant="outlined" />
@@ -675,12 +709,12 @@ export default function Register(props){
                     null
                 }
 
-                </Container>
+            </Container>
 
             <N collapseOnSelect expand="lg" fixed="bottom">
-                <Box sx={{ width: '100%', backgroundColor: 'white'}} >
+                <Box sx={{ width: '100%', backgroundColor: 'white', position: 'fixed', bottom: 0}} >
                     <LinearProgress variant="determinate" value={step} />
-                    <Typography sx={{ pt: 1}} textAlign='center' variant="subtitle2"><strong>Your business</strong></Typography>
+                    <Typography sx={{ pt: 1, pb: 1}} textAlign='center' variant="subtitle2"><strong>Your business</strong></Typography>
                 </Box>
             </N>
         </>

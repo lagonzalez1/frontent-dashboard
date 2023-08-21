@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form } from 'formik';
-import { Switch, FormControlLabel, Grid, Button, FormLabel } from '@mui/material';
+import { Switch, FormControlLabel, Grid, Button, FormLabel, Typography  } from '@mui/material';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -57,10 +57,10 @@ export default function TableForm() {
             <Grid container spacing={2}>
                 {Object.entries(values).map(([key, value]) => (
                 <Grid item xs={12} key={key}>
-                     <FormLabel component="legend">{LABELS[key]}</FormLabel>
+                    <Typography fontWeight='bold' variant="body2">{LABELS[key]}</Typography>
                     <FormControlLabel
-                        control={<Switch checked={value} onChange={handleChange} name={key} />}
-                        
+                        control={<Switch checked={value} onChange={handleChange} name={key}  />}
+                        label={value ? "On": "Off"}
                     />
                 </Grid>
                 ))}

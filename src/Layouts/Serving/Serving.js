@@ -5,8 +5,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 
 import { useSelector, useDispatch } from "react-redux";
-import  { getServingCount, getUserTable, columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingTable } from "../../hooks/hooks";
+import  {  getUserTable, columns, completeClientAppointment } from "./Helper";
+import {  findResource, findService, getServingTable, getServingCount } from "../../hooks/hooks";
 import "../../css/Serving.css";
 import { setReload, setSnackbar } from "../../reducers/user";
 
