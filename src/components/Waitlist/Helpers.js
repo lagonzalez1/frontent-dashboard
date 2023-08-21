@@ -17,7 +17,7 @@ const ENDPOINT_ACCEPTING = '/api/internal/update_accepting'
 
 
 export const handleOpenNewTab = (endpoint) => {
-    const url = 'http://localhost:3000/welcome/'+endpoint;
+    const url = 'https://waitonline.us/welcome/'+endpoint;
     window.open(url, '_blank');
 };
 
