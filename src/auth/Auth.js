@@ -77,7 +77,7 @@ const USER = 'user';
     try {
       const status = await checkAccessToken();
       dispatch(setBusiness(status.business));
-      dispatch(setUser({ id: status.id, email: status.email}))
+      dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions}))
       dispatch(setIndex(status.defaultIndex));
       dispatch(setLocation(0))
       return true;

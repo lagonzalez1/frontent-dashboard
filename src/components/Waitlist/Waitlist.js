@@ -12,6 +12,7 @@ import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import BadgeIcon from '@mui/icons-material/Badge';
 
 import {  findClient, findResource, findService } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
@@ -28,6 +29,7 @@ export default function Waitlist ({setClient, setEditClient}) {
     
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
+    const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
 
     let tableData = getUserTable();
@@ -300,6 +302,12 @@ export default function Waitlist ({setClient, setEditClient}) {
                 >
                     <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack direction={"row"} spacing={1}>
+
+                            {user.permissions > 0 ? (<Tooltip title="Logged in as employee" placement="bottom">
+                                <Button color="error" variant="outlined" startIcon={<BadgeIcon />}>
+                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{ user.email }</Typography>
+                                </Button>
+                            </Tooltip>): null}
                             
                             <Tooltip title="Your current location." placement="bottom">
                                 <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SouthAmericaIcon />}>

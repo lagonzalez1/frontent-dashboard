@@ -47,7 +47,7 @@ export const allowClientJoin = (time,link) => {
     return new Promise((resolve, reject) => {
         axios.get(`/api/external/businessSchedule`, {params: {link}})
         .then(response => {
-            resolve(response.data.schedule);
+            resolve(response.data);
         }) 
         .catch(error => {
             reject(error);

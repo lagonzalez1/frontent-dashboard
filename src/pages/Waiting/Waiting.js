@@ -292,9 +292,9 @@ export default function Waiting() {
                 id="leave_dialog"
                 open={open}
                 onClose={handleClose}
+                maxWidth={'xs'}
             >
             <DialogTitle>
-                <Typography variant="subtitle2">Leave waitlist ?</Typography>  
                 <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -307,14 +307,16 @@ export default function Waiting() {
                     >
                     <CloseIcon />
                 </IconButton>
+                <Typography variant="h6" fontWeight={'bold'}>Leave waitlist ?</Typography>  
             </DialogTitle>
             <DialogContent>
-
-                <Stack direction="row" spacing={2}>
-                    <Button sx={{ borderRadius: 10, color: 'white'}} variant="contained" color="primary" onClick={handleClose}>No</Button>
-                    <Button sx={{ borderRadius: 10}} variant="outlined" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
-                </Stack>
-                
+                <Typography variant="caption">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography>  
+                <Container sx={{pt: 2, pb: 2, pr: 2, pl: 2}}>
+                    <Stack spacing={2}>
+                        <Button sx={{ borderRadius: 15}} variant="contained" color="primary" onClick={handleClose}>No</Button>
+                        <Button sx={{ borderRadius: 15}} variant="outlined" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
+                    </Stack>
+                </Container>
             </DialogContent>
             <DialogActions>
                 

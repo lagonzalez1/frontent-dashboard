@@ -61,10 +61,8 @@ const Customers = () => {
     const payload = {bid: business._id, sort, stateSort, currentTime}
     getAnalyticsClients(payload)
     .then(response => {
-
       if(response.status === 200){
         setData(response.payload);
-
       }
       else {
         console.log(response);

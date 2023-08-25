@@ -75,9 +75,7 @@ export default function Dashboard () {
 
 
     useEffect(() => { 
-        console.log("CALL 1")
         checkAuthStatus();
-        console.log(editClient);
     },[reload])
 
 

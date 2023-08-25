@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, Chip, Divider, IconButton, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, 
+    Avatar, Divider, IconButton, List, ListItem, ListItemText } from "@mui/material";
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +18,7 @@ export default function Welcome() {
     const [errors, setErrors] = useState();
     const [args, setArgs] = useState();
     const [schedule, setSchedule] = useState({});
+    const [nextDate, setNextAvailableDate] = useState({});
 
     const navigate = useNavigate();
 
@@ -46,7 +48,8 @@ export default function Welcome() {
             allowClientJoin(currentTime, link)
         ])
         .then(([scheduleResponse, argsResponse, stateResponse]) => {
-            setSchedule(scheduleResponse);
+            setSchedule(scheduleResponse.schedule);
+            setNextAvailableDate(scheduleResponse.nextAvailable);
             setArgs(argsResponse);
             if (stateResponse.status === 200){
                 if (stateResponse.data.isAccepting){
@@ -88,7 +91,8 @@ export default function Welcome() {
 
 
     const CheckBusinessArguments = () => {
-        
+
+    
         if (open === false) {
             return (
                 <>
@@ -97,25 +101,30 @@ export default function Welcome() {
                     </Typography>
 
                     <Container sx={{ justifyContent: 'center', justifyItems: 'center'}}>
-                    <List dense={true}>
-                            {
-                                schedule ? Object.keys(schedule).map((item, key) => {
-                                    if(item === "_id"){
-                                        return null;
-                                    }
+                    <Stack spacing={0.5}>
+                        {
+                            schedule ? Object.keys(schedule).map((item, key) => {
+                                if(item === "_id"){
+                                    return null;
+                                }
+                                
+                                if (nextDate === item) {
+                                    const start = DateTime.fromFormat(schedule[item].start, "HH:mm").toFormat("h:mm a")
+                                    const end = DateTime.fromFormat(schedule[item].end, "HH:mm").toFormat("h:mm a")
                                     return (
-                                        <ListItem key={key}>
-                                            <ListItemText 
-                                                primary={item}
-                                                secondary={
-                                                    schedule[item].start + " - " + schedule[item].end
-                                                }
-                                            />
-                                        </ListItem>
+                                        <>
+                                        <Typography variant="subtitle2">
+                                            {"Waitlist will open again on " + item}
+                                        </Typography>
+                                        <Typography variant="body2" fontWeight={'bold'}>
+                                            {start + " - " + end}
+                                        </Typography>
+                                        </>
                                     )
-                                }): null
-                            }
-                    </List>
+                                }
+                            }): null
+                        }
+                    </Stack>
                     </Container>
                 </>
             )
@@ -143,17 +152,17 @@ export default function Welcome() {
         <>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
                 <Card sx={{ minWidth: 465, textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+                    
                     { loading ? <CircularProgress/> : 
                     (<>
                     {errors ? <Alert color="error">{errors}</Alert>: null}
-                    <CardContent>
+                    <CardContent sx={{ justifyContent: 'center'}}>
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             {link}
                         </Typography>
                         <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
                         <CheckBusinessArguments />
-            
-
+        
                     </CardContent>
                     </>
                     )}
