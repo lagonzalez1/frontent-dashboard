@@ -2,8 +2,8 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:2222", 
- "dependencies": {
+  "proxy": "http://localhost:2222",
+  "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.11.16",
@@ -28,6 +28,7 @@
     "react-bootstrap": "^2.7.4",
     "react-dom": "^18.0.2",
     "react-intersection-observer": "^9.5.2",
+    "react-qr-code": "^2.0.12",
     "react-redux": "^8.1.0",
     "react-router-dom": "^6.11.2",
     "react-scripts": "^4.0.3",

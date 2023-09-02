@@ -96,7 +96,7 @@ export default function Welcome() {
         if (open === false) {
             return (
                 <>
-                    <Typography variant="h6" fontWeight='bold'>
+                    <Typography variant="h5" fontWeight='bold'>
                             This waitlist is currently closed.
                     </Typography>
 
@@ -113,11 +113,12 @@ export default function Welcome() {
                                     const end = DateTime.fromFormat(schedule[item].end, "HH:mm").toFormat("h:mm a")
                                     return (
                                         <>
-                                        <Typography variant="subtitle2">
-                                            {"Waitlist will open again on " + item}
+                                        <Typography variant="subtitle1">
+                                            {"Waitlist will open again"}
                                         </Typography>
                                         <Typography variant="body2" fontWeight={'bold'}>
-                                            {start + " - " + end}
+                                            <strong>{item}</strong>
+                                            {" from "+  start + " - " + end}
                                         </Typography>
                                         </>
                                     )
@@ -132,6 +133,7 @@ export default function Welcome() {
 
         return(
             <>
+            <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
             {args ? <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography> : null}
             <br/>
             <Button disabled={!open} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
@@ -160,7 +162,6 @@ export default function Welcome() {
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             {link}
                         </Typography>
-                        <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
                         <CheckBusinessArguments />
         
                     </CardContent>

@@ -61,12 +61,8 @@ const Customers = () => {
     const payload = {bid: business._id, sort, stateSort, currentTime}
     getAnalyticsClients(payload)
     .then(response => {
-      if(response.status === 200){
-        setData(response.payload);
-      }
-      else {
-        console.log(response);
-      }
+      setData(response.payload);
+
     })
     .catch(error => {
       console.log(error);
@@ -74,9 +70,6 @@ const Customers = () => {
     })
     
   }
-
-
-
 
   useEffect(() => {
     loadCustomers(sort, stateSort);
@@ -165,27 +158,30 @@ const Customers = () => {
                                 <>
                                   <TableRow>
                                     <TableCell>
-                                      <Typography>
+                                      <Typography variant='subtitle1'>
                                         {client.fullname}
                                       </Typography>
-                                  
-                                    </TableCell>
-                                    <TableCell>
-                                      <Typography>
+                                      <Typography variant='subtitle2'>
                                         {client.phone}
                                       </Typography>
                                   
                                     </TableCell>
                                     <TableCell>
-                                      <Typography>
+                                    <Typography variant='subtitle1'>
+                                        {client.email}
+                                      </Typography>
+                                  
+                                    </TableCell>
+                                    <TableCell>
+                                    <Typography variant='subtitle1'>
                                         {client.summary.length}
                                       </Typography>
                                   
                                     </TableCell>
 
                                     <TableCell>
-                                      <Typography>
-                                        {client.lastUpdate}
+                                      <Typography variant='subtitle1'>
+                                      
                                       </Typography>
                                   
                                     </TableCell>

@@ -2,11 +2,9 @@ import React, {useState, useEffect } from "react";
 import { Box, Swtich , Paper, Slide, Alert, Card, CardContent, Typography, Stack, Container, Button, Divider, CardActions,
     AlertTitle, Dialog, DialogContent, DialogTitle, RadioGroup, FormControlLabel, Radio, DialogActions, ButtonBase, Snackbar, CircularProgress, Link, 
 Collapse, IconButton, DialogContentText} from "@mui/material";
-import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
-
 import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus } from "./WaitingHelper.js";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
+import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import CloseIcon from "@mui/icons-material/Close";
@@ -63,31 +61,35 @@ export default function Waiting() {
     }
 
     useEffect(() => {
-
-        loadUser();
-        getBusinessArgs();
-        return () => {
-            if (args && user) {
-                setLoading(false);
-            }
-        }
-    }, [])
-
-
-    const getBusinessArgs = () => {
+        loadUserAndBusinessArgs();
+    }, []);
+    
+    const loadUserAndBusinessArgs = () => {
         setLoading(true);
-        requestBusinessArguments(link)
-        .then(response => {
-            setArgs(response);
+        const timestamp = DateTime.local().toUTC();
+        Promise.all([
+            getIdentifierData(link, unid, timestamp),
+            requestBusinessArguments(link)
+        ])
+        .then(([userResponse, argsResponse]) => {
+            if (userResponse.status === 201) {
+                setErrors(userResponse.data.msg);
+                setUser({});
+            } else if (userResponse.status === 200) {
+                setTitles(userResponse.data.positionTitles);
+                setUser(userResponse.data.client); 
+                setStatus(userResponse.data.statusTrigger); 
+            }
+            setArgs(argsResponse);
         })
         .catch(error => {
-            console.log(error);
-            setErrors('Error found when collecting arguments.')
+            setErrors('Error: ' + error);
         })
         .finally(() => {
             setLoading(false);
-        })
-    }
+        });
+    };
+    
 
 
     const copyToClipboardHandler = () => {
@@ -122,37 +124,18 @@ export default function Waiting() {
         }        
     }
 
-    const loadUser = () => {
-        setLoading(true);
-        const timestamp = DateTime.local().toUTC();
-        getIdentifierData(link, unid, timestamp)
-        .then(response => {
-            if (response.status === 201){
-                console.log(response);
-                setTitles(response.data.msg);
-                setUser({});
-            }
-            if(response.status === 200) {
-                setTitles(response.data.positionTitles);
-                setUser(response.data.client); 
-                setStatus(response.data.statusTrigger); 
-            }
-        })
-        .catch(error => {
-            setErrors('Error: ' + error);
-        })
-        .finally(() => {
-            setLoading(false);
-        })
-    }
+    
 
     const leaveWaitlist = () => {
         leaveWaitlistRequest(link, unid)
         .then(response => {
-            console.log(response)
+            console.log(response);
         })
         .catch(error => {
             console.log(error);
+        })
+        .finally(() => {
+            handleClose();
         })
     }
 
@@ -214,7 +197,6 @@ export default function Waiting() {
 
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
-
                         </Typography>
                         {loading ? <CircularProgress /> : 
                         <CardContent>
@@ -225,13 +207,24 @@ export default function Waiting() {
                             </Alert>: null} 
                         
                         <Stack sx={{ pt: 2}} spacing={3}>
-                            {errors ? (null) : 
+                            
                             <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                                {errors ? 
+                                (
+                                <div className="circle_red">
+                
+                                    <PriorityHighIcon htmlColor="#fc0303" sx={{ fontSize: 50}} />
+                                </div>
+                                ): 
+                                (
                                 <div className="circle_yellow">
+                                    
                                     <NotificationsRoundedIcon htmlColor="#ffbb00" sx={{ fontSize: 50}} />
                                 </div>
+                                )
+                                }
                             </Container>
-                            }
+                            
 
                             <Typography variant="h4" fontWeight="bold" > {titles ? titles.title : ''} </Typography>
                             <Typography variant="body2"> {titles ? titles.desc : ''}</Typography>
@@ -247,8 +240,8 @@ export default function Waiting() {
                                 </>
                                 ) : 
                                 <>
-                                <Button onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
-                                    <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
+                                <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
+                                    <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
                                     </Typography>
                                 </Button>
                                 </>

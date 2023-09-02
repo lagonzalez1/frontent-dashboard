@@ -63,6 +63,22 @@ const USER = 'user';
     removeAccessToken();
     removeBusinessState();
   }
+
+
+  export const cleanTable = () => {
+    return new Promise((resolve, reject) => {
+      const token = getAccessToken();
+      const { user, business} = getStateData();
+      axios.post('/api/internal/clean_table',{ bid: business._id}, { headers: {'x-access-token': token} })
+      .then(response => {
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error);
+      })
+
+    })
+  }
   
 
   /**

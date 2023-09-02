@@ -18,6 +18,8 @@ export default function EmployeeTable() {
 
     const [employeeDialog, setEmployeeDialog] = useState(false);
     const [employee, setEmployee] = useState(null);
+    const [employeeId, setEmployeeId] = useState(null); 
+    const [deleteConfirm, setDeleteConfirm] = useState(false);
     const dispatch = useDispatch();
 
 
@@ -49,6 +51,16 @@ export default function EmployeeTable() {
         setEmployeeDialog(true);
     }
 
+
+    const confirmDelete = (id) => {
+        setDeleteConfirm(true);
+        setEmployeeId(id);
+    }
+    const cancelEmployeeDelete = () => {
+        setDeleteConfirm(false);
+        setEmployeeId(id);
+    }
+
     return (
         <>
             <Stack spacing={1}>
@@ -58,7 +70,6 @@ export default function EmployeeTable() {
                             <TableCell>
                                 #
                             </TableCell>
-
                             <TableCell>
                                 Fullname
                             </TableCell>
@@ -88,7 +99,7 @@ export default function EmployeeTable() {
                                         </TableCell>
                                         <TableCell>
                                             <Stack direction={'row'}>
-                                            <IconButton onClick={() => removeEmployee(employee._id)}>
+                                            <IconButton onClick={() => confirmDelete(employee._id)}>
                                                 <DeleteIcon fontSize="Small" />
                                             </IconButton>
                                             <IconButton onClick={() => editEmployee(employee)}>
@@ -109,6 +120,40 @@ export default function EmployeeTable() {
             <Button onClick={() => showEmployeeModal()} sx={{borderRadius: 15}} variant="contained">
                 Add
             </Button>
+
+            <Dialog
+                open={deleteConfirm}
+                onClose={() => cancelEmployeeDelete()}
+                maxWidth={'sm'}
+                disableBackdropClick
+                disableEscapeKeyDown
+            >
+            <DialogTitle>
+            <IconButton
+                    aria-label="close"
+                    onClick={() => cancelEmployeeDelete()}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton> 
+                Delete employee ?
+            </DialogTitle>
+
+            <DialogContent>
+                <Container>
+                    <Stack spacing={2}>
+                        <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => removeEmployee(employeeId)} >yes</Button>
+                        <Button sx={{ borderRadius: 15}} variant="outlined" onClick={() => cancelEmployeeDelete()}>no</Button>
+                    </Stack>
+                </Container>
+                
+            </DialogContent>
+            </Dialog>
 
 
             <Dialog

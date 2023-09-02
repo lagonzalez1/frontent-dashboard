@@ -45,7 +45,6 @@ export default function DateSelect({set}) {
         <MenuItem onClick={() => handleOptionSelect('Last 7 days')}>Last 7 days</MenuItem>
         <MenuItem onClick={() => handleOptionSelect('Last 30 days')}>Last 30 days</MenuItem>
         <MenuItem onClick={() => handleOptionSelect('Yesterday')}>Yesterday</MenuItem>
-        <MenuItem onClick={() => handleOptionSelect('This week')}>This week</MenuItem>
         <MenuItem onClick={() => handleOptionSelect('Last week')}>Last week</MenuItem>
         <MenuItem onClick={() => handleOptionSelect('This month')}>This month</MenuItem>
         <MenuItem onClick={() => handleOptionSelect('Last month')}>Last month</MenuItem>

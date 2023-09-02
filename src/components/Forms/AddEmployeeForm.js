@@ -75,7 +75,8 @@ export default function AddEmployeeForm({employee}) {
     // Two potential submits, EDIT and NEW
     const handleSubmit = (values) => {
         setLoading(true);
-        const payload = {...values, originalUsername: employee.employeeUsername}
+        console.log(values);
+        const payload = {...values, originalUsername: employee ? employee.employeeUsername : '' }
         requestEmployeeChange(payload)
         .then(res => {
             console.log(res);
@@ -93,8 +94,10 @@ export default function AddEmployeeForm({employee}) {
     return (
     <Box sx={{ pt: 2}}>
     {loading ? (
-        <Container sx={{p: 2}}>
+        <Container sx={{p: 3}}>
+          <Box>
             <CircularProgress />
+          </Box>
         </Container>
     ) :  
     <Formik

@@ -9,6 +9,7 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import ListIcon from '@mui/icons-material/List';
 
 import { LOCATIONS } from "./SideBarHelper";
 import { useDispatch, useSelector } from "react-redux";
@@ -71,6 +72,30 @@ export default function SideBar({navState, openNav}) {
               </BootstrapTooltip>
             </ListItem>
 
+            <ListItem disablePadding sx={{ display: 'block' }}>
+            <BootstrapTooltip title="Appointments" placement="right">
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: navState ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+                onClick={() => changeLocation(LOCATIONS.Appointments)}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: navState ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <ListIcon htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
+                </ListItemIcon>
+                <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0 }} />
+              </ListItemButton>
+              </BootstrapTooltip>
+            </ListItem>
+
 
             <ListItem disablePadding sx={{ display: 'block' }}>
             <BootstrapTooltip title="Serving" placement="right">
@@ -89,7 +114,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckBoxOutlinedIcon htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
+                  <CheckBoxOutlinedIcon htmlColor={ currentLocation === 2 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
@@ -114,7 +139,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <WidgetsOutlinedIcon htmlColor={ currentLocation === 2 ? '#ffc34d' : '' } />
+                  <WidgetsOutlinedIcon htmlColor={ currentLocation === 3 ? '#ffc34d' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Resources"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
@@ -138,7 +163,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <FactCheckOutlinedIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' } />
+                    <FactCheckOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>
@@ -162,7 +187,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 3 ? '#ffc34d' : '' }/>
+                  <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' }/>
                 </ListItemIcon>
                 <ListItemText primary={"Customers"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
@@ -190,7 +215,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <SettingsOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
+                    <SettingsOutlinedIcon  htmlColor={ currentLocation === 6 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>
@@ -218,7 +243,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 6 ? '#ffc34d' : '' } />
+                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 7 ? '#ffc34d' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>

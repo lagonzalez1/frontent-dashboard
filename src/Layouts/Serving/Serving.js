@@ -153,6 +153,6 @@ export default function Serving({setClient}) {
                         </TableContainer>
                     </Paper>
                     </div>
-                </div>
+        </div>
     )
 }

@@ -14,13 +14,15 @@ import Drawer from "../../components/Drawer/Drawer";
 
 import { useSignOut } from "react-auth-kit";
 import { DashboardHeader } from "./DashboardHelper"
-import { isAuthenticated, removeUserState } from "../../auth/Auth";
+import { isAuthenticated, removeUserState, cleanTable } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
 import ErrorPage from "../Error/Error";
 import Success from "../../components/Snackbar/Success";
 import { reloadBusinessData } from "../../hooks/hooks";
 import EditClient from "../../components/Dialog/EditClient";
+import Appointments from "../Appointments/Appointments";
+import FabAppointment from "../../components/AddAppointment/FabAppointment";
 
 
 /**
@@ -56,8 +58,8 @@ export default function Dashboard () {
     async function checkAuthStatus() {
         setLoading(true);
         try {
-            console.log("ENTER point 1");
             const isAuth = await isAuthenticated(dispatch);
+            //const clean = await cleanTable(); Need to clean the old values.
             if (!isAuth) {
                 removeUserState();
                 signOut();
@@ -72,6 +74,8 @@ export default function Dashboard () {
             setAuthCompleted(true)
         }
     }
+
+
 
 
     useEffect(() => { 
@@ -90,16 +94,23 @@ export default function Dashboard () {
                     <FabButton />
                     </> );
             case 1:
-                return <Serving setClient={setClient} />
+                return (
+                    <>
+                    <Appointments setClient={setClient} />
+                    <FabAppointment />
+                    </>
+                )
             case 2:
-                return <Resources /> ;
+                return <Serving setClient={setClient} />
             case 3:
+                return <Resources /> ;
+            case 4:
                 return <Customers/>;
-            case 4: 
-                return <Settings />;
             case 5: 
-                return <Services />;
+                return <Settings />;
             case 6: 
+                return <Services />;
+            case 7: 
                 return <Help /> 
 
             default:

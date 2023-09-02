@@ -2,10 +2,21 @@
 
 
 .circle_yellow {
-    width: 150px;
-    height: 150px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     border: 5px solid #ffbb00;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .circle_red {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    border: 5px solid #fc0303;
     border-radius: 50%;
     display: flex;
     justify-content: center;

@@ -7,10 +7,11 @@ import PaymentForm from "../../components/Forms/PaymentForm";
 import { useSelector } from "react-redux";
 import ExtrasForm from "../../components/Forms/ExtrasForm";
 import ClientForm from "../../components/Forms/ClientForm";
-import TableForm from "../../components/Forms/TableForm";
+import SystemForm from "../../components/Forms/SystemForm";
 import ResourceServiceForm from "../../components/Forms/ResourceServiceForm";
 import AddEmployeeForm from "../../components/Forms/AddEmployeeForm";
 import EmployeeTable from "../../components/Employee/EmployeeTable";
+import Personalization from "../../components/Forms/Personalization";
 
 
 
@@ -58,6 +59,24 @@ export default function Settings() {
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
+                        <Grid container id="Personalize">
+                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6}>
+                                <Stack>
+                                    <Typography fontWeight='bold'  variant="h6">
+                                        Personalize
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                        Generate a QR code to show to your clients. 
+                                        Elect to have a icon on your welcome page.
+
+                                    </Typography>
+                                </Stack>
+                            </Grid>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                                <Personalization />
+                            </Grid>
+                        </Grid>
+                        <Divider sx={{backgroundColor: 'lightgray'}} />
                         <Grid container id="hours">
                             <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
@@ -88,7 +107,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <TableForm/>
+                                <SystemForm/>
                             </Grid>
                         </Grid>
 
