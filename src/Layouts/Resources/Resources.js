@@ -242,30 +242,44 @@ export default function Resources() {
                     
 
                     <Divider />
-                    <Typography variant="body2" textAlign={'left'}>
-                        Employee assigned to resource.
-                    </Typography>
-                    <FormControl fullWidth={true}>
                     
-                    <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
-                        <MenuItem value="NONE">None</MenuItem>
-                        {employeeList.map((employee, index) => (
-                        <MenuItem key={index} value={employee._id}>
-                            {employee.fullname}
-                        </MenuItem>
-                        ))}
-                    </Select>
-                    </FormControl>
-                    <Divider />
 
-                    <FormControlLabel
-                        control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
-                        label={ form && form.active ? 'Active' : 'Unavailable'}
-                    />  
-                    <FormControlLabel
-                        control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.publicValue} onChange={e => setForm((item) => ({...item, publicValue: e.target.checked}) ) } />}
-                        label={ form && form.publicValue ? 'Public' : 'Not public'}
-                    />  
+                    
+                    <Grid container>
+                            <Grid item xs={6}>
+                                <Typography variant="subtitle2" fontWeight={'bold'}>Active</Typography>
+                                <Typography variant="body2">Allow your staff to use</Typography>
+                                <FormControlLabel
+                                    sx={{ marginLeft: 0}}
+                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                                    label={ form && form.active ? 'On' : 'Off'}
+                                /> 
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="subtitle2" fontWeight={'bold'}>Public</Typography>
+                                <Typography variant="body2">Allow the public to view</Typography>
+                                <FormControlLabel
+                                    sx={{ marginLeft: 0}}
+                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.publicValue} onChange={e => setForm((item) => ({...item, publicValue: e.target.checked}) ) } />}
+                                    label={ form && form.public ? 'On' : 'Off'}
+                                /> 
+                            </Grid>
+                        </Grid>
+                        <Typography variant="subtitle2" textAlign={'left'} fontWeight={'bold'}>
+                            Assign a employee to this resource
+                        </Typography>
+                        <FormControl fullWidth={true}>
+                        
+                        <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
+                            <MenuItem value="NONE">None</MenuItem>
+                            {employeeList.map((employee, index) => (
+                            <MenuItem key={index} value={employee._id}>
+                                {employee.fullname}
+                            </MenuItem>
+                            ))}
+                        </Select>
+                        </FormControl>
+                        <Divider />
 
                 
                     </Stack>  
@@ -274,7 +288,7 @@ export default function Resources() {
 
 
                 <DialogActions>
-                    <Button variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
+                    <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
                 </DialogActions> 
         </Dialog>
 

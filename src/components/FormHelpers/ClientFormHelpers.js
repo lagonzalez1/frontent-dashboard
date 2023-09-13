@@ -14,6 +14,12 @@ export const LABELS = {
     notes: 'Ask client for notes ',
     service: 'Ask client for option to select a service',
 }
+export const TITLE = {
+    email: 'Email',
+    notes: 'Notes',
+    service: 'Service',
+}
+
 
 
 export const requestInputFieldChange = (payload) => {

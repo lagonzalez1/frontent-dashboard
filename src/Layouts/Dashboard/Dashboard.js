@@ -105,11 +105,11 @@ export default function Dashboard () {
             case 3:
                 return <Resources /> ;
             case 4:
-                return <Customers/>;
+                return <Services/>;
             case 5: 
-                return <Settings />;
+                return <Customers />;
             case 6: 
-                return <Services />;
+                return <Settings />;
             case 7: 
                 return <Help /> 
 

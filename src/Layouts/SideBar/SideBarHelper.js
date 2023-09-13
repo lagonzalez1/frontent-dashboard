@@ -71,8 +71,8 @@ export const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 
     'Appointments': 1,
     'Serving': 2,
     'Resources': 3,
-    'Customers': 4,
-    'Settings': 5,
-    'Services': 6,
+    'Services': 4,
+    'Customers': 5,
+    'Settings': 6,
     'Help': 7
   };

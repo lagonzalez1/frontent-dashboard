@@ -64,13 +64,13 @@ export const requestScheduleChange = (payload) => {
 }
 
 
-export const requestClosedDate = (date) => {
+export const requestClosedDate = (date, employeeId) => {
   return new Promise((resolve, reject) => {
       const { user, business } = getStateData();
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       
-      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id}, headers)
+      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId: employeeId}, headers)
       .then(response => {
         if (response.status === 200){
           resolve(response.data);

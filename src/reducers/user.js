@@ -15,6 +15,8 @@ const initialState = {
   location: null,
 };
 
+
+// Dont set the location so many times to keep in the same page.
 const userSlice = createSlice({
   name: 'user',
   initialState,

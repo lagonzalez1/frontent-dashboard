@@ -12,6 +12,7 @@ import ResourceServiceForm from "../../components/Forms/ResourceServiceForm";
 import AddEmployeeForm from "../../components/Forms/AddEmployeeForm";
 import EmployeeTable from "../../components/Employee/EmployeeTable";
 import Personalization from "../../components/Forms/Personalization";
+import NotificationForm from "../../components/Forms/NotificationForm";
 
 
 
@@ -108,6 +109,27 @@ export default function Settings() {
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <SystemForm/>
+                            </Grid>
+                        </Grid>
+
+                        <Divider sx={{backgroundColor: 'lightgray'}} />
+
+                        <Grid container id="notifications">
+                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                                <Stack>
+                                    <Typography fontWeight='bold' variant="h6">
+                                        Notification settings
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                        Control what your client sees in their notification and when they receive it. 
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+
+                                    </Typography>
+                                </Stack>
+                            </Grid>
+                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                                <NotificationForm />
                             </Grid>
                         </Grid>
 

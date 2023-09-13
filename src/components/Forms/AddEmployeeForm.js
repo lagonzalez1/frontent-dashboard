@@ -1,15 +1,12 @@
 import React, { useEffect, useState} from 'react';
-import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress } from '@mui/material';
+import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress, Select, MenuItem, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import {requestEmployeeChange } from "../FormHelpers/AddNewEmployeeFormHelper";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
-import { getAccessToken } from '../../auth/Auth';
 import { setReload, setSnackbar } from '../../reducers/user';
-import { StyledCardService } from '../../pages/Register/CardStyle';
-
-import { useFormikContext } from 'formik';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import LockIcon from '@mui/icons-material/Lock';
 
 
 
@@ -114,44 +111,52 @@ export default function AddEmployeeForm({employee}) {
                   name="fullname"
                   as={TextField}
                   label="Employee Name"
-                  variant="outlined"
-                  fullWidth
+                  variant="standard"
                   error={touched.fullname && !!errors.fullname}
                   helperText={touched.fullname && errors.fullname}
                 />
                 <Field
                   name="employeeUsername"
-                  as={TextField}
                   label="Username"
-                  variant="outlined"
-                  fullWidth
+                  as={TextField}
+                  variant="standard"
                   error={touched.employeeUsername && !!errors.employeeUsername}
                   helperText={touched.employeeUsername && errors.employeeUsername}
                 />
                 <Field
                   name="employeePassword"
-                  as={TextField}
                   label="Password"
-                  variant="outlined"
+                  as={TextField}
+                  variant="standard"
                   type="password"
-                  fullWidth
                   error={touched.employeePassword && !!errors.employeePassword}
                   helperText={touched.employeePassword && errors.employeePassword}
                 />
-                <Box>
-                <Stack>    
-                <Typography variant='caption'>Level 0: Root user, complete access to make changes.</Typography>
-                <Typography variant='caption'>Level 1: Allow user to edit, resources, services and all below.</Typography>
-                <Typography variant='caption'>Level 2: Allow user to create appointments and serve clients and all below.</Typography>
-                <Typography variant='caption'>Level 3: Allow user to serve clients.</Typography>
-                </Stack>
-                </Box>
+                
+
+                <Accordion>
+                <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+                >
+                <Typography variant='subtitle2'><LockIcon fontSize='small' /> Permission levels</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Stack>
+                  <Typography variant='caption'>Level 0: Root user, complete access to make changes.</Typography>
+                  <Typography variant='caption'>Level 1: Allow user to edit, resources, services and all below.</Typography>
+                  <Typography variant='caption'>Level 2: Allow user to create appointments and serve clients and all below.</Typography>
+                  <Typography variant='caption'>Level 3: Allow user to serve clients.</Typography>
+                  </Stack>
+                </AccordionDetails>
+            </Accordion>
+                
                 <Field
                   name="permissionLevel"
                   as={TextField}
                   label="Permission Level"
-                  variant="outlined"
-                  fullWidth
+                  variant="standard"
                   error={touched.permissionLevel && !!errors.permissionLevel}
                   helperText={touched.permissionLevel && errors.permissionLevel}
                 />
@@ -183,7 +188,7 @@ export default function AddEmployeeForm({employee}) {
                                     }
                                     label={day}
                                     />
-                                <Typography variant="caption" color="gray">{day}</Typography>
+                                <Typography variant="caption">{day}</Typography>
                                 </Card>
                             </Grid>
                             </>

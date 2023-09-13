@@ -26,6 +26,16 @@ export const LABELS = {
     waittime: 'Let clients view a estimated wait time.',
 }
 
+export const TITLE = {
+    position: 'Show position',
+    waitlist: 'Show waitlist',
+    servicePrice: 'Show service price',
+    employees: 'Show employees',
+    resources: 'Show resources',
+    services: 'Show services',
+    waittime: 'Show est wait time',
+}
+
 
 export const requestExtraChanges = (payload) => {
     return new Promise((resolve, reject) => {

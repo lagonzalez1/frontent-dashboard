@@ -177,25 +177,33 @@ export default function Services() {
             ): (
             <DialogContent>
 
-                <Stack spacing={2}>
+                <Stack spacing={1}>
                         <Divider />
-                        <Typography variant="body2" textAlign={'left'}>
-                            
-                        </Typography>
-                        <FormControlLabel
-                        sx={{ marginLeft: 0}}
-                            control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
-                            label={ form && form.active ? 'Active' : 'Unavailable'}
-                        /> 
-                        <FormControlLabel
-                            sx={{ marginLeft: 0}}
-                            control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
-                            label={ form && form.public ? 'Public' : 'Not public'}
-                        /> 
+                        <Grid container>
+                            <Grid item xs={6}>
+                                <Typography variant="subtitle2" fontWeight={'bold'}>Active</Typography>
+                                <Typography variant="body2">Allow your staff to use</Typography>
+                                <FormControlLabel
+                                    sx={{ marginLeft: 0}}
+                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                                    label={ form && form.active ? 'On' : 'Off'}
+                                /> 
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Typography variant="subtitle2" fontWeight={'bold'}>Public</Typography>
+                                <Typography variant="body2">Allow the public to view</Typography>
+                                <FormControlLabel
+                                    sx={{ marginLeft: 0}}
+                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
+                                    label={ form && form.public ? 'On' : 'Off'}
+                                /> 
+                            </Grid>
+                        </Grid>
+                        
+                        
                         <Divider />
 
-                        <Typography variant={"body2"} textAlign={'left'}>Add a new employee to service.</Typography>
-
+                        <Typography variant={"subtitle2"} fontWeight={'bold'} textAlign={'left'}>Add a new employee to service</Typography>
                         <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
                         {
                             service.employeeTags && removeExistingEmployees(service.employeeTags).map((employee, index) => (
@@ -210,7 +218,7 @@ export default function Services() {
                         <Divider />
                         <Typography variant={"body2"} textAlign={'left'}>Current employees assigned to this service.</Typography>
                             <TableContainer component={Paper}>
-                                <Table>
+                                <Table size="small">
                                 
                                     <TableHead>
                                         
@@ -261,7 +269,7 @@ export default function Services() {
             )}
 
                 <DialogActions>
-                    <Button variant="contained" onClick={() => handleUpdateService()} > Save</Button>
+                    <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => handleUpdateService()} > Save</Button>
                 </DialogActions> 
         </Dialog>
 

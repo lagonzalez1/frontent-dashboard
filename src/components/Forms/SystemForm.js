@@ -20,13 +20,17 @@ export default function SystemForm() {
         equalDate: settings.equalDate,
         autoDelete: settings.autoDelete,
         serveMax: business.serveMax,
+        appointments: business.system.appointments,
+        waitlist: business.system.waitlist,
       };
       
-      const validationSchema = Yup.object().shape({
+    const validationSchema = Yup.object().shape({
         equalDate: Yup.boolean(),
-        serveMax: Yup.number().max(100)
+        serveMax: Yup.number().max(100),
+        appointments: Yup.boolean(),
+        waitlist: Yup.boolean()
+    });
 
-      });
     const handleSubmit = (values) => {
         setLoading(true);
         const accessToken = getAccessToken();
@@ -45,7 +49,15 @@ export default function SystemForm() {
         })
 
     };
+    const TITLE = { 
+        appointments: 'Appointments',
+        waitlist: 'Waitlist',
+        equalDate: 'Same day',
+        autoDelete: 'Auto delete'
+    }
     const LABELS = {
+        appointments: 'Use appointments based on your services and duration let your clients schedule future appointments ',
+        waitlist: 'User a queue based appointment system, allow clients to join a virtual',
         equalDate: 'Waitlist will only show current day appointments.',
         autoDelete: 'Automatically delete missed once a new day is present. Otherwise, all missed clients will be marked as no show.',
     }
@@ -66,19 +78,21 @@ export default function SystemForm() {
                     if (typeof value === 'boolean') {
                         return (
                         <Grid item xs={12} key={key}>
+                            <Typography variant='subtitle2' fontWeight={'bold'}>{TITLE[key]}</Typography>
                             <Typography variant="body2">{LABELS[key]}</Typography>
                             <FormControlLabel
-                                control={<Switch checked={value} onChange={handleChange} name={key} />}
+                                control={<Switch color={"opposite"} checked={value} onChange={handleChange} name={key} />}
                                 label={value ? "On" : "Off"}
                             />
                         </Grid>
                         );
                     }
                     return null; // Skip non-boolean options
-                })}
+                })
+                }
 
                 <Grid item xs={12}>
-                    <Typography variant='body2'>Blocks any external waitlist request from clients after {business && business.serveMax}. </Typography>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>Blocks any external waitlist request from clients after {business && business.serveMax}. </Typography>
                     <br/>
                     <Field
                         as={TextField}

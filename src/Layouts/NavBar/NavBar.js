@@ -30,7 +30,7 @@ export default function NavBar({ navState, openNav }) {
     
       return (
         <Typography variant="h5">
-          {currentTime.toFormat('hh:mm:ss a') + " "}
+          {"Welcome " + currentTime.toFormat('hh:mm a') + " "}
           <DetermineDaytimeOrEvening />
 
         </Typography>

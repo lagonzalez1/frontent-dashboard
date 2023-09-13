@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
-import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, 
-    ListItemAvatar, ListItemButton, ListItemIcon} from "@mui/material";
+import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, Grid, 
+    ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card} from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
@@ -9,8 +9,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { StyledCard } from "../../pages/Register/CardStyle";
+import ToggleButton from 'react-bootstrap/ToggleButton';
+
 import { setBusiness } from "../../reducers/business";
 import { setReload, setSnackbar } from "../../reducers/user";
+import axios from "axios";
+import { getHeaders } from "../../auth/Auth";
+import { DatePicker } from "@mui/x-date-pickers";
+import { DateTime } from "luxon";
 
 
 
@@ -19,11 +26,14 @@ export default function FabAppointment () {
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
+    const [nextStep, setNextStep] = useState(false);
 
     
     const business = useSelector((state) => state.business);
+    const [appointments, setAppointments] = useState([]);
+    const [selectedDate, setSelectedDate] = useState(null);
+
     const serviceList = getServicesAvailable();
-    const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
 
     const handleClickOpen = () => {
@@ -37,6 +47,19 @@ export default function FabAppointment () {
     useEffect(() => {
 
     }, [])
+
+    const searchAppointments = (employeeId, serviceId) => {
+        setNextStep(true);
+        const header = getHeaders();
+        axios.post('/api/internal/available_appointments', {bid: business._id, appointmentDate: selectedDate , serviceId: serviceId, employeeId: employeeId}, header )
+        .then(response => {
+            setAppointments(response.data.data);
+        })
+        .catch(error => {
+            setError(error.response.data.msg);
+            console.log(error);
+        })
+    }
 
     const handleSubmit = (payload) => {
         console.log(payload);
@@ -54,6 +77,20 @@ export default function FabAppointment () {
         })
         */
     }
+    const test = () => {
+        const headers = getHeaders();
+        const date = DateTime.local().toJSDate();
+        axios.post('/api/internal/available_appointments', {bid: business._id, appointmentDate: selectedDate, }, headers)
+        .then(res => {
+            console.log(res);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    };
 
     const formatPhoneNumber = (value) => {
         if (!value) return value; // Handle empty values
@@ -80,6 +117,7 @@ export default function FabAppointment () {
         notes: '',
         start: '',
         end: '',
+        date: '',
       };
       
       const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;    
@@ -94,8 +132,26 @@ export default function FabAppointment () {
         resource_id: Yup.string(),
         notes: Yup.string(),
         start: Yup.string(),
-        end: Yup.string()
+        end: Yup.string(),
+        date: Yup.string()
       });
+
+      const FutureDatePicker = ({ label, value, onChange }) => {
+        const currentDate = DateTime.local().setZone(business.timezone);
+    
+        return (
+          <Box>
+          <DatePicker
+            label={label}
+            sx={{ width: '100%'}}
+            value={value}
+            onChange={onChange}
+            renderInput={(params) => <TextField {...params} />}
+            minDate={currentDate}
+          />
+          </Box>
+        );
+      };
 
     return(
         <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
@@ -112,7 +168,7 @@ export default function FabAppointment () {
                 maxWidth={'xs'}
                 fullWidth={true}
             >
-                <DialogTitle> <Typography variant="h6" fontWeight="bold">{"Add Customer to waitlist"}
+                <DialogTitle> <Typography variant="h6" fontWeight="bold">{"Add customer to appointments"}
                 
                 </Typography> 
                 <IconButton
@@ -131,28 +187,53 @@ export default function FabAppointment () {
                 <DialogContent>
 
                     { errors ? <Alert severity="error">{errors}</Alert>: null }
+                    {nextStep ? 
+                            (
+                                <Container>
+                                    <Grid sx={{ justifyContent: 'center'}} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 4 }}>
+                                        {appointments ? appointments.map((properties, index) => (
+                                            <Card id="appointments">
+                                                <CardContent>
+                                                    <Typography variant="caption">{properties.start}</Typography>
+                                                    <Typography variant="caption">{"-"}</Typography>
+                                                    <Typography variant="caption">{properties.end}</Typography>
+                                                </CardContent>
+                                            </Card>
+                                        )): null}
+                                    </Grid>
+                                </Container>
+                            )
+                            :
+                            null}
 
                     <Formik
-                    initialValues={initialValues}
-                    onSubmit={handleSubmit}
-                    validationSchema={validationSchema}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                        validationSchema={validationSchema}
                     >
-                    {({ errors, touched, handleChange, handleBlur }) => (
+                    {({ errors, touched, handleChange, handleBlur, values }) => (
                         <Form>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
+                            
+                            
+                            {nextStep ? null : 
                             <Field
                             as={TextField}
                             id="fullname"
                             name="fullname"
+                            size="small"
                             label="Customer name"
                             placeholder="Customer name"
                             error={touched.fullname && !!errors.fullname}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
+                            }
+                            {nextStep ? null : 
                             <Field
                             as={TextField}
                             id="email"
+                            size="small"
                             name="email"
                             label="Customer email"
                             placeholder="Email"
@@ -160,21 +241,26 @@ export default function FabAppointment () {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
-
+                            }
+                            {nextStep ? null : 
                             <Field
                             as={TextField}
                             id="phone"
                             name="phone"
+                            size="small"
                             label="Phone"
                             placeholder="xxx-xxx-xxxx"
                             error={touched.phone && !!errors.phone}
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
+                            }
+                            {nextStep ? null : 
 
                             <Field
                             as={TextField}
                             id="size"
+                            size="small"
                             name="size"
                             label="Party size"
                             placeholder="1"
@@ -182,19 +268,46 @@ export default function FabAppointment () {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
+                            }
+                            <FutureDatePicker label="Select a date you wish to be closed" value={selectedDate} onChange={handleDateChange} />
 
                             {business ? (
+                            <>
+                                <InputLabel id="employees">Employee preference</InputLabel>
+                                <Field
+                                as={Select}
+                                id="employee_id"
+                                name="employee_id"
+                                size="small"
+                                label="Employees"
+                                onChange={handleChange}
+                                >
+                                {Array.isArray(employeeList) ? employeeList.map((employee) => (
+                                    <MenuItem key={employee._id} value={employee._id}>
+                                        <Typography variant="body2">{employee.fullname} </Typography>
+                                    </MenuItem>
+                                )) : null}
+                                </Field>
+                            </>
+                            ) : null}
+
+                            {values.employee_id ? (
+                                
                             <>
                                 <InputLabel id="services">Services</InputLabel>
                                 <Field
                                 as={Select}
                                 id="services"
                                 name="service_id"
+                                size="small"
                                 label="Service"
                                 onChange={handleChange}
                                 >
-                                <MenuItem key={'NONE'} value={''}>none</MenuItem>
-                                { Array.isArray(serviceList) ? serviceList.map((service) => (
+                                { Array.isArray(serviceList) ?
+                                
+                                serviceList
+                                .filter((service) => service.employeeTags.includes(values.employee_id))
+                                .map((service) => (
                                     <MenuItem key={service._id} value={service._id}>
                                         <Stack>
                                             <Typography variant="body2">{service.title}</Typography>
@@ -207,31 +320,11 @@ export default function FabAppointment () {
                             </>
                             ) : null}
 
-                            
-
-                        {business ? (
-                            <>
-                                <InputLabel id="employees">Employee preference</InputLabel>
-                                <Field
-                                as={Select}
-                                id="employee_id"
-                                name="employee_id"
-                                label="Employees"
-                                onChange={handleChange}
-                                >
-                                <MenuItem key={'NONE'} value={''}>none</MenuItem>
-                                {Array.isArray(employeeList) ? employeeList.map((employee) => (
-                                    <MenuItem key={employee._id} value={employee._id}>
-                                        <Typography variant="body2">{employee.fullname} </Typography>
-                                    </MenuItem>
-                                )) : null}
-                                </Field>
-                            </>
-                            ) : null}
 
                             <Field
                             as={TextField}
                             id="notes"
+                            size="small"
                             name="notes"
                             label="Notes"
                             placeholder="Additional notes"
@@ -241,15 +334,22 @@ export default function FabAppointment () {
                             />
 
                             <ErrorMessage name="notes" component="div" />
-
-                            <Button variant="contained" type="submit">Submit</Button>
+                            
+                            {nextStep ? 
+                            (
+                            <>
+                            <Button variant="outlined" sx={{ borderRadius: 15}} onClick={() => setNextStep(false)}> back</Button>
+                            <Button variant="contained" sx={{ borderRadius: 15}} type="submit">Submit</Button>
+                            </>
+                            ): 
+                            <Button variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(values.employee_id, values.service_id)}> search</Button>
+                            }
                         </Stack>
                         </Form>
                     )}
                     </Formik>
 
-                </DialogContent>
-
+                </DialogContent>        
             </Dialog>
         </Box>
     )

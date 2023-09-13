@@ -2,7 +2,7 @@ import React, { useEffect, useState} from "react";
 import { Formik, Form, Field } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { Grid, FormControlLabel, Switch, Button, FormLabel, Typography} from "@mui/material";
-import { requestInputFieldChange, validationSchema, LABELS } from "../FormHelpers/ClientFormHelpers";
+import { requestInputFieldChange, validationSchema, LABELS, TITLE } from "../FormHelpers/ClientFormHelpers";
 import { setSnackbar } from "../../reducers/user";
 
 
@@ -56,10 +56,11 @@ export default function ClientForm() {
                         <Grid container spacing={2}>
                             {Object.entries(values).map(([key, value]) => (
                             <Grid item xs={12} key={key}>
-                                <Typography fontWeight='bold' variant="body2">{LABELS[key]}</Typography>
+                                <Typography fontWeight='bold' variant="subtitle2">{TITLE[key]}</Typography>
+                                <Typography  variant="body2">{LABELS[key]}</Typography>
                                 <FormControlLabel
-                                control={<Switch checked={value} onChange={handleChange} name={key} />}
-                                label={key}
+                                control={<Switch color={"opposite"} checked={value} onChange={handleChange} name={key} />}
+                                label={value ? "On" : "Off"}
                                 />
                             </Grid>
                             ))}

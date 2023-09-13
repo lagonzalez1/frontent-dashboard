@@ -50,7 +50,7 @@ export const removeExistingEmployees = (employeeIds) => {
       result.push(obj);
       return true
     })
-    return result;
+    return filtered;
 }
 
 export const updateService = (data) => {

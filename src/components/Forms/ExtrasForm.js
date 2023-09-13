@@ -3,7 +3,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { Grid, FormControlLabel, Switch, Button, FormLabel, Stack, Box, Typography} from "@mui/material";
-import { validationSchema, LABELS, requestExtraChanges } from "../FormHelpers/ExtraFormsHelper";
+import { validationSchema, LABELS, requestExtraChanges, TITLE } from "../FormHelpers/ExtraFormsHelper";
 import business from "../../reducers/business";
 import { setSnackbar } from "../../reducers/user";
 
@@ -60,10 +60,11 @@ export default function ExtrasForm() {
                     <Stack spacing={1}>
                         {Object.entries(values).map(([key, value]) => (
                             <Box>
-                            <Typography fontWeight='bold' variant="body2">{LABELS[key]}</Typography>
+                            <Typography fontWeight='bold' variant="subtitle2">{TITLE[key]}</Typography>
+                            <Typography variant="body2">{LABELS[key]}</Typography>
                             <FormControlLabel
-                            control={<Switch color="opposite" checked={value} onChange={handleChange} name={key} />}
-                            label={key}
+                                control={<Switch color="opposite" checked={value} onChange={handleChange} name={key} />}
+                                label={value ? "On" : "Off"}
                             />
                             </Box>
                         ))}

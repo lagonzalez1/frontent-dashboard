@@ -6,7 +6,7 @@ import { Typography, ListItem, ListItemText, List, ListItemButton, Dialog, Dialo
 import CloseIcon from "@mui/icons-material/Close";
 import { validationSchemaService, validationSchemaResource, updateResource, updateService, requestRemoveService, requestRemoveResource } from "../FormHelpers/ResourceServiceFormHelper";
 import { useSelector, useDispatch } from "react-redux";
-import { setReload, setSnackbar } from "../../reducers/user";
+import user, { setReload, setSnackbar } from "../../reducers/user";
 
 
 export default function ResourceServiceForm () {
@@ -17,29 +17,38 @@ export default function ResourceServiceForm () {
 
     const [resourceId, setResourceId] = useState(null)
     const [serviceId, setServiceId] = useState(null)
+    const [disable, disableDelete] = useState(false);
 
     const dispatch = useDispatch();
     
     const resources = useSelector((state) => state.business.resources);
     const services = useSelector((state) => state.business.services);
+    const [userSelected, setUserSelected] = useState(null);
 
 
     const closeResourceDialog = () => {
         setResourceDialog(false);
-        setResourceId(null)
-
+        setResourceId(null);
+        setUserSelected(null);
     }
     const closeServiceDialog = () => {
         setServiceDialog(false);
         setServiceId(null);
+        disableDelete(false);
+        setUserSelected(null)
     }
 
     const openResourceDialog = (item) => {
         setResourceDialog(true);
-        setResourceId(item._id)
+        setResourceId(item._id);
+        setUserSelected(item);
     }
 
     const openServiceDialog = (item) => {
+        if(item.title === "default"){
+            disableDelete(true);
+        }
+        setUserSelected(item)
         setServiceDialog(true);
         setServiceId(item._id)
     }
@@ -115,16 +124,17 @@ export default function ResourceServiceForm () {
     
 
     const initialValuesServices = { 
-        title: '',
-        size: 0,
+        title: userSelected ? userSelected.title : '',
+        duration: userSelected ? userSelected.duration: '',
         delete: false,
     }
 
 
     const initialValuesResources = { 
-        title: '',
-        description: '',
-        duration: 0,
+        title: userSelected ? userSelected.title : '',
+        description: userSelected ? userSelected.description : '',
+        duration: userSelected ? userSelected.duration : 0,
+        size: userSelected ? userSelected.size: 0,
         delete: false
     }
 
@@ -184,7 +194,7 @@ export default function ResourceServiceForm () {
                                 <CloseIcon />
                             </IconButton> 
                             <strong>
-                            Services
+                                Services
                             </strong>
 
                         </DialogTitle>
@@ -204,7 +214,14 @@ export default function ResourceServiceForm () {
                         >
                     {({errors, touched, values, setFieldValue}) => (
                         <Form>
-                        <Stack spacing={2}>
+                        <Stack sx={{pt: 1}} spacing={2}>
+                            {disable ? (
+                                <>
+                                <TextField disabled={disable} label={'default'} variant="outlined" >
+                                    <Typography>{'Default'}</Typography>
+                                </TextField>
+                                </>
+                            ):
                             <Field
                                 name="title"
                                 as={TextField}
@@ -214,35 +231,45 @@ export default function ResourceServiceForm () {
                                 error={touched.title && !!errors.title}
                                 helperText={touched.title && errors.title}
                             />
-
+                            }
                             <Field
-                                name="size"
+                                name="duration"
                                 as={TextField}
-                                label="Party size"
+                                label="Duration (in min)"
                                 variant="outlined"
                                 fullWidth
-                                error={touched.size && !!errors.size}
-                                helperText={touched.size && errors.size}
+                                error={touched.duration && !!errors.duration}
+                                helperText={touched.duration && errors.duration}
                             />
                             <Box sx={{ textAlign: 'left'}}>
                             <Stack direction="row" alignContent={'center'} alignItems={'center'}>
 
-                                <Typography variant="body2">Delete service ?</Typography>
-                                <Field
-                                    key={'deleteService'}
-                                    type="checkbox"
-                                    as={Checkbox}
-                                    name={'delete'}
-                                    checked={values.delete}   
-                                    onChange={(event) => {
-                                        setFieldValue(`delete`, event.target.checked)
-                                    }}                             
-                                    control={
-                                        <Checkbox
-                                            color="primary"
+                                {
+                                    disable ? (
+                                    <>
+
+                                    </>
+                                    ):
+                                        <>
+                                            <Typography variant="body2">Delete service ?</Typography>
+                                            <Field
+                                            key={'deleteService'}
+                                            type="checkbox"
+                                            as={Checkbox}
+                                            name={'delete'}
+                                            checked={values.delete}   
+                                            onChange={(event) => {
+                                                setFieldValue(`delete`, event.target.checked)
+                                            }}                             
+                                            control={
+                                                <Checkbox
+                                                    color="primary"
+                                                />
+                                            }
                                         />
-                                    }
-                                    />
+                                        </>
+                                        
+                                }
                             </Stack>
                             
                             </Box>
@@ -310,7 +337,7 @@ export default function ResourceServiceForm () {
                     >
                 {({errors, touched, values, setFieldValue}) => (
                     <Form>
-                    <Stack spacing={2}>
+                    <Stack sx={{pt: 1}} spacing={2}>
                         <Field
                             name="title"
                             as={TextField}
@@ -332,13 +359,13 @@ export default function ResourceServiceForm () {
                         />
 
                         <Field
-                            name="duration"
+                            name="size"
                             as={TextField}
-                            label="Duration"
+                            label="Size"
                             variant="outlined"
                             fullWidth
-                            error={touched.duration && !!errors.duration}
-                            helperText={touched.duration && errors.duration}
+                            error={touched.size && !!errors.size}
+                            helperText={touched.size && errors.size}
                         />
                         <Box sx={{ textAlign: 'left'}}>
                             <Stack direction="row" alignContent={'center'} alignItems={'center'}>
@@ -348,6 +375,7 @@ export default function ResourceServiceForm () {
                                     type="checkbox"
                                     as={Checkbox}
                                     name={'delete'}
+                                    
                                     checked={values.delete}    
                                     onChange={(event) => {
                                         setFieldValue(`delete`, event.target.checked)

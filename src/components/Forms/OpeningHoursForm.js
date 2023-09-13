@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { TIMEZONES, validationSchemaSchedule, initialValuesSchedule, validationSchemaTimezone, requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
-import { reloadBusinessData } from '../../hooks/hooks';
+import { getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
 
 
 
@@ -17,6 +17,9 @@ const OpeningHoursForm = () => {
 
   const business = useSelector((state) => state.business);
   const closedDays = useSelector((state) => state.business.closedDates);
+  const employeeList = getEmployeeList();
+
+  const [employeeTag, setEmployeeTag] = useState();
   const [scheduleDialog, setScheduleDialog] = useState(false);
   const [closedDialog, setClosedDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
@@ -66,7 +69,7 @@ const OpeningHoursForm = () => {
       return;
     }
     setLoading(true);
-    requestClosedDate(selectedDate.toISO())
+    requestClosedDate(selectedDate.toISO(), employeeTag)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
@@ -142,6 +145,7 @@ const OpeningHoursForm = () => {
       <DatePicker
         label={label}
         value={value}
+        sx={{ width: '100%'}}
         onChange={onChange}
         renderInput={(params) => <TextField {...params} />}
         minDate={currentDate}
@@ -351,6 +355,7 @@ const OpeningHoursForm = () => {
 
               <Stack>
                   <Table size='small'>
+                    { closedDays ? null : 
                     <TableHead>
                       <TableRow>
                       <TableCell>
@@ -364,6 +369,7 @@ const OpeningHoursForm = () => {
                       </TableCell>
                       </TableRow>
                     </TableHead>
+                    }
 
                     <TableBody>
                       {closedDays ? closedDays.map((item, index) => {
@@ -389,6 +395,20 @@ const OpeningHoursForm = () => {
                   
                   <br/>
                   <FutureDatePicker label="Select a date you wish to be closed" value={selectedDate} onChange={handleDateChange} />
+                  <InputLabel id="employeeTag">Attach employee?</InputLabel>
+                  <Select 
+                    id="employeeTag"
+                    handleChange={(e) => setEmployeeTag(e.target.value)}
+                    fullWidth={true}
+                    size='small'
+                  >
+                    {employeeList.map((employee) => (
+                      <MenuItem key={employee._id} value={employee._id}>
+                        {employee.fullname}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  
 
               </Stack>
 

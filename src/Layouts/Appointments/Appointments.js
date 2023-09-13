@@ -35,7 +35,7 @@ export default function Appointments ({setClient, setEditClient}) {
 
 
     useEffect(() => {
-        test()
+        
     }, [])
 
 

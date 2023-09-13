@@ -5,9 +5,11 @@ import { useDispatch, useSelector } from "react-redux";
 import AddEmployeeForm from "../Forms/AddEmployeeForm";
 import CloseIcon from "@mui/icons-material/Close"
 import DeleteIcon from '@mui/icons-material/Delete';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EditIcon from '@mui/icons-material/Edit';
 import { requestRemoveEmployee } from "../FormHelpers/AddNewEmployeeFormHelper";
 import { setReload, setSnackbar } from "../../reducers/user";
+import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
 
 
 // Show table of employees
@@ -19,6 +21,7 @@ export default function EmployeeTable() {
     const [employeeDialog, setEmployeeDialog] = useState(false);
     const [employee, setEmployee] = useState(null);
     const [employeeId, setEmployeeId] = useState(null); 
+    const [employeeScheduleDialog, setEmployeeScheduleDialog] = useState(false);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const dispatch = useDispatch();
 
@@ -61,10 +64,20 @@ export default function EmployeeTable() {
         setEmployeeId(id);
     }
 
+    const editSchedule = (employee) => {
+        setEmployee(employee);
+        setEmployeeScheduleDialog(true);
+    }
+
+    const closeEditSchedule = () => {
+        setEmployee(null);
+        setEmployeeScheduleDialog(false);
+    }
+
     return (
         <>
             <Stack spacing={1}>
-                <Table container>
+                <Table container size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -74,7 +87,7 @@ export default function EmployeeTable() {
                                 Fullname
                             </TableCell>
                             <TableCell>
-                                Permission lvl.
+                                Permissions
                             </TableCell>
                             <TableCell>
                                 
@@ -104,6 +117,9 @@ export default function EmployeeTable() {
                                             </IconButton>
                                             <IconButton onClick={() => editEmployee(employee)}>
                                                 <EditIcon fontSize="small"/>
+                                            </IconButton>
+                                            <IconButton onClick={() => editSchedule(employee)}>
+                                                <CalendarMonthIcon fontSize="small"/>
                                             </IconButton>
                                             </Stack>
                                         </TableCell>
@@ -179,6 +195,35 @@ export default function EmployeeTable() {
 
             <DialogContent>
                 <AddEmployeeForm employee={employee}/>
+            </DialogContent>
+            </Dialog>
+
+
+
+            <Dialog
+                open={employeeScheduleDialog}
+                onClose={closeEditSchedule}
+                fullWidth={'xs'}
+                maxWidth={'xs'}
+            >
+            <DialogTitle>
+            <IconButton
+                    aria-label="close"
+                    onClick={closeEditSchedule}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton> 
+                Employee {employee ? employee.fullname: ''} breaks
+           </DialogTitle>
+
+            <DialogContent>
+                <EmployeeScheduleForm employee={employee}/>
             </DialogContent>
             </Dialog>
 

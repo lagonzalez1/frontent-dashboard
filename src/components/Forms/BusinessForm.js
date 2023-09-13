@@ -38,10 +38,10 @@ const BusinessForm = () => {
   };
 
   const initialValue = {
-        businessName: business.businessName,
-        businessWebsite: business.businessWebsite,
-        businessAddress: business.businessAddress,
-        businessPhone: business.businessPhone,
+        businessName: business ? business.businessName : "",
+        businessWebsite: business ? business.businessWebsite: "",
+        businessAddress: business ? business.businessAddress: "",
+        businessPhone: business ? business.businessPhone: "",
   }
 
   return (
@@ -57,37 +57,41 @@ const BusinessForm = () => {
               <Stack spacing={2}>
                 <Field
                   name="businessName"
-                  as={TextField}
                   label="Business Name"
                   variant="outlined"
+                  as={TextField}
+                  defaultValue={initialValue.businessName}
                   fullWidth
                   error={touched.businessName && !!errors.businessName}
                   helperText={touched.businessName && errors.businessName}
                 />
                 <Field
                   name="businessWebsite"
-                  as={TextField}
                   label="Business Website"
                   variant="outlined"
+                  as={TextField}
                   fullWidth
+                  defaultValue={initialValue.businessWebsite}
                   error={touched.businessWebsite && !!errors.businessWebsite}
                   helperText={touched.businessWebsite && errors.businessWebsite}
                 />
                 <Field
                   name="businessAddress"
-                  as={TextField}
                   label="Business Address"
                   variant="outlined"
                   fullWidth
+                  as={TextField}
+                  defaultValue={initialValue.businessAddress}
                   error={touched.businessAddress && !!errors.businessAddress}
                   helperText={touched.businessAddress && errors.businessAddress}
                 />
                 <Field
                   name="businessPhone"
-                  as={TextField}
                   label="Business Phone"
                   variant="outlined"
+                  as={TextField}
                   fullWidth
+                  defaultValue={initialValue.businessPhone}
                   error={touched.businessPhone && !!errors.businessPhone}
                   helperText={touched.businessPhone && errors.businessPhone}
                 />
