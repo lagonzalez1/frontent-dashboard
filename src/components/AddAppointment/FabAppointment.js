@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, Grid, 
-    ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card} from "@mui/material";
+    ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card, CircularProgress} from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
@@ -28,10 +28,12 @@ export default function FabAppointment () {
     const [errors, setError] = useState();
     const [nextStep, setNextStep] = useState(false);
 
-    
+
+    const [loading, setLoading] = useState(false);
     const business = useSelector((state) => state.business);
-    const [appointments, setAppointments] = useState([]);
+    const [appointments, setAppointments] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
 
     const serviceList = getServicesAvailable();
     const employeeList = getEmployeeList();
@@ -50,6 +52,7 @@ export default function FabAppointment () {
 
     const searchAppointments = (employeeId, serviceId) => {
         setNextStep(true);
+        setLoading(true);
         const header = getHeaders();
         axios.post('/api/internal/available_appointments', {bid: business._id, appointmentDate: selectedDate , serviceId: serviceId, employeeId: employeeId}, header )
         .then(response => {
@@ -59,10 +62,14 @@ export default function FabAppointment () {
             setError(error.response.data.msg);
             console.log(error);
         })
+        .finally(() =>{
+            setLoading(false);
+        })
     }
 
     const handleSubmit = (payload) => {
         console.log(payload);
+        console.log(selectedAppointment); // index
         /*
         addCustomerWaitlist(payload)
         .then(response => {
@@ -77,17 +84,7 @@ export default function FabAppointment () {
         })
         */
     }
-    const test = () => {
-        const headers = getHeaders();
-        const date = DateTime.local().toJSDate();
-        axios.post('/api/internal/available_appointments', {bid: business._id, appointmentDate: selectedDate, }, headers)
-        .then(res => {
-            console.log(res);
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
+    
     const handleDateChange = (date) => {
         setSelectedDate(date);
     };
@@ -187,24 +184,7 @@ export default function FabAppointment () {
                 <DialogContent>
 
                     { errors ? <Alert severity="error">{errors}</Alert>: null }
-                    {nextStep ? 
-                            (
-                                <Container>
-                                    <Grid sx={{ justifyContent: 'center'}} container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 4 }}>
-                                        {appointments ? appointments.map((properties, index) => (
-                                            <Card id="appointments">
-                                                <CardContent>
-                                                    <Typography variant="caption">{properties.start}</Typography>
-                                                    <Typography variant="caption">{"-"}</Typography>
-                                                    <Typography variant="caption">{properties.end}</Typography>
-                                                </CardContent>
-                                            </Card>
-                                        )): null}
-                                    </Grid>
-                                </Container>
-                            )
-                            :
-                            null}
+                    
 
                     <Formik
                         initialValues={initialValues}
@@ -269,7 +249,7 @@ export default function FabAppointment () {
                             onBlur={handleBlur}
                             />
                             }
-                            <FutureDatePicker label="Select a date you wish to be closed" value={selectedDate} onChange={handleDateChange} />
+                            <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
 
                             {business ? (
                             <>
@@ -332,6 +312,47 @@ export default function FabAppointment () {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
+
+                    { loading ? <CircularProgress/> : null} 
+                    {nextStep ? 
+                            (
+                                    <Grid 
+                                    container 
+                                    direction={'row'}
+                                    rowSpacing={1}
+                                    columnSpacing={0}
+
+                                    
+                                    >
+                                        {
+                                            appointments ? (
+
+                                                Object.keys(appointments).map((key, index) => {
+                                                    const appointment = appointments[key];
+                                                    return (
+                                                        
+                                                        <Grid item key={index}>
+                                                        <ToggleButton 
+                                                            variant="outline-primary"
+                                                            size="sm"
+                                                            onChange={(e) => setSelectedAppointment(e.target.value)} 
+                                                            checked={selectedAppointment} value={index} key={index} 
+                                                            id="appointmentButtons">
+                                                            <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                            <Typography variant="caption">{"-"}</Typography>
+                                                            <Typography variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                        </ToggleButton>
+                                                        </Grid>
+                                                    )
+                                                })
+                                            
+                                            ): null
+                                            }
+                                    </Grid>
+                            
+                            )
+                            :
+                            null}
 
                             <ErrorMessage name="notes" component="div" />
                             
