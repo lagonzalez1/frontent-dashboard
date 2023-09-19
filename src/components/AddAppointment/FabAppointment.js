@@ -9,10 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { StyledCard } from "../../pages/Register/CardStyle";
-import ToggleButton from 'react-bootstrap/ToggleButton';
-
-import { setBusiness } from "../../reducers/business";
+import {createAppointmentPretense } from "./FabHelper";
 import { setReload, setSnackbar } from "../../reducers/user";
 import axios from "axios";
 import { getHeaders } from "../../auth/Auth";
@@ -20,12 +17,11 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 
 
-
-
 export default function FabAppointment () {
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
+    const [success, setSuccess] = useState();
     const [nextStep, setNextStep] = useState(false);
 
 
@@ -51,12 +47,18 @@ export default function FabAppointment () {
     }, [])
 
     const searchAppointments = (employeeId, serviceId) => {
+        if (!selectedDate || !serviceId || !employeeId) {
+            setError('Missing date and service.');
+            return;
+        }
+        setError(null);
         setNextStep(true);
         setLoading(true);
         const header = getHeaders();
         axios.post('/api/internal/available_appointments', {bid: business._id, appointmentDate: selectedDate , serviceId: serviceId, employeeId: employeeId}, header )
         .then(response => {
             setAppointments(response.data.data);
+            setSuccess(response.data.msg);
         })
         .catch(error => {
             setError(error.response.data.msg);
@@ -68,21 +70,32 @@ export default function FabAppointment () {
     }
 
     const handleSubmit = (payload) => {
-        console.log(payload);
-        console.log(selectedAppointment); // index
-        /*
-        addCustomerWaitlist(payload)
+        if (!payload && !selectedAppointment && !selectedDate) {
+            console.log(payload);
+            console.log(selectedDate);
+            console.log(selectedAppointment); // index
+            
+        }
+        const timestamp = DateTime.local().toISO();
+        
+        const appointment = selectedAppointment;
+        const data = { ...payload, appointmentDate: selectedDate.toISO(), appointment, timestamp};
+        createAppointmentPretense(data)
         .then(response => {
-            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
+            dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
         })
         .finally(() => {
             dispatch(setReload(true));
             handleClose();
         })
-        */
+        
+    }
+
+    const handleAppointmentClick = (app) => {
+        setSelectedAppointment(app);
     }
     
     const handleDateChange = (date) => {
@@ -112,9 +125,6 @@ export default function FabAppointment () {
         resource_id: '',
         employee_id: '',
         notes: '',
-        start: '',
-        end: '',
-        date: '',
       };
       
       const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;    
@@ -128,9 +138,6 @@ export default function FabAppointment () {
         employee_id: Yup.string(),
         resource_id: Yup.string(),
         notes: Yup.string(),
-        start: Yup.string(),
-        end: Yup.string(),
-        date: Yup.string()
       });
 
       const FutureDatePicker = ({ label, value, onChange }) => {
@@ -140,7 +147,9 @@ export default function FabAppointment () {
           <Box>
           <DatePicker
             label={label}
-            sx={{ width: '100%'}}
+            sx={{
+                width: '100%'
+            }}
             value={value}
             onChange={onChange}
             renderInput={(params) => <TextField {...params} />}
@@ -253,7 +262,7 @@ export default function FabAppointment () {
 
                             {business ? (
                             <>
-                                <InputLabel id="employees">Employee preference</InputLabel>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Employee preference</Typography>
                                 <Field
                                 as={Select}
                                 id="employee_id"
@@ -274,7 +283,7 @@ export default function FabAppointment () {
                             {values.employee_id ? (
                                 
                             <>
-                                <InputLabel id="services">Services</InputLabel>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Services available</Typography>
                                 <Field
                                 as={Select}
                                 id="services"
@@ -313,9 +322,14 @@ export default function FabAppointment () {
                             onBlur={handleBlur}
                             />
 
-                    { loading ? <CircularProgress/> : null} 
-                    {nextStep ? 
-                            (
+                            { loading ? <CircularProgress/> : null} 
+                            
+                            
+                            {nextStep ? 
+                                    (
+                                    <>
+                                    <Typography fontWeight={'bold'} variant="subtitle2">Available appointments</Typography>
+                                    { success ? <Alert severity="success">{success}</Alert>: null}
                                     <Grid 
                                     container 
                                     direction={'row'}
@@ -332,16 +346,17 @@ export default function FabAppointment () {
                                                     return (
                                                         
                                                         <Grid item key={index}>
-                                                        <ToggleButton 
-                                                            variant="outline-primary"
+                                                        <Button 
+                                                            sx={{borderRadius: 10}}
+                                                            variant={selectedAppointment === appointment ? "contained": "outlined"}
                                                             size="sm"
-                                                            onChange={(e) => setSelectedAppointment(e.target.value)} 
-                                                            checked={selectedAppointment} value={index} key={index} 
+                                                            onClick={() => handleAppointmentClick(appointment)} 
+                                                            color={selectedAppointment === appointment ? 'primary': 'secondary'}
                                                             id="appointmentButtons">
-                                                            <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                            <Typography variant="caption">{"-"}</Typography>
-                                                            <Typography variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                        </ToggleButton>
+                                                            <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                            <Typography display="block" variant="caption">{"-"}</Typography>
+                                                            <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                        </Button>
                                                         </Grid>
                                                     )
                                                 })
@@ -349,6 +364,7 @@ export default function FabAppointment () {
                                             ): null
                                             }
                                     </Grid>
+                                    </>
                             
                             )
                             :

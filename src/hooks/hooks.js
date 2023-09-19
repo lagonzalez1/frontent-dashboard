@@ -84,6 +84,23 @@ export const requestNoShow = (clientId) => {
     })
   } 
 
+  export const getAppointmentClients = (payload) => {
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const header = getHeaders();
+        const data = { ...payload, bid: business._id}
+        axios.post('/api/internal/appointment_data', data, header)
+        .then(response => {
+            resolve(response.data.data);
+        })
+        .catch(error => {
+            console.log(error);
+            reject("Error cannot hit analytics.");
+        })
+        
+    })
+  } 
+
   export const completeClientAppointment = (client) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();

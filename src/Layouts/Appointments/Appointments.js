@@ -1,53 +1,42 @@
 import React, { useState, useEffect} from "react";
-import { Stack, Typography, Button, List, ListItem, Menu, MenuItem, ListItemText, Grid,
-     IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer, TableBody, Tooltip, Skeleton, CircularProgress  } from "@mui/material";
-     
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import AccessAlarmsIcon from '@mui/icons-material/AccessAlarms';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
-import LaunchIcon from '@mui/icons-material/Launch';
-import EditIcon from '@mui/icons-material/Edit';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import BadgeIcon from '@mui/icons-material/Badge';
+import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, Table, 
+    TableContainer, TableBody, Tooltip, Skeleton  } from "@mui/material";
 
-import {  findClient, findResource, findService } from "../../hooks/hooks";
+
+import { findEmployee, getAppointmentClients } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
-import axios from "axios";
-import { setReload, setSnackbar } from "../../reducers/user";
-import { handleOpenNewTab, requestChangeAccept, options, columns, 
-    clientOptions, OPTIONS_SELECT, acceptingRejecting,
-    removeClient, moveClientDown, moveClientUp, requestNoShow, moveClientServing, requestBusinessState} from "./AppointmentsHelper";
-import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
-import { getHeaders } from "../../auth/Auth";
+import { setSnackbar } from "../../reducers/user";
+import { columns } from "./AppointmentsHelper";
 import { DateTime } from "luxon";
 
 
 
 export default function Appointments ({setClient, setEditClient}) {
     const dispatch = useDispatch();
+
+    const [data, setData] = useState({});
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
+    const refresh = useSelector((state) => state.refresh);
 
 
     useEffect(() => {
-        
-    }, [])
+        loadAppointments();
+    }, [refresh]);
 
 
-    const test = () => {
-        const headers = getHeaders();
-        const date = DateTime.local().toJSDate();
-        axios.post('/api/internal/available_appointments', {bid: business._id, appointmentDate: date}, headers)
-        .then(res => {
-            console.log(res);
+
+    const loadAppointments = () => {
+        const appointmentDate = DateTime.local().setZone(business.timezone);
+        const payload = { appointmentDate }
+        getAppointmentClients(payload)
+        .then(response => {
+            setData(response);
         })
         .catch(error => {
-            console.log(error);
+            dispatch(setSnackbar({ requestMessage: error, requestStatus: true }))
+
         })
     }
 
@@ -69,10 +58,10 @@ export default function Appointments ({setClient, setEditClient}) {
 
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
                     <Tooltip title="How many people are in the establishment." placement="right">
-                                <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}> Appointments </Typography>
-                                </Button>
-                            </Tooltip>
+                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
+                            <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}> Appointments </Typography>
+                        </Button>
+                    </Tooltip>
                         
                 </Grid>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
@@ -96,9 +85,36 @@ export default function Appointments ({setClient, setEditClient}) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-
-                
-                                    
+                                    { data }
+                                    { data.map((client, index) => (
+                                        <TableRow>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    {++index}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    { client.fullname}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    { DateTime.fromFormat(client.start, "HH:mm").toFormat('hh:mm a') + " - " + DateTime.fromFormat(client.end, "HH:mm").toFormat('hh:mm a') }
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    { findEmployee(client.employeeTag).fullname }
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography variant="body2">
+                                                    {'Actions'}
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
