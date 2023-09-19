@@ -94,24 +94,6 @@ export const requestChangeAccept = (accepting) => {
   });
 };
 
-export const moveClientServing = (clientId) => {
-  return new Promise((resolve, reject) => {
-    const { user, business } = getStateData();
-    const headers = getHeaders();
-    const currentTime = new DateTime.local().setZone(business.timezone).toISO();
-    const payload = { clientId, currentTime, b_id: business._id, isServing: true}
-    console.log(currentTime);
-    axios.post('/api/internal/client_to_serving', payload, headers)
-    .then(response => {
-      resolve(response.data);
-    })
-    .catch(error => {
-      reject(error.response.data);
-    }) 
-    
-  })
-}
-
 
 /**
  * 

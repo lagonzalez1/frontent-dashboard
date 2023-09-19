@@ -101,6 +101,26 @@ export const requestNoShow = (clientId) => {
     })
   } 
 
+
+  // Type: Appointment type can be either appointment, waitlist
+  export const moveClientServing = (clientId, type) => {
+    return new Promise((resolve, reject) => {
+      const { user, business } = getStateData();
+      const headers = getHeaders();
+      const currentTime = new DateTime.local().setZone(business.timezone).toISO();
+      const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type }
+      console.log(currentTime);
+      axios.post('/api/internal/client_to_serving', payload, headers)
+      .then(response => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        reject(error.response.data);
+      }) 
+      
+    })
+  }
+
   export const completeClientAppointment = (client) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
@@ -117,25 +137,6 @@ export const requestNoShow = (clientId) => {
         
     })
 }
-
-
-export const moveClientServing = (clientId) => {
-    return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const headers = getHeaders();
-      const currentTime = new DateTime.local().setZone(business.timezone).toISO();
-      const payload = { clientId, currentTime, b_id: business._id, isServing: true}
-      console.log(currentTime);
-      axios.post('/api/internal/client_to_serving', payload, headers)
-      .then(response => {
-        resolve(response.data);
-      })
-      .catch(error => {
-        reject(error.response.data);
-      }) 
-      
-    })
-  }
 
 
 

@@ -14,12 +14,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
 
-import {  findClient, findResource, findService } from "../../hooks/hooks";
+import {  findClient, findResource, findService, moveClientServing } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT, acceptingRejecting,
-    removeClient, moveClientDown, moveClientUp, requestNoShow, moveClientServing, requestBusinessState} from "./Helpers";
+    removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 
 
@@ -200,7 +200,7 @@ export default function Waitlist ({setClient, setEditClient}) {
 
 
     const sendClientServing = (clientId) => {
-        moveClientServing(clientId)
+        moveClientServing(clientId, 'waitlist')
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })

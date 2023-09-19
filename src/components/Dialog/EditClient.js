@@ -27,7 +27,6 @@ export default function EditClient({setEditClient, editClient}) {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log(editClient)
         setPayload(editClient.payload);
         return () => {
             if (editClient.payload === null) {

@@ -1,11 +1,16 @@
 import React, { useState, useEffect} from "react";
 import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, Table, 
-    TableContainer, TableBody, Tooltip, Skeleton  } from "@mui/material";
+    TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton } from "@mui/material";
+
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import EditIcon from '@mui/icons-material/Edit';
 
 
-import { findEmployee, getAppointmentClients } from "../../hooks/hooks";
+
+import { findEmployee, getAppointmentClients, moveClientServing } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
-import { setSnackbar } from "../../reducers/user";
+import { setReload, setSnackbar } from "../../reducers/user";
 import { columns } from "./AppointmentsHelper";
 import { DateTime } from "luxon";
 
@@ -14,20 +19,23 @@ import { DateTime } from "luxon";
 export default function Appointments ({setClient, setEditClient}) {
     const dispatch = useDispatch();
 
-    const [data, setData] = useState({});
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
-    const refresh = useSelector((state) => state.refresh);
 
 
     useEffect(() => {
         loadAppointments();
-    }, [refresh]);
+    }, []);
 
 
 
     const loadAppointments = () => {
+        setLoading(true);
         const appointmentDate = DateTime.local().setZone(business.timezone);
         const payload = { appointmentDate }
         getAppointmentClients(payload)
@@ -36,14 +44,36 @@ export default function Appointments ({setClient, setEditClient}) {
         })
         .catch(error => {
             dispatch(setSnackbar({ requestMessage: error, requestStatus: true }))
-
         })
+        .finally(() => {
+            setLoading(false);
+        })
+    }
+
+    const sendClientServing = (clientId) => {
+        moveClientServing(clientId, 'appointment')
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
+        .finally(() => {
+            dispatch(setReload(true));
+        })
+    }
+
+    const openClientDrawer = (item) => {
+        setClient({payload: item, open: true, fromComponent: 'Waitlist'});
+    }
+    const editClientInfo = (item) => {
+        setEditClient({payload: item, open: true, fromComponent: 'Waitlist'})
     }
 
     return (
         <>
 
-    <div className="appointments">
+        <div className="appointments">
             <Grid container>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack>
@@ -68,7 +98,12 @@ export default function Appointments ({setClient, setEditClient}) {
                 
                 </Grid>
             </Grid>
-
+                {
+                    loading ? (
+                        <Box>
+                            <CircularProgress />
+                        </Box>
+                    ):
                 <div className="servingTable">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
@@ -85,41 +120,56 @@ export default function Appointments ({setClient, setEditClient}) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    { data }
-                                    { data.map((client, index) => (
+                                    { data ? data.map((client, index) => (
                                         <TableRow>
                                             <TableCell>
-                                                <Typography variant="body2">
+                                                <Typography fontWeight={'bold'} variant="body2">
+                                                <IconButton onClick={() => openClientDrawer(client)}>
+                                                    <InfoOutlinedIcon fontSize="small" /> 
+                                                </IconButton>
                                                     {++index}
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">
+                                                <Typography fontWeight={'bold'} variant="body2">
                                                     { client.fullname}
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">
-                                                    { DateTime.fromFormat(client.start, "HH:mm").toFormat('hh:mm a') + " - " + DateTime.fromFormat(client.end, "HH:mm").toFormat('hh:mm a') }
+                                                <Typography fontWeight={'bold'} variant="body2">
+                                                    {DateTime.fromISO(client.appointmentDate).toFormat('LLL dd yyyy')}
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">
-                                                    { findEmployee(client.employeeTag).fullname }
+                                                <Typography fontWeight={'bold'} variant="body2">
+                                                { DateTime.fromFormat(client.start, "HH:mm").toFormat('hh:mm a') + " - " + DateTime.fromFormat(client.end, "HH:mm").toFormat('hh:mm a') }
+
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>
-                                                <Typography variant="body2">
-                                                    {'Actions'}
+                                                <Typography fontWeight={'bold'} variant="body2">
+                                                { findEmployee(client.employeeTag).fullname }
                                                 </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Stack direction={'row'} spacing={1}>
+                                                <IconButton onClick={() => sendClientServing(client._id)}>
+                                                    <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
+                                                </IconButton>
+                                                <IconButton onClick={() => editClientInfo(client)}>
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>
+
+                                                </Stack>
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    )): null}
                                 </TableBody>
                             </Table>
                         </TableContainer>
                     </Paper>
-                    </div>
+                </div>
+                }
         </div>
         
         </>

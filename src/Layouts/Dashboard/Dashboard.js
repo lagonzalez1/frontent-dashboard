@@ -96,7 +96,7 @@ export default function Dashboard () {
             case 1:
                 return (
                     <>
-                    <Appointments setClient={setClient} />
+                    <Appointments setClient={setClient} setEditClient={setEditClient} />
                     <FabAppointment />
                     </>
                 )
