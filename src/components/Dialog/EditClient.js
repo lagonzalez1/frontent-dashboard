@@ -8,8 +8,10 @@ import { useSelector, useDispatch } from "react-redux";
 import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { DateTime } from "luxon";
 import { setReload, setSnackbar } from "../../reducers/user";
-import { requestClientEdit } from "./EditClientHelper";
+import { requestClientEdit, Transition, PHONE_REGEX } from "./EditClientHelper";
+import { APPOINTMENT } from "../../static/static";
 
 
 export default function EditClient({setEditClient, editClient}) {
@@ -20,11 +22,13 @@ export default function EditClient({setEditClient, editClient}) {
     const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
 
-    const dispatch = useDispatch();
+    const currentDate = DateTime.local().setTimezone(business.timezone);
 
+    const dispatch = useDispatch();
 
     const [payload, setPayload] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [appointments, setAppointments] = useState([]);
 
     useEffect(() => {
         setPayload(editClient.payload);
@@ -45,32 +49,27 @@ export default function EditClient({setEditClient, editClient}) {
         service_id: payload ? payload.serviceTag : '',
         resource_id: payload ? payload.resourceTag: '',
         employee_id: payload ? payload.employeeTag: '',
-        notes: payload ? payload.notes : ''
+        notes: payload ? payload.notes : '',
+        appointmentDate: payload ? payload.appointmentDate : ''
       };
       
-      const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;    
       const validationSchema = Yup.object({
         fullname: Yup.string().required('Full name is required'),
-        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format xxx-xxx-xxxx')
+        phone: Yup.string().required('Phone').matches(PHONE_REGEX, 'Phone number must be in the format xxx-xxx-xxxx')
         .required('Phone number is required'),
         email: Yup.string(),
         size: Yup.number(),
         service_id: Yup.string(),
         employee_id: Yup.string(),
         resource_id: Yup.string(),
-        notes: Yup.string()
+        notes: Yup.string(),
+        appointmentDate: Yup.date()
       });
 
-    const Transition = React.forwardRef(function Transition(props, ref) {
-        return <Slide direction="up" ref={ref} {...props} />;
-    });
 
 
     const handleSubmit = (data) => {
-        console.log(data);
         setLoading(true);
-        // To edit search by email or phone number
-        // on complete close closeDrawer()
         requestClientEdit(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
@@ -84,6 +83,10 @@ export default function EditClient({setEditClient, editClient}) {
             dispatch(setReload(true));
             closeDialog();
         })
+    }
+
+    const searchAppointments = () => {
+
     }
 
     const closeDialog = () => {
@@ -100,7 +103,8 @@ export default function EditClient({setEditClient, editClient}) {
                 maxWidth={'xs'}
                 fullWidth={true}
             >
-                <DialogTitle> <Typography variant="h6" fontWeight="bold">
+                <DialogTitle> 
+                    <Typography variant="h6" fontWeight="bold">
                     {"Edit client"}
                 </Typography> 
                 <IconButton
@@ -127,12 +131,13 @@ export default function EditClient({setEditClient, editClient}) {
                     onSubmit={handleSubmit}
                     validationSchema={validationSchema}
                     >
-                    {({ errors, touched, handleChange, handleBlur }) => (
+                    {({ errors, touched, handleChange, handleBlur, setFieldValue, values }) => (
                         <Form>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                             <Field
                             as={TextField}
                             id="fullname"
+                            size="small"
                             name="fullname"
                             label="Customer name"
                             placeholder="Customer name"
@@ -143,6 +148,7 @@ export default function EditClient({setEditClient, editClient}) {
                             <Field
                             as={TextField}
                             id="email"
+                            size="small"
                             name="email"
                             label="Customer email"
                             placeholder="Email"
@@ -154,6 +160,7 @@ export default function EditClient({setEditClient, editClient}) {
                             <Field
                             as={TextField}
                             id="phone"
+                            size="small"
                             name="phone"
                             label="Phone"
                             placeholder="xxx-xxx-xxxx"
@@ -166,6 +173,7 @@ export default function EditClient({setEditClient, editClient}) {
                             as={TextField}
                             id="size"
                             name="size"
+                            size="small"
                             label="Party size"
                             placeholder="1"
                             error={touched.size && !!errors.size}
@@ -179,6 +187,7 @@ export default function EditClient({setEditClient, editClient}) {
                                 <Field
                                 as={Select}
                                 id="services"
+                                size="small"
                                 name="service_id"
                                 label="Service"
                                 onChange={handleChange}
@@ -203,6 +212,7 @@ export default function EditClient({setEditClient, editClient}) {
                                 <Field
                                 as={Select}
                                 id="resources"
+                                size="small"
                                 name="resource_id"
                                 label="Resources"
                                 onChange={handleChange}
@@ -226,6 +236,7 @@ export default function EditClient({setEditClient, editClient}) {
                                 <Field
                                 as={Select}
                                 id="employee_id"
+                                size="small"
                                 name="employee_id"
                                 label="Employees"
                                 onChange={handleChange}
@@ -241,10 +252,41 @@ export default function EditClient({setEditClient, editClient}) {
                             </>
                             ) : null}
 
+                            {
+                                editClient.fromComponent === APPOINTMENT && 
+                                (
+                                    <>
+                                        <Box>
+                                            <DatePicker
+                                            label={'Appointment date'}
+                                            value={values.appointmentDate}
+                                            onChange={(date) => setFieldValue('appointmentDate', date)}
+                                            renderInput={(params) => <TextField {...params} />}
+                                            minDate={currentDate}
+                                            />
+                                        </Box>
+                                        <Button variant="contained" onClick={() => searchAppointments() }>Search</Button>
+                                        <br/>
+                                    </>
+                                )
+                            }
+                            {
+                                (editClient.fromComponent === APPOINTMENT && appointments.length > 0) ? 
+                                (
+                                    <>
+                                        { 
+                                            // Scrollable buttons to the left can show all available appointments in order.
+                                        }
+                                    </>
+                                )
+                                :null
+                            }
+
                             <Field
                             as={TextField}
                             id="notes"
                             name="notes"
+                            size="small"
                             label="Notes"
                             placeholder="Additional notes"
                             error={touched.notes && !!errors.notes}

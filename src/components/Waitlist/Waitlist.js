@@ -21,6 +21,7 @@ import { handleOpenNewTab, requestChangeAccept, options, columns,
     clientOptions, OPTIONS_SELECT, acceptingRejecting,
     removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
+import { WAITLIST } from "../../static/static";
 
 
 
@@ -182,11 +183,11 @@ export default function Waitlist ({setClient, setEditClient}) {
 
     const openClientDrawer = (item) => {
         console.log(item);
-        setClient({payload: item, open: true, fromComponent: 'Waitlist'});
+        setClient({payload: item, open: true, fromComponent: WAITLIST});
     }
 
     const editClientInfo = (item) => {
-        setEditClient({payload: item, open: true, fromComponent: 'Waitlist'})
+        setEditClient({payload: item, open: true, fromComponent: WAITLIST})
     }
 
     useEffect(() => {
@@ -200,7 +201,7 @@ export default function Waitlist ({setClient, setEditClient}) {
 
 
     const sendClientServing = (clientId) => {
-        moveClientServing(clientId, 'waitlist')
+        moveClientServing(clientId, WAITLIST)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })

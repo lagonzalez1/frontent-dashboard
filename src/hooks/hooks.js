@@ -139,6 +139,23 @@ export const requestNoShow = (clientId) => {
 }
 
 
+export const getAvailableAppointments = (payload) => {
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const header = getHeaders();
+        const data = { ...payload, bid: business._id}
+        axios.post('/api/internal/available_appointments',data,header)
+        .then(response => {
+            resolve(response.data);
+        })
+        .catch(error => {
+            reject(error);
+
+        })
+    })
+}
+
+
 
 export const getClientsByResource = (id, resourceTag) => {
     const { _ , business} = getStateData();

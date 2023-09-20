@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
 import { Transition } from "./FabHelper";
 import { useSelector, useDispatch } from "react-redux";
-import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
+import { getAvailableAppointments, getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import {createAppointmentPretense } from "./FabHelper";
@@ -54,17 +54,16 @@ export default function FabAppointment () {
         setError(null);
         setNextStep(true);
         setLoading(true);
-        const header = getHeaders();
-        axios.post('/api/internal/available_appointments', {bid: business._id, appointmentDate: selectedDate , serviceId: serviceId, employeeId: employeeId}, header )
+        const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate }
+        getAvailableAppointments(payload)
         .then(response => {
-            setAppointments(response.data.data);
-            setSuccess(response.data.msg);
+            setAppointments(response.data)
+            setSuccess(response.msg)
         })
         .catch(error => {
-            setError(error.response.data.msg);
-            console.log(error);
+            setError(error);
         })
-        .finally(() =>{
+        .finally(() => {
             setLoading(false);
         })
     }
@@ -76,8 +75,7 @@ export default function FabAppointment () {
             console.log(selectedAppointment); // index
             
         }
-        const timestamp = DateTime.local().toISO();
-        
+        const timestamp = DateTime.local(business.timezone).toISO();
         const appointment = selectedAppointment;
         const data = { ...payload, appointmentDate: selectedDate.toISO(), appointment, timestamp};
         createAppointmentPretense(data)
@@ -311,15 +309,15 @@ export default function FabAppointment () {
 
 
                             <Field
-                            as={TextField}
-                            id="notes"
-                            size="small"
-                            name="notes"
-                            label="Notes"
-                            placeholder="Additional notes"
-                            error={touched.notes && !!errors.notes}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                                as={TextField}
+                                id="notes"
+                                size="small"
+                                name="notes"
+                                label="Notes"
+                                placeholder="Additional notes"
+                                error={touched.notes && !!errors.notes}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
                             />
 
                             { loading ? <CircularProgress/> : null} 
@@ -330,13 +328,11 @@ export default function FabAppointment () {
                                     <>
                                     <Typography fontWeight={'bold'} variant="subtitle2">Available appointments</Typography>
                                     { success ? <Alert severity="success">{success}</Alert>: null}
-                                    <Grid 
-                                    container 
-                                    direction={'row'}
-                                    rowSpacing={1}
-                                    columnSpacing={0}
-
-                                    
+                                    <Grid
+                                        container 
+                                        direction={'row'}
+                                        rowSpacing={1}
+                                        columnSpacing={0}
                                     >
                                         {
                                             appointments ? (

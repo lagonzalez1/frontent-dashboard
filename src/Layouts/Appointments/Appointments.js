@@ -9,6 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 
 
 import { findEmployee, getAppointmentClients, moveClientServing } from "../../hooks/hooks";
+import { APPOINTMENT, WAITLIST } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { columns } from "./AppointmentsHelper";
@@ -51,7 +52,7 @@ export default function Appointments ({setClient, setEditClient}) {
     }
 
     const sendClientServing = (clientId) => {
-        moveClientServing(clientId, 'appointment')
+        moveClientServing(clientId, APPOINTMENT)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
@@ -64,10 +65,10 @@ export default function Appointments ({setClient, setEditClient}) {
     }
 
     const openClientDrawer = (item) => {
-        setClient({payload: item, open: true, fromComponent: 'Waitlist'});
+        setClient({payload: item, open: true, fromComponent: APPOINTMENT});
     }
     const editClientInfo = (item) => {
-        setEditClient({payload: item, open: true, fromComponent: 'Waitlist'})
+        setEditClient({payload: item, open: true, fromComponent: APPOINTMENT})
     }
 
     return (

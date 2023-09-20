@@ -12,9 +12,7 @@ import { completeClientAppointment, findEmployee, findService, moveClientServing
 import axios from "axios";
 import { getHeaders } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
-import EditEmployee from "../Dialog/EditClient";
-import EditClient from "../Dialog/EditClient";
-import FlagIcon from '@mui/icons-material/Flag';
+import { WAITLIST, SERVING, APPOINTMENT } from "../../static/static";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 export default function Drawer({client, setClient}) {
@@ -118,7 +116,7 @@ export default function Drawer({client, setClient}) {
                 hideBackdrop={true}
                 variant="presistent"
             >  
-            {loading && !payload ? <CircularProgress/>:
+            {(loading && !payload) ? <CircularProgress/>:
             <Container sx={{ paddingTop: 8, width: 400}} disableGutters>
             <Toolbar>
                 {/* Close button on the left */}
@@ -144,19 +142,38 @@ export default function Drawer({client, setClient}) {
                     </Box>
                     <TabPanel value="1">
                         <>
-                
                         <Grid container
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center">
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center">
                             <Grid item>
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Served</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography fontWeight={'bold'} variant="body2">{payload && (payload.status.serving === true ? ("Served at " + DateTime.fromISO(payload.status.serve_time).toFormat("hh:mm ")) : ('Not yet'))}</Typography>
+                                <Typography fontWeight={'bold'} variant="body2">{payload && (payload.status.serving === true ? ("Served at " + DateTime.fromISO(payload.status.serve_time).toFormat("hh:mm a")) : ('Not yet'))}</Typography>
                             </Grid>
                         </Grid>
                         <br/>
+                        {
+                            client.fromComponent === APPOINTMENT ? 
+                            (   
+                                <>
+                                <Grid container
+                                    direction="row"
+                                    justifyContent="space-between"
+                                    alignItems="center">
+                                    <Grid item>
+                                        <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Appointment date</Typography>
+                                    </Grid>
+                                    <Grid sx={{ justifyContent: 'right'}} item>
+                                        <Typography fontWeight={'bold'} variant="body2">{payload && (DateTime.fromISO(payload.status.appointmentDate).toFormat("hh:mm a")) }</Typography>
+                                    </Grid>
+                                </Grid>
+                                <br/>
+                                </>
+                            ):
+                            null
+                        }
                         <Grid container
                         direction="row"
                         justifyContent="space-between"
@@ -173,6 +190,8 @@ export default function Drawer({client, setClient}) {
                             </Grid>
                         </Grid>
                         <br/>
+
+
                         <Grid container
                         direction="row"
                         justifyContent="space-between"
@@ -208,7 +227,6 @@ export default function Drawer({client, setClient}) {
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
                                 <Typography fontWeight={'bold'} variant="body2">{payload && findEmployee(payload.employeeTag).fullname}</Typography>
-
                             </Grid>
                         </Grid>
 
@@ -224,9 +242,6 @@ export default function Drawer({client, setClient}) {
                             analytics.summary.map((object, index) => {
                                 return (
                                     <>
-                                        {
-                                            // Add calendar icon here. 
-                                        }
                                         <ListItem>
                                             <ListItemIcon>
                                                 <CalendarMonthIcon fontSize="small" />
@@ -260,7 +275,7 @@ export default function Drawer({client, setClient}) {
                 <Container>
 
                     {
-                        client.fromComponent === "Serving" &&
+                        client.fromComponent === SERVING &&
                         (
                             <Stack direction={'row'} spacing={2} justifyContent="space-evenly">
                                 {payload ? <Button color="secondary" variant="contained" sx={{borderRadius: 15}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
@@ -270,7 +285,7 @@ export default function Drawer({client, setClient}) {
                     }
 
                     {
-                        client.fromComponent === "Waitlist" &&
+                        (client.fromComponent === WAITLIST || client.fromComponent === APPOINTMENT) &&
                         (
                             <Stack direction={'row'} spacing={2} justifyContent="space-evenly">
                                 {payload ? <Button color="error" variant="contained" sx={{borderRadius: 15}} onClick={() => sendClientNoShow(payload._id)}>No show</Button>: null}

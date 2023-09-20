@@ -2,6 +2,13 @@
 import axios from "axios";
 import { getHeaders, getStateData } from "../../auth/Auth";
 
+export const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
+
+export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;    
+
+
 
 export const requestClientEdit = (payload) => {
     console.log(payload);
