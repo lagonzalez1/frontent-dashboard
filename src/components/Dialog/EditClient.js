@@ -1,15 +1,16 @@
 import React, { useState, useEffect} from "react";
-import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Slide, Typography, Stack, Select, MenuItem, InputLabel, Alert, 
+import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Typography, Stack, Select, MenuItem, InputLabel, Alert, 
      ListItemIcon, Box, Container, CircularProgress} from "@mui/material";
 
 import CloseIcon from '@mui/icons-material/Close';
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { useSelector, useDispatch } from "react-redux";
-import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
+import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes, getAvailableAppointments } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { DateTime } from "luxon";
 import { setReload, setSnackbar } from "../../reducers/user";
+import { DatePicker } from "@mui/x-date-pickers";
 import { requestClientEdit, Transition, PHONE_REGEX } from "./EditClientHelper";
 import { APPOINTMENT } from "../../static/static";
 
@@ -22,13 +23,16 @@ export default function EditClient({setEditClient, editClient}) {
     const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
 
-    const currentDate = DateTime.local().setTimezone(business.timezone);
-
     const dispatch = useDispatch();
 
     const [payload, setPayload] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [appointments, setAppointments] = useState([]);
+    const [success, setSuccess] = useState(null);
+    const [errors, setErrors ] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+    const [appointments, setAppointments] = useState(null);
 
     useEffect(() => {
         setPayload(editClient.payload);
@@ -85,12 +89,57 @@ export default function EditClient({setEditClient, editClient}) {
         })
     }
 
-    const searchAppointments = () => {
 
+    const handleAppointmentClick = (app) => {
+        setSelectedAppointment(app);
     }
 
     const closeDialog = () => {
         setEditClient({payload: null, open: false});
+    }
+
+    const FutureDatePicker = ({ label, value, onChange }) => {
+        const currentDate = DateTime.local().setZone(business.timezone);
+    
+        return (
+          <Box>
+          <DatePicker
+            label={label}
+            sx={{
+                width: '100%'
+            }}
+            value={value}
+            onChange={onChange}
+            renderInput={(params) => <TextField {...params} />}
+            minDate={currentDate}
+          />
+          </Box>
+        );
+      };
+
+      const handleDateChange = (date) => {
+        setSelectedDate(date);
+    };
+
+
+    const searchAppointments = (employeeId, serviceId) => {
+        if (!selectedDate || !serviceId || !employeeId) {
+            setErrors('Missing date and service.');
+            return;
+        }
+        setErrors(null);
+        const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate }
+        getAvailableAppointments(payload)
+        .then(response => {
+            setAppointments(response.data)
+            setSuccess(response.msg)
+        })
+        .catch(error => {
+            setErrors(error);
+        })
+        .finally(() => {
+            //setLoading(false);
+        })
     }
 
     return(
@@ -126,12 +175,14 @@ export default function EditClient({setEditClient, editClient}) {
                     <CircularProgress />
                 </Container>) : 
                 <DialogContent>
+                    { errors ? <Alert severity="error">{errors}</Alert>: null }
+                    { success ? <Alert severity="success">{success}</Alert>: null }
                     <Formik
                     initialValues={initialValues}
                     onSubmit={handleSubmit}
                     validationSchema={validationSchema}
                     >
-                    {({ errors, touched, handleChange, handleBlur, setFieldValue, values }) => (
+                    {({ errors, touched, handleChange, handleBlur, values }) => (
                         <Form>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                             <Field
@@ -183,35 +234,10 @@ export default function EditClient({setEditClient, editClient}) {
 
                             {business ? (
                             <>
-                                <InputLabel id="services">Services</InputLabel>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Resources</Typography>
                                 <Field
                                 as={Select}
-                                id="services"
-                                size="small"
-                                name="service_id"
-                                label="Service"
-                                onChange={handleChange}
-                                >
-                                <MenuItem key={'NONE'} value={''}>none</MenuItem>
-                                { Array.isArray(serviceList) ? serviceList.map((service) => (
-                                    <MenuItem key={service._id} value={service._id}>
-                                        <Stack>
-                                            <Typography variant="body2">{service.title}</Typography>
-                                            <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
-                                        </Stack>
-                            
-                                    </MenuItem>
-                                )):null }
-                                </Field>
-                            </>
-                            ) : null}
-
-                            {business ? (
-                            <>
-                                <InputLabel id="resources">Resources</InputLabel>
-                                <Field
-                                as={Select}
-                                id="resources"
+                                labelId="resources"
                                 size="small"
                                 name="resource_id"
                                 label="Resources"
@@ -230,19 +256,17 @@ export default function EditClient({setEditClient, editClient}) {
                             </>
                             ) : null}
 
-                        {business ? (
+                            {business ? (
                             <>
-                                <InputLabel id="employees">Employee preference</InputLabel>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Employee preference</Typography>
                                 <Field
                                 as={Select}
                                 id="employee_id"
-                                size="small"
                                 name="employee_id"
+                                size="small"
                                 label="Employees"
                                 onChange={handleChange}
-
                                 >
-                                <MenuItem key={'NONE'} value={''}>none</MenuItem>
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
                                     <MenuItem key={employee._id} value={employee._id}>
                                         <Typography variant="body2">{employee.fullname} </Typography>
@@ -252,36 +276,80 @@ export default function EditClient({setEditClient, editClient}) {
                             </>
                             ) : null}
 
+                            {values.employee_id ? (
+                                
+                            <>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Services available</Typography>
+                                <Field
+                                as={Select}
+                                id="services"
+                                name="service_id"
+                                size="small"
+                                label="Service"
+                                onChange={handleChange}
+                                >
+                                { Array.isArray(serviceList) ?
+                                
+                                serviceList
+                                .filter((service) => service.employeeTags.includes(values.employee_id))
+                                .map((service) => (
+                                    <MenuItem key={service._id} value={service._id}>
+                                        <Stack>
+                                            <Typography variant="body2">{service.title}</Typography>
+                                            <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
+                                        </Stack>
+                            
+                                    </MenuItem>
+                                )):null }
+                                </Field>
+                            </>
+                            ) : null}
+
                             {
                                 editClient.fromComponent === APPOINTMENT && 
                                 (
                                     <>
                                         <Box>
-                                            <DatePicker
-                                            label={'Appointment date'}
-                                            value={values.appointmentDate}
-                                            onChange={(date) => setFieldValue('appointmentDate', date)}
-                                            renderInput={(params) => <TextField {...params} />}
-                                            minDate={currentDate}
-                                            />
+                                            <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
+                                        
                                         </Box>
-                                        <Button variant="contained" onClick={() => searchAppointments() }>Search</Button>
+                                        <Button sx={{ borderRadius: 10}} fullWidth={false} variant="outlined" onClick={() => searchAppointments(values.employee_id, values.service_id) }>Search</Button>
                                         <br/>
                                     </>
                                 )
                             }
                             {
-                                (editClient.fromComponent === APPOINTMENT && appointments.length > 0) ? 
+                                (editClient.fromComponent === APPOINTMENT && appointments !== null) ? 
                                 (
-                                    <>
+                                    <div style={{ width: '100%', overflowX: 'auto'}}>
+                                    <Box>
+                                        <Stack direction="row" spacing={1}>
+                                        
                                         { 
-                                            // Scrollable buttons to the left can show all available appointments in order.
+                                           Object.keys(appointments).map((key, index) => {
+                                            const appointment = appointments[key];
+                                            return (
+                                                <Button 
+                                                    sx={{borderRadius: 10}}
+                                                    variant={selectedAppointment === appointment ? "contained": "outlined"}
+                                                    size="sm"
+                                                    fullWidth={true}
+                                                    onClick={() => handleAppointmentClick(appointment)} 
+                                                    color={selectedAppointment === appointment ? 'primary': 'secondary'}
+                                                    id="appointmentButtons">
+                                                    <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                    <Typography display="block" variant="caption">{"-"}</Typography>
+                                                    <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                </Button>
+                                            )
+                                        })
                                         }
-                                    </>
+                                        </Stack>
+                                    </Box>
+                                    </div>
                                 )
                                 :null
                             }
-
                             <Field
                             as={TextField}
                             id="notes"
@@ -295,13 +363,11 @@ export default function EditClient({setEditClient, editClient}) {
                             />
 
                             <ErrorMessage name="notes" component="div" />
-
-                            <Button variant="contained" type="submit">Submit</Button>
+                            <Button sx={{ borderRadius: 10}} variant="contained" type="submit">Submit</Button>
                         </Stack>
                         </Form>
                     )}
                     </Formik>
-
                 </DialogContent>
                 }
 

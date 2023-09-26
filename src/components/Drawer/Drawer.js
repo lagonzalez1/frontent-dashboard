@@ -163,10 +163,10 @@ export default function Drawer({client, setClient}) {
                                     justifyContent="space-between"
                                     alignItems="center">
                                     <Grid item>
-                                        <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Appointment date</Typography>
+                                        <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Created on</Typography>
                                     </Grid>
                                     <Grid sx={{ justifyContent: 'right'}} item>
-                                        <Typography fontWeight={'bold'} variant="body2">{payload && (DateTime.fromISO(payload.status.appointmentDate).toFormat("hh:mm a")) }</Typography>
+                                        <Typography fontWeight={'bold'} variant="body2">{payload && (DateTime.fromISO(payload.timestamp).toFormat("LLL mm yyyy")) }</Typography>
                                     </Grid>
                                 </Grid>
                                 <br/>

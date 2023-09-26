@@ -5,8 +5,7 @@ import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
-
-
+import NotificationsIcon from '@mui/icons-material/Notifications';
 
 import { findEmployee, getAppointmentClients, moveClientServing } from "../../hooks/hooks";
 import { APPOINTMENT, WAITLIST } from "../../static/static";
@@ -31,7 +30,7 @@ export default function Appointments ({setClient, setEditClient}) {
 
     useEffect(() => {
         loadAppointments();
-    }, []);
+    }, [reload]);
 
 
 
@@ -69,6 +68,9 @@ export default function Appointments ({setClient, setEditClient}) {
     }
     const editClientInfo = (item) => {
         setEditClient({payload: item, open: true, fromComponent: APPOINTMENT})
+    }
+    const sendClientNotification = (clientId) => {
+        console.log(clientId)
     }
 
     return (
@@ -156,6 +158,9 @@ export default function Appointments ({setClient, setEditClient}) {
                                                 <Stack direction={'row'} spacing={1}>
                                                 <IconButton onClick={() => sendClientServing(client._id)}>
                                                     <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
+                                                </IconButton>
+                                                <IconButton onClick={() => sendClientNotification(client._id)}>
+                                                    <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                                 </IconButton>
                                                 <IconButton onClick={() => editClientInfo(client)}>
                                                     <EditIcon fontSize="small" />
