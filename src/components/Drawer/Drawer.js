@@ -85,8 +85,9 @@ export default function Drawer({client, setClient}) {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true));
             closeDrawer();
+            dispatch(setReload(true));
+
         })
     }
 
@@ -101,8 +102,9 @@ export default function Drawer({client, setClient}) {
             setLoading(false)
         })
         .finally(() => {
-            dispatch(setReload(true))
             closeDrawer();
+            dispatch(setReload(true))
+            
         })
     }
 

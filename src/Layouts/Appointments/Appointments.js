@@ -21,21 +21,22 @@ export default function Appointments ({setClient, setEditClient}) {
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const reload = useSelector((state) => state.user.reload);
 
 
     const business = useSelector((state) => state.business);
-    const user = useSelector((state) => state.user);
-    const reload = useSelector((state) => state.reload);
+
 
 
     useEffect(() => {
         loadAppointments();
+        console.log("called")
     }, [reload]);
 
 
 
     const loadAppointments = () => {
-        setLoading(true);
+        setLoading(true)
         const appointmentDate = DateTime.local().setZone(business.timezone);
         const payload = { appointmentDate }
         getAppointmentClients(payload)
@@ -97,16 +98,11 @@ export default function Appointments ({setClient, setEditClient}) {
                     </Tooltip>
                         
                 </Grid>
-                <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
-                
+                <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'right '}}>
+                    <Button>somebutton</Button>
                 </Grid>
             </Grid>
-                {
-                    loading ? (
-                        <Box>
-                            <CircularProgress />
-                        </Box>
-                    ):
+
                 <div className="servingTable">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
@@ -175,7 +171,7 @@ export default function Appointments ({setClient, setEditClient}) {
                         </TableContainer>
                     </Paper>
                 </div>
-                }
+                
         </div>
         
         </>
