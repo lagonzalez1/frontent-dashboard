@@ -12,33 +12,30 @@ import { APPOINTMENT, WAITLIST } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { columns } from "./AppointmentsHelper";
+import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
-
 
 
 export default function Appointments ({setClient, setEditClient}) {
     const dispatch = useDispatch();
 
     const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const reload = useSelector((state) => state.user.reload);
-
-
     const business = useSelector((state) => state.business);
 
 
+    const currentDate = DateTime.local().setZone(business.timezone);
+    const [selectedDate, setSelectedDate] = useState(currentDate);
 
     useEffect(() => {
         loadAppointments();
-        console.log("called")
-    }, [reload]);
-
+        
+    }, [selectedDate]);
 
 
     const loadAppointments = () => {
-        setLoading(true)
-        const appointmentDate = DateTime.local().setZone(business.timezone);
-        const payload = { appointmentDate }
+        const payload = { appointmentDate: selectedDate }
         getAppointmentClients(payload)
         .then(response => {
             setData(response);
@@ -60,9 +57,14 @@ export default function Appointments ({setClient, setEditClient}) {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
+            setLoading(false);
             dispatch(setReload(true));
         })
     }
+
+    const handleDateChange = (date) => {
+        setSelectedDate(date);
+    };
 
     const openClientDrawer = (item) => {
         setClient({payload: item, open: true, fromComponent: APPOINTMENT});
@@ -73,6 +75,26 @@ export default function Appointments ({setClient, setEditClient}) {
     const sendClientNotification = (clientId) => {
         console.log(clientId)
     }
+
+    const FutureDatePicker = ({ label, value, onChange }) => {
+        const currentDate = DateTime.local().setZone(business.timezone);
+    
+        return (
+          <Box>
+          <DatePicker
+            label={label}
+            sx={{
+                width: '100%'
+            }}
+            fontSize="sm"
+            value={value}
+            onChange={onChange}
+            renderInput={(params) => <TextField {...params} />}
+            minDate={currentDate}
+          />
+          </Box>
+        );
+      };
 
     return (
         <>
@@ -99,7 +121,8 @@ export default function Appointments ({setClient, setEditClient}) {
                         
                 </Grid>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'right '}}>
-                    <Button>somebutton</Button>
+                    <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
+
                 </Grid>
             </Grid>
 

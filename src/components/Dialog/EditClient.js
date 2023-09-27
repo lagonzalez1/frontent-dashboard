@@ -322,30 +322,27 @@ export default function EditClient({setEditClient, editClient}) {
                                 (editClient.fromComponent === APPOINTMENT && appointments !== null) ? 
                                 (
                                     <div style={{ width: '100%', overflowX: 'auto'}}>
-                                    <Box>
-                                        <Stack direction="row" spacing={1}>
+                                        <Box sx={{ display: 'flex'}}>
                                         
                                         { 
                                            Object.keys(appointments).map((key, index) => {
                                             const appointment = appointments[key];
                                             return (
                                                 <Button 
-                                                    sx={{borderRadius: 10}}
+                                                    sx={{borderRadius: 10, margin: 1}}
                                                     variant={selectedAppointment === appointment ? "contained": "outlined"}
-                                                    size="sm"
-                                                    fullWidth={true}
                                                     onClick={() => handleAppointmentClick(appointment)} 
+                                                    fullWidth={true}
                                                     color={selectedAppointment === appointment ? 'primary': 'secondary'}
                                                     id="appointmentButtons">
-                                                    <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                    <Typography display="block" variant="caption">{"-"}</Typography>
-                                                    <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                    <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                    <Typography variant="caption">{"-"}</Typography>
+                                                    <Typography  variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
                                                 </Button>
                                             )
                                         })
                                         }
-                                        </Stack>
-                                    </Box>
+                                        </Box>
                                     </div>
                                 )
                                 :null
