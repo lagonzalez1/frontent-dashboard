@@ -7,7 +7,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 
-import { findEmployee, getAppointmentClients, moveClientServing } from "../../hooks/hooks";
+import { findEmployee, getAppointmentClients, moveClientServing, findService } from "../../hooks/hooks";
 import { APPOINTMENT, WAITLIST } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -21,9 +21,7 @@ export default function Appointments ({setClient, setEditClient}) {
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const reload = useSelector((state) => state.user.reload);
     const business = useSelector((state) => state.business);
-
 
     const currentDate = DateTime.local().setZone(business.timezone);
     const [selectedDate, setSelectedDate] = useState(currentDate);
@@ -155,6 +153,9 @@ export default function Appointments ({setClient, setEditClient}) {
                                             <TableCell>
                                                 <Typography fontWeight={'bold'} variant="body2">
                                                     { client.fullname}
+                                                </Typography>
+                                                <Typography fontWeight="normal" variant="caption">
+                                                    { client.serviceTag ? findService(client.serviceTag).title: null }
                                                 </Typography>
                                             </TableCell>
                                             <TableCell>

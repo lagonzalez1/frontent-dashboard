@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Typography, Stack, Select, MenuItem, InputLabel, Alert, 
-     ListItemIcon, Box, Container, CircularProgress} from "@mui/material";
+     ListItemIcon, Box, Container, CircularProgress, Grid} from "@mui/material";
 
 import CloseIcon from '@mui/icons-material/Close';
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
@@ -34,32 +34,24 @@ export default function EditClient({setEditClient, editClient}) {
 
     const [appointments, setAppointments] = useState(null);
 
-    useEffect(() => {
-        setPayload(editClient.payload);
-        return () => {
-            if (editClient.payload === null) {
-                return <></>;
-            }
-            console.log("return payload empty");
-        }
-    }, [editClient]);
+    
 
     const initialValues = {
-        _id: payload ? payload._id : '',
-        fullname: payload ? payload.fullname : '',
-        email: payload ? payload.email: '',
-        phone: payload ? payload.phone : '',
-        size: payload ? payload.partySize: 1,
-        service_id: payload ? payload.serviceTag : '',
-        resource_id: payload ? payload.resourceTag: '',
-        employee_id: payload ? payload.employeeTag: '',
-        notes: payload ? payload.notes : '',
-        appointmentDate: payload ? payload.appointmentDate : ''
+        _id: editClient ? editClient._id : '',
+        fullname: editClient ? editClient.fullname : '',
+        email: editClient ? editClient.email: '',
+        phone: editClient ? editClient.phone : '',
+        size: editClient ? editClient.partySize: 1,
+        service_id: editClient ? editClient.serviceTag : '',
+        resource_id: editClient ? editClient.resourceTag: '',
+        employee_id: editClient ? editClient.employeeTag: '',
+        notes: editClient ? editClient.notes : '',
+        appointmentDate: editClient ? editClient.appointmentDate : ''
       };
       
       const validationSchema = Yup.object({
         fullname: Yup.string().required('Full name is required'),
-        phone: Yup.string().required('Phone').matches(PHONE_REGEX, 'Phone number must be in the format xxx-xxx-xxxx')
+        phone: Yup.string().matches(PHONE_REGEX, 'Phone number must be in the format xxx-xxx-xxxx')
         .required('Phone number is required'),
         email: Yup.string(),
         size: Yup.number(),
@@ -73,6 +65,7 @@ export default function EditClient({setEditClient, editClient}) {
 
 
     const handleSubmit = (data) => {
+        console.log(data)
         setLoading(true);
         requestClientEdit(data)
         .then(response => {
@@ -148,7 +141,7 @@ export default function EditClient({setEditClient, editClient}) {
             <Dialog
                 open={editClient ? editClient.open : false}
                 TransitionComponent={Transition}
-                onClose={closeDialog}
+                onClose={() => closeDialog()}
                 maxWidth={'xs'}
                 fullWidth={true}
             >
@@ -158,7 +151,7 @@ export default function EditClient({setEditClient, editClient}) {
                 </Typography> 
                 <IconButton
                     aria-label="close"
-                    onClick={closeDialog}
+                    onClick={() => closeDialog()}
                     sx={{
                         position: 'absolute',
                         right: 8,
@@ -183,6 +176,7 @@ export default function EditClient({setEditClient, editClient}) {
                     validationSchema={validationSchema}
                     >
                     {({ errors, touched, handleChange, handleBlur, values }) => (
+                    
                         <Form>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                             <Field
@@ -231,14 +225,16 @@ export default function EditClient({setEditClient, editClient}) {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
-
-                            {business ? (
+                            <Grid container>
+                                <Grid item xs={12} md={6} sm={6}>
+                                {business ? (
                             <>
                                 <Typography fontWeight={'bold'} variant="subtitle2">Resources</Typography>
                                 <Field
                                 as={Select}
                                 labelId="resources"
                                 size="small"
+                                fullWidth={true}
                                 name="resource_id"
                                 label="Resources"
                                 onChange={handleChange}
@@ -255,7 +251,8 @@ export default function EditClient({setEditClient, editClient}) {
                                 </Field>
                             </>
                             ) : null}
-
+                            </Grid>
+                            <Grid item xs={12} md={6} sm={6}>
                             {business ? (
                             <>
                                 <Typography fontWeight={'bold'} variant="subtitle2">Employee preference</Typography>
@@ -264,6 +261,7 @@ export default function EditClient({setEditClient, editClient}) {
                                 id="employee_id"
                                 name="employee_id"
                                 size="small"
+                                fullWidth={true}
                                 label="Employees"
                                 onChange={handleChange}
                                 >
@@ -275,6 +273,9 @@ export default function EditClient({setEditClient, editClient}) {
                                 </Field>
                             </>
                             ) : null}
+                                </Grid>
+                            </Grid>
+                            
 
                             {values.employee_id ? (
                                 
@@ -282,7 +283,7 @@ export default function EditClient({setEditClient, editClient}) {
                                 <Typography fontWeight={'bold'} variant="subtitle2">Services available</Typography>
                                 <Field
                                 as={Select}
-                                id="services"
+                                labelId="services"
                                 name="service_id"
                                 size="small"
                                 label="Service"
@@ -321,27 +322,28 @@ export default function EditClient({setEditClient, editClient}) {
                             {
                                 (editClient.fromComponent === APPOINTMENT && appointments !== null) ? 
                                 (
-                                    <div style={{ width: '100%', overflowX: 'auto'}}>
-                                        <Box sx={{ display: 'flex'}}>
+                                    <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap'}}>
+                                        <Stack direction={'row'}>
                                         
                                         { 
                                            Object.keys(appointments).map((key, index) => {
                                             const appointment = appointments[key];
                                             return (
                                                 <Button 
-                                                    sx={{borderRadius: 10, margin: 1}}
+                                                    sx={{ margin: 1, borderRadius: 10}}
                                                     variant={selectedAppointment === appointment ? "contained": "outlined"}
                                                     onClick={() => handleAppointmentClick(appointment)} 
-                                                    fullWidth={true}
                                                     color={selectedAppointment === appointment ? 'primary': 'secondary'}
                                                     id="appointmentButtons">
-                                                    <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                    <Typography variant="caption">{"-"}</Typography>
-                                                    <Typography  variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                    <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                    <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{"-"}</Typography>
+                                                    <Typography sx={{ whiteSpace: 'nowrap' }}  variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
                                                 </Button>
                                             )
                                         })
                                         }
+                                        </Stack>
                                         </Box>
                                     </div>
                                 )
