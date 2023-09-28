@@ -34,19 +34,22 @@ export default function EditClient({setEditClient, editClient}) {
 
     const [appointments, setAppointments] = useState(null);
 
-    
+    useEffect(() => {
+        if (editClient) {
+            setPayload(editClient.payload);
+        }
+    },[editClient]);
 
-    const initialValues = {
-        _id: editClient ? editClient._id : '',
-        fullname: editClient ? editClient.fullname : '',
-        email: editClient ? editClient.email: '',
-        phone: editClient ? editClient.phone : '',
-        size: editClient ? editClient.partySize: 1,
-        service_id: editClient ? editClient.serviceTag : '',
-        resource_id: editClient ? editClient.resourceTag: '',
-        employee_id: editClient ? editClient.employeeTag: '',
-        notes: editClient ? editClient.notes : '',
-        appointmentDate: editClient ? editClient.appointmentDate : ''
+    let initialValues = {
+        _id: editClient ? editClient.payload._id : '',
+        fullname: editClient ? editClient.payload.fullname : '',
+        email: editClient ? editClient.payload.email: '',
+        phone: editClient ? editClient.payload.phone : '',
+        size: editClient ? editClient.payload.partySize: 1,
+        service_id: editClient ? editClient.payload.serviceTag : '',
+        resource_id: editClient ? editClient.payload.resourceTag: '',
+        employee_id: editClient ? editClient.payload.employeeTag: '',
+        notes: editClient ? editClient.payload.notes : '',
       };
       
       const validationSchema = Yup.object({
@@ -59,15 +62,14 @@ export default function EditClient({setEditClient, editClient}) {
         employee_id: Yup.string(),
         resource_id: Yup.string(),
         notes: Yup.string(),
-        appointmentDate: Yup.date()
       });
 
 
 
     const handleSubmit = (data) => {
-        console.log(data)
         setLoading(true);
-        requestClientEdit(data)
+        const payload = { ...data, appointment: selectedAppointment, appointmentDate: selectedDate}
+        requestClientEdit(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
         })
@@ -84,6 +86,7 @@ export default function EditClient({setEditClient, editClient}) {
 
 
     const handleAppointmentClick = (app) => {
+        console.log(app);
         setSelectedAppointment(app);
     }
 
@@ -220,7 +223,6 @@ export default function EditClient({setEditClient, editClient}) {
                             name="size"
                             size="small"
                             label="Party size"
-                            placeholder="1"
                             error={touched.size && !!errors.size}
                             onChange={handleChange}
                             onBlur={handleBlur}
