@@ -348,7 +348,7 @@ export default function Waitlist ({setClient, setEditClient}) {
                                 <TableBody>
 
                 {
-                    Array.isArray(tableData) ? (
+                    tableData ? (
                         tableData.map((item, index) => {
                             return (
                             <TableRow key={item._id}>

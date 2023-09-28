@@ -352,9 +352,7 @@ export const getUserTable = () => {
                 }
             }
             const type = business.system.equalDate;
-            if (!clients) {
-                return [];
-            }
+
             const timezone = business.timezone;
             if (!timezone) {
                 return new Error('No timezone to validate.');
@@ -364,10 +362,11 @@ export const getUserTable = () => {
             let sorted = null;
             const currentTime = DateTime.local().setZone(timezone);
 
+            console.log(clients)
             
             if(type) {
                 for (var client of clients) {
-                    const clientDate = new DateTime.fromJSDate(new Date(client.timestamp));
+                    const clientDate = DateTime.fromISO(client.timestamp);
                     if ( currentTime.hasSame(clientDate, 'day')){
                         currentDates.push(client);
                     }
@@ -376,10 +375,9 @@ export const getUserTable = () => {
             }else {
                 sorted = clients.sort(sortBaseTime);
             }
-            
             // Add wait time in {hour, minute}
             const wait = sorted.map((client) => {
-            const luxonDateTime = DateTime.fromJSDate(new Date(client.timestampOrigin));
+            const luxonDateTime = DateTime.fromISO(client.timestampOrigin);
 
             const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
             const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;

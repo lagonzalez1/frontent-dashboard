@@ -11,8 +11,8 @@ import * as Yup from 'yup';
 import { DateTime } from "luxon";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { DatePicker } from "@mui/x-date-pickers";
-import { requestClientEdit, Transition, PHONE_REGEX } from "./EditClientHelper";
-import { APPOINTMENT } from "../../static/static";
+import { requestClientEditWait, requestClientEditApp, Transition, PHONE_REGEX } from "./EditClientHelper";
+import { APPOINTMENT, WAITLIST } from "../../static/static";
 
 
 export default function EditClient({setEditClient, editClient}) {
@@ -67,9 +67,34 @@ export default function EditClient({setEditClient, editClient}) {
 
 
     const handleSubmit = (data) => {
-        setLoading(true);
-        const payload = { ...data, appointment: selectedAppointment, appointmentDate: selectedDate}
-        requestClientEdit(payload)
+        if (editClient.fromComponent === APPOINTMENT){
+            const payload = { ...data, appointment: selectedAppointment, appointmentDate: selectedDate}
+            appointmentEdit(payload);
+        }
+        if (editClient.fromComponent === WAITLIST){
+            const payload = { ...data}
+            waitlistEdit(payload);
+        }
+    }
+
+    const waitlistEdit = (payload) => {
+        requestClientEditWait(payload)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(setSnackbar({ requestMessage: error.response.msg, requestStatus: true} ))
+        })
+        .finally(() => {
+            setLoading(false);
+            dispatch(setReload(true));
+            closeDialog();
+        })
+    } 
+
+    const appointmentEdit = (payload) => {
+        requestClientEditApp(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
         })
@@ -86,7 +111,6 @@ export default function EditClient({setEditClient, editClient}) {
 
 
     const handleAppointmentClick = (app) => {
-        console.log(app);
         setSelectedAppointment(app);
     }
 
