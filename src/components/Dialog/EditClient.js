@@ -262,7 +262,6 @@ export default function EditClient({setEditClient, editClient}) {
                                 size="small"
                                 fullWidth={true}
                                 name="resource_id"
-                                label="Resources"
                                 onChange={handleChange}
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
@@ -288,7 +287,6 @@ export default function EditClient({setEditClient, editClient}) {
                                 name="employee_id"
                                 size="small"
                                 fullWidth={true}
-                                label="Employees"
                                 onChange={handleChange}
                                 >
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
@@ -312,7 +310,6 @@ export default function EditClient({setEditClient, editClient}) {
                                 labelId="services"
                                 name="service_id"
                                 size="small"
-                                label="Service"
                                 onChange={handleChange}
                                 >
                                 { Array.isArray(serviceList) ?

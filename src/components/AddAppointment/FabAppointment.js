@@ -266,7 +266,6 @@ export default function FabAppointment () {
                                 id="employee_id"
                                 name="employee_id"
                                 size="small"
-                                label="Employees"
                                 onChange={handleChange}
                                 >
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
@@ -287,7 +286,6 @@ export default function FabAppointment () {
                                 id="services"
                                 name="service_id"
                                 size="small"
-                                label="Service"
                                 onChange={handleChange}
                                 >
                                 { Array.isArray(serviceList) ?

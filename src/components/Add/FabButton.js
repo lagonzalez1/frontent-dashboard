@@ -124,6 +124,7 @@ export default function FabButton () {
                             as={TextField}
                             id="fullname"
                             name="fullname"
+                            size="small"
                             label="Customer name"
                             placeholder="Customer name"
                             error={touched.fullname && !!errors.fullname}
@@ -134,6 +135,7 @@ export default function FabButton () {
                             as={TextField}
                             id="email"
                             name="email"
+                            size="small"
                             label="Customer email"
                             placeholder="Email"
                             error={touched.email && !!errors.email}
@@ -146,6 +148,7 @@ export default function FabButton () {
                             id="phone"
                             name="phone"
                             label="Phone"
+                            size="small"
                             placeholder="xxx-xxx-xxxx"
                             error={touched.phone && !!errors.phone}
                             onChange={handleChange}
@@ -156,6 +159,7 @@ export default function FabButton () {
                             as={TextField}
                             id="size"
                             name="size"
+                            size="small"
                             label="Party size"
                             placeholder="1"
                             error={touched.size && !!errors.size}
@@ -168,9 +172,9 @@ export default function FabButton () {
                                 <InputLabel id="services">Services</InputLabel>
                                 <Field
                                 as={Select}
-                                id="services"
+                                labelId="services"
                                 name="service_id"
-                                label="Service"
+                                size="small"
                                 onChange={handleChange}
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
@@ -194,7 +198,7 @@ export default function FabButton () {
                                 as={Select}
                                 id="resources"
                                 name="resource_id"
-                                label="Resources"
+                                size="small"
                                 onChange={handleChange}
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
@@ -217,7 +221,7 @@ export default function FabButton () {
                                 as={Select}
                                 id="employee_id"
                                 name="employee_id"
-                                label="Employees"
+                                size="small"
                                 onChange={handleChange}
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
@@ -234,7 +238,7 @@ export default function FabButton () {
                             as={TextField}
                             id="notes"
                             name="notes"
-                            label="Notes"
+                            size="small"
                             placeholder="Additional notes"
                             error={touched.notes && !!errors.notes}
                             onChange={handleChange}

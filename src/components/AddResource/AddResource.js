@@ -109,7 +109,6 @@ export default function AddResource() {
                           as={Select}
                           id="services"
                           name="service_id"
-                          label="Service"
                           fullWidth={true}
                           error={touched.service_id && !!errors.service_id}
                           onChange={handleChange}
