@@ -15,7 +15,6 @@ export const reloadBusinessData = (dispatch) => {
     const ENDPOINT = GET_BUSINESS + id;
     axios.get(ENDPOINT, headers)
     .then(response => {
-        console.log(response.data);
         dispatch(setBusiness(response.data.business));
     })
     .catch(error => {
@@ -109,7 +108,6 @@ export const requestNoShow = (clientId) => {
       const headers = getHeaders();
       const currentTime = new DateTime.local().setZone(business.timezone).toISO();
       const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type }
-      console.log(currentTime);
       axios.post('/api/internal/client_to_serving', payload, headers)
       .then(response => {
         resolve(response.data);
@@ -165,8 +163,7 @@ export const getClientsByResource = (id, resourceTag) => {
     const timestampNow = DateTime.now().setZone(timezone);
     const clientList = business.currentClients;
     const list = [];
-    console.log(id)
-    console.log(resourceTag)
+
     for(var client of clientList){
         const timestamp = DateTime.fromISO(client.timestamp, { zone: 'utc' });
         const timestampInTimezone = timestamp.setZone(timezone);
@@ -175,7 +172,6 @@ export const getClientsByResource = (id, resourceTag) => {
             list.push(client);
         }
     }
-    console.log(list)
     return list;
 }
 
@@ -360,10 +356,7 @@ export const getUserTable = () => {
             // Compare the current date to each client.
             let currentDates = [];
             let sorted = null;
-            const currentTime = DateTime.local().setZone(timezone);
-
-            console.log(clients)
-            
+            const currentTime = DateTime.local().setZone(timezone);            
             if(type) {
                 for (var client of clients) {
                     const clientDate = DateTime.fromISO(client.timestamp);

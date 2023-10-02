@@ -46,7 +46,6 @@ export default function Drawer({client, setClient}) {
     const moveClientComplete = (client) => {
         completeClientAppointment(client)
         .then(response => {
-            console.log(response);
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         }).catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
@@ -60,7 +59,6 @@ export default function Drawer({client, setClient}) {
 
     const getAnalytics = (payload) => {
         if (!payload) { return; }
-        console.log(payload);
         const bid = business._id;
         const email = payload.email;
         const phone = payload.phone;
@@ -116,8 +114,8 @@ export default function Drawer({client, setClient}) {
                 anchor={'right'}
                 open={client.open}
                 hideBackdrop={true}
-                variant="presistent"
-            >  
+                
+                >  
             {(loading && !payload) ? <CircularProgress/>:
             <Container sx={{ paddingTop: 8, width: 400}} disableGutters>
             <Toolbar>
@@ -274,14 +272,14 @@ export default function Drawer({client, setClient}) {
 
             <Divider/>
             <Container sx={{ mt: 'auto', mb: 2}}>
-                <Container>
+                <Box sx={{ display: 'flex', justifyContent: 'center'}}> 
 
                     {
                         client.fromComponent === SERVING &&
                         (
-                            <Stack direction={'row'} spacing={2} justifyContent="space-evenly">
-                                {payload ? <Button color="secondary" variant="contained" sx={{borderRadius: 15}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
-                                <Button variant="contained" sx={{borderRadius: 15}}>Move Waitlist</Button>
+                            <Stack direction={'row'}>
+                                {payload ? <Button color="secondary" variant="contained" sx={{borderRadius: 10}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
+                                <Button variant="contained" sx={{borderRadius: 10}}>Move Waitlist</Button>
                             </Stack>
                         )
                     }
@@ -289,15 +287,15 @@ export default function Drawer({client, setClient}) {
                     {
                         (client.fromComponent === WAITLIST || client.fromComponent === APPOINTMENT) &&
                         (
-                            <Stack direction={'row'} spacing={2} justifyContent="space-evenly">
-                                {payload ? <Button color="error" variant="contained" sx={{borderRadius: 15}} onClick={() => sendClientNoShow(payload._id)}>No show</Button>: null}
-                                <Button color="secondary" variant="contained" sx={{borderRadius: 15}}>Notify</Button>
-                                {payload ? <Button color="primary" variant="contained" sx={{borderRadius: 15}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
+                            <Stack direction={'row'}>
+                                {payload ? <Button color="error" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNoShow(payload._id)}>No show</Button>: null}
+                                <Button color="secondary" variant="contained" sx={{borderRadius: 10, margin: 1}}>Notify</Button>
+                                {payload ? <Button color="primary" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
 
                             </Stack>
                         )
                     }
-                </Container>
+                </Box>
             </Container>        
             </SIDEBAR> 
 

@@ -6,6 +6,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 
 import { findEmployee, getAppointmentClients, moveClientServing, findService } from "../../hooks/hooks";
 import { APPOINTMENT, WAITLIST } from "../../static/static";
@@ -21,19 +22,26 @@ export default function Appointments ({setClient, setEditClient}) {
 
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [avoid, setAvoid] = useState(false);
     const business = useSelector((state) => state.business);
 
     const currentDate = DateTime.local().setZone(business.timezone);
-    const [selectedDate, setSelectedDate] = useState(currentDate);
+    const [selectedDate, setSelectedDate] = useState(null);
 
     useEffect(() => {
-        loadAppointments();
-        
+        console.log("RE-RENDER")
+        if (selectedDate !== null){
+            loadAppointments(selectedDate);
+            setAvoid(false)
+        }else {
+            loadAppointments(currentDate);
+            setAvoid(false)
+        }
     }, [selectedDate]);
 
 
-    const loadAppointments = () => {
-        const payload = { appointmentDate: selectedDate }
+    const loadAppointments = (date) => {
+        const payload = { appointmentDate: date }
         getAppointmentClients(payload)
         .then(response => {
             setData(response);
@@ -64,7 +72,7 @@ export default function Appointments ({setClient, setEditClient}) {
         setSelectedDate(date);
     };
 
-    const openClientDrawer = (item) => {
+    function openClientDrawer(item) {
         setClient({payload: item, open: true, fromComponent: APPOINTMENT});
     }
     const editClientInfo = (item) => {
@@ -111,16 +119,16 @@ export default function Appointments ({setClient, setEditClient}) {
                 </Grid>
 
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
-                    <Tooltip title="How many people are in the establishment." placement="right">
-                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
-                            <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}> Appointments </Typography>
+                    <Tooltip title="Your current location." placement="bottom">
+                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SouthAmericaIcon />}>
+                            <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? (business.timezone): <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>
                         
                 </Grid>
+                {/** Is this where the error is?, once a new component  */}
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'right '}}>
                     <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
-
                 </Grid>
             </Grid>
 

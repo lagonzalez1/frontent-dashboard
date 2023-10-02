@@ -79,6 +79,7 @@ export default function Dashboard () {
 
 
     useEffect(() => { 
+        console.log("Dashboard render.");
         checkAuthStatus();
     },[reload])
 
