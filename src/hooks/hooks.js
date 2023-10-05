@@ -277,6 +277,58 @@ export const getServingTable = () => {
       }
 };
 
+export const getAppointmentServingTable = () => {
+    const { user, business } = getStateData();
+    try {
+            let currentClients = business.appointments;
+            let clients = [];
+            for (var client of currentClients){
+                if (client.status.serving === true) {
+                    clients.push(client);
+                }
+            }
+
+            const timezone = business.timezone;
+            if (!timezone) {
+                return new Error('No timezone to validate.');
+            }
+            // Compare the current date to each client.
+            let currentDates = [];
+            let sorted = null;
+            const currentTime = DateTime.local().setZone(timezone);
+
+            if(type) {
+                for (var client of clients) {
+                    const clientDate = DateTime.fromISO(client.appointmentDate);
+                    if ( currentTime.hasSame(clientDate, 'day')){
+                        currentDates.push(client);
+                    }
+                }
+                sorted = currentDates.sort(sortAppointmentTime);
+            }else {
+                sorted = clients.sort(sortAppointmentTime);
+            }
+            
+            // Add wait time in {hour, minute}
+            const wait = sorted.map((client) => {
+            const luxonDateTime = DateTime.fromISO(client.status.serve_time);
+            const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
+            const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
+            const hours = Math.floor(diffHours);
+            const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
+            return {
+                ...client,
+                waittime: { hours, minutes },
+            };
+            });
+            return wait;
+      } catch (error) {
+            // Handle the error here
+            console.error(error);
+            return new Error(error); // Return an empty array or any other appropriate value
+      }
+};
+
 export const getServingCount = () => {
     const { user, business } = getStateData();
     try {
@@ -323,6 +375,29 @@ export const getServingCount = () => {
       }
 };
 
+
+export const getAppointmentTable = (date) => {
+    const { user,  business} = getStateData();
+    try {
+        
+        let appointments = business.appointments;
+        let filtered = []
+        for (var client of appointments){
+            const appDate = DateTime.fromISO(client.appointmentDate);
+            
+            if (appDate.hasSame(date, 'day') && client.status.serving !== true){
+                filtered.push(client);
+            }
+        }
+        return filtered;
+
+    }
+    catch (error) {
+        // Handle the error here
+        console.error(error);
+        return new Error(error); // Return an empty array or any other appropriate value
+    }
+}
 
 
 
@@ -393,6 +468,18 @@ export const getUserTable = () => {
     const timestampA = DateTime.fromISO(a.timestamp);
     const timestampB = DateTime.fromISO(b.timestamp);
   
+    if (timestampA < timestampB) {
+      return -1;
+    }
+    if (timestampA > timestampB) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function sortAppointmentTime (a,b) {
+    const timestampA = DateTime.fromISO(a.appointmentDate);
+    const timestampB = DateTime.fromISO(b.appointmentDate);
     if (timestampA < timestampB) {
       return -1;
     }

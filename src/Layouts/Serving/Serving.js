@@ -6,7 +6,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 
 import { useSelector, useDispatch } from "react-redux";
 import  {  getUserTable, columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingTable, getServingCount } from "../../hooks/hooks";
+import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable } from "../../hooks/hooks";
 import "../../css/Serving.css";
 import { setReload, setSnackbar } from "../../reducers/user";
 
@@ -16,6 +16,7 @@ export default function Serving({setClient}) {
     const business = useSelector((state) => state.business);
 
     let servingList = getServingTable();
+    let appointmentServing = getAppointmentServingTable();
     let { groupCount, groupTotalCount } = getServingCount();
 
     useEffect(() => {
@@ -89,6 +90,67 @@ export default function Serving({setClient}) {
                 {
                     Array.isArray(servingList) ? 
                         servingList.map((item, index) => (
+                            <TableRow key={index}>                                       
+                                <TableCell align="left">
+                                    <Typography variant="subtitle2" fontWeight="bolder">
+                                    {++index}
+                                    </Typography> 
+                                    </TableCell>
+                                <TableCell align="left">
+                                <Typography variant="subtitle2" fontWeight="bolder">
+                                    {item.fullname}
+                                </Typography>
+                                </TableCell>
+
+                                <TableCell align="left"> 
+                                    <Typography variant="subtitle2" fontWeight="bolder">{item.partySize}</Typography>
+                                
+                                </TableCell>
+                                <TableCell align="left"> 
+                                    <Typography variant="subtitle2" fontWeight="bolder">
+                                        {'Service: '+ findService(item.serviceTag).title }
+                                    </Typography>
+
+                                    <Typography variant="subtitle2" fontWeight="bolder">
+                                        {'Resource: ' + findResource(item.resourceTag).title }
+                                    </Typography>
+                                </TableCell>
+                                <TableCell align="left">
+                                <Typography variant="subtitle2" fontWeight="bolder">
+                                    {item.waittime ? ( item.waittime.hours >= 1 ? (`${item.waittime.hours} Hr ${item.waittime.minutes} Min.`): (`${item.waittime.minutes} Min.`)): (null) } 
+
+                                </Typography>
+
+                                </TableCell>
+                                <TableCell align="left">
+                                <Stack
+                                        direction="row"
+                                        spacing={1}
+                                    >
+                                        <IconButton onClick={() => checkoutClient(item)}>
+                                            <Tooltip title="Checkout" placement="left">
+                                                <CheckCircleIcon htmlColor="#4CBB17"/>
+                                            </Tooltip>                                            
+                                        </IconButton>
+
+                                        <IconButton onClick={() => displayClientInformation(item)}>
+                                            <Tooltip title="Edit" placement="right">
+                                                <EditNoteIcon />
+                                            </Tooltip>  
+                                        </IconButton>
+                                       
+                                    </Stack>
+                                </TableCell>
+
+
+
+                            </TableRow>
+                        ))
+                    : null
+                }
+                {
+                    Array.isArray(appointmentServing) ? 
+                        appointmentServing.map((item, index) => (
                             <TableRow key={index}>                                       
                                 <TableCell align="left">
                                     <Typography variant="subtitle2" fontWeight="bolder">

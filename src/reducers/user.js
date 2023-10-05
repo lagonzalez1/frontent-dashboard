@@ -13,6 +13,7 @@ const initialState = {
   requestMessage: null,
   requestType: null,
   location: null,
+  searchDate: null,
 };
 
 
@@ -53,5 +54,6 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, logoutUser, setPermisisons, setIndex, setLocation, setSnackbar, setBusinessRef, setReload } = userSlice.actions;
+export const { setUser, logoutUser, setPermisisons, setIndex, setLocation, 
+  setSnackbar, setBusinessRef, setReload, setSearchDate } = userSlice.actions;
 export default userSlice.reducer;

@@ -8,8 +8,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 
-import { findEmployee, getAppointmentClients, moveClientServing, findService } from "../../hooks/hooks";
-import { APPOINTMENT, WAITLIST } from "../../static/static";
+import { findEmployee, getAppointmentClients, moveClientServing, findService, getAppointmentTable } from "../../hooks/hooks";
+import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { columns } from "./AppointmentsHelper";
@@ -17,27 +17,38 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 
 
-export default function Appointments ({setClient, setEditClient}) {
+export default function Appointments({setClient, setEditClient}) {
     const dispatch = useDispatch();
 
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [avoid, setAvoid] = useState(false);
+    const [loading, setLoading] = useState(false);
     const business = useSelector((state) => state.business);
-
     const currentDate = DateTime.local().setZone(business.timezone);
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDate, setSelectedDate] = useState();
+    const [data, setData] = useState([]);
 
     useEffect(() => {
-        console.log("RE-RENDER")
-        if (selectedDate !== null){
-            loadAppointments(selectedDate);
-            setAvoid(false)
-        }else {
-            loadAppointments(currentDate);
-            setAvoid(false)
+        getLastSearchedDate();
+        // Cleanup
+        return () => {
+            setLoading(false);
         }
-    }, [selectedDate]);
+    }, [loading]);
+
+    function getLastSearchedDate () {
+        const date = sessionStorage.getItem(APPOINTMENT_DATE_SELECT);
+        if (date) {
+            let lastDate = DateTime.fromISO(date);
+            setSelectedDate(lastDate)
+            let reload = getAppointmentTable(lastDate);
+            setData(reload);
+        }
+        else {
+            let reload = getAppointmentTable(currentDate);
+            setSelectedDate(lastDate)
+            setData(reload);
+        }
+
+    }
 
 
     const loadAppointments = (date) => {
@@ -68,8 +79,10 @@ export default function Appointments ({setClient, setEditClient}) {
         })
     }
 
-    const handleDateChange = (date) => {
-        setSelectedDate(date);
+    function handleDateChange(date) {
+        const dateObj = date.toISO();
+        sessionStorage.setItem(APPOINTMENT_DATE_SELECT, dateObj); 
+        setLoading(true);
     };
 
     function openClientDrawer(item) {
@@ -100,11 +113,10 @@ export default function Appointments ({setClient, setEditClient}) {
           />
           </Box>
         );
-      };
+    };
 
     return (
         <>
-
         <div className="appointments">
             <Grid container>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
@@ -128,11 +140,23 @@ export default function Appointments ({setClient, setEditClient}) {
                 </Grid>
                 {/** Is this where the error is?, once a new component  */}
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'right '}}>
-                    <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
+                    <Box>
+                        <DatePicker
+                            label={"Date"}
+                            sx={{
+                                width: '100%'
+                            }}
+                            fontSize="sm"
+                            value={selectedDate}
+                            onChange={handleDateChange}
+                            renderInput={(params) => <TextField {...params} />}
+                            minDate={currentDate}
+                        />
+                        </Box>
                 </Grid>
             </Grid>
 
-                <div className="servingTable">
+                {!loading ? <div className="servingTable">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
                             <Table stickyHeader aria-label='main_table'>
@@ -203,9 +227,14 @@ export default function Appointments ({setClient, setEditClient}) {
                         </TableContainer>
                     </Paper>
                 </div>
+                : <CircularProgress />
+                }
                 
         </div>
         
         </>
     )
-}
+};
+
+
+

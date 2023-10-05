@@ -27,6 +27,7 @@ export default function Drawer({client, setClient}) {
     const [analytics, setAnalytics] = useState({});
 
     useEffect(() => {
+        console.log("Drawer-Render")
         setPayload(client.payload);
         getAnalytics(client.payload);
         return() => {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Box, CircularProgress, Backdrop } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
@@ -51,6 +51,8 @@ export default function Dashboard () {
     const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
 
     const [openNav, setOpenNav] = useState(false);
+
+
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
     const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
 
@@ -79,7 +81,7 @@ export default function Dashboard () {
 
 
     useEffect(() => { 
-        console.log("Dashboard render.");
+        console.log("Dashboard-render.");
         checkAuthStatus();
     },[reload])
 
@@ -88,6 +90,7 @@ export default function Dashboard () {
 
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
+        console.log("RENDER CALLE");
         switch(location) {
             case 0:
                 return( <> 
