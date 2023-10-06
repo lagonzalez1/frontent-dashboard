@@ -29,19 +29,13 @@ export default function Welcome() {
 
 
     useEffect(() => {
-        //checkBuisnessState();
-        //getBusinessArgs();
-        //getBusinessSchedule();
         gatherBusinessData();
-
     }, [])
 
 
     const gatherBusinessData = () => {
         setLoading(true);
-        const currentTime = DateTime.local().toISO();
-       
-        // Execute both requests concurrently using Promise.all()
+        const currentTime = DateTime.local().toISO();       
         Promise.all([
             requestBusinessSchedule(link),
             requestBusinessArguments(link),

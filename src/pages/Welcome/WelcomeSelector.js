@@ -1,32 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField } from "@mui/material";
+    Fade, CircularProgress, Stack, IconButton, Zoom, ButtonGroup } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { getMax} from "./WelcomeHelper";
+import { requestBusinessArguments} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSize.css";
-import { CLIENT } from "../../static/static";
+import { APPOINTMENT, CLIENT } from "../../static/static";
 
 
-export default function Welcome() {
+export default function WelcomeSelector() {
 
     const { link } = useParams();
 
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [size,setSize] = useState(1);
-    const [maxSize, setMaxSize] = useState(0);
+    const [args, setArguments] = useState(null);
+    const [systemTypeSelected, setSystem] = useState(null);
 
     const navigate = useNavigate();
 
 
     const getBuisnessForm = () => {
-        getMax(link)
+        requestBusinessArguments(link)
         .then(data => {
-            setMaxSize(data.serveMax);
+            setArguments(data);
         })
         .catch(error => {
             console.log(error);
@@ -38,7 +39,7 @@ export default function Welcome() {
             partySize: size
         }
         sessionStorage.setItem(CLIENT, JSON.stringify(object));
-        navigate(`/welcome/${link}/selector`);
+        navigate(`/welcome/${link}/details`);
     }
     
     useEffect(() => {
@@ -59,8 +60,11 @@ export default function Welcome() {
     }
 
     const redirectBack = () => {
-        navigate(`/welcome/${link}`)
+        navigate(`/welcome/${link}/size`)
     }
+
+
+
     return (
         <>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
@@ -77,38 +81,23 @@ export default function Welcome() {
                         </Typography>
                             {loading ? <CircularProgress /> : null}
                         <Typography variant="h4" fontWeight="bold">
-                            Party size
+                            Type
                         </Typography>
-
-                        <Stack direction='row' spacing={2} sx={{ pt: 5, p: 2}}>
-                        <ToggleButtonGroup
-                            value={size}
-                            onChange={handleChange}
-                            fullWidth
-                            exclusive
-                            >
-                            {Array(6).fill().map((_, index) => (
-                                <ToggleButton
-                                value={index+1}
-                                key={index+1}                               
-                                >
-                                    <strong>{index + 1}{index === 5 ? '+' : ''}</strong>
-                                </ToggleButton>
-                            ))}
-                            </ToggleButtonGroup>
-                            
-                        </Stack>
+                        <br/>
+                        <ButtonGroup fullWidth={true} variant="outlined">
+                            <Button> Waitlist</Button>
+                            <Button> Appointment</Button>
+                        </ButtonGroup>
 
 
-                        <Box sx={{ display: 'flex', pt: 2, height: open ? 'auto' : 0  }}>
-                            <Fade in={open}>
-                                <TextField inputProps={{ max: maxSize, min: 6 }} type="number" onChange={e => setSize(e.target.value)} fullWidth={true} id="outlined-basic" label=" Party size" variant="outlined" />
-                            </Fade>
-                        </Box>
+                        
+                        
+
+
+                        
 
 
 
-                        <Typography sx={{ pt: 3}} variant="body2" fontWeight="bold">Current wait time 8 min.</Typography>
                         <Container sx={{ pt: 3}}>
                             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
                                 <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>

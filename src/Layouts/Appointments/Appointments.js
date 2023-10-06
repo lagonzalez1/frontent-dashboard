@@ -51,19 +51,7 @@ export default function Appointments({setClient, setEditClient}) {
     }
 
 
-    const loadAppointments = (date) => {
-        const payload = { appointmentDate: date }
-        getAppointmentClients(payload)
-        .then(response => {
-            setData(response);
-        })
-        .catch(error => {
-            dispatch(setSnackbar({ requestMessage: error, requestStatus: true }))
-        })
-        .finally(() => {
-            setLoading(false);
-        })
-    }
+    
 
     const sendClientServing = (clientId) => {
         moveClientServing(clientId, APPOINTMENT)
