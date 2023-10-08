@@ -15,6 +15,19 @@ export const allowClientJoin = (time,link) => {
     });
   };
 
+  export const getEmployeeList = (date,link) => {
+    return new Promise((resolve, reject) => {
+      axios
+        .get('/api/external/employeeList', { params: { link, date } })
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  };
+
   export const getExtras = (link) => {
     return new Promise((resolve, reject) => {
       axios

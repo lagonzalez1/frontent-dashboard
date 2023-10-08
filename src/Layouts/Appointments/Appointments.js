@@ -44,14 +44,11 @@ export default function Appointments({setClient, setEditClient}) {
         }
         else {
             let reload = getAppointmentTable(currentDate);
-            setSelectedDate(lastDate)
+            setSelectedDate(currentDate)
             setData(reload);
         }
 
     }
-
-
-    
 
     const sendClientServing = (clientId) => {
         moveClientServing(clientId, APPOINTMENT)
@@ -83,25 +80,7 @@ export default function Appointments({setClient, setEditClient}) {
         console.log(clientId)
     }
 
-    const FutureDatePicker = ({ label, value, onChange }) => {
-        const currentDate = DateTime.local().setZone(business.timezone);
     
-        return (
-          <Box>
-          <DatePicker
-            label={label}
-            sx={{
-                width: '100%'
-            }}
-            fontSize="sm"
-            value={value}
-            onChange={onChange}
-            renderInput={(params) => <TextField {...params} />}
-            minDate={currentDate}
-          />
-          </Box>
-        );
-    };
 
     return (
         <>

@@ -117,7 +117,7 @@ export default function WelcomeDetails() {
     
 
     const redirectBack = () => {
-        navigate(`/welcome/${link}/size`)
+        navigate(`/welcome/${link}/selector`)
     }
     return (
         <>
