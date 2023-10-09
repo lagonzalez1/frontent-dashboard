@@ -100,10 +100,10 @@ export default function WelcomeExtras() {
                         </Typography>
 
                         <Formik
-                    initialValues={initialValues}
-                    onSubmit={setDataAndContinue}
-                    validationSchema={validationSchema}
-                    >
+                        initialValues={initialValues}
+                        onSubmit={setDataAndContinue}
+                        validationSchema={validationSchema}
+                        >
                     {({ errors, touched, handleChange, handleBlur }) => (
                         <Form>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2} textAlign="left">

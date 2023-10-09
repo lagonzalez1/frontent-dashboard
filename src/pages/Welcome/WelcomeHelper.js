@@ -15,12 +15,22 @@ export const allowClientJoin = (time,link) => {
     });
   };
 
+  export const findServicesAssociatedWithEmployee = (id, services) => {
+    const collection = [];
+    for (var service of services){
+      if (service._id === id){
+        collection.push(service)
+      }
+    }
+    return collection;
+  }
+
   export const getEmployeeList = (date,link) => {
     return new Promise((resolve, reject) => {
       axios
         .get('/api/external/employeeList', { params: { link, date } })
         .then((response) => {
-          resolve(response);
+          resolve(response.data.employees);
         })
         .catch((error) => {
           reject(error);
