@@ -6,7 +6,7 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
 import { Transition } from "./FabHelper";
 import { useSelector, useDispatch } from "react-redux";
-import { getAvailableAppointments, getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
+import { getAvailableAppointments, getEmployeeList, getServicesAvailable } from "../../hooks/hooks";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import {createAppointmentPretense } from "./FabHelper";
@@ -189,10 +189,7 @@ export default function FabAppointment () {
                 </IconButton>
                 </DialogTitle>
                 <DialogContent>
-
                     { errors ? <Alert severity="error">{errors}</Alert>: null }
-                    
-
                     <Formik
                         initialValues={initialValues}
                         onSubmit={handleSubmit}
@@ -201,8 +198,6 @@ export default function FabAppointment () {
                     {({ errors, touched, handleChange, handleBlur, values }) => (
                         <Form>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
-                            
-                            
                             {nextStep ? null : 
                             <Field
                             as={TextField}

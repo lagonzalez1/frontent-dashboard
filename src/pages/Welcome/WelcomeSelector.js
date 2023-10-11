@@ -5,15 +5,13 @@ import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { requestBusinessArguments, getExtras, getEmployeeList} from "./WelcomeHelper";
+import { requestBusinessArguments, getExtras, getEmployeeList, findServicesAssociatedWithEmployee} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSize.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
-import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
-import * as Yup from 'yup';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 
 
@@ -28,15 +26,17 @@ export default function WelcomeSelector() {
     const [args, setArguments] = useState(null);
     const [openEmployees, setOpenEmployees] = useState(false);
     const [openServices, setOpenServices] = useState(false);
-    const [openAvailabiity, setOpenAvailability] = useState(false);
+    const [openAvailabity, setOpenAvailability] = useState(false);
 
     const [systemTypeSelected, setSystem] = useState(null);
 
     const [error, setError] = useState(null);
     const [employees, setEmployees] = useState(null);
     const [present, setPresent] = useState(null);
-    const [services, serServices] = useState(null);
+    const [services, setServices] = useState(null);
     const [resources, setResouces] = useState(null);
+    const [slots, setSlots] = useState(false);
+    
 
     const [appointmentEmployees, setAppEmployees] = useState(null);
 
@@ -55,7 +55,7 @@ export default function WelcomeSelector() {
         date: null,
         start: null,
         end: null
-    })
+    });
 
     const setDataAndContinue = () => {
         if (systemTypeSelected === APPOINTMENT){
@@ -117,7 +117,7 @@ export default function WelcomeSelector() {
             setPresent(data.present);
             setEmployees(data.employees);
             setResouces(data.resources);
-            serServices(data.services);
+            setServices(data.services);
         })
         .catch(error => {
             console.log(error);
@@ -134,17 +134,40 @@ export default function WelcomeSelector() {
 
     const redirectBack = () => {
         navigate(`/welcome/${link}/size`)
+    
     }
 
+    /**
+     * 
+     * @param {ISO} date
+     * Date change promps employee availability
+     *  
+     */
     const handleDateChange = (date) => {
         setOpenEmployees(false);
         setAppointmentData((prev) => ({...prev, date: date}));
         getAvailableEmployees(date);
     }
+        /**
+     * 
+     * @param {STRING} date
+     * Service change promps availabilty durations
+     *  
+     */
+    const handleServiceChange = (id) => {
+        setOpenAvailability(true);
+        setAppointmentData((prev) => ({...prev, service_id: id}));
+    }
+    /**
+     * 
+     * @param {STRING} date
+     * Employee select promps service filtration.
+     *  
+     */
     const handleEmployeeChange = (id) => {
-        setOpenServices(true); // oct 10
+        setOpenServices(true);
         setAppointmentData((prev) => ({...prev, employee_id: id}));
-        
+
     }
 
     const getAvailableEmployees = (date) => {
@@ -216,11 +239,11 @@ export default function WelcomeSelector() {
                             &&
                             <Box id="appointmentSection" sx={{ pt: 1}}>
                                     <DateCalendar
-                                        orientation="portrait"
+                                        value={appointmentData.date}
                                         onChange={(newDate) => handleDateChange(newDate) }
                                         defaultValue={currentDate} />
 
-                                        <Box sx={{display: 'flex'}}>
+                                        <Box id="employeeSelect" sx={{display: 'flex'}}>
                                             <Grow in={openEmployees}
                                             style={{ transformOrigin: '0 0 0' }}
                                                 {...(openEmployees ? { timeout: 1000 } : {})}
@@ -234,15 +257,15 @@ export default function WelcomeSelector() {
                                                     columnSpacing={1}
                                                 >
                                                     
-                                                    {   appointmentEmployees ? 
-                                                        appointmentEmployees.map((item) => {
+                                                    {   appointmentEmployees !== null ? 
+                                                        appointmentEmployees.map((employee) => {
                                                             return (
-                                                                <Grid item key={item.id}>
-                                                                    <Card sx={{backgroundColor: appointmentData.employee_id === item.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(item.id)}>
+                                                                <Grid item key={employee.id}>
+                                                                    <Card sx={{backgroundColor: appointmentData.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee.id)}>
                                                                         <CardActionArea>
                                                                             <CardContent>
                                                                                 <PersonIcon />
-                                                                                <Typography variant="caption">{item.fullname}</Typography>
+                                                                                <Typography variant="caption">{employee.fullname}</Typography>
                                                                             </CardContent>
                                                                         </CardActionArea>
                                                                     </Card>
@@ -250,12 +273,58 @@ export default function WelcomeSelector() {
                                                             
                                                             )
                                                         })
-                                                    : <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>}
+                                                    : <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>}                                                    
                                                 </Grid>
                                                 </Stack>
                                             </Grow>
-                                            
                                         </Box>
+                                        <Box id="serviceSelect" sx={{display:'flex'}}>
+                                            <Grow in={openServices}>
+                                                <Stack sx={{display: 'flex', justifyContent: 'left'}}>
+                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
+                                                        {
+                                                        services ? 
+                                                        services
+                                                        .filter((service) => service.employeeTags.includes(values.employee_id))
+                                                        .map((service) => (
+                                                            <Grid item key={service._id}>
+                                                                <Card sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service._id)}>
+                                                                    <Stack>
+                                                                        <Typography variant="body2">{service.title}</Typography>
+                                                                        <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
+                                                                    </Stack>
+                                                                </Card>
+                                                            </Grid>
+                                                        )):
+                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No services found</Typography> 
+                                                    }
+                                                </Stack>
+                                            </Grow>
+                                        </Box>
+                                        <Box id="availabilitySelect" sx={{display:'flex'}}>
+                                            <Grow in={openAvailabity}>
+                                                <Stack sx={{display: 'flex', justifyContent: 'left'}}>
+                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Availability</Typography>
+                                                        {
+                                                        services ? 
+                                                        services
+                                                        .filter((service) => service.employeeTags.includes(values.employee_id))
+                                                        .map((service) => (
+                                                            <Grid item key={service._id}>
+                                                                <Card sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service._id)}>
+                                                                    <Stack>
+                                                                        <Typography variant="body2">{service.title}</Typography>
+                                                                        <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
+                                                                    </Stack>
+                                                                </Card>
+                                                            </Grid>
+                                                        )):
+                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No services found</Typography> 
+                                                    }
+                                                </Stack>
+                                            </Grow>
+                                        </Box>
+                                        
                             </Box>
                             ||
                             systemTypeSelected === WAITLIST 

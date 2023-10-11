@@ -18,6 +18,7 @@ export const allowClientJoin = (time,link) => {
   export const findServicesAssociatedWithEmployee = (id, services) => {
     const collection = [];
     for (var service of services){
+      
       if (service._id === id){
         collection.push(service)
       }
