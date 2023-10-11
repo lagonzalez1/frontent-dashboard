@@ -30,7 +30,10 @@ export const allowClientJoin = (time,link) => {
       axios
         .get('/api/external/employeeList', { params: { link, date } })
         .then((response) => {
-          resolve(response.data.employees);
+          if (response.status === 200){
+            resolve(response.data.employees);
+          }
+          resolve(response.data.msg);
         })
         .catch((error) => {
           reject(error);

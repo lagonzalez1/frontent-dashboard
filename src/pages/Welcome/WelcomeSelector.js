@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid } from "@mui/material";
+    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
@@ -12,20 +12,25 @@ import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CloseIcon from '@mui/icons-material/Close';
-
-
+import PersonIcon from '@mui/icons-material/Person';
 import * as Yup from 'yup';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+
 
 export default function WelcomeSelector() {
 
     const { link } = useParams();
+
+    const currentDate = DateTime.now();
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
     const [args, setArguments] = useState(null);
     const [openEmployees, setOpenEmployees] = useState(false);
+    const [openServices, setOpenServices] = useState(false);
+    const [openAvailabiity, setOpenAvailability] = useState(false);
+
     const [systemTypeSelected, setSystem] = useState(null);
-    const currentDate = DateTime.now();
 
     const [error, setError] = useState(null);
     const [employees, setEmployees] = useState(null);
@@ -33,23 +38,20 @@ export default function WelcomeSelector() {
     const [services, serServices] = useState(null);
     const [resources, setResouces] = useState(null);
 
-    const initialValues = {
+    const [appointmentEmployees, setAppEmployees] = useState(null);
+
+    const [waitlistData, setWaitlistData] = useState({
         employee_id: '',
         service_id: '',
         resource_id: '',
         notes: ''
-    };
-    
-    const validationSchema = Yup.object({
-        employee_id: Yup.string(),
-        service_id: Yup.string(),
-        resource_id: Yup.string(),
-        notes: Yup.string()
-    });
-
-    const [appointmentEmployees, setAppEmployees] = useState([]);
-    const [service, setAppServices] = useState(null);
+    })
     const [appointmentData, setAppointmentData] = useState({
+        employee_id: null,
+        service_id: null,
+        resource_id: null,
+        start: null,
+        end: null,
         date: null,
         start: null,
         end: null
@@ -135,15 +137,22 @@ export default function WelcomeSelector() {
     }
 
     const handleDateChange = (date) => {
+        setOpenEmployees(false);
         setAppointmentData((prev) => ({...prev, date: date}));
         getAvailableEmployees(date);
+    }
+    const handleEmployeeChange = (id) => {
+        setOpenServices(true); // oct 10
+        setAppointmentData((prev) => ({...prev, employee_id: id}));
+        
     }
 
     const getAvailableEmployees = (date) => {
         const incomingDate = date.toISO();
         getEmployeeList(incomingDate,link)
         .then(response => {
-            setAppEmployees(response)
+            setAppEmployees(response);
+            
         })
         .catch(error => {
             setError(error);
@@ -153,9 +162,6 @@ export default function WelcomeSelector() {
             setOpenEmployees(true);
         })
     }
-
-
-
 
     return (
         <>
@@ -209,33 +215,46 @@ export default function WelcomeSelector() {
                             systemTypeSelected === APPOINTMENT 
                             &&
                             <Box id="appointmentSection" sx={{ pt: 1}}>
-                                    <StaticDatePicker
+                                    <DateCalendar
                                         orientation="portrait"
                                         onChange={(newDate) => handleDateChange(newDate) }
                                         defaultValue={currentDate} />
 
                                         <Box sx={{display: 'flex'}}>
-                                            <Fade in={openEmployees}>
+                                            <Grow in={openEmployees}
+                                            style={{ transformOrigin: '0 0 0' }}
+                                                {...(openEmployees ? { timeout: 1000 } : {})}
+                                            >
+                                                <Stack sx={{ display: 'flex', justifyContent: 'left'}}>
+                                                <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
                                                 <Grid
                                                     container 
                                                     direction={'row'}
                                                     rowSpacing={1}
-                                                    columnSpacing={0}
+                                                    columnSpacing={1}
                                                 >
                                                     
                                                     {   appointmentEmployees ? 
                                                         appointmentEmployees.map((item) => {
                                                             return (
-                                                                <Grid item>
-                                                                    <Button variant="outlined">
-                                                                        { item.fullname}
-                                                                    </Button>
+                                                                <Grid item key={item.id}>
+                                                                    <Card sx={{backgroundColor: appointmentData.employee_id === item.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(item.id)}>
+                                                                        <CardActionArea>
+                                                                            <CardContent>
+                                                                                <PersonIcon />
+                                                                                <Typography variant="caption">{item.fullname}</Typography>
+                                                                            </CardContent>
+                                                                        </CardActionArea>
+                                                                    </Card>
                                                                 </Grid>
+                                                            
                                                             )
                                                         })
-                                                    : null}
+                                                    : <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>}
                                                 </Grid>
-                                            </Fade>
+                                                </Stack>
+                                            </Grow>
+                                            
                                         </Box>
                             </Box>
                             ||
@@ -247,7 +266,7 @@ export default function WelcomeSelector() {
                                 onSubmit={setDataAndContinue}
                                 validationSchema={validationSchema}
                         >
-                    {({ errors, touched, handleChange, handleBlur }) => (
+                        {({ errors, touched, handleChange, handleBlur }) => (
                         <Form>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2} textAlign="left">
 
@@ -314,8 +333,7 @@ export default function WelcomeSelector() {
                                 </Field>
                             </>
                             ) : null}
-                                <InputLabel id="notes" textAlign="left">Additional notes</InputLabel>
-
+                            <InputLabel id="notes" textAlign="left">Additional notes</InputLabel>
                             <Field
                             as={TextField}
                             id="notes"
@@ -326,20 +344,13 @@ export default function WelcomeSelector() {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             />
-
                             <ErrorMessage name="notes" component="div" />
-
-                            
-
                         </Stack>
                         </Form>
                         )}
                                 </Formik>
                             </Box>
                         }
-
-
-
                         <Container sx={{ pt: 3}}>
                             <Button disabled={systemTypeSelected === null} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
                                 <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
