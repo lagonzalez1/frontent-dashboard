@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow } from "@mui/material";
+    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { requestBusinessArguments, getExtras, getEmployeeList, findServicesAssociatedWithEmployee} from "./WelcomeHelper";
+import { requestBusinessArguments, getExtras, getEmployeeList, getAvailableAppointments} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSize.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
@@ -152,11 +152,13 @@ export default function WelcomeSelector() {
      * 
      * @param {STRING} date
      * Service change promps availabilty durations
-     *  
+     * Issue: We assume this value will be filled once the state is fullfilled. 
      */
     const handleServiceChange = (id) => {
         setOpenAvailability(true);
-        setAppointmentData((prev) => ({...prev, service_id: id}));
+        setAppointmentData((prev) => ({...prev, service_id: id})); // Assume this will not fail, might be q issue later. 
+        searchAppointments(id);
+        // Call function with (link, employee_id, service_id) -> Durations.
     }
     /**
      * 
@@ -168,6 +170,27 @@ export default function WelcomeSelector() {
         setOpenServices(true);
         setAppointmentData((prev) => ({...prev, employee_id: id}));
 
+    }
+
+    const searchAppointments = (id) => {
+        if (appointmentData.date === null || appointmentData.employee_id === null){ 
+            setError("Missing values");
+            return;
+        }
+        console.log("Called");
+        const payload = { employeeId: appointmentData.employee_id, serviceId: id, appointmentDate: appointmentData.date.toISO(), link }
+        getAvailableAppointments(payload)
+        .then(response => {
+            console.log(response)
+            setSlots(response.data)
+        })
+        .catch(error => {
+            setError(error);
+            console.log(error)
+        })
+        .finally(() => {
+            //setLoading(false);
+        })
     }
 
     const getAvailableEmployees = (date) => {
@@ -222,7 +245,7 @@ export default function WelcomeSelector() {
                             }
                             sx={{ mb: 2 }}
                             >
-                            {error}
+                            {'Found error'}
                             </Alert>
                         ): null}
 
@@ -243,13 +266,14 @@ export default function WelcomeSelector() {
                                         onChange={(newDate) => handleDateChange(newDate) }
                                         defaultValue={currentDate} />
 
-                                        <Box id="employeeSelect" sx={{display: 'flex'}}>
+                                        <Box id="employeeSelect">
                                             <Grow in={openEmployees}
-                                            style={{ transformOrigin: '0 0 0' }}
+                                                style={{ transformOrigin: '0 0 0' }}
                                                 {...(openEmployees ? { timeout: 1000 } : {})}
                                             >
-                                                <Stack sx={{ display: 'flex', justifyContent: 'left'}}>
+                                                <Stack sx={{ display: 'flex', justifyContent: 'left'}} spacing={1}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+
                                                 <Grid
                                                     container 
                                                     direction={'row'}
@@ -278,21 +302,26 @@ export default function WelcomeSelector() {
                                                 </Stack>
                                             </Grow>
                                         </Box>
-                                        <Box id="serviceSelect" sx={{display:'flex'}}>
+                                        <Box id="serviceSelect" sx={{pt: 1}}>
                                             <Grow in={openServices}>
-                                                <Stack sx={{display: 'flex', justifyContent: 'left'}}>
-                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
+                                                <Stack sx={{display: 'flex', justifyContent: 'left'}} spacing={1}>
+                                                <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
+
                                                         {
                                                         services ? 
                                                         services
-                                                        .filter((service) => service.employeeTags.includes(values.employee_id))
+                                                        .filter((service) => service.employeeTags.includes(appointmentData.employee_id))
                                                         .map((service) => (
                                                             <Grid item key={service._id}>
                                                                 <Card sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service._id)}>
-                                                                    <Stack>
-                                                                        <Typography variant="body2">{service.title}</Typography>
-                                                                        <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
-                                                                    </Stack>
+                                                                    <CardActionArea>
+                                                                        <CardContent>
+                                                                        <Stack>
+                                                                            <Typography variant="body2">{service.title}</Typography>
+                                                                            <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
+                                                                        </Stack>    
+                                                                        </CardContent>
+                                                                    </CardActionArea>
                                                                 </Card>
                                                             </Grid>
                                                         )):
@@ -301,35 +330,56 @@ export default function WelcomeSelector() {
                                                 </Stack>
                                             </Grow>
                                         </Box>
-                                        <Box id="availabilitySelect" sx={{display:'flex'}}>
+                                        {
+                                            // Slots is causing the entire width to span, overFlowX is not containing the width.
+                                            // Oct 12
+                                        }
+                                        <Box id="intervalSelect"sx={{ maxWidth: '100%', overflowX: 'auto'}}>
                                             <Grow in={openAvailabity}>
-                                                <Stack sx={{display: 'flex', justifyContent: 'left'}}>
-                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Availability</Typography>
-                                                        {
-                                                        services ? 
-                                                        services
-                                                        .filter((service) => service.employeeTags.includes(values.employee_id))
-                                                        .map((service) => (
-                                                            <Grid item key={service._id}>
-                                                                <Card sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service._id)}>
-                                                                    <Stack>
-                                                                        <Typography variant="body2">{service.title}</Typography>
-                                                                        <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
-                                                                    </Stack>
-                                                                </Card>
-                                                            </Grid>
-                                                        )):
-                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No services found</Typography> 
-                                                    }
+                                                <Stack sx={{ display: 'flex', justifyContent: 'left'}} spacing={1}> 
+                                                    <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>
+                                                    <Grid
+                                                        container 
+                                                        direction={'row'}
+                                                        rowSpacing={1}
+                                                        columnSpacing={0}
+                                                    >
+                                        {
+                                            slots ? (
+
+                                                Object.keys(slots).map((key, index) => {
+                                                    const appointment = slots[key];
+                                                    return (
+                                                        
+                                                        <Grid item key={index}>
+                                                        <Button 
+                                                            sx={{borderRadius: 10}}
+                                                            //variant={selectedAppointment === appointment ? "contained": "outlined"}
+                                                            size="sm"
+                                                            onClick={() => console.log(appointment)} 
+                                                            //color={selectedAppointment === appointment ? 'primary': 'secondary'}
+                                                            id="appointmentButtons">
+                                                            <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                            <Typography display="block" variant="caption">{"-"}</Typography>
+                                                            <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                        </Button>
+                                                        </Grid>
+                                                    )
+                                                })
+                                            
+                                            ): null
+                                        }
+                                    </Grid>
                                                 </Stack>
                                             </Grow>
+                                                
                                         </Box>
                                         
                             </Box>
                             ||
                             systemTypeSelected === WAITLIST 
                             && 
-                            <Box id="waitlistSection"  sx={{pt: 1}}>
+                            <Box id="waitlistSection"  sx={{pt: 2}}>
                                 <Formik
                                 initialValues={initialValues}
                                 onSubmit={setDataAndContinue}

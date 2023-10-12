@@ -14,11 +14,25 @@ export const allowClientJoin = (time,link) => {
         });
     });
   };
+  // 
+  export const getAvailableAppointments = (payload) => {
+    return new Promise((resolve, reject) => {
+        const data = { ...payload}
+        axios.post('/api/external/available_appointments',data)
+        .then(response => {
+            resolve(response.data);
+        })
+        .catch(error => {
+            reject(error);
+
+        })
+    })
+}
 
   export const findServicesAssociatedWithEmployee = (id, services) => {
     const collection = [];
     for (var service of services){
-      
+
       if (service._id === id){
         collection.push(service)
       }
