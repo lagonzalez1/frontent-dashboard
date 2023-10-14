@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { requestBusinessArguments, getExtras, getEmployeeList, getAvailableAppointments} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSize.css";
+import "../../css/WelcomeSelector.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CloseIcon from '@mui/icons-material/Close';
@@ -167,6 +168,7 @@ export default function WelcomeSelector() {
      *  
      */
     const handleEmployeeChange = (id) => {
+        setOpenAvailability(false);
         setOpenServices(true);
         setAppointmentData((prev) => ({...prev, employee_id: id}));
 
@@ -211,8 +213,8 @@ export default function WelcomeSelector() {
 
     return (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-                <Card sx={{ minWidth: 465, textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3}}>
+                <Card sx={{ maxWidth: '100vh', minWidth: '30%', maxHeight: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
                     <Container sx={{ textAlign: 'left'}}>
                         <IconButton onClick={ () => redirectBack() }>
                             <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
@@ -266,7 +268,7 @@ export default function WelcomeSelector() {
                                         onChange={(newDate) => handleDateChange(newDate) }
                                         defaultValue={currentDate} />
 
-                                        <Box id="employeeSelect">
+                                        <Box id="employeeSelect" sx={{ display: openEmployees ? 'flex': 'none'}}>
                                             <Grow in={openEmployees}
                                                 style={{ transformOrigin: '0 0 0' }}
                                                 {...(openEmployees ? { timeout: 1000 } : {})}
@@ -302,7 +304,7 @@ export default function WelcomeSelector() {
                                                 </Stack>
                                             </Grow>
                                         </Box>
-                                        <Box id="serviceSelect" sx={{pt: 1}}>
+                                        <Box id="serviceSelect" sx={{pt: 1, display: openServices ? 'flex': 'none'}}>
                                             <Grow in={openServices}>
                                                 <Stack sx={{display: 'flex', justifyContent: 'left'}} spacing={1}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
@@ -334,43 +336,42 @@ export default function WelcomeSelector() {
                                             // Slots is causing the entire width to span, overFlowX is not containing the width.
                                             // Oct 12
                                         }
-                                        <Box id="intervalSelect"sx={{ maxWidth: '100%', overflowX: 'auto'}}>
+                                        <Box id="intervalSelect" sx={{pt: 1, display: openAvailabity ? 'flex': 'none', overflowX: 'auto'}}>
                                             <Grow in={openAvailabity}>
-                                                <Stack sx={{ display: 'flex', justifyContent: 'left'}} spacing={1}> 
+                                                <Box sx={{display: 'block', whiteSpace: 'nowrap'}}>
                                                     <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>
                                                     <Grid
+                                                        maxHeight={1}
                                                         container 
-                                                        direction={'row'}
+                                                        wrap='nowrap'
+                                                        flexDirection={'row'}
                                                         rowSpacing={1}
-                                                        columnSpacing={0}
                                                     >
-                                        {
-                                            slots ? (
-
-                                                Object.keys(slots).map((key, index) => {
-                                                    const appointment = slots[key];
-                                                    return (
+                                                    {
+                                                        slots ? (
+                                                            Object.keys(slots).map((key, index) => {
+                                                                const appointment = slots[key];
+                                                                return (   
+                                                                    <Grid item key={index}>
+                                                                    <Button 
+                                                                        sx={{borderRadius: 10}}
+                                                                        //variant={selectedAppointment === appointment ? "contained": "outlined"}
+                                                                        size="sm"
+                                                                        onClick={() => console.log(appointment)} 
+                                                                        //color={selectedAppointment === appointment ? 'primary': 'secondary'}
+                                                                        id="appointmentButtons">
+                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                                        <Typography variant="caption">{"-"}</Typography>
+                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                                    </Button>
+                                                                    </Grid>
+                                                                )
+                                                            })
                                                         
-                                                        <Grid item key={index}>
-                                                        <Button 
-                                                            sx={{borderRadius: 10}}
-                                                            //variant={selectedAppointment === appointment ? "contained": "outlined"}
-                                                            size="sm"
-                                                            onClick={() => console.log(appointment)} 
-                                                            //color={selectedAppointment === appointment ? 'primary': 'secondary'}
-                                                            id="appointmentButtons">
-                                                            <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                            <Typography display="block" variant="caption">{"-"}</Typography>
-                                                            <Typography display="block" variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                        </Button>
-                                                        </Grid>
-                                                    )
-                                                })
-                                            
-                                            ): null
-                                        }
-                                    </Grid>
-                                                </Stack>
+                                                        ): null
+                                                    }
+                                                    </Grid>
+                                                    </Box>
                                             </Grow>
                                                 
                                         </Box>

@@ -82,7 +82,7 @@ export default function WelcomeExtras() {
     return (
         <>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-                <Card sx={{ minWidth: 465, textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+                <Card sx={{ maxWidth: '100vh', minWidth: '40%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
 
                     {loading ? <CircularProgress/> : (<>
                     <Container sx={{ textAlign: 'left'}}>

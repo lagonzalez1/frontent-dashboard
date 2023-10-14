@@ -360,7 +360,6 @@ export default function FabAppointment () {
                             null}
 
                             <ErrorMessage name="notes" component="div" />
-                            
                             {nextStep ? 
                             (
                             <>
