@@ -7,8 +7,8 @@ import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { getMax} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
-import "../../css/WelcomeSize.css";
 import { CLIENT } from "../../static/static";
+import "../../css/Welcome.css";
 
 
 export default function Welcome() {
@@ -40,9 +40,21 @@ export default function Welcome() {
         sessionStorage.setItem(CLIENT, JSON.stringify(object));
         navigate(`/welcome/${link}/selector`);
     }
+
+    const getAnySavedFields = () => {
+        const user = sessionStorage.getItem(CLIENT);
+        if (user) {
+            let userObject = JSON.parse(user);
+            if (userObject.partySize) {
+                setSize(userObject.partySize);
+            }
+            return;
+        }
+    }
     
     useEffect(() => {
         getBuisnessForm();
+        getAnySavedFields();
         return() => {
             setLoading(false)
         }
@@ -63,20 +75,21 @@ export default function Welcome() {
     }
     return (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-                <Card sx={{ maxWidth: '100vh', minWidth: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+            <Box className="center-box" sx={{ pt: 3 }}>
+                <Card className="custom-card"  sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
                     <Container sx={{ textAlign: 'left'}}>
                         <IconButton onClick={ () => redirectBack() }>
                             <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                         </IconButton>
                     </Container>
-                    <CardContent>
-                    
-                        <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
+                    <CardContent sx={{ justifyContent: 'center'}}>
+                        <Container>
+
+                        <Typography variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
                             {link}
                         </Typography>
                             {loading ? <CircularProgress /> : null}
-                        <Typography variant="h4" fontWeight="bold">
+                        <Typography variant="h4" fontWeight="bold" textAlign={'center'}>
                             Party size
                         </Typography>
 
@@ -107,14 +120,17 @@ export default function Welcome() {
                         </Box>
 
 
-
-                        <Typography sx={{ pt: 3}} variant="body2" fontWeight="bold">Current wait time 8 min.</Typography>
+                        { 
+                            // Current wait time needs to be calculated. 
+                        }
+                        <Typography sx={{ pt: 3}} textAlign={'center'} variant="body2" fontWeight="bold">Current wait time 8 min.</Typography>
                         <Container sx={{ pt: 3}}>
                             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
                                 <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
                                     Next
                                 </Typography>
                             </Button> 
+                        </Container>
                         </Container>
                                     
                     </CardContent>

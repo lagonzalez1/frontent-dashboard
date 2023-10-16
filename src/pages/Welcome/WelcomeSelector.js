@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert } from "@mui/material";
+    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert, Chip, Divider, AlertTitle } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { requestBusinessArguments, getExtras, getEmployeeList, getAvailableAppointments} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
-import "../../css/WelcomeSize.css";
 import "../../css/WelcomeSelector.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
+import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
+import * as Yup from 'yup';
 
 
 export default function WelcomeSelector() {
@@ -28,6 +30,7 @@ export default function WelcomeSelector() {
     const [openEmployees, setOpenEmployees] = useState(false);
     const [openServices, setOpenServices] = useState(false);
     const [openAvailabity, setOpenAvailability] = useState(false);
+    const [openSummary, setOpenSummary] = useState(false);
 
     const [systemTypeSelected, setSystem] = useState(null);
 
@@ -48,6 +51,8 @@ export default function WelcomeSelector() {
         notes: ''
     })
     const [appointmentData, setAppointmentData] = useState({
+        fullname: null,
+        serviceName: null,
         employee_id: null,
         service_id: null,
         resource_id: null,
@@ -57,6 +62,26 @@ export default function WelcomeSelector() {
         start: null,
         end: null
     });
+
+    const initialValues = {
+        employee_id: '',
+        service_id: '',
+        resource_id: '',
+        notes: ''
+    };
+
+    const validationSchema = Yup.object({
+        employee_id: Yup.string(),
+        service_id: Yup.string(),
+        resource_id: Yup.string(),
+        notes: Yup.string()
+    });
+
+    const appointmentSlotSelect = (duration) => {
+        const {start, end} = duration;
+        setAppointmentData((prev) => ({...prev, start: start, end: end}));
+        setOpenSummary(true);
+    }
 
     const setDataAndContinue = () => {
         if (systemTypeSelected === APPOINTMENT){
@@ -131,6 +156,22 @@ export default function WelcomeSelector() {
    
     const typeChange = (TYPE) => {
         setSystem(TYPE);
+        setWaitlistData({
+            employee_id: '',
+            service_id: '',
+            resource_id: '',
+            notes: ''
+        })
+        setAppointmentData({
+            employee_id: null,
+            service_id: null,
+            resource_id: null,
+            start: null,
+            end: null,
+            date: null,
+            start: null,
+            end: null
+        })
     }
 
     const redirectBack = () => {
@@ -155,10 +196,10 @@ export default function WelcomeSelector() {
      * Service change promps availabilty durations
      * Issue: We assume this value will be filled once the state is fullfilled. 
      */
-    const handleServiceChange = (id) => {
+    const handleServiceChange = (service) => {
         setOpenAvailability(true);
-        setAppointmentData((prev) => ({...prev, service_id: id})); // Assume this will not fail, might be q issue later. 
-        searchAppointments(id);
+        setAppointmentData((prev) => ({...prev, service_id: service._id, serviceName: service.title})); // Assume this will not fail, might be q issue later. 
+        searchAppointments(service._id);
         // Call function with (link, employee_id, service_id) -> Durations.
     }
     /**
@@ -167,10 +208,11 @@ export default function WelcomeSelector() {
      * Employee select promps service filtration.
      *  
      */
-    const handleEmployeeChange = (id) => {
+    const handleEmployeeChange = (employee) => {
         setOpenAvailability(false);
+        setOpenSummary(false);
         setOpenServices(true);
-        setAppointmentData((prev) => ({...prev, employee_id: id}));
+        setAppointmentData((prev) => ({...prev, employee_id: employee.id, fullname: employee.fullname}));
 
     }
 
@@ -213,17 +255,16 @@ export default function WelcomeSelector() {
 
     return (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3}}>
-                <Card sx={{ maxWidth: '100vh', minWidth: '30%', maxHeight: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
-                    <Container sx={{ textAlign: 'left'}}>
-                        <IconButton onClick={ () => redirectBack() }>
-                            <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
-                        </IconButton>
-                    </Container>
-
+            <Box className="center-box" sx={{}}>
+                <Card className="custom-card" sx={{ p: 1, borderRadius: 5, boxShadow: 0, marginTop: 2 }}>
                     {loading ? (<CircularProgress />): 
                     <CardContent>
-                    
+                        <Container sx={{ textAlign: 'left'}}>
+                            <IconButton onClick={ () => redirectBack() }>
+                                <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
+                            </IconButton>
+                        </Container>
+                        <Container>
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             {link}
                         </Typography>
@@ -262,19 +303,23 @@ export default function WelcomeSelector() {
 
                             systemTypeSelected === APPOINTMENT 
                             &&
-                            <Box id="appointmentSection" sx={{ pt: 1}}>
+                            <Box id="appointmentSection" sx={{ justifyContent: 'center', alignItems: 'center'}}>
                                     <DateCalendar
+                                        sx={{width: 'auto'}}
+                                        disablePast={true}
                                         value={appointmentData.date}
                                         onChange={(newDate) => handleDateChange(newDate) }
-                                        defaultValue={currentDate} />
+                                        defaultValue={currentDate} 
+                                    />
+                                        <Box sx={{pt: 1, display: openEmployees ? 'flex': 'none'}}>
+                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+                                        </Box>
 
-                                        <Box id="employeeSelect" sx={{ display: openEmployees ? 'flex': 'none'}}>
+                                        <Box className="scroll-left" id="employeeSelect" sx={{ display: openEmployees ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
                                             <Grow in={openEmployees}
                                                 style={{ transformOrigin: '0 0 0' }}
                                                 {...(openEmployees ? { timeout: 1000 } : {})}
                                             >
-                                                <Stack sx={{ display: 'flex', justifyContent: 'left'}} spacing={1}>
-                                                <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
 
                                                 <Grid
                                                     container 
@@ -287,7 +332,7 @@ export default function WelcomeSelector() {
                                                         appointmentEmployees.map((employee) => {
                                                             return (
                                                                 <Grid item key={employee.id}>
-                                                                    <Card sx={{backgroundColor: appointmentData.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee.id)}>
+                                                                    <Card className="card-style" sx={{backgroundColor: appointmentData.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee)}>
                                                                         <CardActionArea>
                                                                             <CardContent>
                                                                                 <PersonIcon />
@@ -301,27 +346,46 @@ export default function WelcomeSelector() {
                                                         })
                                                     : <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>}                                                    
                                                 </Grid>
-                                                </Stack>
                                             </Grow>
                                         </Box>
-                                        <Box id="serviceSelect" sx={{pt: 1, display: openServices ? 'flex': 'none'}}>
-                                            <Grow in={openServices}>
-                                                <Stack sx={{display: 'flex', justifyContent: 'left'}} spacing={1}>
-                                                <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
 
-                                                        {
+                                        <Box sx={{pt: 1, display: openServices ? 'flex': 'none'}}>
+                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
+                                        </Box>
+                                        <Box id="serviceSelect" className="scroll-left" sx={{pt: 1, display: openServices ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
+                                            <Grow in={openServices}>
+                                                <Grid
+                                                    container 
+                                                    direction={'row'}
+                                                    rowSpacing={1}
+                                                    columnSpacing={1}
+                                                >
+
+                                                    {
                                                         services ? 
                                                         services
                                                         .filter((service) => service.employeeTags.includes(appointmentData.employee_id))
                                                         .map((service) => (
                                                             <Grid item key={service._id}>
-                                                                <Card sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service._id)}>
+                                                                <Card variant="outlined" className="card-style" sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service)}>
                                                                     <CardActionArea>
                                                                         <CardContent>
-                                                                        <Stack>
-                                                                            <Typography variant="body2">{service.title}</Typography>
-                                                                            <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
-                                                                        </Stack>    
+
+                                                                        <Grid container alignItems="center">
+                                                                            <Grid item xs>
+                                                                                <Typography component="div" variant="subtitle2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                                                            </Grid>
+                                                                            <Grid item>
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                        <Typography gutterBottom color="text.secondary" variant="body2">
+                                                                            { service.description }
+                                                                        </Typography>
+                                                                        <Divider variant="middle" />                                                                    
+                                                                        <Stack sx={{m: 1}} spacing={0.5}>
+                                                                            <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
+                                                                            <Chip size="small" label={"Cost: " + service.cost} avatar={<PaidRoundedIcon fontSize="small" />} />
+                                                                        </Stack>
                                                                         </CardContent>
                                                                     </CardActionArea>
                                                                 </Card>
@@ -329,23 +393,26 @@ export default function WelcomeSelector() {
                                                         )):
                                                         <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No services found</Typography> 
                                                     }
-                                                </Stack>
+                                                    </Grid>
                                             </Grow>
                                         </Box>
                                         {
                                             // Slots is causing the entire width to span, overFlowX is not containing the width.
                                             // Oct 12
                                         }
-                                        <Box id="intervalSelect" sx={{pt: 1, display: openAvailabity ? 'flex': 'none', overflowX: 'auto'}}>
+                                    
+                                        <Box sx={{ pt: 1, display: openAvailabity ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
+                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
+                                        </Box>
+                                        <Container id="intervalSelect" sx={{pt: 1, display: openAvailabity ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
                                             <Grow in={openAvailabity}>
-                                                <Box sx={{display: 'block', whiteSpace: 'nowrap'}}>
-                                                    <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>
+                                                <Box className="scroll-left" sx={{display: 'block', whiteSpace: 'nowrap'}}>
                                                     <Grid
                                                         maxHeight={1}
                                                         container 
                                                         wrap='nowrap'
                                                         flexDirection={'row'}
-                                                        rowSpacing={1}
+                                                        rowSpacing={2}
                                                     >
                                                     {
                                                         slots ? (
@@ -355,14 +422,14 @@ export default function WelcomeSelector() {
                                                                     <Grid item key={index}>
                                                                     <Button 
                                                                         sx={{borderRadius: 10}}
-                                                                        //variant={selectedAppointment === appointment ? "contained": "outlined"}
+                                                                        variant={appointmentData.start === appointment.start ? "contained": "outlined"}
                                                                         size="sm"
-                                                                        onClick={() => console.log(appointment)} 
-                                                                        //color={selectedAppointment === appointment ? 'primary': 'secondary'}
+                                                                        onClick={() => appointmentSlotSelect(appointment)} 
+                                                                        color={appointmentData.start === appointment.start ? 'primary': 'secondary'}
                                                                         id="appointmentButtons">
-                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>
                                                                         <Typography variant="caption">{"-"}</Typography>
-                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("h:mm a")}</Typography>
                                                                     </Button>
                                                                     </Grid>
                                                                 )
@@ -373,8 +440,26 @@ export default function WelcomeSelector() {
                                                     </Grid>
                                                     </Box>
                                             </Grow>
-                                                
-                                        </Box>
+                                        </Container>
+                                        
+
+                                        {
+                                            openSummary && (
+                                                <Box sx={{ pt: 1, display: openSummary ? "flex": 'none', width: '100%'}}>
+                                                    <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
+                                                        <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
+                                                        <Typography variant="caption">Date assigned — <strong>{appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>
+                                                        <br/>
+                                                        <Typography variant="caption">Start — <strong>{DateTime.fromFormat(appointmentData.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(appointmentData.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
+                                                        <br/>
+                                                        <Typography variant="caption">With — <strong>{appointmentData.fullname}</strong></Typography>
+                                                        <br/>
+                                                        <Typography variant="caption">Service — <strong>{appointmentData.serviceName}  </strong></Typography>
+                                                    </Alert>
+                                                </Box>
+                                            )
+                                        }
+                                        
                                         
                             </Box>
                             ||
@@ -479,6 +564,7 @@ export default function WelcomeSelector() {
                             </Button> 
                         </Container>
                                     
+                        </Container>
                     </CardContent>
                     }
 

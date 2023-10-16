@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { allowClientJoin, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
+import "../../css/Welcome.css";
 
 
 export default function Welcome() {
@@ -146,8 +147,8 @@ export default function Welcome() {
 
     return (
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-                <Card sx={{ maxWidth: '100vh', minWidth: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+            <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
+                <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
                     
                     { loading ? <CircularProgress/> : 
                     (<>
@@ -161,7 +162,7 @@ export default function Welcome() {
                     </CardContent>
                     </>
                     )}
-                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
+                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 2, pt: 7}}>
                         <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                     </CardActions>
                 </Card>
