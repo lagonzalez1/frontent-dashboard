@@ -6,7 +6,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from 'yup';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useDispatch, useSelector } from 'react-redux';
-import { TIMEZONES, validationSchemaSchedule, initialValuesSchedule, validationSchemaTimezone, requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate } from "../FormHelpers/OpeningHoursHelper";
+import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone, 
+  requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
 import { getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
@@ -16,6 +17,7 @@ import { getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
 const OpeningHoursForm = () => {
 
   const business = useSelector((state) => state.business);
+  const schedule = useSelector((state) => state.business.schedule);
   const closedDays = useSelector((state) => state.business.closedDates);
   const employeeList = getEmployeeList();
 
@@ -154,6 +156,12 @@ const OpeningHoursForm = () => {
     );
   };
 
+
+const initialValuesSchedule = {
+  ...schedule
+};
+
+
   return (
     <>
     <Formik
@@ -252,15 +260,16 @@ const OpeningHoursForm = () => {
                 </strong>
 
             </DialogTitle>
-          {loading ? <CircularProgress /> :
+          {loading ? <DialogContent>
+            <CircularProgress /> 
+          </DialogContent>:
           <DialogContent>
             <Divider />
-            <Box sx={{textAlign: 'left'}}>
+            <Box sx={{textAlign: 'left', pb: 1}}>
             <Typography variant='caption'>Any changes will reflect immediately.</Typography>
             <br/>
             <Typography variant='caption'>Submit your 
               time based on 24 hour time (Ex. 08:00~8AM, 18:00~6PM.)</Typography>
-
             <br/>
             <Divider />
             </Box>
@@ -288,7 +297,6 @@ const OpeningHoursForm = () => {
                 <Box display={'flex'}>
                   <TimeInput label="Thursday Start" name="Thursday.start" />
                   <Divider orientation='vertical' flexItem>-</Divider>
-
                   <TimeInput label="Thursday End" name="Thursday.end" />
                 </Box>
                 <Box display={'flex'}>
@@ -311,7 +319,7 @@ const OpeningHoursForm = () => {
                 </Box>
                 <DialogActions>
                   
-                  <Button sx={{ borderRadius: 15}} type="submit" variant='contained' color="primary">
+                  <Button sx={{ borderRadius: 10}} type="submit" variant='contained' color="primary">
                     Save
                   </Button>
                 </DialogActions>
@@ -349,7 +357,9 @@ const OpeningHoursForm = () => {
                 </strong>
 
             </DialogTitle>
-          {loading ? <CircularProgress/> :
+          {loading ? <DialogContent>
+            <CircularProgress/>
+          </DialogContent> :
 
           <DialogContent>
 
@@ -394,20 +404,22 @@ const OpeningHoursForm = () => {
                   </Table>
                   
                   <br/>
-                  <FutureDatePicker label="Select a date you wish to be closed" value={selectedDate} onChange={handleDateChange} />
-                  <InputLabel id="employeeTag">Attach employee?</InputLabel>
-                  <Select 
-                    id="employeeTag"
-                    handleChange={(e) => setEmployeeTag(e.target.value)}
-                    fullWidth={true}
-                    size='small'
-                  >
-                    {employeeList.map((employee) => (
-                      <MenuItem key={employee._id} value={employee._id}>
-                        {employee.fullname}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                  <Stack spacing={1}> 
+                    <FutureDatePicker label="Select a date you wish to be closed" value={selectedDate} onChange={handleDateChange} />
+                    <InputLabel id="employeeTag">Attach employee?</InputLabel>
+                    <Select 
+                      sx={{ pt: 1}}
+                      id="employeeTag"
+                      handleChange={(e) => setEmployeeTag(e.target.value)}
+                      fullWidth={true}
+                    >
+                      {employeeList.map((employee) => (
+                        <MenuItem key={employee._id} value={employee._id}>
+                          {employee.fullname}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </Stack>
                   
 
               </Stack>
@@ -415,7 +427,7 @@ const OpeningHoursForm = () => {
           </DialogContent>
           }
           <DialogActions>
-            <Button variant='contained' onClick={() => saveCloseDate()}>save</Button>
+            <Button sx={{ borderRadius: 10}} variant='contained' onClick={() => saveCloseDate()}>save</Button>
           </DialogActions>
         
       </Dialog>

@@ -85,11 +85,7 @@ export const requestClosedDate = (date, employeeId) => {
 }
 
 
-export const validationSchemaTimezone = Yup.object().shape({
-  timezone: Yup.string().required('Timezone is required'),
-});
-
-export const initialValuesSchedule = {
+const initialValuesSchedule = {
   Monday: {
     start: '',
     end: '',
@@ -120,6 +116,11 @@ export const initialValuesSchedule = {
   },
   // ... repeat for other days of the week
 };
+
+export const validationSchemaTimezone = Yup.object().shape({
+  timezone: Yup.string().required('Timezone is required'),
+});
+
 
 export const validationSchemaSchedule = Yup.object().shape({
   Monday: Yup.object().shape({

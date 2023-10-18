@@ -9,18 +9,17 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { DateTime } from "luxon";
+import { CLIENT } from "../../static/static";
 
 export default function WelcomeDetails() {
 
     
     const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
-
     const validationSchema = Yup.object({
         fullname: Yup.string().required('Full Name is required'),
         phoneNumber: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format xxx-xx-xxxx')
         .required('Phone number is required'),
         email: Yup.string().email('Invalid email').required('Email is required'),
-        service: Yup.string()
     });
 
     const formik = useFormik({
@@ -28,7 +27,6 @@ export default function WelcomeDetails() {
           fullname: '',
           phoneNumber: '',
           email: '',
-          service: '',
         },
         validationSchema: validationSchema,
         onSubmit: (values) => {
@@ -39,17 +37,16 @@ export default function WelcomeDetails() {
 
     const { link } = useParams();
     const navigate = useNavigate();
-    const [services, setServices] = useState();
     const [inputs, setInputs] = useState({});
     const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [phoneNumber, setPhoneNumber] = useState(null);
 
 
     const businessForm = () => {
         getBuisnessForm(link)
         .then(data => {
             setInputs(data.inputFields);
-            setServices(data.services);
         })
         .catch(error => {
             setErrors(errors);
@@ -86,8 +83,12 @@ export default function WelcomeDetails() {
 
 
     const externalWaitlistRequest = (values) => {
-
-        const clientStorage = JSON.parse(sessionStorage.getItem('client'));
+        const clientPayload = sessionStorage.getItem(CLIENT);
+        if (payload === null) { 
+            navigate(`/welcome/${link}`)
+            return
+        }
+        const clientStorage = JSON.parse(clientPayload);
         let timestamp = DateTime.local().toUTC();
         let partySize = clientStorage.partySize;
         let payload = { ...values, link, timestamp, partySize, ...clientStorage}
@@ -113,8 +114,26 @@ export default function WelcomeDetails() {
             setErrors(error);
         })
     }
-
-    
+    const formatPhoneNumber = (input) => {
+        const digits = input.replace(/\D/g, '');
+        if (digits.length <= 3) {
+            return digits;
+          } else if (digits.length <= 6) {
+            return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+          } else {
+            return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+        }
+    }
+    const phoneNumberChange = (event) => {
+        const input = event.target.value;
+        // Apply formatting to the input and update the state
+        const phoneNumber = formatPhoneNumber(input);
+        if (phoneNumber.length === 12) {
+            console.log("Completed", phoneNumber);
+            formik.setFieldValue('phoneNumber', phoneNumber);
+        }
+        setPhoneNumber(phoneNumber);
+    }
 
     const redirectBack = () => {
         navigate(`/welcome/${link}/selector`)
@@ -165,8 +184,8 @@ export default function WelcomeDetails() {
                                         name="phoneNumber"
                                         label="Phone Number"
                                         placeholder="xxx-xxx-xxxx"
-                                        value={formik.values.phoneNumber}
-                                        onChange={formik.handleChange}
+                                        value={phoneNumber}
+                                        onChange={(event) => phoneNumberChange(event)}
                                         error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
                                         helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
                                     />
@@ -190,37 +209,7 @@ export default function WelcomeDetails() {
                                 </>
                             ): null}
                             
-                            {
-                                inputs.services ? 
-                                (
-                                    <Box sx={{ height : inputs.service ? 'auto': 0}}>
-                                    <InputLabel htmlFor="service"  sx={{ textAlign: 'left', fontWeight: 'bold'}}>
-                                        Services</InputLabel>
-                                    <Select
-                                    id="service"
-                                    name="service"
-                                    sx={{ textAlign: 'left'}}
-                                    fullWidth={true}
-                                    value={formik.values.service}
-                                    onChange={formik.handleChange}
-                                    
-                                    >
-                                    <MenuItem disabled value="">Select </MenuItem>
-                                    { services && 
-                                        services.map((item,index) => {
-                                            return(
-                                                <MenuItem key={index} value={item._id}>{item.title}</MenuItem>
-
-                                            )
-                                        })
-                                    }
-                                    
-                                    
-                                    </Select>
-                                </Box>
-                                )
-                                :null
-                            }
+                            
                              <Divider/>
                              <Button sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                             { loading ? (<CircularProgress />) :
@@ -231,10 +220,7 @@ export default function WelcomeDetails() {
                             </Stack>
 
                             </form>      
-
-                                    
-                        
-                                          
+                
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
                     

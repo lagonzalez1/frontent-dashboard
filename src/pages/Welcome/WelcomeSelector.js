@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { requestBusinessArguments, getExtras, getEmployeeList, getAvailableAppointments} from "./WelcomeHelper";
+import { requestBusinessArguments, getExtras, getEmployeeList,getAvailableAppointments  } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSelector.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
@@ -31,6 +31,7 @@ export default function WelcomeSelector() {
     const [openServices, setOpenServices] = useState(false);
     const [openAvailabity, setOpenAvailability] = useState(false);
     const [openSummary, setOpenSummary] = useState(false);
+    const [openWaitlistSummary, setOpenWaitlistSummary] = useState(false);
 
     const [systemTypeSelected, setSystem] = useState(null);
 
@@ -45,6 +46,9 @@ export default function WelcomeSelector() {
     const [appointmentEmployees, setAppEmployees] = useState(null);
 
     const [waitlistData, setWaitlistData] = useState({
+        fullname: null,
+        serviceTitle: null,
+        resourceTitle: null,
         employee_id: '',
         service_id: '',
         resource_id: '',
@@ -63,19 +67,7 @@ export default function WelcomeSelector() {
         end: null
     });
 
-    const initialValues = {
-        employee_id: '',
-        service_id: '',
-        resource_id: '',
-        notes: ''
-    };
-
-    const validationSchema = Yup.object({
-        employee_id: Yup.string(),
-        service_id: Yup.string(),
-        resource_id: Yup.string(),
-        notes: Yup.string()
-    });
+    
 
     const appointmentSlotSelect = (duration) => {
         const {start, end} = duration;
@@ -84,17 +76,24 @@ export default function WelcomeSelector() {
     }
 
     const setDataAndContinue = () => {
+        console.log(appointmentData);
+        console.log(waitlistData);
         if (systemTypeSelected === APPOINTMENT){
-            if (appointmentData.date === null || appointmentData.start === null || appointmentData.end === null){
+            if (appointmentData.date === null || appointmentData.start === null || appointmentData.end === null || appointmentData.employee_id === null){
                 setError('You are missing values for yoour appointment.');
                 return;
             }
             const payload = sessionStorage.getItem(CLIENT);
+            if (payload === null) { 
+                setError('Unable to find previous values.');
+                return;
+            }
             // Check if data is empty.
             let previousData = JSON.parse(payload);
             const object = {
                 TYPE: APPOINTMENT,
                 ...appointmentData,
+                date: appointmentData.date.toISO(),
                 ...previousData
             }
             sessionStorage.setItem(CLIENT, JSON.stringify(object));
@@ -103,8 +102,14 @@ export default function WelcomeSelector() {
         }
         if (systemTypeSelected === WAITLIST){
             const payload = sessionStorage.getItem(CLIENT);
+            if (payload === null) { 
+                setError('Unable to find previous values.');
+                return;
+            }
             let previousData = JSON.parse(payload);
             const object = {
+                TYPE: WAITLIST,
+                ...waitlistData,
                 ...previousData,
             }
             sessionStorage.setItem(CLIENT, JSON.stringify(object));
@@ -114,10 +119,29 @@ export default function WelcomeSelector() {
         setError('Please select from the options available.');
         return;
     }
+
+    const getPreviouslySaved = () => {
+        const payload = sessionStorage.getItem(CLIENT);
+        if (payload) {
+            const previousData = JSON.parse(payload);
+            if (previousData.TYPE === APPOINTMENT){
+                setAppointmentData(() => ({...previousData, date: DateTime.fromISO(previousData.date) }));
+                setSystem(APPOINTMENT);
+                setOpenSummary(true);
+            }
+            if (previousData.TYPE === WAITLIST){
+                setWaitlistData({previousData});
+                setSystem(WAITLIST);
+                setOpenWaitlistSummary(true);
+            }
+        }
+        return;
+    }
     
     useEffect(() => {
         getBuisnessForm();
         getBuisnessExtras();
+        getPreviouslySaved();
         return() => {
             setLoading(false);
         }
@@ -172,11 +196,12 @@ export default function WelcomeSelector() {
             start: null,
             end: null
         })
+        setOpenWaitlistSummary(false);
+        setOpenSummary(false);
     }
 
     const redirectBack = () => {
         navigate(`/welcome/${link}/size`)
-    
     }
 
     /**
@@ -187,6 +212,9 @@ export default function WelcomeSelector() {
      */
     const handleDateChange = (date) => {
         setOpenEmployees(false);
+        setOpenSummary(false);
+        setOpenWaitlistSummary(false);
+        setOpenServices(false);
         setAppointmentData((prev) => ({...prev, date: date}));
         getAvailableEmployees(date);
     }
@@ -221,8 +249,8 @@ export default function WelcomeSelector() {
             setError("Missing values");
             return;
         }
-        console.log("Called");
-        const payload = { employeeId: appointmentData.employee_id, serviceId: id, appointmentDate: appointmentData.date.toISO(), link }
+        const currentDate = DateTime.now().toISO();
+        const payload = { employeeId: appointmentData.employee_id, serviceId: id, appointmentDate: appointmentData.date.toISO(), link, currentDate }
         getAvailableAppointments(payload)
         .then(response => {
             console.log(response)
@@ -344,7 +372,10 @@ export default function WelcomeSelector() {
                                                             
                                                             )
                                                         })
-                                                    : <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>}                                                    
+                                                    : <Grid item>
+                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                                                    </Grid>
+                                                    }                                                    
                                                 </Grid>
                                             </Grow>
                                         </Box>
@@ -352,7 +383,7 @@ export default function WelcomeSelector() {
                                         <Box sx={{pt: 1, display: openServices ? 'flex': 'none'}}>
                                             <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
                                         </Box>
-                                        <Box id="serviceSelect" className="scroll-left" sx={{pt: 1, display: openServices ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
+                                        <Box id="serviceSelect" className="scroll-left" sx={{pt: 0, display: openServices ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
                                             <Grow in={openServices}>
                                                 <Grid
                                                     container 
@@ -391,7 +422,9 @@ export default function WelcomeSelector() {
                                                                 </Card>
                                                             </Grid>
                                                         )):
-                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No services found</Typography> 
+                                                        <Grid item>
+                                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                                                        </Grid>
                                                     }
                                                     </Grid>
                                             </Grow>
@@ -444,10 +477,10 @@ export default function WelcomeSelector() {
                                         
 
                                         {
-                                            openSummary && (
-                                                <Box sx={{ pt: 1, display: openSummary ? "flex": 'none', width: '100%'}}>
+                                            (openSummary && systemTypeSelected === APPOINTMENT) ? (
+                                                <Box sx={{ pt: 2, display: openSummary ? "flex": 'none', width: '100%', maxWidth: '100%'}}>
                                                     <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
-                                                        <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
+                                                        <AlertTitle><Typography variant="body1"><strong>Details saved</strong></Typography></AlertTitle>
                                                         <Typography variant="caption">Date assigned — <strong>{appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>
                                                         <br/>
                                                         <Typography variant="caption">Start — <strong>{DateTime.fromFormat(appointmentData.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(appointmentData.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
@@ -457,7 +490,7 @@ export default function WelcomeSelector() {
                                                         <Typography variant="caption">Service — <strong>{appointmentData.serviceName}  </strong></Typography>
                                                     </Alert>
                                                 </Box>
-                                            )
+                                            ) : null
                                         }
                                         
                                         
@@ -466,94 +499,116 @@ export default function WelcomeSelector() {
                             systemTypeSelected === WAITLIST 
                             && 
                             <Box id="waitlistSection"  sx={{pt: 2}}>
-                                <Formik
-                                initialValues={initialValues}
-                                onSubmit={setDataAndContinue}
-                                validationSchema={validationSchema}
-                        >
-                        {({ errors, touched, handleChange, handleBlur }) => (
-                        <Form>
-                        <Stack sx={{ pt: 1 }} direction="column" spacing={2} textAlign="left">
+                                
+                                <Stack sx={{ pt: 1 }} direction="column" spacing={2} textAlign="left">
 
 
-                        {employees && present.employees === true ? (
-                            <>
-                                <InputLabel id="employee">Employee preference</InputLabel>
-                                <Field
-                                as={Select}
-                                id="employee"
-                                name="employee_id"
-                                onChange={handleChange}
-                                >
-                                {Array.isArray(employees) ? employees.map((employee) => (
-                                    <MenuItem key={employee._id} value={employee._id}>
-                                        <Typography variant="body2">{employee.fullname} </Typography>
-                                    </MenuItem>
-                                )) : null}
-                                </Field>
-                            </>
-                            ) : null}
+                                {employees && present.employees === true ? (
+                                    <>
+                                        <InputLabel id="employee">Employee preference</InputLabel>
+                                        <Select
+                                            id="employee"
+                                            name="employee_id"
+                                            value={waitlistData.employee_id}
+                                        >
+                                        {Array.isArray(employees) ? employees.map((employee) => (
+                                            <MenuItem key={employee._id} value={employee._id} onClick={() => setWaitlistData((prev) => ({...prev, employee_id: employee._id, fullname: employee.fullname}))}>
+                                                <Typography variant="body2">{employee.fullname} </Typography>
+                                            </MenuItem>
+                                        )) : null}
+                                        </Select>
+                                    </>
+                                    ) : null}
 
-                            {services && present.services === true ? (
-                            <>
-                                <InputLabel id="services">Services</InputLabel>
-                                <Field
-                                as={Select}
-                                id="services"
-                                name="service_id"
-                                onChange={handleChange}
-                                >
-                                { Array.isArray(services) ? services.map((service) => {
-                                    if (!service.public) { return null;}
-                                    return (
-                                    <MenuItem key={service._id} value={service._id}>
-                                        <Stack>
-                                            <Typography variant="body2">{service.title}</Typography>
-                                            <Typography variant="caption">{'Duration: ' + service.duration }</Typography>
-                                            <Typography variant="caption">{present.servicePrice ? ("Cost: " + service.cost) : null}</Typography>
-                                        </Stack>
-                            
-                                    </MenuItem>
-                                    )}):null }
-                                </Field>
-                            </>
-                            ) : null}
+                                    {services && present.services === true ? (
+                                    <>
+                                        <InputLabel id="services">Services</InputLabel>
+                                        <Select
+                                        id="services"
+                                        name="service_id"
+                                        value={waitlistData.service_id}
+                                        >
+                                        { Array.isArray(services) ? services.map((service) => {
+                                            if (!service.public) { return null;}
+                                            return (
+                                            <MenuItem key={service._id} value={service._id} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                                <Stack>
+                                                    <Typography variant="body2">{service.title}</Typography>
+                                                    <Typography variant="caption">{'Duration: ' + service.duration }</Typography>
+                                                    <Typography variant="caption">{present.servicePrice ? ("Cost: " + service.cost) : null}</Typography>
+                                                </Stack>
+                                    
+                                            </MenuItem>
+                                            )}):null }
+                                        </Select>
+                                    </>
+                                    ) : null}
 
-                            {resources && present.resources === true ? (
-                            <>
-                                <InputLabel id="resources" textAlign="left">Resources</InputLabel>
-                                <Field
-                                as={Select}
-                                id="resources"
-                                name="resource_id"
-                                onChange={handleChange}
-                                >
-                                {Array.isArray(resources) ? resources.map((resource) => {
-                                    if (!resource.public) { return null }
-                                    return (
-                                    <MenuItem key={resource._id} value={resource._id}>
-                                        <Typography variant="body2">{resource.title} </Typography>
-                                    </MenuItem>
-                                    )}) : null}
-                                </Field>
-                            </>
-                            ) : null}
-                            <InputLabel id="notes" textAlign="left">Additional notes</InputLabel>
-                            <Field
-                            as={TextField}
-                            id="notes"
-                            name="notes"
-                            label="Notes"
-                            placeholder="Additional notes"
-                            error={touched.notes && !!errors.notes}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            />
-                            <ErrorMessage name="notes" component="div" />
-                        </Stack>
-                        </Form>
-                        )}
-                                </Formik>
+                                    {resources && present.resources === true ? (
+                                    <>
+                                        <InputLabel id="resources" textAlign="left">Resources</InputLabel>
+                                        <Select
+                                        as={Select}
+                                        id="resources"
+                                        name="resource_id"
+                                        value={waitlistData.resource_id}
+                                        >
+                                        {Array.isArray(resources) ? resources.map((resource) => {
+                                            if (!resource.public) { return null }
+                                            return (
+                                            <MenuItem key={resource._id} value={resource._id} onClick={() => setWaitlistData((prev) => ({...prev, resource_id: resource._id, resourceTitle: resource.title}))}>
+                                                <Typography variant="body2">{resource.title} </Typography>
+                                            </MenuItem>
+                                            )}) : null}
+                                        </Select>
+                                    </>
+                                    ) : null}
+                                    <InputLabel id="notes" textAlign="left">Additional notes</InputLabel>
+                                    <TextField
+                                    id="notes"
+                                    name="notes"
+                                    label="Notes"
+                                    placeholder="Additional notes"
+                                    value={waitlistData.notes}
+                                    onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }
+                                    />
+                                </Stack>
+
+                                {
+                                    (openWaitlistSummary && systemTypeSelected === WAITLIST) ? (
+                                        <Box sx={{ pt: 1, display: openWaitlistSummary ? "flex": 'none', width: '100%', maxWidth: '100%'}}>
+                                            <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
+                                                <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
+                                                { (employees && present.employees === true) ? (
+                                                <>
+                                                <Typography variant="caption">Employee assigned — <strong>{waitlistData.fullname }</strong></Typography>
+                                                <br/>
+                                                </>
+                                                ) : null}
+                                                
+                                                { (employees && present.services === true) ? (
+                                                <>
+                                                <Typography variant="caption">Service — <strong>{waitlistData.serviceTitle }</strong></Typography>
+                                                <br/>
+                                                </>
+                                                ) : null}
+                                                { (employees && present.resources === true) ? (
+                                                <>
+                                                <Typography variant="caption">Employee assigned — <strong>{waitlistData.resourceTitle }</strong></Typography>
+                                                <br/>
+                                                </>
+                                                ) : null}
+                                                { (employees && present.notes === true) ? (
+                                                <>
+                                                <Typography variant="caption">Employee assigned — <strong>{waitlistData.notes }</strong></Typography>
+                                                <br/>
+                                                </>
+                                                ) : null}
+                                            </Alert>
+                                        </Box>
+                                    ): null
+                                }
+                                
                             </Box>
                         }
                         <Container sx={{ pt: 3}}>
