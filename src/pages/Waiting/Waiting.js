@@ -167,8 +167,8 @@ export default function Waiting() {
 
     return(
         <>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3, pl: 2, pr: 2 }}>
-                    <Card sx={{ minWidth: 350, maxWidth: 475, textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
+            <Box className="center-box" sx={{ pt: 3 }}>
+                    <Card className="custom-card" sx={{ textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
                         
                     <Box sx={{ width: '100%' }}>
                     <Collapse in={alert}>
