@@ -135,10 +135,10 @@ export const allowClientJoin = (time,link) => {
     })
   }
 
-  export const checkDuplicatesRequest = (email, link) => {
+  export const checkDuplicatesRequest = (payload) => {
     return new Promise((resolve, reject) => {
       axios
-      .post('/api/external/checkDuplicates', {link, email} )
+      .post('/api/external/checkDuplicates', payload )
       .then((response) => {
         resolve(response.data);
       })

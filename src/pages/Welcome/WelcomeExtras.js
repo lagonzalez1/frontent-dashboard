@@ -6,7 +6,7 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 import { useParams } from "react-router-dom";
-import { getExtras } from "./WelcomeHelper";
+import { allowClientJoin, getExtras } from "./WelcomeHelper";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
@@ -72,8 +72,28 @@ export default function WelcomeExtras() {
     }
     
     useEffect(() => {
+        redirectStatus();
         getBuisnessExtras();
-    }, [loading])
+    }, [loading]);
+
+
+    const redirectStatus = () => {
+        const currentTime = DateTime.local().toISO();       
+        allowClientJoin(currentTime, link)
+        .then(response => {
+            if (response.status === 200) {
+                if (response.data.isAccepting === false) {
+                    navigate(`/welcome/${link}`);
+                    return;
+                }
+            }            
+            
+        })
+        .catch(error => {
+            console.log(error);
+            setError('Error found when trying to reach business.');
+        })
+    }
    
 
     const redirectBack = () => {

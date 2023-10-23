@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { requestBusinessArguments, getExtras, getEmployeeList,getAvailableAppointments  } from "./WelcomeHelper";
+import { requestBusinessArguments, getExtras, getEmployeeList,getAvailableAppointments, allowClientJoin  } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSelector.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
@@ -76,8 +76,6 @@ export default function WelcomeSelector() {
     }
 
     const setDataAndContinue = () => {
-        console.log(appointmentData);
-        console.log(waitlistData);
         if (systemTypeSelected === APPOINTMENT){
             if (appointmentData.date === null || appointmentData.start === null || appointmentData.end === null || appointmentData.employee_id === null){
                 setError('You are missing values for yoour appointment.');
@@ -91,13 +89,13 @@ export default function WelcomeSelector() {
             // Check if data is empty.
             let previousData = JSON.parse(payload);
             const object = {
+                ...previousData,
                 TYPE: APPOINTMENT,
                 ...appointmentData,
                 date: appointmentData.date.toISO(),
-                ...previousData
             }
             sessionStorage.setItem(CLIENT, JSON.stringify(object));
-            navigate(`/welcome/${link}/details`);
+            navigate(`/welcome/${link}/details`);   
             return;
         }
         if (systemTypeSelected === WAITLIST){
@@ -108,9 +106,9 @@ export default function WelcomeSelector() {
             }
             let previousData = JSON.parse(payload);
             const object = {
+                ...previousData,
                 TYPE: WAITLIST,
                 ...waitlistData,
-                ...previousData,
             }
             sessionStorage.setItem(CLIENT, JSON.stringify(object));
             navigate(`/welcome/${link}/details`);
@@ -130,7 +128,7 @@ export default function WelcomeSelector() {
                 setOpenSummary(true);
             }
             if (previousData.TYPE === WAITLIST){
-                setWaitlistData({previousData});
+                setWaitlistData({...previousData});
                 setSystem(WAITLIST);
                 setOpenWaitlistSummary(true);
             }
@@ -139,6 +137,7 @@ export default function WelcomeSelector() {
     }
     
     useEffect(() => {
+        redirectStatus();
         getBuisnessForm();
         getBuisnessExtras();
         getPreviouslySaved();
@@ -146,6 +145,25 @@ export default function WelcomeSelector() {
             setLoading(false);
         }
     }, [loading])
+
+
+    const redirectStatus = () => {
+        const currentTime = DateTime.local().toISO();       
+        allowClientJoin(currentTime, link)
+        .then(response => {
+            if (response.status === 200) {
+                if (response.data.isAccepting === false) {
+                    navigate(`/welcome/${link}`);
+                    return;
+                }
+            }            
+            
+        })
+        .catch(error => {
+            console.log(error);
+            setError('Error found when trying to reach business.');
+        })
+    }
 
     const getBuisnessForm = () => {
         requestBusinessArguments(link)
@@ -579,28 +597,28 @@ export default function WelcomeSelector() {
                                         <Box sx={{ pt: 1, display: openWaitlistSummary ? "flex": 'none', width: '100%', maxWidth: '100%'}}>
                                             <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
                                                 <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
-                                                { (employees && present.employees === true) ? (
+                                                { (waitlistData && waitlistData.fullname === true) ? (
                                                 <>
                                                 <Typography variant="caption">Employee assigned — <strong>{waitlistData.fullname }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
                                                 
-                                                { (employees && present.services === true) ? (
+                                                { (waitlistData && waitlistData.serviceTitle === true) ? (
                                                 <>
                                                 <Typography variant="caption">Service — <strong>{waitlistData.serviceTitle }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
-                                                { (employees && present.resources === true) ? (
+                                                { (waitlistData && waitlistData.resourceTitle === true) ? (
                                                 <>
-                                                <Typography variant="caption">Employee assigned — <strong>{waitlistData.resourceTitle }</strong></Typography>
+                                                <Typography variant="caption">Resource — <strong>{waitlistData.resourceTitle }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
-                                                { (employees && present.notes === true) ? (
+                                                { (waitlistData && waitlistData.notes) ? (
                                                 <>
-                                                <Typography variant="caption">Employee assigned — <strong>{waitlistData.notes }</strong></Typography>
+                                                <Typography variant="caption">Notes — <strong>{waitlistData.notes }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}

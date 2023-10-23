@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, InputLabel, Select, MenuItem, Alert, Divider } from "@mui/material";
+    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, InputLabel, Select, MenuItem, Alert, Divider, AlertTitle } from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
 import { allowClientJoin, getBuisnessForm, waitlistRequest,checkDuplicatesRequest } from "./WelcomeHelper";
@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { DateTime } from "luxon";
-import { CLIENT } from "../../static/static";
+import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 
 export default function WelcomeDetails() {
 
@@ -41,6 +41,7 @@ export default function WelcomeDetails() {
     const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(null);
+    const [preview, setPreview] = useState(null);
 
 
     const businessForm = () => {
@@ -55,11 +56,41 @@ export default function WelcomeDetails() {
     }
 
     useEffect(() => {
+        redirectStatus();
         businessForm();
+        getPreview();
         return() => {
             setLoading(false)
         }
-    }, [])
+    }, []);
+
+    const getPreview = () => {
+        const clientJson = sessionStorage.getItem(CLIENT);
+        if (clientJson === null) {
+            setErrors('No data has been saved.');
+            return 
+        }
+        const clientData = JSON.parse(clientJson);
+        setPreview(() => ({...clientData, date: DateTime.fromISO(clientData.date)})) ;
+    }
+
+
+    const redirectStatus = () => {
+        const currentTime = DateTime.local().toISO();       
+        allowClientJoin(currentTime, link)
+        .then(response => {
+            if (response.status === 200) {
+                if (response.data.isAccepting === false) {
+                    navigate(`/welcome/${link}`);
+                    return;
+                }
+            }            
+        })
+        .catch(error => {
+            console.log(error);
+            setErrors('Error found when trying to reach business.');
+        })
+    }
 
     const checkAcceptingState = async (values) => {
         let timestamp = DateTime.local().toUTC();
@@ -84,16 +115,15 @@ export default function WelcomeDetails() {
 
     const externalWaitlistRequest = (values) => {
         const clientPayload = sessionStorage.getItem(CLIENT);
-        if (payload === null) { 
-            navigate(`/welcome/${link}`)
+        if (clientPayload === null) { 
+            navigate(`/welcome/${link}`);
             return
         }
         const clientStorage = JSON.parse(clientPayload);
         let timestamp = DateTime.local().toUTC();
-        let partySize = clientStorage.partySize;
-        let payload = { ...values, link, timestamp, partySize, ...clientStorage}
-        console.log(payload);
-        checkDuplicatesRequest(values.email, link)
+        let payload = { ...values, link, timestamp, timestampOrigin: timestamp, ...clientStorage}
+        let duplicatePayload = { ...clientStorage, link, values}
+        checkDuplicatesRequest(duplicatePayload)
         .then((response) => {
             console.log(response);
             if(response.duplicate === true) {
@@ -219,7 +249,64 @@ export default function WelcomeDetails() {
                             </Button> 
                             </Stack>
 
-                            </form>      
+                            </form>
+
+                            {
+                                preview ? (
+                                    <>
+                                        <Box sx={{ pt: 2, display: 'flex', width: '100%', maxWidth: '100%'}}>
+                                            <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
+                                                <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
+
+                                                {
+                                                    preview && preview.TYPE === APPOINTMENT ? (
+                                                        <>
+                                                        <Typography variant="caption">Employee assigned — <strong>{preview.fullname}</strong></Typography>
+                                                        <br/>
+                                                        <Typography variant="caption">Service — <strong>{preview.serviceName }</strong></Typography>
+                                                        <br/>
+                                                        <Typography variant="caption">Date assigned — <strong>{preview.date.toFormat('LLL dd yyyy') }</strong></Typography>
+                                                        <br/>
+                                                        <Typography variant="caption">Start — <strong>{DateTime.fromFormat(preview.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(preview.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
+                                                        <br/>
+                                                        </>
+                                                    ) : null
+                                                }
+
+{
+                                                    preview && preview.TYPE === WAITLIST ? (
+                                                        <>
+                                                        <Typography variant="caption">For today — <strong>{DateTime.local().toFormat('LLL dd yyyy')}</strong></Typography>
+                                                        <br/>   
+                                                        { preview.fullname && (<>
+                                                            <Typography variant="caption">Employee assigned — <strong>{preview.fullname}</strong></Typography>
+                                                            <br/>
+                                                        </>)}
+
+                                                        { preview.serviceTitle && (<>
+                                                            <Typography variant="caption">Service — <strong>{preview.serviceTitle}</strong></Typography>
+                                                            <br/>
+                                                        </>)}
+
+                                                        { preview.resourceTitle && (<>
+                                                            <Typography variant="caption">Resource — <strong>{preview.resourceTitle}</strong></Typography>
+                                                            <br/>
+                                                        </>)}
+
+                                                        { preview.notes && (<>
+                                                            <Typography variant="caption">Notes  — <strong>{preview.notes}</strong></Typography>
+                                                            <br/>
+                                                        </>)}
+                                                        </>
+                                                    ) : null
+                                                }
+                                                
+                                                
+                                            </Alert>
+                                        </Box>
+                                    </>
+                                ) : null
+                            }      
                 
                     </CardContent>
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>

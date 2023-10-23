@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { getMax} from "./WelcomeHelper";
+import { allowClientJoin, getMax} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { CLIENT } from "../../static/static";
 import "../../css/Welcome.css";
@@ -53,12 +53,31 @@ export default function Welcome() {
     }
     
     useEffect(() => {
+        redirectStatus();
         getBuisnessForm();
         getAnySavedFields();
         return() => {
             setLoading(false)
         }
     }, [])
+
+    const redirectStatus = () => {
+        const currentTime = DateTime.local().toISO();       
+        allowClientJoin(currentTime, link)
+        .then(response => {
+            if (response.status === 200) {
+                if (response.data.isAccepting === false) {
+                    navigate(`/welcome/${link}`);
+                    return;
+                }
+            }            
+            
+        })
+        .catch(error => {
+            console.log(error);
+            setError('Error found when trying to reach business.');
+        })
+    }
    
     const handleChange = (event, value) => {
         if (value === 6){

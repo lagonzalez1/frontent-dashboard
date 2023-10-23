@@ -85,6 +85,8 @@
   @media (min-width: 1500px) {
     .custom-card {
       width: 15%; /* Adjust the width for larger screens */
+      max-width: 200px;
       min-height: 35vh; /* Adjust the height for larger screens */
     }
   }
+  
