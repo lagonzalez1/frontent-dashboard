@@ -2,15 +2,37 @@
 
 
 .circle_yellow {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    border: 5px solid #ffbb00;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  position: relative;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Create a pseudo-element for the pulsating background circle */
+.circle_yellow::before {
+  content: "";
+  position: absolute;
+  width: 100%; /* Cover the entire circle */
+  height: 100%; /* Cover the entire circle */
+  border-radius: inherit; /* Match the border radius of the main circle */
+  border: 5px solid #ffbb00;
+  animation: pulsate 2s infinite; /* Add animation properties to the pseudo-element */
+}
+
+@keyframes pulsate {
+  0% {
+      transform: scale(1);
   }
+  50% {
+      transform: scale(1.1);
+  }
+  100% {
+      transform: scale(1);
+  }
+}
 
   .circle_red {
     width: 140px;

@@ -12,6 +12,7 @@ import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import { useNavigate, useParams } from "react-router-dom";
 import { APPOINTMENT, WAITLIST } from "../../static/static.js";
+import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
 
@@ -129,7 +130,7 @@ export default function Waiting() {
 
     
     const leaveWaitlist = () => {
-        leaveWaitlistRequest(link, unid)
+        leaveWaitlistRequest(link, unid, type)
         .then(response => {
             console.log(response);
         })
@@ -210,23 +211,23 @@ export default function Waiting() {
                             <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 {errors ? 
                                 (
+                                
                                 <div className="circle_red">
-                
                                     <PriorityHighIcon htmlColor="#fc0303" sx={{ fontSize: 50}} />
                                 </div>
                                 ): 
                                 (
-                                <div className="circle_yellow">
-                                    
-                                    <NotificationsRoundedIcon htmlColor="#ffbb00" sx={{ fontSize: 50}} />
-                                </div>
+                                    <div className="circle_yellow">
+                                        {type === WAITLIST && <NotificationsRoundedIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} />}
+                                        {type === APPOINTMENT && <EventAvailableTwoToneIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} /> }
+                                    </div>                                
                                 )
                                 }
                             </Container>
                             
                             { type === APPOINTMENT && (
                                 <>
-                                    <Typography variant="h4" fontWeight="bold" > Appointment </Typography>
+                                    <Typography variant="h5" fontWeight="bold"> Appointment details </Typography>
                                 </>
                             )} 
 
@@ -237,11 +238,17 @@ export default function Waiting() {
                                 </>
                             )}
 
+                            { type === APPOINTMENT && (
+                                <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
+                                    <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
+                                    </Typography>
+                                </Button>
+                            )} 
+
                             { 
                                 type === WAITLIST && (
                                     <>
                                         {status ? 
-                                        
                                         (
                                             <>
                                             <Divider />
@@ -288,9 +295,6 @@ export default function Waiting() {
                                 <Typography variant="subtitle2" sx={{ color: "gray"}}> Phone </Typography>
                                 <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.phone : ''}</Typography>
 
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Email </Typography>
-                                <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.email : ''}</Typography>
-
                                 <Typography variant="subtitle2" sx={{ color: "gray"}}> Duration </Typography>
                                 <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromFormat(user.start, 'HH:mm').toFormat('h:mm a') +  " - " + DateTime.fromFormat(user.end, 'HH:mm').toFormat('h:mm a') : ''}</Typography>
 
@@ -298,15 +302,6 @@ export default function Waiting() {
                                 <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromISO(user.appointmentDate).toFormat('LLL dd yyyy') : ''}</Typography>
                             </Container>
                             }
-
-
-                        
-                         {
-                            /// Oct 24: Complete small details on this page.
-                            /// TO DO: User can edit appointments. 
-    
-                         }
-                            
                             <Divider />
                             { 
                                 type === WAITLIST && (
@@ -326,16 +321,14 @@ export default function Waiting() {
                                     <>
                                     <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                                         <Stack direction={'row'} spacing={0.5}>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => copyToClipboardHandler()}>share link</Button>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => navigateToWaitlist()}> Edit appointment</Button>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}>Leave appointment</Button>
+                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => console.log("status")}>Update Status</Button>
+                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => console.log("Reschedule")}>Edit appointment</Button>
+                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}>Cancel appointment</Button>
                                         </Stack>
                                     </Container>
                                     </>
                                 )
-
                             }
-                            
                             <Divider />
                         </Stack>
                     
@@ -367,19 +360,18 @@ export default function Waiting() {
                     >
                     <CloseIcon />
                 </IconButton>
-                <Typography variant="h6" fontWeight={'bold'}>Leave waitlist ?</Typography>  
+                {type === APPOINTMENT && (<Typography variant="h6" fontWeight={'bold'}>Cancel appointment ?</Typography> )}
+                {type === WAITLIST && (<Typography variant="h6" fontWeight={'bold'}>Leave waitlist ?</Typography> )}
             </DialogTitle>
             <DialogContent>
-                <Typography variant="caption">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography>  
-                <Container sx={{pt: 2, pb: 2, pr: 2, pl: 2}}>
-                    <Stack spacing={2}>
-                        <Button sx={{ borderRadius: 15}} variant="contained" color="primary" onClick={handleClose}>No</Button>
-                        <Button sx={{ borderRadius: 15}} variant="outlined" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
-                    </Stack>
-                </Container>
+                {type === APPOINTMENT && (<Typography variant="caption">You are abandoning your appointment.</Typography> )}
+                {type === WAITLIST && (<Typography variant="caption">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography> )}
+
+               
             </DialogContent>
             <DialogActions>
-                
+                <Button sx={{ borderRadius: 10}} variant="contained" color="primary" onClick={() => handleClose()}>No</Button>
+                <Button sx={{ borderRadius: 10}} variant="outlined" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
             </DialogActions>
             </Dialog>
 
@@ -421,7 +413,7 @@ export default function Waiting() {
                 </Container>
             </DialogContent>
             <DialogActions>
-                <Button sx={{ borderRadius: 10, color: 'black'}} variant="text" onClick={() => statusRequest() }>Update</Button>
+                <Button sx={{ borderRadius: 10, color: 'black'}} variant="text" onClick={() => statusRequest()}>Update</Button>
             </DialogActions>
             </Dialog>
 
