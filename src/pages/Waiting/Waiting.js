@@ -2,7 +2,8 @@ import React, {useState, useEffect } from "react";
 import { Box, Swtich , Paper, Slide, Alert, Card, CardContent, Typography, Stack, Container, Button, Divider, CardActions,
     AlertTitle, Dialog, DialogContent, DialogTitle, RadioGroup, FormControlLabel, Radio, DialogActions, ButtonBase, Snackbar, CircularProgress, Link, 
 Collapse, IconButton, DialogContentText} from "@mui/material";
-import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus } from "./WaitingHelper.js";
+import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
+    getAvailableAppointments, requestClientEditApp, getEmployeeList } from "./WaitingHelper.js";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
@@ -15,6 +16,7 @@ import { APPOINTMENT, WAITLIST } from "../../static/static.js";
 import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
+import { Formik } from "formik";
 
 export default function Waiting() {
 
@@ -24,7 +26,7 @@ export default function Waiting() {
     const [alert, setAlert] = useState(false);
     const [message, setMessage] = useState(null);
     
-
+    const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState(null);
     const [user, setUser] = useState({});
@@ -32,6 +34,15 @@ export default function Waiting() {
     const [titles, setTitles] = useState({});
     const [status, setStatus] = useState(false);
     const [type, setType] = useState(null);
+
+
+    const [appointments, setAppointments] = useState(null);
+    const [editClient, setEditClient] = useState(false);
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [serviceList, setServiceList] = useState(null);
+    const [employeeList, setEmployeeList] = useState(null);
+
 
     const [openStatus, setOpenStatus ] = useState(false);
     const [openSnack, setOpenSnack] = useState(false);
@@ -85,6 +96,7 @@ export default function Waiting() {
                 setType(userResponse.data.type);
             }
             setArgs(argsResponse);
+            setServiceList(argsResponse.data.services);
         })
         .catch(error => {
             setErrors('Error: ' + error);
@@ -161,6 +173,124 @@ export default function Waiting() {
         .finally(() => {
             setAlert(true);
             handleStatusClose();
+        })
+    }
+
+        let initialValues = {
+            _id: user ? user.payload._id : '',
+            fullname: user ? user.fullname : '',
+            email: user ? user.email: '',
+            phone: user ? user.phone : '',
+            size: user ? user.partySize: 1,
+            service_id: user ? user.serviceTag : '',
+            resource_id: user ? user.resourceTag: '',
+            employee_id: user ? user.employeeTag: '',
+            notes: user ? user.notes : '',
+        };
+        
+        const validationSchema = Yup.object({
+            fullname: Yup.string().required('Full name is required'),
+            phone: Yup.string().matches(PHONE_REGEX, 'Phone number must be in the format xxx-xxx-xxxx')
+            .required('Phone number is required'),
+            email: Yup.string(),
+            size: Yup.number(),
+            service_id: Yup.string(),
+            employee_id: Yup.string(),
+            resource_id: Yup.string(),
+            notes: Yup.string(),
+        });
+
+
+        const handleSubmit = (data) => {
+            const payload = { ...data, appointment: selectedAppointment, appointmentDate: selectedDate}
+            appointmentEdit(payload);
+
+        }
+
+        const appointmentEdit = (payload) => {
+            requestClientEditApp(payload)
+            .then(response => {
+                dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+            })
+            .catch(error => {
+                console.log(error);
+                dispatch(setSnackbar({ requestMessage: error.response.msg, requestStatus: true} ))
+            })
+            .finally(() => {
+                setLoading(false);
+                dispatch(setReload(true));
+                closeDialog();
+            })
+        }
+
+        const FutureDatePicker = ({ label, value, onChange }) => {
+        const currentDate = DateTime.local().setZone(business.timezone);
+    
+        return (
+          <Box>
+          <DatePicker
+            label={label}
+            sx={{
+                width: '100%'
+            }}
+            value={value}
+            onChange={onChange}
+            renderInput={(params) => <TextField {...params} />}
+            minDate={currentDate}
+          />
+          </Box>
+        );
+      };
+
+      const handleDateChange = (date) => {
+        // Also call to get available employees.
+        getAvailableEmployees(date);
+        setSelectedDate(date);
+    };
+    // Last left off. 
+    // 9:35 pm 27th
+    // Need to fix waiting, to show a similar to WelcomeSector (Cards, Appointment slots)
+    // 1. SetEmployeeList now holds all current date available, Create Menu show all the employees.
+    // 2. Retrive all services associated with employee, show similar to WelcomeSelector.
+    // 3. Search all appointments available with {link, unid, date, ....} 
+
+    const getAvailableEmployees = (date) => {
+        const incomingDate = date.toISO();
+        getEmployeeList(incomingDate,link)
+        .then(response => {
+            setEmployeeList(response);
+        })
+        .catch(error => {
+            setError(error);
+        })  
+        .finally(() => {
+            setLoading(false);
+            setOpenEmployees(true);
+        })
+    }
+
+    const closeDialog = () => {
+        setEditClient(false);
+    }
+
+
+    const searchAppointments = (employeeId, serviceId) => {
+        if (!selectedDate || !serviceId || !employeeId) {
+            setErrors('Missing date and service.');
+            return;
+        }
+        setErrors(null);
+        const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate }
+        getAvailableAppointments(payload)
+        .then(response => {
+            setAppointments(response.data)
+            setSuccess(response.msg)
+        })
+        .catch(error => {
+            setErrors(error);
+        })
+        .finally(() => {
+            //setLoading(false);
         })
     }
 
@@ -347,7 +477,10 @@ export default function Waiting() {
                 onClose={handleClose}
                 maxWidth={'xs'}
             >
+                
             <DialogTitle>
+                {type === APPOINTMENT && (<Typography variant="h6" fontWeight={'bold'}>Cancel appointment ?</Typography> )}
+                {type === WAITLIST && (<Typography variant="h6" fontWeight={'bold'}>Leave waitlist ?</Typography> )}
                 <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -360,14 +493,14 @@ export default function Waiting() {
                     >
                     <CloseIcon />
                 </IconButton>
-                {type === APPOINTMENT && (<Typography variant="h6" fontWeight={'bold'}>Cancel appointment ?</Typography> )}
-                {type === WAITLIST && (<Typography variant="h6" fontWeight={'bold'}>Leave waitlist ?</Typography> )}
+                
             </DialogTitle>
+            
             <DialogContent>
-                {type === APPOINTMENT && (<Typography variant="caption">You are abandoning your appointment.</Typography> )}
-                {type === WAITLIST && (<Typography variant="caption">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography> )}
-
-               
+                <DialogContentText>
+                    {type === APPOINTMENT && (<Typography variant="caption">You are abandoning your appointment.</Typography> )}
+                    {type === WAITLIST && (<Typography variant="caption">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography> )}
+                </DialogContentText>   
             </DialogContent>
             <DialogActions>
                 <Button sx={{ borderRadius: 10}} variant="contained" color="primary" onClick={() => handleClose()}>No</Button>
@@ -415,6 +548,225 @@ export default function Waiting() {
             <DialogActions>
                 <Button sx={{ borderRadius: 10, color: 'black'}} variant="text" onClick={() => statusRequest()}>Update</Button>
             </DialogActions>
+            </Dialog>
+
+            <Dialog
+                open={editClient}
+                onClose={() => closeDialog()}
+                maxWidth={'xs'}
+                fullWidth={true}
+            >
+                <DialogTitle> 
+                    <Typography variant="h6" fontWeight="bold">
+                    {"Edit client"}
+                </Typography> 
+                <IconButton
+                    aria-label="close"
+                    onClick={() => closeDialog()}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton>
+                </DialogTitle>
+
+                
+                <DialogContent>
+                    { errors ? <Alert severity="error">{errors}</Alert>: null }
+                    { success ? <Alert severity="success">{success}</Alert>: null }
+                    <Formik
+                    initialValues={initialValues}
+                    onSubmit={handleSubmit}
+                    validationSchema={validationSchema}
+                    >
+                    {({ errors, touched, handleChange, handleBlur, values }) => (
+                    
+                        <Form>
+                        <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
+                            <Field
+                            as={TextField}
+                            id="fullname"
+                            size="small"
+                            name="fullname"
+                            label="Customer name"
+                            placeholder="Customer name"
+                            error={touched.fullname && !!errors.fullname}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            />
+                            <Field
+                            as={TextField}
+                            id="email"
+                            size="small"
+                            name="email"
+                            label="Customer email"
+                            placeholder="Email"
+                            error={touched.email && !!errors.email}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            />
+
+                            <Field
+                            as={TextField}
+                            id="phone"
+                            size="small"
+                            name="phone"
+                            label="Phone"
+                            placeholder="xxx-xxx-xxxx"
+                            error={touched.phone && !!errors.phone}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            />
+
+                            <Field
+                            as={TextField}
+                            id="size"
+                            name="size"
+                            size="small"
+                            label="Party size"
+                            error={touched.size && !!errors.size}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            />
+                            <Grid container>
+                                <Grid item xs={12} md={6} sm={6}>
+                                {business ? (
+                            <>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Resources</Typography>
+                                <Field
+                                as={Select}
+                                labelId="resources"
+                                size="small"
+                                fullWidth={true}
+                                name="resource_id"
+                                onChange={handleChange}
+                                >
+                                <MenuItem key={'NONE'} value={''}>none</MenuItem>
+                                {Array.isArray(resourceList) ? resourceList.map((resource) => (
+                                    <MenuItem key={resource._id} value={resource._id}>
+                                        <ListItemIcon>
+                                            { resource.serving && resource.active ? <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> : <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> }
+                                        </ListItemIcon>
+                                        <Typography variant="body2">{resource.title} </Typography>
+                                    </MenuItem>
+                                )) : null}
+                                </Field>
+                            </>
+                            ) : null}
+                            </Grid>
+                            <Grid item xs={12} md={6} sm={6}>
+                            <>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Employee preference</Typography>
+                                <Field
+                                as={Select}
+                                id="employee_id"
+                                name="employee_id"
+                                size="small"
+                                fullWidth={true}
+                                onChange={handleChange}
+                                >
+                                {Array.isArray(employeeList) ? employeeList.map((employee) => (
+                                    <MenuItem key={employee._id} value={employee._id}>
+                                        <Typography variant="body2">{employee.fullname} </Typography>
+                                    </MenuItem>
+                                )) : null}
+                                </Field>
+                            </>
+                                </Grid>
+                            </Grid>
+                            
+
+                            {values.employee_id ? (
+                                
+                            <>
+                                <Typography fontWeight={'bold'} variant="subtitle2">Services available</Typography>
+                                <Field
+                                as={Select}
+                                labelId="services"
+                                name="service_id"
+                                size="small"
+                                onChange={handleChange}
+                                >
+                                { Array.isArray(serviceList) ?
+                                
+                                serviceList
+                                .filter((service) => service.employeeTags.includes(values.employee_id))
+                                .map((service) => (
+                                    <MenuItem key={service._id} value={service._id}>
+                                        <Stack>
+                                            <Typography variant="body2">{service.title}</Typography>
+                                            <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
+                                        </Stack>
+                            
+                                    </MenuItem>
+                                )):null }
+                                </Field>
+                            </>
+                            ) : null}
+
+                            <>
+                                <Box>
+                                    <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
+                                
+                                </Box>
+                                <Button sx={{ borderRadius: 10}} fullWidth={false} variant="outlined" onClick={() => searchAppointments(values.employee_id, values.service_id) }>Search</Button>
+                                <br/>
+                            </>
+                            {
+                                (appointments !== null) ? 
+                                (
+                                    <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap'}}>
+                                        <Stack direction={'row'}>
+                                        
+                                        { 
+                                           Object.keys(appointments).map((key, index) => {
+                                            const appointment = appointments[key];
+                                            return (
+                                                <Button 
+                                                    sx={{ margin: 1, borderRadius: 10}}
+                                                    variant={selectedAppointment === appointment ? "contained": "outlined"}
+                                                    onClick={() => handleAppointmentClick(appointment)} 
+                                                    color={selectedAppointment === appointment ? 'primary': 'secondary'}
+                                                    id="appointmentButtons">
+                                                    <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                    <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{"-"}</Typography>
+                                                    <Typography sx={{ whiteSpace: 'nowrap' }}  variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                </Button>
+                                            )
+                                        })
+                                        }
+                                        </Stack>
+                                        </Box>
+                                    </div>
+                                )
+                                :null
+                            }
+                            <Field
+                            as={TextField}
+                            id="notes"
+                            name="notes"
+                            size="small"
+                            label="Notes"
+                            placeholder="Additional notes"
+                            error={touched.notes && !!errors.notes}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                            />
+
+                            <ErrorMessage name="notes" component="div" />
+                            <Button sx={{ borderRadius: 10}} variant="contained" type="submit">Submit</Button>
+                        </Stack>
+                        </Form>
+                    )}
+                    </Formik>
+                </DialogContent>
+                
+
             </Dialog>
 
             <Snackbar
