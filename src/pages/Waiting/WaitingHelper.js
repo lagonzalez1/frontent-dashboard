@@ -2,6 +2,7 @@
 
 import axios from "axios";
 
+export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;    
 
 
 export const getIdentifierData = (link, unid) => {
@@ -34,8 +35,7 @@ export const getEmployeeList = (date,link) => {
 
 export const requestClientEditApp = (payload, link, unid) => {
     return new Promise((resolve, reject) => {
-        const {user, business} = getStateData();
-        const data = {payload: {...payload}, link: link, unid} // Carefull here with backend.
+        const data = {...payload} // Carefull here with backend.
         axios.post(`/api/external/editAppointment`, data)
         .then(response => {
             resolve(response.data.msg);

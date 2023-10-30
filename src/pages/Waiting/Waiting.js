@@ -1,22 +1,35 @@
 import React, {useState, useEffect } from "react";
 import { Box, Swtich , Paper, Slide, Alert, Card, CardContent, Typography, Stack, Container, Button, Divider, CardActions,
     AlertTitle, Dialog, DialogContent, DialogTitle, RadioGroup, FormControlLabel, Radio, DialogActions, ButtonBase, Snackbar, CircularProgress, Link, 
-Collapse, IconButton, DialogContentText} from "@mui/material";
-import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
-    getAvailableAppointments, requestClientEditApp, getEmployeeList } from "./WaitingHelper.js";
+Collapse, IconButton, DialogContentText, Grow, TextField, Select, Grid, Menu, MenuItem, CardActionArea, Chip, LinearProgress} from "@mui/material";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+
+
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import CloseIcon from "@mui/icons-material/Close";
+import PersonIcon from '@mui/icons-material/Person';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import { useNavigate, useParams } from "react-router-dom";
 import { APPOINTMENT, WAITLIST } from "../../static/static.js";
 import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
+import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
+import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
+
+import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
-import { Formik } from "formik";
+import { Field, Form, Formik, ErrorMessage } from "formik";
+
+
+
+import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
+    getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX } from "./WaitingHelper.js";
+import { DatePicker } from "@mui/x-date-pickers";
 
 export default function Waiting() {
 
@@ -28,6 +41,8 @@ export default function Waiting() {
     
     const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [wait, setWait] = useState(false);
+
     const [errors, setErrors] = useState(null);
     const [user, setUser] = useState({});
     const [open, setOpen] = useState(false);
@@ -53,6 +68,35 @@ export default function Waiting() {
         parking: false,
         late: false
     })
+
+    let initialValues = {
+        fullname: user ? user.fullname : '',
+        email: user ? user.email: '',
+        phone: user ? user.phone : '',
+        size: user ? user.partySize: 1,
+        service_id: '',
+        resource_id: user ? user.resourceTag: '',
+        employee_id: '',
+        start: '',
+        end: '',
+        appointmentDate: user ? DateTime.fromISO(user.appointmentDate).toString() : '',
+        notes: user ? user.notes : '',
+    };
+    
+    const validationSchema = Yup.object({
+        fullname: Yup.string().required('Full name is required'),
+        phone: Yup.string().matches(PHONE_REGEX, 'Phone number must be in the format xxx-xxx-xxxx')
+        .required('Phone number is required'),
+        email: Yup.string(),
+        size: Yup.number(),
+        service_id: Yup.string(),
+        employee_id: Yup.string(),
+        resource_id: Yup.string(),
+        start: Yup.string(),
+        end: Yup.string(),
+        appointmentDate: Yup.string(),
+        notes: Yup.string(),
+    });
 
 
     function isOnlyOneTrue(obj) {
@@ -96,7 +140,8 @@ export default function Waiting() {
                 setType(userResponse.data.type);
             }
             setArgs(argsResponse);
-            setServiceList(argsResponse.data.services);
+            console.log(argsResponse)
+            setServiceList(argsResponse.services);
         })
         .catch(error => {
             setErrors('Error: ' + error);
@@ -140,6 +185,11 @@ export default function Waiting() {
         }        
     }
 
+    const handleEmployeeChange = (employee, setFieldValue) => {
+        setAppointments(null);
+        setFieldValue('employee_id', employee.id);
+    }
+
     
     const leaveWaitlist = () => {
         leaveWaitlistRequest(link, unid, type)
@@ -176,58 +226,33 @@ export default function Waiting() {
         })
     }
 
-        let initialValues = {
-            _id: user ? user.payload._id : '',
-            fullname: user ? user.fullname : '',
-            email: user ? user.email: '',
-            phone: user ? user.phone : '',
-            size: user ? user.partySize: 1,
-            service_id: user ? user.serviceTag : '',
-            resource_id: user ? user.resourceTag: '',
-            employee_id: user ? user.employeeTag: '',
-            notes: user ? user.notes : '',
-        };
-        
-        const validationSchema = Yup.object({
-            fullname: Yup.string().required('Full name is required'),
-            phone: Yup.string().matches(PHONE_REGEX, 'Phone number must be in the format xxx-xxx-xxxx')
-            .required('Phone number is required'),
-            email: Yup.string(),
-            size: Yup.number(),
-            service_id: Yup.string(),
-            employee_id: Yup.string(),
-            resource_id: Yup.string(),
-            notes: Yup.string(),
-        });
+        const handleSubmit = (values) => {
+            console.log(values)    
+        } 
 
-
-        const handleSubmit = (data) => {
-            const payload = { ...data, appointment: selectedAppointment, appointmentDate: selectedDate}
-            appointmentEdit(payload);
-
+        const handleAppointmentClick = (appointment, setFieldValue) => {
+            setFieldValue('start', appointment.start);
+            setFieldValue('end', appointment.end);
         }
 
         const appointmentEdit = (payload) => {
             requestClientEditApp(payload)
             .then(response => {
-                dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                console.log(response)
             })
             .catch(error => {
                 console.log(error);
-                dispatch(setSnackbar({ requestMessage: error.response.msg, requestStatus: true} ))
             })
             .finally(() => {
                 setLoading(false);
-                dispatch(setReload(true));
-                closeDialog();
+                
             })
         }
-
         const FutureDatePicker = ({ label, value, onChange }) => {
-        const currentDate = DateTime.local().setZone(business.timezone);
+        const currentDate = DateTime.local();
     
         return (
-          <Box>
+          <DemoContainer components={['DatePicker']}>
           <DatePicker
             label={label}
             sx={{
@@ -238,7 +263,7 @@ export default function Waiting() {
             renderInput={(params) => <TextField {...params} />}
             minDate={currentDate}
           />
-          </Box>
+          </DemoContainer>
         );
       };
 
@@ -261,36 +286,41 @@ export default function Waiting() {
             setEmployeeList(response);
         })
         .catch(error => {
-            setError(error);
+            setErrors(error);
         })  
-        .finally(() => {
-            setLoading(false);
-            setOpenEmployees(true);
-        })
+    
     }
 
     const closeDialog = () => {
         setEditClient(false);
     }
 
+    const handleServiceChange = (service, setFieldValue, values) => {
+        setFieldValue('service_id', service._id);
+        searchAppointments(service._id, values.employee_id)
+    }
 
-    const searchAppointments = (employeeId, serviceId) => {
-        if (!selectedDate || !serviceId || !employeeId) {
+
+    const searchAppointments = (service_id, employee_id) => {
+        setWait(true);
+        if (!selectedDate || !service_id || !employee_id) {
             setErrors('Missing date and service.');
             return;
         }
+        const currentDate = DateTime.local();
+
         setErrors(null);
-        const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate }
+        const payload = { employeeId: employee_id, serviceId: service_id , appointmentDate: selectedDate, currentDate, link}
+        
         getAvailableAppointments(payload)
         .then(response => {
             setAppointments(response.data)
-            setSuccess(response.msg)
         })
         .catch(error => {
             setErrors(error);
         })
         .finally(() => {
-            //setLoading(false);
+            setWait(false);
         })
     }
 
@@ -328,15 +358,250 @@ export default function Waiting() {
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                         </Typography>
-                        {loading ? <CircularProgress /> : 
+                        {loading ? <CircularProgress sx={{ p: 3}} /> : 
                         <CardContent>
                             
                         { errors ? <Alert severity="error">
                             <AlertTitle sx={{ textAlign: 'left', fontWeight: 'bold'}}>Error</AlertTitle>
                             <Typography sx={{ textAlign: 'left'}}>{errors}</Typography>
                             </Alert>: null} 
-                        
-                        <Stack sx={{ pt: 2}} spacing={3}>
+
+                            
+                        {editClient ? (
+                        <>
+
+                        <Box >
+                        <Grow in={editClient}>
+                            <Box>
+                            <Typography variant="h5" fontWeight="bold">
+                                Edit appointment
+                            </Typography>
+                            { errors ? <Alert severity="error">{errors}</Alert>: null }
+                            { success ? <Alert severity="success">{success}</Alert>: null }
+                            <Formik
+                            initialValues={initialValues}
+                            validationSchema={validationSchema}
+                            >
+                            {({ errors, touched, handleChange, handleBlur, values, setFieldValue, isSubmitting }) => (
+                            
+                                <form onSubmit={Formik.handleSubmit}>
+                                <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
+                                    <Field
+                                    as={TextField}
+                                    id="fullname"
+                                    size="small"
+                                    name="fullname"
+                                    label="Customer name"
+                                    placeholder="Customer name"
+                                    error={touched.fullname && !!errors.fullname}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    />
+                                    <Field
+                                    as={TextField}
+                                    id="email"
+                                    size="small"
+                                    name="email"
+                                    label="Customer email"
+                                    placeholder="Email"
+                                    error={touched.email && !!errors.email}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    />
+
+                                    <Field
+                                    as={TextField}
+                                    id="phone"
+                                    size="small"
+                                    name="phone"
+                                    label="Phone"
+                                    placeholder="xxx-xxx-xxxx"
+                                    error={touched.phone && !!errors.phone}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    />
+
+                                
+                                    <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Select your new date </Typography>
+                                    <Box>
+                                        <FutureDatePicker label="Appointment date" value={selectedDate} onChange={handleDateChange} />
+                                    </Box>
+
+                                        {
+                                            employeeList && 
+                                            (
+                                            <Box>
+                                            <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
+                                                <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+                                            </Box>
+
+                                                <Grid
+                                                    container 
+                                                    direction={'row'}
+                                                    rowSpacing={1}
+                                                    columnSpacing={1}
+                                                
+                                                >
+                                                    {
+                                                        employeeList.map((employee) => {
+                                                            return (
+                                                                <Grid item key={employee.id}>
+                                                                    <Card className="card-style" sx={{backgroundColor: values.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee, setFieldValue)}>
+                                                                        <CardActionArea>
+                                                                            <CardContent>
+                                                                                <PersonIcon />
+                                                                                <Typography variant="caption">{employee.fullname}</Typography>
+                                                                            </CardContent>
+                                                                        </CardActionArea>
+                                                                    </Card>
+                                                                </Grid>
+                                                            
+                                                            )
+                                                        })
+                                                    }
+
+
+                                                </Grid>
+                                                </Box>
+
+                                            )
+
+                                        }
+      
+                                    
+                                    {values.employee_id ? (
+                                        
+                                            <Box>
+                                                <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
+                                                    <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+                                                </Box>
+                                                <Grid
+                                                    container 
+                                                    direction={'row'}
+                                                    rowSpacing={1}
+                                                    columnSpacing={1}
+                                                    sx={{pt: 0}}
+
+                                                >
+
+                                                    {
+                                                        serviceList ? 
+                                                        serviceList
+                                                        .filter((service) => service.employeeTags.includes(values.employee_id))
+                                                        .map((service) => (
+                                                            <Grid item key={service._id}>
+                                                                <Card variant="outlined" className="card-style" sx={{backgroundColor: values.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service, setFieldValue, values)}>
+                                                                    <CardActionArea>
+                                                                        <CardContent>
+
+                                                                        <Grid container alignItems="center">
+                                                                            <Grid item xs>
+                                                                                <Typography component="div" variant="subtitle2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                                                            </Grid>
+                                                                            <Grid item>
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                        <Typography gutterBottom color="text.secondary" variant="body2">
+                                                                            { service.description }
+                                                                        </Typography>
+                                                                        <Divider variant="middle" />                                                                    
+                                                                        <Stack sx={{m: 1}} spacing={0.5}>
+                                                                            <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
+                                                                            <Chip size="small" label={"Cost: " + service.cost} avatar={<PaidRoundedIcon fontSize="small" />} />
+                                                                        </Stack>
+                                                                        </CardContent>
+                                                                    </CardActionArea>
+                                                                </Card>
+                                                            </Grid>
+                                                        )):
+                                                        <Grid item>
+                                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                                                        </Grid>
+                                                    }
+                                                </Grid>
+                                    </Box>
+                                    ) : null}
+
+                                    
+                                    {
+                                        (appointments !== null) ? 
+                                        (
+                                            <>
+                                            <Box sx={{ pt:0, display: appointments ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
+                                                <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
+                                            </Box>
+                                            <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
+                                                {
+                                                    wait ? <LinearProgress />: 
+                                                
+                                                <Box sx={{ display: 'flex', flexWrap: 'wrap'}}> 
+                                                <Stack direction={'row'} sx={{ backgroundColor: 'lightgray'}}>
+                                                
+                                                { 
+                                                Object.keys(appointments).map((key, index) => {
+                                                    const appointment = appointments[key];
+                                                    return (
+                                                        <Button 
+                                                            sx={{ margin: 1, borderRadius: 10}}
+                                                            variant={values.start === appointment.start ? "contained": "outlined"}
+                                                            onClick={() => handleAppointmentClick(appointment, setFieldValue)} 
+                                                            color={values.start === appointment.start ? 'primary': 'secondary'}
+                                                            id={`appointment${index}`}>
+                                                            <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                            <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{"-"}</Typography>
+                                                            <Typography sx={{ whiteSpace: 'nowrap' }}  variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                        </Button>
+                                                    )
+                                                })
+                                                }
+                                                </Stack>
+                                                </Box>
+}
+                                            </div>
+                                            </>
+                                        )
+                                        : null
+                                    }
+                                    <Divider variant="middle" />
+                                    <Field
+                                    as={TextField}          
+                                    id="size"
+                                    name="size"
+                                    size="small"
+                                    label="Party size"
+                                    error={touched.size && !!errors.size}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    />
+
+                                    <Field
+                                    as={TextField}
+                                    id="notes"
+                                    name="notes"
+                                    size="small"
+                                    label="Notes"
+                                    placeholder="Additional notes"
+                                    error={touched.notes && !!errors.notes}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    />
+                                    <ErrorMessage name="notes" component="div" />
+
+                                    <Button type="submit" sx={{ borderRadius: 10}} variant="contained">Submit</Button>
+
+                                </Stack>
+                                </form>
+                            )}
+                            </Formik>
+                            </Box>
+                        </Grow>
+                        </Box>    
+                        </>
+                        )
+                        :
+                        (
+                            <>
+                            <Stack sx={{ pt: 2}} spacing={3}>
                             
                             <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                                 {errors ? 
@@ -452,7 +717,7 @@ export default function Waiting() {
                                     <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                                         <Stack direction={'row'} spacing={0.5}>
                                             <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => console.log("status")}>Update Status</Button>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => console.log("Reschedule")}>Edit appointment</Button>
+                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setEditClient(true)}>Edit appointment</Button>
                                             <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}>Cancel appointment</Button>
                                         </Stack>
                                     </Container>
@@ -461,6 +726,10 @@ export default function Waiting() {
                             }
                             <Divider />
                         </Stack>
+                        </>
+                        )
+                        }
+                        
                     
                     
                         </CardContent>
@@ -550,224 +819,7 @@ export default function Waiting() {
             </DialogActions>
             </Dialog>
 
-            <Dialog
-                open={editClient}
-                onClose={() => closeDialog()}
-                maxWidth={'xs'}
-                fullWidth={true}
-            >
-                <DialogTitle> 
-                    <Typography variant="h6" fontWeight="bold">
-                    {"Edit client"}
-                </Typography> 
-                <IconButton
-                    aria-label="close"
-                    onClick={() => closeDialog()}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500],
-                    }}
-                    >
-                    <CloseIcon />
-                </IconButton>
-                </DialogTitle>
-
-                
-                <DialogContent>
-                    { errors ? <Alert severity="error">{errors}</Alert>: null }
-                    { success ? <Alert severity="success">{success}</Alert>: null }
-                    <Formik
-                    initialValues={initialValues}
-                    onSubmit={handleSubmit}
-                    validationSchema={validationSchema}
-                    >
-                    {({ errors, touched, handleChange, handleBlur, values }) => (
-                    
-                        <Form>
-                        <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
-                            <Field
-                            as={TextField}
-                            id="fullname"
-                            size="small"
-                            name="fullname"
-                            label="Customer name"
-                            placeholder="Customer name"
-                            error={touched.fullname && !!errors.fullname}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            />
-                            <Field
-                            as={TextField}
-                            id="email"
-                            size="small"
-                            name="email"
-                            label="Customer email"
-                            placeholder="Email"
-                            error={touched.email && !!errors.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            />
-
-                            <Field
-                            as={TextField}
-                            id="phone"
-                            size="small"
-                            name="phone"
-                            label="Phone"
-                            placeholder="xxx-xxx-xxxx"
-                            error={touched.phone && !!errors.phone}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            />
-
-                            <Field
-                            as={TextField}
-                            id="size"
-                            name="size"
-                            size="small"
-                            label="Party size"
-                            error={touched.size && !!errors.size}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            />
-                            <Grid container>
-                                <Grid item xs={12} md={6} sm={6}>
-                                {business ? (
-                            <>
-                                <Typography fontWeight={'bold'} variant="subtitle2">Resources</Typography>
-                                <Field
-                                as={Select}
-                                labelId="resources"
-                                size="small"
-                                fullWidth={true}
-                                name="resource_id"
-                                onChange={handleChange}
-                                >
-                                <MenuItem key={'NONE'} value={''}>none</MenuItem>
-                                {Array.isArray(resourceList) ? resourceList.map((resource) => (
-                                    <MenuItem key={resource._id} value={resource._id}>
-                                        <ListItemIcon>
-                                            { resource.serving && resource.active ? <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> : <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> }
-                                        </ListItemIcon>
-                                        <Typography variant="body2">{resource.title} </Typography>
-                                    </MenuItem>
-                                )) : null}
-                                </Field>
-                            </>
-                            ) : null}
-                            </Grid>
-                            <Grid item xs={12} md={6} sm={6}>
-                            <>
-                                <Typography fontWeight={'bold'} variant="subtitle2">Employee preference</Typography>
-                                <Field
-                                as={Select}
-                                id="employee_id"
-                                name="employee_id"
-                                size="small"
-                                fullWidth={true}
-                                onChange={handleChange}
-                                >
-                                {Array.isArray(employeeList) ? employeeList.map((employee) => (
-                                    <MenuItem key={employee._id} value={employee._id}>
-                                        <Typography variant="body2">{employee.fullname} </Typography>
-                                    </MenuItem>
-                                )) : null}
-                                </Field>
-                            </>
-                                </Grid>
-                            </Grid>
-                            
-
-                            {values.employee_id ? (
-                                
-                            <>
-                                <Typography fontWeight={'bold'} variant="subtitle2">Services available</Typography>
-                                <Field
-                                as={Select}
-                                labelId="services"
-                                name="service_id"
-                                size="small"
-                                onChange={handleChange}
-                                >
-                                { Array.isArray(serviceList) ?
-                                
-                                serviceList
-                                .filter((service) => service.employeeTags.includes(values.employee_id))
-                                .map((service) => (
-                                    <MenuItem key={service._id} value={service._id}>
-                                        <Stack>
-                                            <Typography variant="body2">{service.title}</Typography>
-                                            <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
-                                        </Stack>
-                            
-                                    </MenuItem>
-                                )):null }
-                                </Field>
-                            </>
-                            ) : null}
-
-                            <>
-                                <Box>
-                                    <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
-                                
-                                </Box>
-                                <Button sx={{ borderRadius: 10}} fullWidth={false} variant="outlined" onClick={() => searchAppointments(values.employee_id, values.service_id) }>Search</Button>
-                                <br/>
-                            </>
-                            {
-                                (appointments !== null) ? 
-                                (
-                                    <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
-                                        <Box sx={{ display: 'flex', flexWrap: 'wrap'}}>
-                                        <Stack direction={'row'}>
-                                        
-                                        { 
-                                           Object.keys(appointments).map((key, index) => {
-                                            const appointment = appointments[key];
-                                            return (
-                                                <Button 
-                                                    sx={{ margin: 1, borderRadius: 10}}
-                                                    variant={selectedAppointment === appointment ? "contained": "outlined"}
-                                                    onClick={() => handleAppointmentClick(appointment)} 
-                                                    color={selectedAppointment === appointment ? 'primary': 'secondary'}
-                                                    id="appointmentButtons">
-                                                    <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                    <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{"-"}</Typography>
-                                                    <Typography sx={{ whiteSpace: 'nowrap' }}  variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                </Button>
-                                            )
-                                        })
-                                        }
-                                        </Stack>
-                                        </Box>
-                                    </div>
-                                )
-                                :null
-                            }
-                            <Field
-                            as={TextField}
-                            id="notes"
-                            name="notes"
-                            size="small"
-                            label="Notes"
-                            placeholder="Additional notes"
-                            error={touched.notes && !!errors.notes}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            />
-
-                            <ErrorMessage name="notes" component="div" />
-                            <Button sx={{ borderRadius: 10}} variant="contained" type="submit">Submit</Button>
-                        </Stack>
-                        </Form>
-                    )}
-                    </Formik>
-                </DialogContent>
-                
-
-            </Dialog>
+            
 
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center'}}

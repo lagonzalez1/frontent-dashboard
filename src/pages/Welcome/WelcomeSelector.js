@@ -449,7 +449,7 @@ export default function WelcomeSelector() {
                                                             <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
                                                         </Grid>
                                                     }
-                                                    </Grid>
+                                                </Grid>
                                             </Grow>
                                         </Box>
                                         {
