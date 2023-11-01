@@ -35,7 +35,7 @@ export const getEmployeeList = (date,link) => {
 
 export const requestClientEditApp = (payload, link, unid) => {
     return new Promise((resolve, reject) => {
-        const data = {...payload} // Carefull here with backend.
+        const data = {...payload} 
         axios.post(`/api/external/editAppointment`, data)
         .then(response => {
             resolve(response.data.msg);

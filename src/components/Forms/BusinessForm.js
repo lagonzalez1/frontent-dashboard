@@ -1,4 +1,4 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { TextField, Button, Grid, Stack } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -38,10 +38,10 @@ const BusinessForm = () => {
   };
 
   const initialValue = {
-        businessName: business ? business.businessName : "",
-        businessWebsite: business ? business.businessWebsite: "",
-        businessAddress: business ? business.businessAddress: "",
-        businessPhone: business ? business.businessPhone: "",
+    businessName: business ? business.businessName : "",
+    businessWebsite: business ? business.businessWebsite: "",
+    businessAddress: business ? business.businessAddress: "",
+    businessPhone: business ? business.businessPhone: "",
   }
 
   return (

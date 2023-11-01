@@ -23,7 +23,7 @@ import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
 import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
-import { Field, Form, Formik, ErrorMessage } from "formik";
+import { Field, Formik,Form, ErrorMessage } from "formik";
 
 
 
@@ -75,11 +75,10 @@ export default function Waiting() {
         phone: user ? user.phone : '',
         size: user ? user.partySize: 1,
         service_id: '',
-        resource_id: user ? user.resourceTag: '',
         employee_id: '',
         start: '',
         end: '',
-        appointmentDate: user ? DateTime.fromISO(user.appointmentDate).toString() : '',
+        appointmentDate: '',
         notes: user ? user.notes : '',
     };
     
@@ -91,7 +90,6 @@ export default function Waiting() {
         size: Yup.number(),
         service_id: Yup.string(),
         employee_id: Yup.string(),
-        resource_id: Yup.string(),
         start: Yup.string(),
         end: Yup.string(),
         appointmentDate: Yup.string(),
@@ -226,8 +224,9 @@ export default function Waiting() {
         })
     }
 
-        const handleSubmit = (values) => {
-            console.log(values)    
+        const handleSubmit = (values, setSubmitting) => {
+            console.log("handle submit called.");
+            appointmentEdit(values);
         } 
 
         const handleAppointmentClick = (appointment, setFieldValue) => {
@@ -236,7 +235,8 @@ export default function Waiting() {
         }
 
         const appointmentEdit = (payload) => {
-            requestClientEditApp(payload)
+            const appointmentDate = DateTime.fromISO(selectedDate).toString();
+            requestClientEditApp({...payload, appointmentDate, link, unid})
             .then(response => {
                 console.log(response)
             })
@@ -267,17 +267,13 @@ export default function Waiting() {
         );
       };
 
-      const handleDateChange = (date) => {
-        // Also call to get available employees.
+      
+      const handleDateChange = (date, setFieldValue) => {
         getAvailableEmployees(date);
         setSelectedDate(date);
     };
-    // Last left off. 
-    // 9:35 pm 27th
-    // Need to fix waiting, to show a similar to WelcomeSector (Cards, Appointment slots)
-    // 1. SetEmployeeList now holds all current date available, Create Menu show all the employees.
-    // 2. Retrive all services associated with employee, show similar to WelcomeSelector.
-    // 3. Search all appointments available with {link, unid, date, ....} 
+
+
 
     const getAvailableEmployees = (date) => {
         const incomingDate = date.toISO();
@@ -323,8 +319,6 @@ export default function Waiting() {
             setWait(false);
         })
     }
-
-
 
     return(
         <>
@@ -376,15 +370,14 @@ export default function Waiting() {
                             <Typography variant="h5" fontWeight="bold">
                                 Edit appointment
                             </Typography>
-                            { errors ? <Alert severity="error">{errors}</Alert>: null }
-                            { success ? <Alert severity="success">{success}</Alert>: null }
                             <Formik
-                            initialValues={initialValues}
-                            validationSchema={validationSchema}
+                                initialValues={initialValues}
+                                validationSchema={validationSchema}
+                                onSubmit={handleSubmit}
                             >
-                            {({ errors, touched, handleChange, handleBlur, values, setFieldValue, isSubmitting }) => (
-                            
-                                <form onSubmit={Formik.handleSubmit}>
+                            {({ errors, touched, handleChange, handleBlur, values, setFieldValue, isSubmitting, setSubmitting }) => (
+                                
+                                <Form>
                                 <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                                     <Field
                                     as={TextField}
@@ -397,34 +390,41 @@ export default function Waiting() {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     />
+                                    <ErrorMessage name="fullname" component="div" />
+
                                     <Field
                                     as={TextField}
                                     id="email"
                                     size="small"
                                     name="email"
+                                    disabled={true}
                                     label="Customer email"
                                     placeholder="Email"
                                     error={touched.email && !!errors.email}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     />
+                                    <ErrorMessage name="email" component="div" />
+
 
                                     <Field
                                     as={TextField}
                                     id="phone"
                                     size="small"
                                     name="phone"
+                                    disabled={true}
                                     label="Phone"
                                     placeholder="xxx-xxx-xxxx"
                                     error={touched.phone && !!errors.phone}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     />
+                                    <ErrorMessage name="phone" component="div" />
 
                                 
                                     <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Select your new date </Typography>
                                     <Box>
-                                        <FutureDatePicker label="Appointment date" value={selectedDate} onChange={handleDateChange} />
+                                        <FutureDatePicker label="Appointment date" value={selectedDate} onChange={handleDateChange}  />
                                     </Box>
 
                                         {
@@ -573,6 +573,8 @@ export default function Waiting() {
                                     onChange={handleChange}
                                     onBlur={handleBlur}
                                     />
+                                    <ErrorMessage name="size" component="div" />
+
 
                                     <Field
                                     as={TextField}
@@ -587,10 +589,10 @@ export default function Waiting() {
                                     />
                                     <ErrorMessage name="notes" component="div" />
 
-                                    <Button type="submit" sx={{ borderRadius: 10}} variant="contained">Submit</Button>
+                                    <Button disabled={isSubmitting} type="submit" sx={{ borderRadius: 10}} variant="contained">Submit</Button>
 
                                 </Stack>
-                                </form>
+                                </Form>
                             )}
                             </Formik>
                             </Box>
