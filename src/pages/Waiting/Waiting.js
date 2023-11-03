@@ -5,9 +5,9 @@ Collapse, IconButton, DialogContentText, Grow, TextField, Select, Grid, Menu, Me
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 
-
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import CloseIcon from "@mui/icons-material/Close";
@@ -54,6 +54,7 @@ export default function Waiting() {
     const [appointments, setAppointments] = useState(null);
     const [editClient, setEditClient] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
+    const [updateClient, setUpdateClient] = useState(false);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [serviceList, setServiceList] = useState(null);
     const [employeeList, setEmployeeList] = useState(null);
@@ -112,8 +113,7 @@ export default function Waiting() {
     }
 
     const handleStatusClose = () => {
-        setOpenStatus(false);
-        setClientStatus({here: false, parking: false, late: false});
+        setUpdateClient(false);
     }
 
     useEffect(() => {
@@ -132,8 +132,10 @@ export default function Waiting() {
                 setErrors(userResponse.data.msg);
                 setUser({});
             } else if (userResponse.status === 200) {
+                const user = userResponse.data.client;
                 setTitles(userResponse.data.positionTitles);
-                setUser(userResponse.data.client); 
+                setUser(userResponse.data.client);
+                setClientStatus({ here: user.status.here, parking: user.status.parking, late: user.status.late});
                 setStatus(userResponse.data.statusTrigger); 
                 setType(userResponse.data.type);
             }
@@ -238,10 +240,10 @@ export default function Waiting() {
             const appointmentDate = DateTime.fromISO(selectedDate).toString();
             requestClientEditApp({...payload, appointmentDate, link, unid})
             .then(response => {
-                console.log(response)
+                setMessage(response.data.msg);
             })
             .catch(error => {
-                console.log(error);
+                setErrors(error);
             })
             .finally(() => {
                 setLoading(false);
@@ -268,7 +270,7 @@ export default function Waiting() {
       };
 
       
-      const handleDateChange = (date, setFieldValue) => {
+      const handleDateChange = (date) => {
         getAvailableEmployees(date);
         setSelectedDate(date);
     };
@@ -283,12 +285,7 @@ export default function Waiting() {
         })
         .catch(error => {
             setErrors(error);
-        })  
-    
-    }
-
-    const closeDialog = () => {
-        setEditClient(false);
+        })
     }
 
     const handleServiceChange = (service, setFieldValue, values) => {
@@ -364,9 +361,13 @@ export default function Waiting() {
                         {editClient ? (
                         <>
 
-                        <Box >
+                        <Box>
                         <Grow in={editClient}>
                             <Box>
+                            <IconButton onClick={ () => setEditClient(false) }>
+                                <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
+                            </IconButton>
+
                             <Typography variant="h5" fontWeight="bold">
                                 Edit appointment
                             </Typography>
@@ -375,7 +376,7 @@ export default function Waiting() {
                                 validationSchema={validationSchema}
                                 onSubmit={handleSubmit}
                             >
-                            {({ errors, touched, handleChange, handleBlur, values, setFieldValue, isSubmitting, setSubmitting }) => (
+                            {({ errors, touched, handleChange, handleBlur, values, setFieldValue, isSubmitting }) => (
                                 
                                 <Form>
                                 <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
@@ -526,10 +527,12 @@ export default function Waiting() {
                                     {
                                         (appointments !== null) ? 
                                         (
+                                            
                                             <>
                                             <Box sx={{ pt:0, display: appointments ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
                                             </Box>
+                                            { wait ? (<LinearProgress />) : (
                                             <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
                                                 {
                                                     wait ? <LinearProgress />: 
@@ -558,6 +561,8 @@ export default function Waiting() {
                                                 </Box>
 }
                                             </div>
+                                            )} 
+
                                             </>
                                         )
                                         : null
@@ -602,138 +607,135 @@ export default function Waiting() {
                         )
                         :
                         (
+                            
+                        <Stack sx={{ pt: 2}} spacing={3}>
+                        
+                        <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                            {errors ? 
+                            (
+                            
+                            <div className="circle_red">
+                                <PriorityHighIcon htmlColor="#fc0303" sx={{ fontSize: 50}} />
+                            </div>
+                            ): 
+                            (
+                                <div className="circle_yellow">
+                                    {type === WAITLIST && <NotificationsRoundedIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} />}
+                                    {type === APPOINTMENT && <EventAvailableTwoToneIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} /> }
+                                </div>                                
+                            )
+                            }
+                        </Container>
+                        
+                        { type === APPOINTMENT && (
                             <>
-                            <Stack sx={{ pt: 2}} spacing={3}>
-                            
-                            <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                {errors ? 
-                                (
-                                
-                                <div className="circle_red">
-                                    <PriorityHighIcon htmlColor="#fc0303" sx={{ fontSize: 50}} />
-                                </div>
-                                ): 
-                                (
-                                    <div className="circle_yellow">
-                                        {type === WAITLIST && <NotificationsRoundedIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} />}
-                                        {type === APPOINTMENT && <EventAvailableTwoToneIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} /> }
-                                    </div>                                
-                                )
-                                }
-                            </Container>
-                            
-                            { type === APPOINTMENT && (
+                                <Typography variant="h5" fontWeight="bold"> Appointment details </Typography>
+                            </>
+                        )} 
+
+                        {type === WAITLIST && (
+                            <>
+                            <Typography variant="h4" fontWeight="bold" > {titles ? titles.title : ''} </Typography>
+                            <Typography variant="body2"> {titles ? titles.desc : ''}</Typography>
+                            </>
+                        )}
+
+                        { type === APPOINTMENT && (
+                            <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
+                                <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
+                                </Typography>
+                            </Button>
+                        )} 
+
+                        { 
+                            type === WAITLIST && (
                                 <>
-                                    <Typography variant="h5" fontWeight="bold"> Appointment details </Typography>
+                                    {status ? 
+                                    (
+                                        <>
+                                        <Divider />
+                                        <Button onClick={() => setOpenStatus(true)} variant="outlined" color="success" sx={{ borderRadius: 10}}>
+                                            <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>Status
+                                            </Typography>
+                                        </Button>
+                                        </>
+                                    )
+                                    : 
+                                    (
+                                        <>
+                                        <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
+                                            <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
+                                            </Typography>
+                                        </Button>
+                                        </>
+                                    )
+                                    }
                                 </>
-                            )} 
+                            ) 
+                        }
+                        
+            
+                        <Divider />
+                        { type === WAITLIST  &&  
+                        <Container sx={{ textAlign: 'left'}}>
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Name </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.fullname : '' }</Typography>
 
-                            {type === WAITLIST && (
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Phone </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.phone : ''}</Typography>
+
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Email </Typography>
+                            <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.email : ''}</Typography>
+                        </Container>
+                        }
+
+                        { type === APPOINTMENT  &&  
+                        <Container sx={{ textAlign: 'left'}}>
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Name </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.fullname : '' }</Typography>
+
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Phone </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.phone : ''}</Typography>
+
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Duration </Typography>
+                            <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromFormat(user.start, 'HH:mm').toFormat('h:mm a') +  " - " + DateTime.fromFormat(user.end, 'HH:mm').toFormat('h:mm a') : ''}</Typography>
+
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Date </Typography>
+                            <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromISO(user.appointmentDate).toFormat('LLL dd yyyy') : ''}</Typography>
+                        </Container>
+                        }
+                        <Divider />
+                        { 
+                            type === WAITLIST && (
                                 <>
-                                <Typography variant="h4" fontWeight="bold" > {titles ? titles.title : ''} </Typography>
-                                <Typography variant="body2"> {titles ? titles.desc : ''}</Typography>
+                                <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
+                                    <Stack direction={'row'} spacing={0.5}>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => copyToClipboardHandler()}>share link</Button>
+                                        <Button disabled={errors ? true: false} variant="info" onClick={() => navigateToWaitlist() }> View waitlist</Button>
+                                        <Button disabled={errors ? true: false} variant="info" onClick={() => setOpen(true)}> Leave waitlist</Button>
+                                    </Stack>
+                                </Container>
                                 </>
-                            )}
-
-                            { type === APPOINTMENT && (
-                                <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
-                                    <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
-                                    </Typography>
-                                </Button>
-                            )} 
-
-                            { 
-                                type === WAITLIST && (
-                                    <>
-                                        {status ? 
-                                        (
-                                            <>
-                                            <Divider />
-                                            <Button onClick={() => setOpenStatus(true)} variant="outlined" color="success" sx={{ borderRadius: 10}}>
-                                                <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>Status
-                                                </Typography>
-                                            </Button>
-                                            </>
-                                        )
-                                        : 
-                                        (
-                                            <>
-                                            <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
-                                                <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
-                                                </Typography>
-                                            </Button>
-                                            </>
-                                        )
-                                        }
-                                    </>
-                                ) 
-                            }
-                            
-                
-                            <Divider />
-                            { type === WAITLIST  &&  
-                            <Container sx={{ textAlign: 'left'}}>
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Name </Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.fullname : '' }</Typography>
-
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Phone </Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.phone : ''}</Typography>
-
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Email </Typography>
-                                <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.email : ''}</Typography>
-                            </Container>
-                            }
-
-                            { type === APPOINTMENT  &&  
-                            <Container sx={{ textAlign: 'left'}}>
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Name </Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.fullname : '' }</Typography>
-
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Phone </Typography>
-                                <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.phone : ''}</Typography>
-
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Duration </Typography>
-                                <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromFormat(user.start, 'HH:mm').toFormat('h:mm a') +  " - " + DateTime.fromFormat(user.end, 'HH:mm').toFormat('h:mm a') : ''}</Typography>
-
-                                <Typography variant="subtitle2" sx={{ color: "gray"}}> Date </Typography>
-                                <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromISO(user.appointmentDate).toFormat('LLL dd yyyy') : ''}</Typography>
-                            </Container>
-                            }
-                            <Divider />
-                            { 
-                                type === WAITLIST && (
-                                    <>
-                                    <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
-                                        <Stack direction={'row'} spacing={0.5}>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => copyToClipboardHandler()}>share link</Button>
-                                            <Button disabled={errors ? true: false} variant="info" onClick={() => navigateToWaitlist() }> View waitlist</Button>
-                                            <Button disabled={errors ? true: false} variant="info" onClick={() => setOpen(true)}> Leave waitlist</Button>
-                                        </Stack>
-                                    </Container>
-                                    </>
-                                )
-                            }
-                            {
-                                type === APPOINTMENT && (
-                                    <>
-                                    <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
-                                        <Stack direction={'row'} spacing={0.5}>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => console.log("status")}>Update Status</Button>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setEditClient(true)}>Edit appointment</Button>
-                                            <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}>Cancel appointment</Button>
-                                        </Stack>
-                                    </Container>
-                                    </>
-                                )
-                            }
-                            <Divider />
+                            )
+                        }
+                        {
+                            type === APPOINTMENT && (
+                                <>
+                                <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
+                                    <Stack direction={'row'} spacing={0.5}>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setUpdateClient(true)}>Update Status</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setEditClient(true)}>Edit appointment</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}>Cancel appointment</Button>
+                                    </Stack>
+                                </Container>
+                                </>
+                            )
+                        }
+                        <Divider />
                         </Stack>
-                        </>
                         )
                         }
                         
-                    
-                    
                         </CardContent>
                         }
                         <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 2}}>
@@ -750,8 +752,8 @@ export default function Waiting() {
             >
                 
             <DialogTitle>
-                {type === APPOINTMENT && (<Typography variant="h6" fontWeight={'bold'}>Cancel appointment ?</Typography> )}
-                {type === WAITLIST && (<Typography variant="h6" fontWeight={'bold'}>Leave waitlist ?</Typography> )}
+                {type === APPOINTMENT && (<Typography variant="h5" fontWeight={'bold'}>Cancel appointment ?</Typography> )}
+                {type === WAITLIST && (<Typography variant="h5" fontWeight={'bold'}>Leave waitlist ?</Typography> )}
                 <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -781,7 +783,7 @@ export default function Waiting() {
 
             <Dialog
                 id="status_dialog"
-                open={openStatus}
+                open={updateClient}
                 onClose={handleStatusClose}
                 minWidth={'xs'}
                 maxWidth={'sm'}
@@ -805,7 +807,7 @@ export default function Waiting() {
             <DialogContent>
                 <Divider />
                 <DialogContentText>
-                    <Typography variant="body2" gutterBottom>Let us know where you are at!</Typography>  
+                    <Typography gutterBottom variant="body2">Let us know where you are at!</Typography>  
                 </DialogContentText>
                 
                 <Container sx={{ width: '100%'}}>

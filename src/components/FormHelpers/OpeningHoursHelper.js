@@ -2,6 +2,8 @@ import * as Yup from 'yup';
 import { getAccessToken, getStateData } from '../../auth/Auth';
 import axios from 'axios';
 
+export const DAYOFWEEK = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
+
 
 
 export const requestTimezoneChange = (timezone) => {
@@ -64,13 +66,13 @@ export const requestScheduleChange = (payload) => {
 }
 
 
-export const requestClosedDate = (date, employeeId) => {
+export const requestClosedDate = (date, employeeId, start, end) => {
   return new Promise((resolve, reject) => {
       const { user, business } = getStateData();
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       
-      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId: employeeId}, headers)
+      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId: employeeId, start, end}, headers)
       .then(response => {
         if (response.status === 200){
           resolve(response.data);
@@ -83,6 +85,23 @@ export const requestClosedDate = (date, employeeId) => {
 
   })
 }
+
+// Nov 2 12:53
+// @params [DateTime, DateTime]
+
+export const validateTimerange = (selectedDate, start, end, schedule) => {
+  if (!start || !end) { return false; }
+  const selectedDayOfWeek = selectedDate.weekday;
+  const KEY = DAYOFWEEK[selectedDayOfWeek];
+  const scheduledStart = schedule[KEY].start;
+  const scheduledEnd = schedule[KEY].end;
+  
+  const isStartTimeConsistent = start >= scheduledStart && start <= scheduledEnd;
+  const isEndTimeConsistent = end <= scheduledEnd && end >= scheduledStart;
+
+  return isStartTimeConsistent && isEndTimeConsistent;
+}
+
 
 
 const initialValuesSchedule = {
