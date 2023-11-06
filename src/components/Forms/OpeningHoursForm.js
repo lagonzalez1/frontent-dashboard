@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Grid, FormControl, InputLabel, Select, MenuItem, Button,
-   Stack, Typography, Dialog, DialogTitle, DialogContent, IconButton, DialogActions, TextField, Divider, Box, Container, Table, TableHead, TableCell, TableBody, CircularProgress, TableRow, Switch, FormControlLabel, Grow, Collapse, Alert } from '@mui/material';
+   Stack, Typography, Dialog, DialogTitle, DialogContent, IconButton, DialogActions, TextField, Divider, Box, Container, Table, TableHead, TableCell, TableBody, CircularProgress, TableRow, Switch, FormControlLabel, Grow, Collapse, Alert, alertClasses, TableContainer } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from 'yup';
@@ -12,7 +12,7 @@ import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone,
   requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate,validateTimerange, DAYOFWEEK } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
-import { getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
+import { findEmployee, getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
 
 
 
@@ -28,7 +28,7 @@ const OpeningHoursForm = () => {
   ]);
   const employeeList = getEmployeeList();
 
-  const [employeeTag, setEmployeeTag] = useState();
+  const [employeeTag, setEmployeeTag] = useState('');
   const [partialDay, setPartialDay] = useState(false);
   const [scheduleDialog, setScheduleDialog] = useState(false);
   const [closedDialog, setClosedDialog] = useState(false);
@@ -73,6 +73,10 @@ const OpeningHoursForm = () => {
 
   }
 
+  const handleEmployeeChange = (event) => {
+    setEmployeeTag(event.target.value)
+  }
+
   const setPartialDayPretense = (e) => {
     setPartialDay(e.target.checked);
   }
@@ -94,7 +98,7 @@ const OpeningHoursForm = () => {
         return;
       }
     }
-    
+    console.log("Employee tag" + employeeTag)
     setLoading(true);
     requestClosedDate(selectedDate.toISO(), employeeTag, start, end)
     .then(response => {
@@ -130,7 +134,7 @@ const OpeningHoursForm = () => {
       const key = DAYOFWEEK[selectedDayOfWeek];
       const scheduledStart = DateTime.fromFormat(schedule[key].start, 'HH:mm');
       const scheduledEnd = DateTime.fromFormat(schedule[key].end, 'HH:mm');
-      setTimerange(() => ([scheduledStart, scheduledEnd]));
+      setTimerange(() => ([schedule[key].start ? scheduledStart: null, schedule[key].end ? scheduledEnd: null]));
   };
 
   const closeScheduleDialog = () => {
@@ -139,6 +143,9 @@ const OpeningHoursForm = () => {
   const closeClosedDialog = () => {
     setClosedDialog(false);
     setSelectedDate(null);
+    setPartialDay(false);
+    setMessage(null);
+    
   }
 
   useEffect(() => {
@@ -419,24 +426,26 @@ const initialValuesSchedule = {
 
               <Grid container spacing={1} rowSpacing={1} sx={{ pt: 1}}>
                   <Grid item xs>
+                  <TableContainer style={{ maxHeight: '350px', overflowY: 'auto' }}>
                     <Table size='small'>
-                      { closedDays ? null : 
+                      { closedDays ?
                       <TableHead>
                         <TableRow>
                         <TableCell>
                             #
                         </TableCell>
                         <TableCell>
-                            Date off
+                            Date
                         </TableCell>
                         <TableCell>
-                          Range
+                          Employee
                         </TableCell>
                         <TableCell>
                             Action
                         </TableCell>
                         </TableRow>
                       </TableHead>
+                      : null
                       }
 
                       <TableBody>
@@ -448,16 +457,22 @@ const initialValuesSchedule = {
                                   {index + 1}
                               </TableCell>
                               <TableCell>
+                                <Typography variant='caption'>
                                   { DateTime.fromJSDate(new Date(item.date)).toLocaleString() }
-                              </TableCell>
-                              <TableCell>
-                                {
-                                  item.range.start !== null ? (
+                                  <br/>
+                                  {
+                                  item.range.start ? (
                                     <>
-                                      { DateTime.fromFormat(item.range.start,"HH:mm").toFormat('hh:mm').toString() - DateTime.fromFormat(item.range.end,"HH:mm").toFormat('hh:mm').toString() }
+                                      { DateTime.fromFormat(item.range.start, 'hh:mm').toFormat('h:mm a') + " - " +  DateTime.fromFormat(item.range.end, 'hh:mm').toFormat('HH:mm a') }
                                     </>
                                   ) : 'Fullday'
                                 }
+                                </Typography>
+                              </TableCell>
+                              <TableCell>
+                                <Typography variant='caption'>
+                                  { findEmployee(item.employeeTag).fullname }
+                                </Typography>
                               </TableCell>
                               <TableCell>
                                   <Button size="small" onClick={() => removeClosedDate(item._id) }>
@@ -469,29 +484,32 @@ const initialValuesSchedule = {
                         }): null}
                       </TableBody>
                     </Table>
+                    </TableContainer>
                   </Grid>
 
 
                   <Grid item xs>
                     <Stack spacing={1}> 
-                      <FutureDatePicker label="Close on this date" value={selectedDate} onChange={handleDateChange} />
+                      <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
                       <InputLabel id="employeeTag">Attach employee?</InputLabel>
                       <Select 
                         sx={{ pt: 1}}
                         id="employeeTag"
                         size="small"
-                        handleChange={(e) => setEmployeeTag(e.target.value)}
+                        value={employeeTag}
+                        onChange={handleEmployeeChange}
                         fullWidth={true}
                       >
-                        {employeeList.map((employee) => (
-                          <MenuItem key={employee._id} value={employee._id}>
-                            {employee.fullname}
+                        {employeeList.map((employee, index) => (
+                          <MenuItem value={employee._id}>
+                            <Typography variant='body2'>{employee.fullname}</Typography>
                           </MenuItem>
                         ))}
                       </Select>
                       {
                         selectedDate && <FormControlLabel 
                         control={<Switch
+                          disabled={timerange[0] === null ? true: false}
                           checked={partialDay}
                           onChange={(e) => setPartialDayPretense(e) }
                           inputProps={{ 'aria-label': 'controlled' }}
@@ -509,11 +527,13 @@ const initialValuesSchedule = {
                                 label="Start and end"
                                 value={timerange}
                                 fullWidth={true}
+                                disabled={timerange[0] === null ? true: false}
                                 size={'small'}
                                 onChange={(newValue) => setTimerange(newValue)}
                                 />
                               <br/>
-                            <Typography variant='caption' gutterBottom>Enter the time range you will NOT be available.</Typography> 
+                            <Typography variant='caption' gutterBottom>Enter the time range you will be available.</Typography>
+ 
                             </Box>
                           </Grow>
                         ):

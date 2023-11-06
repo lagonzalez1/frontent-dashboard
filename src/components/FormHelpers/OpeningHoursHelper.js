@@ -72,7 +72,7 @@ export const requestClosedDate = (date, employeeId, start, end) => {
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       
-      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId: employeeId, start, end}, headers)
+      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId, start, end}, headers)
       .then(response => {
         if (response.status === 200){
           resolve(response.data);
