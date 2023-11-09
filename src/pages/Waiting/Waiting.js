@@ -19,7 +19,6 @@ import { APPOINTMENT, WAITLIST } from "../../static/static.js";
 import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
 import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
 import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
-
 import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
@@ -121,7 +120,6 @@ export default function Waiting() {
     }, []);
     
     const loadUserAndBusinessArgs = () => {
-        setLoading(true);
         const timestamp = DateTime.local().toUTC();
         Promise.all([
             getIdentifierData(link, unid, timestamp),
@@ -201,6 +199,7 @@ export default function Waiting() {
         })
         .finally(() => {
             handleClose();
+            navigate(`/welcome/${link}/${type}/landingPage`)
         })
     }
 
@@ -240,9 +239,10 @@ export default function Waiting() {
             const appointmentDate = DateTime.fromISO(selectedDate).toString();
             requestClientEditApp({...payload, appointmentDate, link, unid})
             .then(response => {
-                setMessage(response.data.msg);
+                setMessage(response);
             })
             .catch(error => {
+                console.log(error)
                 setErrors(error);
             })
             .finally(() => {
@@ -711,8 +711,8 @@ export default function Waiting() {
                                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                                     <Stack direction={'row'} spacing={0.5}>
                                         <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => copyToClipboardHandler()}>share link</Button>
-                                        <Button disabled={errors ? true: false} variant="info" onClick={() => navigateToWaitlist() }> View waitlist</Button>
-                                        <Button disabled={errors ? true: false} variant="info" onClick={() => setOpen(true)}> Leave waitlist</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => navigateToWaitlist() }> View waitlist</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}> Leave waitlist</Button>
                                     </Stack>
                                 </Container>
                                 </>
@@ -822,8 +822,6 @@ export default function Waiting() {
                 <Button sx={{ borderRadius: 10, color: 'black'}} variant="text" onClick={() => statusRequest()}>Update</Button>
             </DialogActions>
             </Dialog>
-
-            
 
             <Snackbar
                 anchorOrigin={{ vertical: 'top', horizontal: 'center'}}

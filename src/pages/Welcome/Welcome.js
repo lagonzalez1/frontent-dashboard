@@ -4,7 +4,7 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent, Ale
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { allowClientJoin, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
+import { allowClientJoin, requestBusinessArguments, requestBusinessSchedule, waitlistRequest } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 
@@ -20,6 +20,8 @@ export default function Welcome() {
     const [errors, setErrors] = useState();
     const [args, setArgs] = useState();
     const [schedule, setSchedule] = useState({});
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
+    const [appointmentsOnly, setAppointmentsOnly] = useState(false);
     const [nextDate, setNextAvailableDate] = useState({});
 
     const navigate = useNavigate();
@@ -48,21 +50,16 @@ export default function Welcome() {
             setNextAvailableDate(scheduleResponse.nextAvailable);
             setArgs(argsResponse);
             if (stateResponse.status === 200){
-                if (stateResponse.data.isAccepting){
-                    setOpen(true)
-                    setListSize(stateResponse.data.waitlistLength);
-                    setLoading(false);
-                }else {
-                    setOpen(false);
-                    setLoading(false);
+                
+                setAcceptingStatus({ waitlist: stateResponse.data.isAccepting, appointments: stateResponse.data.accpetingAppointments});
+                if (stateResponse.data.isAccepting === false && stateResponse.data.accpetingAppointments === false) {
+                    navigate(`/welcome/${link}`);
+                    return;
                 }
-                return;
-            }
-            if (stateResponse.status === 203){
-                setOpen(false);
-                setErrors(stateResponse.data.msg);
+                setOpen(stateResponse.data.isAccepting);
+                setListSize(stateResponse.data.waitlistLength);
                 setLoading(false);
-                return;
+                
             }
             if (stateResponse.status === 404){
                 setOpen(false);
@@ -85,11 +82,18 @@ export default function Welcome() {
         });
     }
 
+    const ShowBusinessArguments = ({businessArgs}) => {
+        return (
+            <Box>
+                { businessArgs.waitlist &&  <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography>}                
+            </Box>
+        )
+    }
+
 
     const CheckBusinessArguments = () => {
 
-    
-        if (open === false) {
+        if (acceptingStatus.waitlist === false && acceptingStatus.appointments === false) {
             return (
                 <>
                     <Typography variant="h5" fontWeight='bold'>
@@ -127,14 +131,15 @@ export default function Welcome() {
             )
         }
 
-        return(
+        return (
             <>
             <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
-            {args ? <Typography variant="subtitle1" gutterBottom>Currently {listSize} in line.</Typography> : null}
+            { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
-            <Button disabled={!open} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
+            <ShowBusinessArguments businessArgs={args}/>
+            <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
                 <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
-                    Join waitlist
+                    { acceptingStatus.waitlist && acceptingStatus.appointments ? 'Join waitlist' : 'create appointment'}
                 </Typography>
             </Button>
             </>

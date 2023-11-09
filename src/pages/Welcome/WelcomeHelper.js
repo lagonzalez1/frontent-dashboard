@@ -56,10 +56,10 @@ export const allowClientJoin = (time,link) => {
     });
   };
 
-  export const getExtras = (link) => {
+  export const getExtras = (link, date) => {
     return new Promise((resolve, reject) => {
       axios
-      .get('/api/external/buisnessExtras', { params: {link} })
+      .get('/api/external/buisnessExtras', { params: {link, date} })
       .then((response) => {
         if (response.status === 200) {
           resolve(response.data);

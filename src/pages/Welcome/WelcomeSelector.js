@@ -32,6 +32,8 @@ export default function WelcomeSelector() {
     const [openAvailabity, setOpenAvailability] = useState(false);
     const [openSummary, setOpenSummary] = useState(false);
     const [openWaitlistSummary, setOpenWaitlistSummary] = useState(false);
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
+
 
     const [systemTypeSelected, setSystem] = useState(null);
 
@@ -152,12 +154,12 @@ export default function WelcomeSelector() {
         allowClientJoin(currentTime, link)
         .then(response => {
             if (response.status === 200) {
-                if (response.data.isAccepting === false) {
+                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.accpetingAppointments});
+                if (response.data.isAccepting === false && response.data.accpetingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
                 }
-            }            
-            
+            }           
         })
         .catch(error => {
             console.log(error);
@@ -271,7 +273,7 @@ export default function WelcomeSelector() {
         const payload = { employeeId: appointmentData.employee_id, serviceId: id, appointmentDate: appointmentData.date.toISO(), link, currentDate }
         getAvailableAppointments(payload)
         .then(response => {
-            console.log(response)
+            
             setSlots(response.data)
         })
         .catch(error => {
@@ -279,7 +281,7 @@ export default function WelcomeSelector() {
             console.log(error)
         })
         .finally(() => {
-            //setLoading(false);
+            setLoading(false);
         })
     }
 
@@ -341,7 +343,14 @@ export default function WelcomeSelector() {
                         <br/>
                         <ButtonGroup fullWidth={true} variant="outlined">
                             <Tooltip title="Waitlist: Wait in a general line.">
-                                <Button disabled={args && !args.system.waitlist} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
+                                {
+                                    acceptingStatus.waitlist === false ? (
+                                        <span>
+                                            <Button disabled={true} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
+                                        </span>
+                                    ):
+                                    <Button disabled={args && !args.system.waitlist} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
+                                }
                             </Tooltip>
                             <Tooltip title="Appointment: Schedule an appointment that best suits your schedule.">
                                 <Button disabled={args && !args.system.appointments} variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> Appointment</Button>

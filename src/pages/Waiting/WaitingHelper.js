@@ -73,9 +73,9 @@ export const requestClientStatus = (payload) => {
     })
 }
 
-export const leaveWaitlistRequest = (link, unid) => {
+export const leaveWaitlistRequest = (link, unid, type) => {
     return new Promise((resolve, reject) => {
-        axios.delete('/api/external/removeRequest', {params: { link, unid}})
+        axios.F('/api/external/removeRequest', { link, unid, type})
         .then(response => {
             resolve(response);
         }) 

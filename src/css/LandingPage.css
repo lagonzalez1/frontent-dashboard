@@ -1,0 +1,137 @@
+
+
+
+.circle_yellow {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Create a pseudo-element for the pulsating background circle */
+  .circle_yellow::before {
+    content: "";
+    position: absolute;
+    width: 100%; /* Cover the entire circle */
+    height: 100%; /* Cover the entire circle */
+    border-radius: inherit; /* Match the border radius of the main circle */
+    border: 5px solid #ffbb00;
+    animation: pulsate 2s infinite; /* Add animation properties to the pseudo-element */
+  }
+  
+  @keyframes pulsate {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+  }
+  
+    .circle_red {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 5px solid #fc0303;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  
+  
+  
+  
+  /* YourComponent.css */
+  .center-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: baseline;
+    height: 100vh; /* Center vertically and take the full height on smaller screens */
+    flex-direction: column;
+  }
+  
+  .custom-card {
+    width: 100%; /* Full width on smaller screens */
+    max-width: 100vh; /* Adjust the maximum width for larger screens */
+    min-width: 40%; /* Adjust the minimum width for larger screens */
+    min-height: 40vh; /* Adjust the minimum height for larger screens */
+    align-content: center;
+    text-align: center;
+    padding: 2;
+    overflow: auto !important;
+    border-radius: 5;
+    box-shadow: 0;
+  }
+  
+  
+  .card-style {
+    border-radius: 5;
+    border-color: lightgray;
+  
+  }
+  
+  .scroll-left {
+    overflow-x: auto !important;
+  }
+  
+  
+  
+  @media (min-width: 300px) {
+    .center-box {
+      margin-top: 10px;
+      width: 100%; /* Adjust the width for larger screens */
+    }
+  }
+  
+  @media (min-width: 300px) {
+    .custom-card {
+      margin-top: 10px;
+      width: 100%; /* Adjust the width for larger screens */
+  
+    }
+  }
+  
+  /* Media query for larger screens */
+  @media (min-width: 600px) {
+    .custom-card {
+      width: 62%; /* Adjust the width for larger screens */
+      min-height: 35vh; /* Adjust the height for larger screens */
+    }
+  }
+  
+  @media (min-width: 800px) {
+    .custom-card {
+      width: 50%; /* Adjust the width for larger screens */
+      min-height: 35vh; /* Adjust the height for larger screens */
+    }
+  }
+  
+  
+  @media (min-width: 1000px) {
+    .custom-card {
+      width: 30%; /* Adjust the width for larger screens */
+      min-height: 35vh; /* Adjust the height for larger screens */
+    }
+  }
+  
+  @media (min-width: 1300px) {
+    .custom-card {
+      width: 15%; /* Adjust the width for larger screens */
+      min-height: 35vh; /* Adjust the height for larger screens */
+    }
+  }
+  
+  @media (min-width: 1500px) {
+    .custom-card {
+      width: 15%; /* Adjust the width for larger screens */
+      min-height: 35vh; /* Adjust the height for larger screens */
+    }
+  }

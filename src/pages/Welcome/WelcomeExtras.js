@@ -11,6 +11,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/WelcomeSize.css";
+import { DateTime } from "luxon";
 
 
 export default function WelcomeExtras() {
@@ -42,7 +43,8 @@ export default function WelcomeExtras() {
 
 
     const getBuisnessExtras = () => {
-        getExtras(link)
+        const currentDate = DateTime.local().toISO();
+        getExtras(link, currentDate)
         .then(data => {
             setPresent(data.present);
             setEmployees(data.employees);

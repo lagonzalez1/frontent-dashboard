@@ -120,6 +120,9 @@ export default function EmployeeTable() {
                                 #
                             </TableCell>
                             <TableCell>
+                                Visable
+                            </TableCell>
+                            <TableCell>
                                 Fullname
                             </TableCell>
                             <TableCell>
@@ -138,16 +141,22 @@ export default function EmployeeTable() {
                                 return (
                                     <TableRow>
                                         <TableCell>
-                                            <IconButton aria-label="InfoClick" size="small" onClick={() => showQuickActions(employee)}>
-                                                <VisibilityOffOutlinedIcon  fontSize="sm"/>
-                                            </IconButton>
                                             {++index}
                                         </TableCell>
                                         <TableCell>
-                                            {employee.fullname}
+                                            <IconButton aria-label="InfoClick" size="small" onClick={() => showQuickActions(employee)}>
+                                                <VisibilityOffOutlinedIcon fontSize="sm"/>
+                                            </IconButton>
                                         </TableCell>
                                         <TableCell>
-                                            {employee.permissionLevel}
+                                            <Typography variant="body2">
+                                                {employee.fullname}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2">
+                                                {employee.permissionLevel}
+                                            </Typography>
                                         </TableCell>
                                         <TableCell>
                                             <Stack direction={'row'}>

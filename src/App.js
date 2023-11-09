@@ -14,6 +14,7 @@ import Waiting from './pages/Waiting/Waiting';
 import WelcomeExtras from './pages/Welcome/WelcomeExtras';
 import BusinessWaitlist from './pages/Waitlist/BusinessWaitlist';
 import WelcomeSelector from './pages/Welcome/WelcomeSelector';
+import LandingPage from './pages/Landing/LandingPage';
 
 
 
@@ -42,6 +43,7 @@ function App() {
           <Route path={'/welcome/:link/extras'} element={<WelcomeExtras />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
           <Route path={'/welcome/:link/waitlist'} element={<BusinessWaitlist />}></Route>
+          <Route path={'/welcome/:link/:status/landingPage'} element={<LandingPage />}></Route>
 
 
           <Route path={'/Dashboard'} element={

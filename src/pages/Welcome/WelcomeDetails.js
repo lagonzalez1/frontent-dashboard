@@ -42,6 +42,9 @@ export default function WelcomeDetails() {
     const [loading, setLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(null);
     const [preview, setPreview] = useState(null);
+    const [appointmentsOnly, setAppointmentsOnly] = useState(false);
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
+
 
 
     const businessForm = () => {
@@ -80,7 +83,8 @@ export default function WelcomeDetails() {
         allowClientJoin(currentTime, link)
         .then(response => {
             if (response.status === 200) {
-                if (response.data.isAccepting === false) {
+                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.accpetingAppointments});
+                if (response.data.isAccepting === false && response.data.accpetingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
                 }

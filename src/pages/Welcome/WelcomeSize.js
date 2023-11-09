@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { allowClientJoin, getMax} from "./WelcomeHelper";
+import { allowClientJoin, getMax, requestBusinessArguments} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { CLIENT } from "../../static/static";
 import "../../css/Welcome.css";
@@ -19,6 +19,9 @@ export default function Welcome() {
     const [loading, setLoading] = useState(true);
     const [size,setSize] = useState(1);
     const [maxSize, setMaxSize] = useState(0);
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
+    const [args, setArgs] = useState(null);
+    const [waitlistSize, setWaitlistSize ] = useState(null);
 
     const navigate = useNavigate();
 
@@ -51,22 +54,37 @@ export default function Welcome() {
             return;
         }
     }
+
+    const businessArguments = () => {
+        requestBusinessArguments(link)
+        .then(response => {
+            setArgs(response);
+        })
+        .catch(error => {
+            console.log(error)
+            setError('Error found when trying to reach business.');
+        })
+
+    }
     
     useEffect(() => {
         redirectStatus();
+        businessArguments();
         getBuisnessForm();
         getAnySavedFields();
         return() => {
             setLoading(false)
         }
-    }, [])
+    }, [loading])
 
     const redirectStatus = () => {
         const currentTime = DateTime.local().toISO();       
         allowClientJoin(currentTime, link)
         .then(response => {
             if (response.status === 200) {
-                if (response.data.isAccepting === false) {
+                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.accpetingAppointments});
+                setWaitlistSize(response.data.waitlistLength);
+                if (response.data.isAccepting === false && response.data.accpetingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
                 }
@@ -92,6 +110,18 @@ export default function Welcome() {
     const redirectBack = () => {
         navigate(`/welcome/${link}`)
     }
+
+    const ShowBusinessArguments = ({businessArgs, accepting}) => {
+        console.log(businessArgs);
+        if (accepting.waitlist === true) {
+            return (
+                <Box>
+                    { businessArgs && businessArgs.present.position ?  <Typography variant="subtitle1" gutterBottom>Currenlty {waitlistSize} ahead of you.</Typography>: null }                
+                </Box>
+            )
+        }
+    }
+
     return (
         <>
             <Box className="center-box" sx={{ pt: 3 }}>
@@ -142,7 +172,7 @@ export default function Welcome() {
                         { 
                             // Current wait time needs to be calculated. 
                         }
-                        <Typography sx={{ pt: 3}} textAlign={'center'} variant="body2" fontWeight="bold">Current wait time 8 min.</Typography>
+                        <ShowBusinessArguments businessArgs={args} accepting={acceptingStatus}/>
                         <Container sx={{ pt: 3}}>
                             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
                                 <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
