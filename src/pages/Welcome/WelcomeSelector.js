@@ -16,6 +16,7 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
 import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
 import * as Yup from 'yup';
+import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 
 
 export default function WelcomeSelector() {
@@ -32,7 +33,10 @@ export default function WelcomeSelector() {
     const [openAvailabity, setOpenAvailability] = useState(false);
     const [openSummary, setOpenSummary] = useState(false);
     const [openWaitlistSummary, setOpenWaitlistSummary] = useState(false);
-    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
+    
+
+    const [alertAppointments, setAlertAppointment] = useState(false);
 
 
     const [systemTypeSelected, setSystem] = useState(null);
@@ -234,8 +238,9 @@ export default function WelcomeSelector() {
         setOpenEmployees(false);
         setOpenSummary(false);
         setOpenWaitlistSummary(false);
+        setSlots(null);
         setOpenServices(false);
-        setAppointmentData((prev) => ({...prev, date: date}));
+        setAppointmentData((prev) => ({...prev, date: date, start: null, end: null}));
         getAvailableEmployees(date);
     }
         /**
@@ -273,8 +278,10 @@ export default function WelcomeSelector() {
         const payload = { employeeId: appointmentData.employee_id, serviceId: id, appointmentDate: appointmentData.date.toISO(), link, currentDate }
         getAvailableAppointments(payload)
         .then(response => {
-            
-            setSlots(response.data)
+            setSlots(response.data);
+            if(response.data.length === 0){
+                setAlertAppointment(true)
+            }
         })
         .catch(error => {
             setError(error);
@@ -395,7 +402,7 @@ export default function WelcomeSelector() {
                                                                     <Card className="card-style" sx={{backgroundColor: appointmentData.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee)}>
                                                                         <CardActionArea>
                                                                             <CardContent>
-                                                                                <PersonIcon />
+                                                                                <PersonIcon fontSize="small" />
                                                                                 <Typography variant="caption">{employee.fullname}</Typography>
                                                                             </CardContent>
                                                                         </CardActionArea>
@@ -479,6 +486,7 @@ export default function WelcomeSelector() {
                                                         flexDirection={'row'}
                                                         rowSpacing={2}
                                                     >
+                                                
                                                     {
                                                         slots ? (
                                                             Object.keys(slots).map((key, index) => {
@@ -502,6 +510,7 @@ export default function WelcomeSelector() {
                                                         
                                                         ): null
                                                     }
+                                                    <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={"No slots available"} body={'The reasoning here.'} />
                                                     </Grid>
                                                     </Box>
                                             </Grow>

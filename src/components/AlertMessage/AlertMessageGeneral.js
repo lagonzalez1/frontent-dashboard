@@ -1,16 +1,13 @@
 import React, { useState, useEffect} from "react";  
+import { Box, Container, Alert, AlertTitle, Typography, Collapse, IconButton} from "@mui/material"
 
+import CloseIcon from '@mui/icons-material/Close';
 
-import { Box, Container, Alert, AlertTitle, Typography} from "@mui/material"
+export default function AlertMessageGeneral({open, onClose, title, body}) {
 
-
-export default function ErrorMessage({open, setOpen, title, body}) {
-
-    
     const closeAlert = () => {
-        setOpen(false);
+        onClose(false);
     }
-
     return (
         <>
         <Collapse in={open}>
@@ -31,7 +28,7 @@ export default function ErrorMessage({open, setOpen, title, body}) {
             <AlertTitle>
                 {title}
             </AlertTitle>
-            {body}
+                {body}
             </Alert>
         </Collapse>        
         </>
