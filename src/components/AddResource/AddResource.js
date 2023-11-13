@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton, Stack, Divider   } from '@mui/material';
+import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton, Stack, Divider, Typography   } from '@mui/material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
@@ -66,7 +66,6 @@ export default function AddResource() {
       </Fab>
       <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="xs">
         <DialogTitle>
-          Add a resource
           <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -79,7 +78,10 @@ export default function AddResource() {
                     >
                     <CloseIcon />
                 </IconButton>
+                <Typography variant='h5' fontWeight={'bold'}>Add a resource</Typography>
+
         </DialogTitle>
+        <Divider />
         <DialogContent>
           <Formik
             initialValues={initialValues}

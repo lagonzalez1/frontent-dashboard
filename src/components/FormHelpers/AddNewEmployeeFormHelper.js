@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getHeaders, getStateData } from "../../auth/Auth";
-import business from "../../reducers/business";
 
 /**
  *  IF payload includes _id then we treat the backedn to edit a current employee.
@@ -74,3 +73,27 @@ export const requestBlockEmployee = (payload) => {
 
     })
 } 
+
+
+export const permissionLevel = [
+    {
+        title: 'Root',
+        desc: 'complete access to make changes',
+        value: 0
+    },
+    {
+        title: 'Managment',
+        desc: 'Allow user to edit, resources, services, employees, settings.',
+        value: 1
+    },
+    {
+        title: 'Employee 1',
+        desc: 'Allow user to create appointments and serve clients.',
+        value: 2
+    },
+    {
+        title: 'Employee 2',
+        desc: 'Allow user to serve clients.',
+        value: 3
+    }
+]

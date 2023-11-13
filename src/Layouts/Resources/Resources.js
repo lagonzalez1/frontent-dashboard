@@ -98,7 +98,7 @@ export default function Resources() {
         </Grid>
 
         
-        <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }} >
+        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap-reverse' }} columnSpacing={2} rowSpacing={2} >
             { resourceData? resourceData.map((resource, index) => (
                 <Grid item key={resource._id} xs={4} sm={4} md={4} lg={1}>
                         <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleResourceClick(resource)}>

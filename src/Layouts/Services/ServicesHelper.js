@@ -77,7 +77,7 @@ export const removeEmployeeTag = (data) => {
   const payload = { ...data, bid: business._id}
   const headers = { headers: { 'x-access-token': accessToken } };
   return new Promise((resolve, reject) => {
-    axios.put('/api/internal/service_remove_tag',payload, headers)
+    axios.post('/api/internal/service_remove_tag',payload, headers)
       .then(response => {
         if(response.status === 200) {
           resolve(response.data.msg);

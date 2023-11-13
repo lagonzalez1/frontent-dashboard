@@ -100,11 +100,16 @@ export default function WelcomeDetails() {
         let timestamp = DateTime.local().toUTC();
         try {
             const response = await allowClientJoin(timestamp, link);
-            const { isAccepting } = response.data;
-            console.log(isAccepting);
-            if (isAccepting){
+            const { isAccepting, accpetingAppointments } = response.data;
+            if ( accpetingAppointments === true || isAccepting === true ) {
                 externalWaitlistRequest(values);
-            }else{
+            }
+            else if (accpetingAppointments === false && isAccepting === false){
+                setErrors('Business is currently not accpeting appointments and waitlist request.');
+                setLoading(false);
+                return;
+            }
+            else{
                 setLoading(false);
                 redirectBack();
             }
@@ -124,8 +129,8 @@ export default function WelcomeDetails() {
             return
         }
         const clientStorage = JSON.parse(clientPayload);
-        let timestamp = DateTime.local().toUTC();
-        let payload = { ...values, link, timestamp, timestampOrigin: timestamp, ...clientStorage}
+        let timestamp = DateTime.local().toISO();
+        let payload = { link, timestamp, timestampOrigin: timestamp, ...clientStorage, ...values}
         let duplicatePayload = { ...clientStorage, link, values}
         checkDuplicatesRequest(duplicatePayload)
         .then((response) => {
@@ -170,6 +175,7 @@ export default function WelcomeDetails() {
     }
 
     const redirectBack = () => {
+
         navigate(`/welcome/${link}/selector`)
     }
     return (

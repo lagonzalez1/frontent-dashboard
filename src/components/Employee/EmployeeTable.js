@@ -10,7 +10,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import { requestRemoveEmployee, requestBlockEmployee } from "../FormHelpers/AddNewEmployeeFormHelper";
 import { setReload, setSnackbar } from "../../reducers/user";
 import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
-import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
+import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import { DateTime } from "luxon";
 // Show table of employees
 // Allow to delete and add employees
@@ -35,7 +36,6 @@ export default function EmployeeTable() {
 
     const showQuickActions = (employee) => {
         setEmployee(employee);
-        setInvisable(employee.blockOff.status)
         setQuickActions(true);
     }
 
@@ -65,9 +65,9 @@ export default function EmployeeTable() {
 
     const handleActionClose = () => {
         setQuickActions(false);
+        setInvisable(null)
         setEmployee(null);
     }
-
 
     const confirmDelete = (id) => {
         setDeleteConfirm(true);
@@ -145,7 +145,7 @@ export default function EmployeeTable() {
                                         </TableCell>
                                         <TableCell>
                                             <IconButton aria-label="InfoClick" size="small" onClick={() => showQuickActions(employee)}>
-                                                <VisibilityOffOutlinedIcon fontSize="sm"/>
+                                                <VisibilityRoundedIcon fontSize="small"/>
                                             </IconButton>
                                         </TableCell>
                                         <TableCell>
@@ -164,7 +164,7 @@ export default function EmployeeTable() {
                                                 <DeleteIcon fontSize="Small" />
                                             </IconButton>
                                             <IconButton onClick={() => editEmployee(employee)}>
-                                                <EditIcon fontSize="small"/>
+                                                <BorderColorRoundedIcon fontSize="small"/>
                                             </IconButton>
                                             <IconButton onClick={() => editSchedule(employee)}>
                                                 <CalendarMonthIcon fontSize="small"/>
@@ -205,18 +205,19 @@ export default function EmployeeTable() {
                     >
                     <CloseIcon />
                 </IconButton> 
-                Delete employee ?
+                <Typography variant="h5" fontWeight={'bold'}> Delete employee</Typography>
+                
             </DialogTitle>
+            <Divider/>
 
             <DialogContent>
-                <Container>
-                    <Stack spacing={2}>
-                        <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => removeEmployee(employeeId)} >yes</Button>
-                        <Button sx={{ borderRadius: 15}} variant="outlined" onClick={() => cancelEmployeeDelete()}>no</Button>
-                    </Stack>
-                </Container>
+                <Typography variant="body2">Delete employee from buisness?</Typography>
                 
             </DialogContent>
+            <DialogActions>
+                <Button sx={{ borderRadius: 15}} variant="outlined" color="error" onClick={() => removeEmployee(employeeId)} >yes</Button>
+                        <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => cancelEmployeeDelete()}>no</Button>
+            </DialogActions>
             </Dialog>
 
 
@@ -236,10 +237,10 @@ export default function EmployeeTable() {
                     }}
                     >
                     <CloseIcon />
-                </IconButton> 
-                Employee
-
+                </IconButton>
+                <Typography variant="h6" fontWeight={'bold'}>Add new employee</Typography> 
            </DialogTitle>
+           <Divider/>
 
             <DialogContent>
                 <AddEmployeeForm employee={employee}/>
@@ -267,9 +268,10 @@ export default function EmployeeTable() {
                     >
                     <CloseIcon />
                 </IconButton> 
-                Employee {employee ? employee.fullname: ''} breaks
+                <Typography variant="h5" fontWeight={'bold'}>Breaks:  {employee ? employee.fullname: ''}</Typography>
+                
            </DialogTitle>
-
+            <Divider />
             <DialogContent>
                 <EmployeeScheduleForm employee={employee}/>
             </DialogContent>
@@ -294,21 +296,22 @@ export default function EmployeeTable() {
                     >
                     <CloseIcon />
                 </IconButton> 
-                Employee {employee ? employee.fullname: ''}
+                <Typography variant="h5" fontWeight={'bold'}>Actions: {employee ? employee.fullname: ''} </Typography>
+                <Divider />
            </DialogTitle>
 
             <DialogContent>
-                <Typography variant="subtitle1">Make employee invisable for waitlist and appointments for the rest of today, {DateTime.local().toFormat('dd LLLL yyyy')}.</Typography>
+                <Typography variant="body2">Make employee invisable for waitlist and appointments for the rest of today, {DateTime.local().toFormat('dd LLLL yyyy')}.</Typography>
                 <Typography variant="body2">{ employee && today.hasSame(DateTime.fromISO(employee.blockOff.lastUpdate), 'day') ? DateTime.fromISO(employee.blockOff.lastUpdate).toString() : '' }</Typography>
                 <FormControl>
-                    <FormLabel id="demo-controlled-radio-buttons-group"></FormLabel>
+                    <FormLabel id="demo-controlled-radio-buttons-group">Block employee</FormLabel>
                     <RadioGroup
                         aria-labelledby="demo-controlled-radio-buttons-group"
                         name="controlled-radio-buttons-group"
                         value={invisable}
                         onChange={(e) => setInvisable(e.target.value) }
                     >
-                        <FormControlLabel value={false}control={<Radio />} label="Visable" />
+                        <FormControlLabel value={false} control={<Radio />} label="Visable" />
                         <FormControlLabel value={true} control={<Radio />} label="Invisable" />
                     </RadioGroup>
                     </FormControl>

@@ -66,6 +66,11 @@ export const requestNoShow = (clientId) => {
   }
 
 
+    // No longer do i need to create a new Analytic, we can assume it exist since regisstration handles that.
+    // Analytics has changed so now this need to reflect the new strcuture.
+    // Mongodb Service doc: {businessId, name, email, ...waitlist[], ...appointments[]}
+    // Nov 12 2023
+
   export const getAnalyticsClients = (payload) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();

@@ -35,7 +35,7 @@ export default function Services() {
         container: {
           display: 'flex', // Set the container's display to flex
           flexDirection: 'row', // Set the main axis to be horizontal
-          flexWrap: 'wrap', // Allow the items to wrap to the next row if there's not enough space
+          flexWrap: 'wrap-reversed', // Allow the items to wrap to the next row if there's not enough space
           justifyContent: 'flex-start', // Start the items from the left (you can adjust this to center or space-between if needed)
         }
     };
@@ -79,15 +79,15 @@ export default function Services() {
         removeEmployeeTag(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
-            setLoading(false)
             handleClose();
         })
         .catch(error => {
             dispatch(setSnackbar(error))
-            setLoading(false)
         })
         .finally(() =>{
             dispatch(setReload(true));
+            setLoading(false)
+
         })
     }
 
@@ -114,9 +114,9 @@ export default function Services() {
         </Grid>
 
         
-        <Grid container style={styles.container} sx={{ pt: 2}} spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap-reverse' }} columnSpacing={2} rowSpacing={2}>
             { serviceList ? serviceList.map((service) => (
-                <Grid item key={service._id} xs={4} sm={4} md={4} lg={1}>
+                <Grid item key={service._id}>
                     <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleClick(service)}>
                         <CardActionArea>
                         <CardContent>
@@ -129,14 +129,15 @@ export default function Services() {
                                 { ' ' + service.title}
                             </Typography>
                             <Stack>
-                                <Typography color="#878686" variant="body2" component="p">
-                                    Duration: {service.duration}
+                                <Typography variant="caption" component="p">
+                                    Duration: 
+                                    <Typography variant="caption" fontWeight={'bold'}>{service.duration} </Typography>
                                 </Typography>
-                                <Typography color="#878686" variant="body2" component="p">
-                                    Cost: {service.cost}
+                                <Typography variant="caption" component="p">
+                                    Cost: <Typography variant="caption" fontWeight={'bold'}>{service.cost}</Typography>
                                 </Typography>
-                                <Typography color="#878686" variant="body2" component="p">
-                                    Public: {service.public ? 'True': 'False'}
+                                <Typography variant="caption" component="p">
+                                    Public:<Typography variant="caption" fontWeight={'bold'}> {service.public ? 'True': 'False'}</Typography>
                                 </Typography>
                             </Stack>
                             </Box>
@@ -164,9 +165,10 @@ export default function Services() {
                     >
                     <CloseIcon />
                 </IconButton> 
-                Service- <strong>
+                
 
-            { service ? service.title: null } </strong></DialogTitle>
+                <Typography variant="h5" fontWeight={'bold'}>{ "Service -" + service ? service.title: null } </Typography>
+            </DialogTitle>
 
 
             {loading ? (

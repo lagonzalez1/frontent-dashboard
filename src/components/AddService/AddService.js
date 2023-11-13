@@ -3,7 +3,7 @@ import {
   Fab,
   TextField,
   Button, Checkbox, 
-  Dialog, Box, IconButton, DialogTitle, DialogContent, DialogActions, Select, InputLabel, MenuItem, Stack, FormLabel, Grid
+  Dialog, Box, IconButton, DialogTitle, DialogContent, DialogActions, Select, InputLabel, MenuItem, Stack, FormLabel, Grid, Typography, Divider
 } from '@mui/material';
 
 import makeStyles from "@emotion/styled"
@@ -86,7 +86,7 @@ const AddService = () => {
         fullWidth={true}
       >
         <DialogTitle>
-            Add a service
+            
             <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -99,7 +99,10 @@ const AddService = () => {
                     >
                     <CloseIcon />
                 </IconButton>
+
+                <Typography variant='h5' fontWeight={'bold'}>Add a service</Typography>
             </DialogTitle>
+            <Divider/>
         <DialogContent>
           <Formik
             initialValues={{

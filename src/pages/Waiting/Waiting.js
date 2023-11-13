@@ -19,6 +19,13 @@ import { APPOINTMENT, WAITLIST } from "../../static/static.js";
 import EventAvailableTwoToneIcon from '@mui/icons-material/EventAvailableTwoTone';
 import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
 import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
+import BlockRoundedIcon from '@mui/icons-material/BlockRounded';
+import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
+import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
+import IosShareRoundedIcon from '@mui/icons-material/IosShareRounded';
+import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
+
+import FormatListNumberedRoundedIcon from '@mui/icons-material/FormatListNumberedRounded';
 import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
@@ -349,13 +356,16 @@ export default function Waiting() {
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                         </Typography>
-                        {loading ? <CircularProgress sx={{ p: 3}} /> : 
+                        {loading ? 
+                        <CircularProgress sx={{ p: 3}} /> : 
                         <CardContent>
                             
                         { errors ? <Alert severity="error">
                             <AlertTitle sx={{ textAlign: 'left', fontWeight: 'bold'}}>Error</AlertTitle>
                             <Typography sx={{ textAlign: 'left'}}>{errors}</Typography>
-                            </Alert>: null} 
+                            </Alert>: 
+                            null
+                        } 
 
                             
                         {editClient ? (
@@ -614,14 +624,24 @@ export default function Waiting() {
                             {errors ? 
                             (
                             
+                                
                             <div className="circle_red">
                                 <PriorityHighIcon htmlColor="#fc0303" sx={{ fontSize: 50}} />
                             </div>
                             ): 
                             (
-                                <div className="circle_yellow">
-                                    {type === WAITLIST && <NotificationsRoundedIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} />}
-                                    {type === APPOINTMENT && <EventAvailableTwoToneIcon htmlColor="#ffbb00" sx={{ fontSize: 50 }} /> }
+                                <div className="">
+                                    {type === WAITLIST && 
+                                        <div className="blob_waitlist">
+                                        <NotificationsRoundedIcon htmlColor="#f8fbf2" sx={{ fontSize: 50 }} />
+                                        </div>
+                                    }
+                                    {type === APPOINTMENT && 
+                                     // 
+                                        <div className="blob_appointment">
+                                            <EventAvailableRoundedIcon htmlColor="#fff8e5" sx={{ fontSize: 50 }} />
+                                        </div>
+                                    }
                                 </div>                                
                             )
                             }
@@ -710,9 +730,9 @@ export default function Waiting() {
                                 <>
                                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                                     <Stack direction={'row'} spacing={0.5}>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => copyToClipboardHandler()}>share link</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => navigateToWaitlist() }> View waitlist</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}> Leave waitlist</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<IosShareRoundedIcon fontSize="small" />} onClick={() => copyToClipboardHandler()}>Share</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<FormatListNumberedRoundedIcon fontSize="small"/>} onClick={() => navigateToWaitlist() }> Waitlist</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<BlockRoundedIcon fontSize="small"/>} onClick={() => setOpen(true)}> Cancel</Button>
                                     </Stack>
                                 </Container>
                                 </>
@@ -723,9 +743,9 @@ export default function Waiting() {
                                 <>
                                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                                     <Stack direction={'row'} spacing={0.5}>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setUpdateClient(true)}>Update Status</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setEditClient(true)}>Edit appointment</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" onClick={() => setOpen(true)}>Cancel appointment</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<NotificationsActiveRoundedIcon fontSize="small"/>} onClick={() => setUpdateClient(true)}>Status</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<BorderColorRoundedIcon fontSize="small"/>} onClick={() => setEditClient(true)}>Edit</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<BlockRoundedIcon fontSize="small"/>} onClick={() => setOpen(true)}>Cancel</Button>
                                     </Stack>
                                 </Container>
                                 </>
@@ -752,8 +772,11 @@ export default function Waiting() {
             >
                 
             <DialogTitle>
-                {type === APPOINTMENT && (<Typography variant="h5" fontWeight={'bold'}>Cancel appointment ?</Typography> )}
-                {type === WAITLIST && (<Typography variant="h5" fontWeight={'bold'}>Leave waitlist ?</Typography> )}
+                <Box>
+                    {type === APPOINTMENT && (<Typography variant="h5" fontWeight={'bold'}>Cancel appointment</Typography> )}
+                    {type === WAITLIST && (<Typography variant="h5" fontWeight={'bold'}>Leave waitlist</Typography> )}
+                </Box>
+                
                 <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -770,8 +793,10 @@ export default function Waiting() {
             </DialogTitle>
             
             <DialogContent>
+                <Divider />
+
                 <DialogContentText>
-                    {type === APPOINTMENT && (<Typography variant="caption">You are abandoning your appointment.</Typography> )}
+                    {type === APPOINTMENT && (<Typography variant="caption">Are you sure you want to give up your appointment?</Typography> )}
                     {type === WAITLIST && (<Typography variant="caption">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography> )}
                 </DialogContentText>   
             </DialogContent>
@@ -789,7 +814,7 @@ export default function Waiting() {
                 maxWidth={'sm'}
             >
             <DialogTitle>
-                <Typography variant="h6" fontWeight={'bold'}>Set status</Typography>  
+                <Typography variant="h5" fontWeight={'bold'}>Status</Typography>  
                 <IconButton
                     aria-label="close"
                     onClick={handleStatusClose}
@@ -807,11 +832,10 @@ export default function Waiting() {
             <DialogContent>
                 <Divider />
                 <DialogContentText>
-                    <Typography gutterBottom variant="body2">Let us know where you are at!</Typography>  
                 </DialogContentText>
-                
-                <Container sx={{ width: '100%'}}>
-                <Stack spacing={2}>
+                <Container sx={{ width: '100%', mt: 1}}>
+                <Stack spacing={1}>
+                    <Typography gutterBottom variant="body2">Let us know where you are at!</Typography>  
                     <Button size="large" color="primary" sx={{ borderRadius: 10}} variant={clientStatus.late ? "contained" : "outlined"} startIcon={<WatchLaterIcon /> } onClick={() => setClientStatus((prev) => ({...prev, late: !clientStatus.late})) }>Late</Button>
                     <Button size="large"  color="primary"sx={{ borderRadius: 10}} variant={clientStatus.here ? "contained" : "outlined"}  startIcon={<EmojiPeopleIcon /> } onClick={() => setClientStatus((prev) => ({...prev, here: !clientStatus.here})) }>Here</Button>
                     <Button size="large"  color="primary" sx={{ borderRadius: 10}} variant={clientStatus.parking ? "contained" : "outlined"}  startIcon={<DirectionsCarFilledIcon /> } onClick={() => setClientStatus((prev) => ({...prev, parking: !clientStatus.parking})) }>Parking</Button>
@@ -819,7 +843,7 @@ export default function Waiting() {
                 </Container>
             </DialogContent>
             <DialogActions>
-                <Button sx={{ borderRadius: 10, color: 'black'}} variant="text" onClick={() => statusRequest()}>Update</Button>
+                <Button sx={{ borderRadius: 10}} variant="contained" onClick={() => statusRequest()}>Update</Button>
             </DialogActions>
             </Dialog>
 

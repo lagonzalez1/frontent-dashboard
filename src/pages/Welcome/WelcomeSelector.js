@@ -186,7 +186,8 @@ export default function WelcomeSelector() {
     }
 
     const getBuisnessExtras = () => {
-        getExtras(link)
+        const date = DateTime.local().toISO();
+        getExtras(link, date)
         .then(data => {
             setPresent(data.present);
             setEmployees(data.employees);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
-import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress, Select, MenuItem, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress, Select, MenuItem, Accordion, AccordionSummary, AccordionDetails, InputLabel } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
-import {requestEmployeeChange } from "../FormHelpers/AddNewEmployeeFormHelper";
+import {permissionLevel, requestEmployeeChange } from "../FormHelpers/AddNewEmployeeFormHelper";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
@@ -92,6 +92,7 @@ export default function AddEmployeeForm({employee}) {
     <Box sx={{ pt: 2}}>
     {loading ? (
         <Container sx={{p: 3}}>
+          <Typography variant='caption'>Saving your information...</Typography>
           <Box>
             <CircularProgress />
           </Box>
@@ -104,14 +105,14 @@ export default function AddEmployeeForm({employee}) {
     >
       {({ errors, touched, values, setFieldValue }) => (
         <Form>
-          <Grid container spacing={2}>
+          <Grid container spacing={1}>
             <Grid item xs={12}>
-              <Stack spacing={2}>
+              <Stack spacing={1.5}>
                 <Field
                   name="fullname"
                   as={TextField}
                   label="Employee Name"
-                  variant="standard"
+                  variant="outlined"
                   error={touched.fullname && !!errors.fullname}
                   helperText={touched.fullname && errors.fullname}
                 />
@@ -119,7 +120,7 @@ export default function AddEmployeeForm({employee}) {
                   name="employeeUsername"
                   label="Username"
                   as={TextField}
-                  variant="standard"
+                  variant="outlined"
                   error={touched.employeeUsername && !!errors.employeeUsername}
                   helperText={touched.employeeUsername && errors.employeeUsername}
                 />
@@ -127,7 +128,7 @@ export default function AddEmployeeForm({employee}) {
                   name="employeePassword"
                   label="Password"
                   as={TextField}
-                  variant="standard"
+                  variant="outlined"
                   type="password"
                   error={touched.employeePassword && !!errors.employeePassword}
                   helperText={touched.employeePassword && errors.employeePassword}
@@ -144,22 +145,40 @@ export default function AddEmployeeForm({employee}) {
                 </AccordionSummary>
                 <AccordionDetails>
                   <Stack>
-                  <Typography variant='caption'>Level 0: Root user, complete access to make changes.</Typography>
-                  <Typography variant='caption'>Level 1: Allow user to edit, resources, services and all below.</Typography>
-                  <Typography variant='caption'>Level 2: Allow user to create appointments and serve clients and all below.</Typography>
-                  <Typography variant='caption'>Level 3: Allow user to serve clients.</Typography>
+                    <Typography variant='caption'>Level 0: Root user, complete access to make changes.</Typography>
+                    <Typography variant='caption'>Level 1: Allow user to edit, resources, services and all below.</Typography>
+                    <Typography variant='caption'>Level 2: Allow user to create appointments and serve clients and all below.</Typography>
+                    <Typography variant='caption'>Level 3: Allow user to serve clients.</Typography>
                   </Stack>
                 </AccordionDetails>
             </Accordion>
+              <InputLabel id="permissionLevel">Attach employee?</InputLabel>
+              <Field 
+                id="permissionLevel"
+                name="permissionLevel"
+                as={Select}
+                error={touched.permissionLevel && !!errors.permissionLevel}
+                helperText={touched.permissionLevel && errors.permissionLevel}
+              >
+                  {
+                    permissionLevel.map((item, index) => {
+                      return (
+                            <MenuItem key={index} value={item.value}>
+                              <Typography variant='body1' fontWeight={'bold'}>{item.title}</Typography>
+                              <Typography variant='body1' fontWeight={'bold'}> - </Typography>
+                              <Typography variant='body2'>{item.desc}</Typography>
+                            </MenuItem>
+                      )
+                    })
+                  }
+                  
+              </Field>
+
+
                 
-                <Field
-                  name="permissionLevel"
-                  as={TextField}
-                  label="Permission Level"
-                  variant="standard"
-                  error={touched.permissionLevel && !!errors.permissionLevel}
-                  helperText={touched.permissionLevel && errors.permissionLevel}
-                />
+
+
+
                 <Typography variant='caption'>Select your availability.</Typography>
                 <Grid container
                     sx={{ pt: 2}}
@@ -170,7 +189,7 @@ export default function AddEmployeeForm({employee}) {
                     { WEEK.map((day, index) => {
                         return(
                             <>
-                            <Grid item xs={6} md={4} lg={2}>
+                            <Grid key={index} item xs={6} md={4} lg={2}>
                                 <Card sx={{ p: 1, textAlign: 'center'}}>
                                 <Field
                                     key={day}
@@ -186,9 +205,10 @@ export default function AddEmployeeForm({employee}) {
                                             color="primary"
                                         />
                                     }
+
                                     label={day}
                                     />
-                                <Typography variant="caption">{day}</Typography>
+                                <Typography variant="caption" fontWeight={'bold'}>{day}</Typography>
                                 </Card>
                             </Grid>
                             </>

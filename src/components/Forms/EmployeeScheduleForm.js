@@ -8,6 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { DateTime } from 'luxon';
 
 
 
@@ -125,24 +126,17 @@ export default function EmployeeScheduleForm({employee}) {
                 aria-controls="panel1a-content"
                 id="panel1a-header"
                 >
-                <Typography>Business schedule</Typography>
+                <Typography variant='subtitle1' fontWeight={'bold'}>Business schedule</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                <Typography>
-                    Sunday: { business ? business.schedule.Sunday.start + "-" + business.schedule.Sunday.end : ''}
-                    <br />
-                    Monday: { business ? business.schedule.Monday.start + "-" + business.schedule.Monday.end : ''}
-                    <br />
-                    Tuesday: { business ? business.schedule.Tuesday.start + "-" + business.schedule.Tuesday.end : ''}
-                    <br />
-                    Wednesday: { business ? business.schedule.Wednesday.start + "-" + business.schedule.Wednesday.end: ''}
-                    <br />
-                    Thursday: { business ? business.schedule.Thursday.start + "-" + business.schedule.Thursday.end: ''}
-                    <br />
-                    Friday: { business ? business.schedule.Friday.start + "-" + business.schedule.Friday.end: ''}
-                    <br />
-                    Saturday: { business ? business.schedule.Saturday.start + "-" + business.schedule.Saturday.end : ''}
-                </Typography>
+                
+                    <Typography variant='body1' fontWeight={'bold'}>Sunday </Typography><Typography variant='body2'>{ business?  DateTime.fromFormat('HH:mm',business.schedule.Sunday.start).toFormat('h:mm')  + "-" + DateTime.fromFormat('HH:mm',business.schedule.Sunday.end).toFormat('h:mm'): null }</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Monday </Typography> <Typography variant='body2'>{ business ? DateTime.fromFormat('HH:mm',business.schedule.Monday.start).toFormat('h:mm a')  + "-" + DateTime.fromFormat('HH:mm',business.schedule.Monday.end ).toFormat('h:mm'): ''}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Tuesday </Typography>: <Typography variant='body2'>{ business ? DateTime.fromFormat('HH:mm',business.schedule.Tuesday.start).toFormat('h:mm')  + "-" + DateTime.fromFormat('HH:mm',business.schedule.Tuesday.end).toFormat('h:mm') : ''}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Wednesday </Typography>: <Typography variant='body2'>{ business ? DateTime.fromFormat('HH:mm',business.schedule.Wednesday.start).toFormat('h:mm')  + "-" + DateTime.fromFormat('HH:mm',business.schedule.Wednesday.end).toFormat('h:mm'): ''}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Thursday </Typography>: <Typography variant='body2'>{ business ? DateTime.fromFormat('HH:mm',business.schedule.Thursday.start).toFormat('h:mm')  + "-" +DateTime.fromFormat('HH:mm', business.schedule.Thursday.end).toFormat('h:mm'): ''}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Friday </Typography>: <Typography variant='body2'>{ business ? DateTime.fromFormat('HH:mm', business.schedule.Friday.start).toFormat('h:mm') + "-" + DateTime.fromFormat('HH:mm',business.schedule.Friday.end).toFormat('h:mm'): ''}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Saturday </Typography>: <Typography variant='body2'>{ business ? DateTime.fromFormat('HH:mm',business.schedule.Saturday.start).toFormat('h:mm')  + "-" + DateTime.fromFormat('HH:mm',business.schedule.Saturday.end ).toFormat('h:mm'): ''}</Typography>
                 </AccordionDetails>
             </Accordion>
         <Typography variant='caption'>Ex. Monday break starts at 12:00 and 60 min break.</Typography>
@@ -202,6 +196,7 @@ export default function EmployeeScheduleForm({employee}) {
                             >
                             <MenuItem value={15}>15 minutes</MenuItem>
                             <MenuItem value={30}>30 minutes</MenuItem>
+                            <MenuItem value={45}>45 minutes</MenuItem>
                             <MenuItem value={60}>60 minutes</MenuItem>
                             </Field>
                             <ErrorMessage name={`${day}.duration`} />
