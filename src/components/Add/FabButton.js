@@ -8,7 +8,7 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { Transition, addCustomerWaitlist  } from "./Helper";
 import { useSelector, useDispatch } from "react-redux";
 import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { Formik, Form, Field, ErrorMessage, useFormik, validateYupSchema } from 'formik';
 import * as Yup from 'yup';
 import { setBusiness } from "../../reducers/business";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -24,6 +24,7 @@ export default function FabButton () {
     
     const business = useSelector((state) => state.business);
     const serviceList = getServicesAvailable();
+    const [phoneNumber, setPhoneNumber] = useState(null);
     const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
 
@@ -63,12 +64,11 @@ export default function FabButton () {
         employee_id: '',
         notes: ''
       };
-      
-      const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;    
+      const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+
       const validationSchema = Yup.object({
         fullname: Yup.string().required('Full name is required'),
-        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format XXX-XXX-XXXX')
-        .required('Phone number is required'),
+        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format xxx-xx-xxxx'),
         email: Yup.string().required(),
         size: Yup.number().default(1),
         service_id: Yup.string(),
@@ -76,6 +76,38 @@ export default function FabButton () {
         resource_id: Yup.string(),
         notes: Yup.string()
       });
+
+
+    const formik = useFormik({
+        initialValues: initialValues,
+        validationSchema: validationSchema,
+        onSubmit: handleSubmit
+
+    })
+
+
+    // Need to implement this later on
+    // Stops cursor at 12 long and inputs dashes for US numbers
+    const formatPhoneNumber = (input) => {
+        const digits = input.replace(/\D/g, '');
+        if (digits.length <= 3) {
+            return digits;
+            } else if (digits.length <= 6) {
+            return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+            } else {
+            return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+        }
+    }
+    const phoneNumberChange = (event) => {
+        const input = event.target.value;
+        // Apply formatting to the input and update the state
+        const phoneNumber = formatPhoneNumber(input);
+        if (phoneNumber.length === 12) {
+            console.log("Completed", phoneNumber);
+            formik.setFieldValue('phone', phoneNumber);
+        }
+        setPhoneNumber(phoneNumber);
+    }
 
     return(
         <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
@@ -149,9 +181,10 @@ export default function FabButton () {
                             name="phone"
                             label="Phone"
                             size="small"
+                            value={phoneNumber}
+                            onChange={(event) => phoneNumberChange(event)}
                             placeholder="xxx-xxx-xxxx"
                             error={touched.phone && !!errors.phone}
-                            onChange={handleChange}
                             onBlur={handleBlur}
                             />
 

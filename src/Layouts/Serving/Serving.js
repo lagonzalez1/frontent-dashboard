@@ -6,7 +6,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote';
 
 import { useSelector, useDispatch } from "react-redux";
 import  {  getUserTable, columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable } from "../../hooks/hooks";
+import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable, getWaitlistServingTable } from "../../hooks/hooks";
 import "../../css/Serving.css";
 import { setReload, setSnackbar } from "../../reducers/user";
 
@@ -17,14 +17,15 @@ export default function Serving({setClient}) {
 
     let servingList = getServingTable();
     let appointmentServing = getAppointmentServingTable();
+    let waitlistServing = getWaitlistServingTable();
     let { groupCount, groupTotalCount } = getServingCount();
 
     useEffect(() => {
-        
+        console.log(waitlistServing);
+        console.log(appointmentServing);
     }, [])
 
     const checkoutClient = (client) => {
-        console.log(client);
         completeClientAppointment(client)
         .then(response => {
             console.log(response);
@@ -123,7 +124,7 @@ export default function Serving({setClient}) {
 
                                 </TableCell>
                                 <TableCell align="left">
-                                <Stack
+                                    <Stack
                                         direction="row"
                                         spacing={1}
                                     >

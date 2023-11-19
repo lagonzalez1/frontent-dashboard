@@ -156,7 +156,9 @@ export default function Welcome() {
             <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
                 <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
                     
-                    { loading ? <CircularProgress/> : 
+                    { loading ? <Box>
+                        <CircularProgress/>
+                        </Box> : 
                     (<>
                     {errors ? <Alert color="error">{errors}</Alert>: null}
                     <CardContent sx={{ justifyContent: 'center'}}>

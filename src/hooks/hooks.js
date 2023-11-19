@@ -282,37 +282,88 @@ export const getServingTable = () => {
       }
 };
 
+export const getWaitlistServingTable = () => {
+    const { user, business } = getStateData();
+    const currentTime = DateTime.local();
+    try {
+        let currentWaitlist = business.currentClients;
+        let sameDayWaitlist = business.system.equalDate;
+    
+        let waitlist = [];
+        let sorted = null;
+
+        // Same day waitlist active
+        if (sameDayWaitlist) {
+            for (var client of currentWaitlist){
+                if (client.status.serving === true && currentTime.hasSame(client.timestampOrigin, 'day') ) {
+                    waitlist.push(client);
+                }
+            }
+        }else {
+            for (var client of currentWaitlist){
+                if (client.status.serving === true) {
+                    waitlist.push(client);
+                }
+            }
+        }
+
+        sorted = waitlist.sort(sortAppointmentTime);
+        
+        // Add wait time in {hour, minute}
+        const wait = sorted.map((client) => {
+        const luxonDateTime = DateTime.fromISO(client.status.serve_time);
+        const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
+        const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
+        const hours = Math.floor(diffHours);
+        const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
+            return {
+                ...client,
+                waittime: { hours, minutes },
+            };
+        });
+        return wait;
+  } catch (error) {
+        // Handle the error here
+        console.error(error);
+        return new Error(error); // Return an empty array or any other appropriate value
+  }
+}
+
 export const getAppointmentServingTable = () => {
     const { user, business } = getStateData();
+    const currentTime = DateTime.local();
     try {
-            let currentClients = business.appointments;
-            let clients = [];
-            for (var client of currentClients){
-                if (client.status.serving === true) {
-                    clients.push(client);
-                }
-            }
-
-            const timezone = business.timezone;
-            if (!timezone) {
-                return new Error('No timezone to validate.');
-            }
-            // Compare the current date to each client.
-            let currentDates = [];
+            let currentAppointments = business.appointments;
+            let currentWaitlist = business.currentClients;
+            let sameDayWaitlist = business.system.equalDate;
+        
+            let waitlist = [];
+            let appointments = [];
             let sorted = null;
-            const currentTime = DateTime.local().setZone(timezone);
 
-            if(type) {
-                for (var client of clients) {
-                    const clientDate = DateTime.fromISO(client.appointmentDate);
-                    if ( currentTime.hasSame(clientDate, 'day')){
-                        currentDates.push(client);
+            // Same day waitlist active
+            if (sameDayWaitlist) {
+                for (var client of currentWaitlist){
+                    if (client.status.serving === true && currentTime.hasSame(client.timestampOrigin, 'day') ) {
+                        waitlist.push(client);
                     }
                 }
-                sorted = currentDates.sort(sortAppointmentTime);
             }else {
-                sorted = clients.sort(sortAppointmentTime);
+                for (var client of currentWaitlist){
+                    if (client.status.serving === true) {
+                        waitlist.push(client);
+                    }
+                }
             }
+            // Waitlist end.
+
+            for (var client of currentAppointments) {
+                if (client.status.serving === true && client){
+                    appointments.push(client);
+                }
+            }
+
+            sorted = appointments.sort(sortAppointmentTime);
             
             // Add wait time in {hour, minute}
             const wait = sorted.map((client) => {
@@ -321,10 +372,10 @@ export const getAppointmentServingTable = () => {
             const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
             const hours = Math.floor(diffHours);
             const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
-            return {
-                ...client,
-                waittime: { hours, minutes },
-            };
+                return {
+                    ...client,
+                    waittime: { hours, minutes },
+                };
             });
             return wait;
       } catch (error) {
