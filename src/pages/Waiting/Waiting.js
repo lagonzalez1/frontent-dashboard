@@ -674,7 +674,7 @@ export default function Waiting() {
                                     (
                                         <>
                                         <Divider />
-                                        <Button onClick={() => setOpenStatus(true)} variant="outlined" color="success" sx={{ borderRadius: 10}}>
+                                        <Button onClick={() => setUpdateClient(true)} variant="outlined" color="success" sx={{ borderRadius: 10}}>
                                             <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>Status
                                             </Typography>
                                         </Button>
@@ -706,6 +706,9 @@ export default function Waiting() {
 
                             <Typography variant="subtitle2" sx={{ color: "gray"}}> Email </Typography>
                             <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.email : ''}</Typography>
+
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Unique identifier </Typography>
+                            <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
                         </Container>
                         }
 
@@ -722,6 +725,9 @@ export default function Waiting() {
 
                             <Typography variant="subtitle2" sx={{ color: "gray"}}> Date </Typography>
                             <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromISO(user.appointmentDate).toFormat('LLL dd yyyy') : ''}</Typography>
+
+                            <Typography variant="subtitle2" sx={{ color: "gray"}}> Unique identifier </Typography>
+                            <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
                         </Container>
                         }
                         <Divider />

@@ -16,9 +16,8 @@ const validationSchema = Yup.object().shape({
 
 const LocationForm = () => {
 
-
-
   const business = useSelector((state) => state.business);
+  const permissionLevel = useSelector((state) => state.user.permissions);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -109,15 +108,15 @@ const LocationForm = () => {
               />
             </Grid>
             <Grid item xs={12}>
-            <Button variant='outlined' size={'small'} onClick={() => navigateToWaitlist()} sx={{borderRadius: 15}}>
+            <Button variant='outlined' size={'small'} onClick={() => navigateToWaitlist()} sx={{borderRadius: 10}}>
                 Show waitlist
             </Button>
             </Grid>
 
             <Grid item xs={12}>
               
-              
-            <Button variant='contained' size={'small'}  type="submit" sx={{borderRadius: 15}}>
+              {console.log(permissionLevel)}
+            <Button disabled={ (permissionLevel === 2 || permissionLevel === 3 || permissionLevel === 1) ? true: false} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 10}}>
                 {loading ? <CircularProgress /> : 'Save'}
             </Button>
             </Grid>

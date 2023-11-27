@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, Table, 
-    TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton } from "@mui/material";
+    TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton, Badge } from "@mui/material";
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -12,8 +12,8 @@ import { findEmployee, getAppointmentClients, moveClientServing, findService, ge
 import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
-import { columns } from "./AppointmentsHelper";
-import { DatePicker } from "@mui/x-date-pickers";
+import { columns, getHighlightedDays } from "./AppointmentsHelper";
+import { DatePicker, PickersDay } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 
 
@@ -24,7 +24,9 @@ export default function Appointments({setClient, setEditClient}) {
     const business = useSelector((state) => state.business);
     const currentDate = DateTime.local().setZone(business.timezone);
     const [selectedDate, setSelectedDate] = useState();
+    const [highlightedDays, setHighlightedDays] = useState([]);
     const [data, setData] = useState([]);
+
 
     useEffect(() => {
         getLastSearchedDate();
@@ -40,11 +42,13 @@ export default function Appointments({setClient, setEditClient}) {
             let lastDate = DateTime.fromISO(date);
             setSelectedDate(lastDate)
             let reload = getAppointmentTable(lastDate);
+            setHighlightedDays(getHighlightedDays(lastDate))
             setData(reload);
         }
         else {
             let reload = getAppointmentTable(currentDate);
             setSelectedDate(currentDate)
+            setHighlightedDays(getHighlightedDays(currentDate))
             setData(reload);
         }
 
@@ -79,6 +83,38 @@ export default function Appointments({setClient, setEditClient}) {
     const sendClientNotification = (clientId) => {
         console.log(clientId)
     }
+
+    const handelMonthChage = (date) => {
+        setHighlightedDays([]);
+        const dates = getHighlightedDays(date)
+        setHighlightedDays(dates);
+    
+    }   
+
+
+
+    //**
+     /* 
+     /* @param {Array} props array of dates that will be highlighted.
+     /* @param {Array} 
+     /* @returns 
+     */
+    function ServerDay(props) {
+        
+        const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
+        const isSelected =
+          !props.outsideCurrentMonth && highlightedDays.indexOf(day.day) >= 0;
+          
+        return (
+          <Badge
+            key={props.day.toString()}
+            overlap="circular"
+            color="success" variant="dot" invisible={!isSelected}
+            >
+            <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
+          </Badge>
+        );
+      }
 
     
 
@@ -115,9 +151,19 @@ export default function Appointments({setClient, setEditClient}) {
                             }}
                             fontSize="sm"
                             value={selectedDate}
+                            onMonthChange={handelMonthChage}
                             onChange={handleDateChange}
                             renderInput={(params) => <TextField {...params} />}
                             minDate={currentDate}
+
+                            slots={{
+                                day: ServerDay,
+                              }}
+                              slotProps={{
+                                day: {
+                                  highlightedDays,
+                                },
+                            }}
                         />
                         </Box>
                 </Grid>

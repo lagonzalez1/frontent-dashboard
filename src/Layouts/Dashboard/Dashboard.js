@@ -47,6 +47,7 @@ export default function Dashboard () {
     const dispatch = useDispatch();
     const signOut = useSignOut();
     const reload = useSelector((state) => state.user.reload);
+    const permissionLevel = useSelector((state) => state.user.permissions);
     const [loading, setLoading] = useState(false);
     const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
 
@@ -82,6 +83,7 @@ export default function Dashboard () {
 
     useEffect(() => { 
         console.log("Dashboard-render.");
+        console.log("Permission level" )
         checkAuthStatus();
     },[reload])
 
@@ -109,7 +111,7 @@ export default function Dashboard () {
             case 3:
                 return <Resources /> ;
             case 4:
-                return <Services/>;
+                return <Services />;
             case 5: 
                 return <Customers />;
             case 6: 

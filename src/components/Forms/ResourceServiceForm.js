@@ -12,7 +12,8 @@ import user, { setReload, setSnackbar } from "../../reducers/user";
 export default function ResourceServiceForm () {
 
     const [resourceDialog, setResourceDialog] = useState(false)
-    const [servicesDialog, setServiceDialog] = useState(false)
+    const [servicesDialog, setServiceDialog] = useState(false);
+    const permissionLevel = useSelector((state) => state.user.permissions);
     const [loading, setLoading] = useState(false);
 
     const [resourceId, setResourceId] = useState(null)
@@ -149,7 +150,7 @@ export default function ResourceServiceForm () {
             {
                 resources ? resources.map((item) => (
                     <ListItem disablePadding>
-                        <ListItemButton onClick={() => openResourceDialog(item) }>
+                        <ListItemButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} onClick={() => openResourceDialog(item) }>
                             <ListItemText primary={item.title} secondary={item.description} />
                         </ListItemButton>
                     </ListItem>
@@ -165,7 +166,7 @@ export default function ResourceServiceForm () {
             {
                 services ? services.map((item) => (
                     <ListItem disablePadding>
-                        <ListItemButton onClick={() => openServiceDialog(item) }>
+                        <ListItemButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} onClick={() => openServiceDialog(item) }>
                             <ListItemText primary={item.title} secondary={item.description} />
                         </ListItemButton>
                     </ListItem>

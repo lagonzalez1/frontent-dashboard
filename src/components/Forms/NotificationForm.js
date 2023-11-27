@@ -13,6 +13,7 @@ const NotificationForm = () => {
   
   const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
+  const permissionLevel = useSelector((state) => state.user.permissions);
   const dispatch = useDispatch();
   
   const handleSubmit = (values) => {
@@ -90,7 +91,7 @@ const NotificationForm = () => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button sx={{ borderRadius: 15}} type="submit" variant="contained" color="primary">
+              <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </Grid>

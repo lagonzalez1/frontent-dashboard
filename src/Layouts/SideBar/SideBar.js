@@ -67,7 +67,7 @@ export default function SideBar({navState, openNav}) {
                 >
                   <AccessTimeOutlinedIcon htmlColor={ currentLocation === 0 ? '#ffc34d' : '' } />
                 </ListItemIcon>
-                <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0 }} />
+                <ListItemText primary={"Waitlist"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
               </BootstrapTooltip>
             </ListItem>
@@ -91,7 +91,7 @@ export default function SideBar({navState, openNav}) {
                 >
                   <ListIcon htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
                 </ListItemIcon>
-                <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0 }} />
+                <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0 }} />
               </ListItemButton>
               </BootstrapTooltip>
             </ListItem>
@@ -165,7 +165,7 @@ export default function SideBar({navState, openNav}) {
                   >
                     <FactCheckOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
                   </ListItemIcon>
-                  <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
+                  <ListItemText primary={"Services "} sx={{ opacity: navState ? 1 : 0 }} />
                 </ListItemButton>
                 </BootstrapTooltip>
               </ListItem>

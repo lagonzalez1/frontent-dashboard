@@ -134,7 +134,6 @@ export default function WelcomeDetails() {
         let duplicatePayload = { ...clientStorage, link, values}
         checkDuplicatesRequest(duplicatePayload)
         .then((response) => {
-            console.log(response);
             if(response.duplicate === true) {
                 setLoading(false);
                 navigate(`/welcome/${link}/visits/${response.identifier}`);
@@ -144,13 +143,15 @@ export default function WelcomeDetails() {
             }
         })
         .then(response => {
-            setLoading(false);
             navigate(`/welcome/${link}/visits/${response.unid}`)
         })
         .catch(error => {
             setLoading(false);
             console.log(error);
             setErrors(error);
+        })
+        .finally(() => {
+            setLoading(false);
         })
     }
     const formatPhoneNumber = (input) => {
@@ -252,10 +253,9 @@ export default function WelcomeDetails() {
                             
                              <Divider/>
                              <Button sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
-                            { loading ? (<CircularProgress />) :
                              <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
                                 Join waitlist
-                                </Typography> }
+                            </Typography> 
                             </Button> 
                             </Stack>
 

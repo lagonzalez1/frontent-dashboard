@@ -21,6 +21,7 @@ const OpeningHoursForm = () => {
   const business = useSelector((state) => state.business);
   const schedule = useSelector((state) => state.business.schedule);
   const closedDays = useSelector((state) => state.business.closedDates);
+  const permissionLevel = useSelector((state) => state.user.permissions);
   const [message, setMessage] = useState(null);
   const [timerange, setTimerange] = React.useState(() => [
     DateTime.local(),
@@ -92,7 +93,6 @@ const OpeningHoursForm = () => {
       start = timerange[0].toFormat("HH:mm");
       end = timerange[1].toFormat("HH:mm");
       const isValidRange = validateTimerange(selectedDate, start, end, schedule);
-      console.log("IsValidRange: ", isValidRange);
       if (!isValidRange) {
         setMessage('Invalid timerange, must be within business start and end time.');
         return;
@@ -149,7 +149,7 @@ const OpeningHoursForm = () => {
   }
 
   useEffect(() => {
-    reloadBusinessData(dispatch);
+    //reloadBusinessData(dispatch);
   }, [loading])
   
 
@@ -247,7 +247,7 @@ const initialValuesSchedule = {
                       }
                       return (
                         <Typography key={key}>
-                          <strong>{key}</strong>: {value.start + ' - ' + value.end}
+                          <strong>{key}</strong>: {DateTime.fromFormat(value.start, 'HH:mm').toFormat('h:mm a') + ' - ' + DateTime.fromFormat(value.end, 'HH:mm').toFormat('h:mm a')}
                         </Typography>
                       );
                     })}
@@ -255,15 +255,15 @@ const initialValuesSchedule = {
             </Grid>
             <Grid item xs={12}>
                 <Stack spacing={1}>
-                    <Button sx={{ borderRadius: 15}} onClick={() => setScheduleDialog(true)} fullWidth={false} variant="outlined" color="primary">
+                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 15}} onClick={() => setScheduleDialog(true)} fullWidth={false} variant="outlined" color="primary">
                       Set Opening Hours
                     </Button>
-                    <Button sx={{ borderRadius: 15}} variant="outlined" onClick={() => setClosedDialog(true)} fullWidth={false}  color="primary">
+                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 15}} variant="outlined" onClick={() => setClosedDialog(true)} fullWidth={false}  color="primary">
                       Closed on Days
                     </Button>
                   
-                    <Button type="submit" variant='contained' sx={{borderRadius: 15}}>
-                      {loading ? <CircularProgress/> : 'save timezone'}
+                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} type="submit" variant='contained' sx={{borderRadius: 10}}>
+                      {'save timezone'}
                     </Button>
 
                 </Stack>

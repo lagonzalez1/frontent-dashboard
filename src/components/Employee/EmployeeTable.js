@@ -18,6 +18,7 @@ import { DateTime } from "luxon";
 export default function EmployeeTable() {
 
     const employees = useSelector((state) => state.business.employees);
+    const permissionLevel = useSelector((state) => state.user.permissions);
     const today = DateTime.local();
     const [employeeDialog, setEmployeeDialog] = useState(false);
     const [employee, setEmployee] = useState(null);
@@ -181,7 +182,7 @@ export default function EmployeeTable() {
                 </Table>
             </Stack>
             <br/>
-            <Button onClick={() => showEmployeeModal()} sx={{borderRadius: 15}} variant="contained">
+            <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} onClick={() => showEmployeeModal()} sx={{borderRadius: 15}} variant="contained">
                 Add
             </Button>
 

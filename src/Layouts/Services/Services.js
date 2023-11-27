@@ -18,6 +18,7 @@ export default function Services() {
     const {active, unactive} = getServicesTotal();
     const [service, setService] = useState({});
     const [loading, setLoading] = useState(false);
+    const permissionLevel = useSelector((state) => state.user.permissions);
 
 
     const serviceList = useSelector((state) => state.business.services);
@@ -68,6 +69,10 @@ export default function Services() {
         .catch(error => {
             dispatch(setSnackbar(error))
             setLoading(false);
+        })
+        .finally(() =>{
+            dispatch(setReload(true));
+            setLoading(false)
         })
 
     }
@@ -129,15 +134,14 @@ export default function Services() {
                                 { ' ' + service.title}
                             </Typography>
                             <Stack>
-                                <Typography variant="caption" component="p">
-                                    Duration: 
-                                    <Typography variant="caption" fontWeight={'bold'}>{service.duration} </Typography>
+                                <Typography variant="body2" component="p">
+                                    <strong>Duration: </strong> {service.duration}
                                 </Typography>
-                                <Typography variant="caption" component="p">
-                                    Cost: <Typography variant="caption" fontWeight={'bold'}>{service.cost}</Typography>
+                                <Typography  variant="body2" component="p">
+                                    <strong>Cost: </strong> {service.cost}
                                 </Typography>
-                                <Typography variant="caption" component="p">
-                                    Public:<Typography variant="caption" fontWeight={'bold'}> {service.public ? 'True': 'False'}</Typography>
+                                <Typography  variant="body2" component="p">
+                                    <strong>Public: </strong> {service.public ? 'True': 'False'}
                                 </Typography>
                             </Stack>
                             </Box>
@@ -271,7 +275,7 @@ export default function Services() {
             )}
 
                 <DialogActions>
-                    <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => handleUpdateService()} > Save</Button>
+                    <Button sx={{ borderRadius: 10}} disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} variant="contained" onClick={() => handleUpdateService()} > Save</Button>
                 </DialogActions> 
         </Dialog>
 

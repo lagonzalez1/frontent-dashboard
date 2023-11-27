@@ -13,14 +13,13 @@ import AddEmployeeForm from "../../components/Forms/AddEmployeeForm";
 import EmployeeTable from "../../components/Employee/EmployeeTable";
 import Personalization from "../../components/Forms/Personalization";
 import NotificationForm from "../../components/Forms/NotificationForm";
+import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 
 
 
-export default function Settings() {
+export default function Settings(permissionLevel) {
 
     const business = useSelector((state) => state.business);
-
-
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -31,7 +30,6 @@ export default function Settings() {
 
 
     
-
 
 
     return(
@@ -47,7 +45,7 @@ export default function Settings() {
                         <Grid container id="location">
                             <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6}>
                                 <Stack>
-                                    <Typography fontWeight='bold'  variant="h6">
+                                    <Typography fontWeight='bold' variant="h6">
                                         Location
                                     </Typography>
                                     <Typography variant="subtitle2">

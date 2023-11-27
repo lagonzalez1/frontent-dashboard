@@ -34,6 +34,7 @@ export default function AddResource() {
   const business = useSelector((state) => state.business);
   const serviceList = getServicesAvailable();
   const dispatch = useDispatch();
+  const permissionLevel = useSelector((state) => state.user.permissions);
 
 
   const handleOpen = () => {
@@ -58,6 +59,8 @@ export default function AddResource() {
     })
     
   };
+
+  const TextFieldEdit = () => { return <TextField multiline={true} rows={3} label="Description" />}
 
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
@@ -90,8 +93,8 @@ export default function AddResource() {
           >
             {({ errors, touched, handleBlur, handleChange }) => (
               <Form>
-                <Stack spacing={2}>
-                  
+                <Stack spacing={1.5}>
+                  <InputLabel id="services" sx={{fontWeight: 'bold'}}>Title *</InputLabel>
                     <Field
                       name="title"
                       as={TextField}
@@ -106,7 +109,7 @@ export default function AddResource() {
                   
                   {business ? (
                       <>
-                          <InputLabel id="services">Services</InputLabel>
+                          <InputLabel id="services" sx={{fontWeight: 'bold'}}>Services *</InputLabel>
                           <Field
                           as={Select}
                           id="services"
@@ -124,22 +127,16 @@ export default function AddResource() {
                           </Field>
                       </>
                       ) : null}
-                  
-           
-
+                
                     <Field
                       name="description"
-                      as={TextField}
-                      fullWidth={true}
-                      label="Description"
+                      as={TextFieldEdit}
+                      fullWidth={true}  
                       onChange={handleChange}
+                    
                       variant="outlined"
                       error={touched.description && !!errors.description}
                     />
-           
-
-                  
-                  
                     <Field
                       name="serveSize"
                       as={TextField}
@@ -150,9 +147,6 @@ export default function AddResource() {
                       variant="outlined"
                       error={touched.serveSize && !!errors.serveSize}
                     />
-                  
-           
-
                     <Field
                       name="active"
                       type="checkbox"
@@ -162,7 +156,6 @@ export default function AddResource() {
                       label="Set active"
                       error={touched.active && !!errors.active}
                     />
-
                     <Field
                       name="publicValue"
                       type="checkbox"
@@ -173,14 +166,9 @@ export default function AddResource() {
                       error={touched.publicValue && !!errors.publicValue}
                     />  
 
-
                   </Stack>
-                  
-                
                 <DialogActions>
-
-                  <Button variant="contained" type="submit">Save</Button>
-
+                  <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}}  variant="contained" type="submit">Save</Button>
                 </DialogActions>
               </Form>
             )}

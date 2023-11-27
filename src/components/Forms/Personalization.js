@@ -11,6 +11,7 @@ export default function Personalization () {
 
     const link = useSelector((state) => state.business.publicLink);
     const imageRef = useSelector((state) => state.business.settings.profileImage);
+    const permissionLevel = useSelector((state) => state.user.permissions);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(true);
 
@@ -189,6 +190,7 @@ export default function Personalization () {
                     component="span"
                     sx={{ borderRadius: 15}}
                     startIcon={<UploadIcon />}
+                    disabled={(permissionLevel === 2 || permissionLevel === 3) ? true: false}
                     >
                     Upload Image
                     </Button>
@@ -198,7 +200,7 @@ export default function Personalization () {
                 (
                 <>
                 <br/>
-                <Button size="small" sx={{ borderRadius: 15, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</Button>
+                <Button size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</Button>
                 </>)
                 : null}             
         

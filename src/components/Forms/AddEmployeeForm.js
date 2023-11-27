@@ -174,11 +174,6 @@ export default function AddEmployeeForm({employee}) {
                   
               </Field>
 
-
-                
-
-
-
                 <Typography variant='caption'>Select your availability.</Typography>
                 <Grid container
                     sx={{ pt: 2}}

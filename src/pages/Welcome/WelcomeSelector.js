@@ -37,6 +37,7 @@ export default function WelcomeSelector() {
     
 
     const [alertAppointments, setAlertAppointment] = useState(false);
+    const [errorMessage, setErrorMessage] = useState({title: '', body: ''});
 
 
     const [systemTypeSelected, setSystem] = useState(null);
@@ -174,7 +175,6 @@ export default function WelcomeSelector() {
     const getBuisnessForm = () => {
         requestBusinessArguments(link)
         .then(data => {
-            console.log(data)
             setArguments(data);
         })
         .catch(error => {
@@ -281,7 +281,9 @@ export default function WelcomeSelector() {
         .then(response => {
             setSlots(response.data);
             if(response.data.length === 0){
-                setAlertAppointment(true)
+                setAlertAppointment(true);
+                setErrorMessage({title: 'No available appointments.'})
+                return;
             }
         })
         .catch(error => {
@@ -378,6 +380,8 @@ export default function WelcomeSelector() {
                                         value={appointmentData.date}
                                         onChange={(newDate) => handleDateChange(newDate) }
                                         defaultValue={currentDate} 
+                                        maxDate={args && DateTime.fromISO(args.maxDateAvailable)}
+                                        
                                     />
                                         <Box sx={{pt: 1, display: openEmployees ? 'flex': 'none'}}>
                                             <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
@@ -486,6 +490,7 @@ export default function WelcomeSelector() {
                                                         wrap='nowrap'
                                                         flexDirection={'row'}
                                                         rowSpacing={2}
+                                                        spacing={.5}
                                                     >
                                                 
                                                     {
@@ -501,9 +506,8 @@ export default function WelcomeSelector() {
                                                                         onClick={() => appointmentSlotSelect(appointment)} 
                                                                         color={appointmentData.start === appointment.start ? 'primary': 'secondary'}
                                                                         id="appointmentButtons">
-                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>
-                                                                        <Typography variant="caption">{"-"}</Typography>
-                                                                        <Typography variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("h:mm a")}</Typography>
+                                                                        <Typography variant="body2" sx={{ pl: 1, pr: 1}}>{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>
+                                                                        
                                                                     </Button>
                                                                     </Grid>
                                                                 )
@@ -511,7 +515,9 @@ export default function WelcomeSelector() {
                                                         
                                                         ): null
                                                     }
-                                                    <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={"No slots available"} body={'The reasoning here.'} />
+                                                        <Grid item>
+                                                            <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={errorMessage.title} body={''} />\
+                                                        </Grid>
                                                     </Grid>
                                                     </Box>
                                             </Grow>
@@ -542,7 +548,7 @@ export default function WelcomeSelector() {
                             && 
                             <Box id="waitlistSection"  sx={{pt: 2}}>
                                 
-                                <Stack sx={{ pt: 1 }} direction="column" spacing={2} textAlign="left">
+                                <Stack sx={{ pt: 1 }} direction="column" spacing={1.5} textAlign="left">
 
 
                                 {employees && present.employees === true ? (
@@ -551,16 +557,27 @@ export default function WelcomeSelector() {
                                         <Select
                                             id="employee"
                                             name="employee_id"
-                                            value={waitlistData.employee_id}
+                                            defaultValue={waitlistData.employee_id}
+                                            onChange={(event) => {
+                                                const selectedEmployeeId = event.target.value;
+                                                const selectedEmployee = employees.find(employee => employee.id === selectedEmployeeId);
+                                                setWaitlistData(prev => ({
+                                                    ...prev,
+                                                    employee_id: selectedEmployeeId,
+                                                    fullname: selectedEmployee ? selectedEmployee.fullname : ''
+                                                }));
+                                            }}
                                         >
-                                        {Array.isArray(employees) ? employees.map((employee) => (
-                                            <MenuItem key={employee._id} value={employee._id} onClick={() => setWaitlistData((prev) => ({...prev, employee_id: employee._id, fullname: employee.fullname}))}>
-                                                <Typography variant="body2">{employee.fullname} </Typography>
-                                            </MenuItem>
-                                        )) : null}
+                                            {Array.isArray(employees) ? employees.map((employee) => (
+                                                <MenuItem key={employee.id} value={employee.id}>
+                                                    {employee.fullname}
+                                                </MenuItem>
+                                            )) : null}
                                         </Select>
                                     </>
-                                    ) : null}
+                                ) : null}
+
+
 
                                     {services && present.services === true ? (
                                     <>

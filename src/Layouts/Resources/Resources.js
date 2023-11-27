@@ -15,6 +15,7 @@ export default function Resources() {
 
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
+    const permissionLevel = useSelector((state) => state.user.permissions);
 
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
@@ -70,17 +71,11 @@ export default function Resources() {
         .finally(() => {
             dispatch(setReload(true))
         })
-        
       };
-
-      
 
       useEffect(() => {
         
       }, [])
-
-
-
 
     return(
         <>
@@ -112,21 +107,22 @@ export default function Resources() {
                              (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
                                 { ' ' + resource.title}
                             </Typography>
-                            <Typography color="#878686" variant="body2" component="p">
-                                    Assigned: { findResourceTag(resource.employeeTag) }
+                            <Typography variant="body2" component="p">
+                                    <strong>Assigned: </strong> { findResourceTag(resource.employeeTag) }
                             </Typography>
+                            <Typography  variant="body2" component="p">
+                                    <strong>Serving: </strong> {findServingSize(resource._id).fullname }
+                                </Typography>
                             <Stack direction="row" spacing={1}>
-                                <Typography color="#878686" variant="body2" component="p">
-                                    Serving: {findServingSize(resource._id).fullname }
+                                
+                                <Typography  variant="body2" component="p">
+                                    <strong>Size:</strong> {findServingSize(resource._id).partySize }
                                 </Typography>
-                                <Typography color="#878686" variant="body2" component="p">
-                                    Serving size: {findServingSize(resource._id).partySize }
-                                </Typography>
-                                   
+                                <Typography variant="body2" component="p">
+                                    <strong>Max: </strong> {resource.size}
+                                </Typography>   
                             </Stack>
-                                <Typography color="#878686" variant="body2" component="p">
-                                    Max: {resource.size}
-                                </Typography>
+                                
                             </Box>
                             </Stack>    
                         </CardContent>   
@@ -288,7 +284,7 @@ export default function Resources() {
 
 
                 <DialogActions>
-                    <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
+                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}} variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
                 </DialogActions> 
         </Dialog>
 

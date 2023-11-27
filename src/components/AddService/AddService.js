@@ -50,6 +50,7 @@ const AddService = () => {
   const [open, setOpen] = useState(false);
   const employees = useSelector((state) => state.business.employees);
   const dispatch = useDispatch();
+  const permissionLevel = useSelector((state) => state.user.permissions);
 
   const handleOpen = () => {
     setOpen(true);
@@ -203,7 +204,7 @@ const AddService = () => {
                 </Grid>
               </Grid>
             
-              <Button fullWidth={true} variant="contained" type="submit">Submit</Button>
+              <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}}  fullWidth={true} variant="contained" type="submit">Submit</Button>
               </Stack>
             </Form>
             )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect} from "react";ListItemIcon
 import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, Grid, 
     ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card, CircularProgress} from "@mui/material";
 
@@ -23,6 +23,7 @@ export default function FabAppointment () {
     const [errors, setError] = useState();
     const [success, setSuccess] = useState();
     const [nextStep, setNextStep] = useState(false);
+    const permissionLevel = useSelector((state) => state.user.permissions);
 
 
     const [loading, setLoading] = useState(false);
@@ -354,7 +355,6 @@ export default function FabAppointment () {
                                         }
                                     </Grid>
                                     </>
-                            
                             )
                             :
                             null}
@@ -363,8 +363,8 @@ export default function FabAppointment () {
                             {nextStep ? 
                             (
                             <>
-                            <Button variant="outlined" sx={{ borderRadius: 15}} onClick={() => setNextStep(false)}> back</Button>
-                            <Button variant="contained" sx={{ borderRadius: 15}} type="submit">Submit</Button>
+                            <Button variant="outlined" sx={{ borderRadius: 10}} onClick={() => setNextStep(false)}> back</Button>
+                            <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</Button>
                             </>
                             ): 
                             <Button variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(values.employee_id, values.service_id)}> search</Button>

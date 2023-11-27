@@ -7,27 +7,20 @@ import { setSnackbar } from "../../reducers/user";
 
 
 export default function ClientForm() {
-
-
+    
     const [loading, setLoading] = useState(false);
+    const permissionLevel = useSelector((state) => state.user.permissions);
     const settings = useSelector((state) => state.business.settings.inputFields);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
-
-
     useEffect(() => {
 
     },[])
-
     const initialValues = {
         email: settings.email,
         notes: settings.notes,
         service: settings.service,
     };
-      
-    
-
-
 
     const handleSubmit = (values) => {
         // Handle form submission (e.g., send data to backend)
@@ -44,10 +37,7 @@ export default function ClientForm() {
         .finally(() => {
             setLoading(false);
         })
-
     };
-
-
     return(
         <>
             <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
@@ -66,7 +56,7 @@ export default function ClientForm() {
                             ))}
                         </Grid>
                         <br/>
-                        <Button sx={{borderRadius: 15}} variant="contained" type="submit">Save</Button>
+                        <Button sx={{borderRadius: 10}} disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} variant="contained" type="submit">Save</Button>
                     </Form>
                     )}
             </Formik>

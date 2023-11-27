@@ -11,6 +11,7 @@ import { reloadBusinessData } from '../../hooks/hooks';
 export default function SystemForm() {
 
     const settings = useSelector((state) => state.business.system);
+    const permissionLevel = useSelector((state) => state.user.permissions);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
 
@@ -22,13 +23,15 @@ export default function SystemForm() {
         serveMax: business.serveMax,
         appointments: business.system.appointments,
         waitlist: business.system.waitlist,
+        maxAppointmentDate: settings.maxAppointmentDate,
       };
       
     const validationSchema = Yup.object().shape({
         equalDate: Yup.boolean(),
         serveMax: Yup.number().max(100),
         appointments: Yup.boolean(),
-        waitlist: Yup.boolean()
+        waitlist: Yup.boolean(),
+        maxAppointmentDate: Yup.number().min(20).max(360)
     });
 
     const handleSubmit = (values) => {
@@ -53,7 +56,7 @@ export default function SystemForm() {
         appointments: 'Appointments',
         waitlist: 'Waitlist',
         equalDate: 'Same day',
-        autoDelete: 'Auto delete'
+        autoDelete: 'Auto delete',
     }
     const LABELS = {
         appointments: 'Use appointments based on your services and duration let your clients schedule future appointments ',
@@ -64,7 +67,7 @@ export default function SystemForm() {
 
 
     useEffect(() => {
-        reloadBusinessData(dispatch);
+        //reloadBusinessData(dispatch);
     }, [loading])
 
     return (
@@ -103,10 +106,25 @@ export default function SystemForm() {
                         helperText={touched.serveMax && errors.serveMax}
                         fullWidth={false}
                     />
-                    </Grid>
+                </Grid>
+
+                <Grid item xs={12}>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>Maximum Open Dates Control. </Typography>
+                    <Typography variant='body2'>Configure the number of open dates in your Date Calendar with precision. For example, limit the availability to a maximum of {initialValues.maxAppointmentDate} days from the current date.</Typography>
+                    <br/>
+                    <Field
+                        as={TextField}
+                        name="maxAppointmentDate"
+                        label="Open dates control"
+                        type="number"
+                        error={touched.maxAppointmentDate && Boolean(errors.maxAppointmentDate)}
+                        helperText={touched.maxAppointmentDate && errors.maxAppointmentDate}
+                        fullWidth={false}
+                    />
+                </Grid>
             </Grid>
             <br/>
-            <Button variant='contained' type="submit" sx={{borderRadius: 15}}>Save</Button>
+                <Button variant='contained' type="submit" sx={{borderRadius: 10}} disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false}>Save</Button>
             </Form>
         )}
         </Formik>

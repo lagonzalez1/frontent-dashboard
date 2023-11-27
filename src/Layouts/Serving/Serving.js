@@ -21,8 +21,7 @@ export default function Serving({setClient}) {
     let { groupCount, groupTotalCount } = getServingCount();
 
     useEffect(() => {
-        console.log(waitlistServing);
-        console.log(appointmentServing);
+        
     }, [])
 
     const checkoutClient = (client) => {

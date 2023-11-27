@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";
 import { Stack, Typography, Button, List, ListItem, Menu, MenuItem, ListItemText, Grid,
-     IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer, TableBody, Tooltip, Skeleton, CircularProgress  } from "@mui/material";
+     IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton  } from "@mui/material";
      
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -32,6 +32,8 @@ export default function Waitlist ({setClient, setEditClient}) {
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
+    const permissionLevel = useSelector((state) => state.user.permissions);
+
 
     let tableData = getUserTable();
     let accepting = acceptingRejecting();
@@ -191,6 +193,7 @@ export default function Waitlist ({setClient, setEditClient}) {
     }
 
     useEffect(() => {
+        console.log(permissionLevel )
         tableData = getUserTable();
         return() => {
             dispatch(setReload(false));
@@ -239,13 +242,15 @@ export default function Waitlist ({setClient, setEditClient}) {
                         aria-label="Device settings"
                         sx={{ bgcolor: 'background.paper' }}
                     >
-                        <ListItem
+                        <ListItemButton
                         id="lock-button"
                         aria-haspopup="listbox"
                         aria-controls="lock-menu"
                         aria-label="when device is locked."
                         aria-expanded={open ? 'true' : undefined}
                         onClick={handleClickListItem}
+                        disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} 
+                        
                         >
                         {accepting ? 
                         <FiberManualRecordIcon fontSize="small" htmlColor="#00FF00"/>:
@@ -254,7 +259,7 @@ export default function Waitlist ({setClient, setEditClient}) {
                             primary={ accepting ? 'Open' : 'Close'}
                         />
                         <KeyboardArrowDownIcon/>
-                        </ListItem>
+                        </ListItemButton>
                     </List>
                     <Menu
                         id="lock-menu"
@@ -304,7 +309,7 @@ export default function Waitlist ({setClient, setEditClient}) {
                     <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack direction={"row"} spacing={1}>
 
-                            {user.permissions > 0 ? (<Tooltip title="Logged in as employee" placement="bottom">
+                            {user.permissions === 3 || user.permissions === 2 ? (<Tooltip title="Logged in as employee" placement="bottom">
                                 <Button color="error" variant="outlined" startIcon={<BadgeIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{ user.email }</Typography>
                                 </Button>

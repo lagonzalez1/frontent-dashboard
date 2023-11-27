@@ -45,18 +45,18 @@ export const findEmployee = (id) => {
     return {fullname: 'NA'}
 }
 
-export const requestNoShow = (clientId) => {
+export const requestNoShow = (clientId, type) => {
     return new Promise((resolve, reject) => {
       const { user, business } = getStateData();
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
-      const payload = { bId: business._id, clientId}
+      const payload = { bId: business._id, clientId, type}
       axios.put('/api/internal/noShow', payload, headers)
       .then(response => {
         if(response.status === 200){
-          resolve(response.data)
+          resolve(response.data.client)
         }
-        resolve(response.data.msg);
+        reject(response.data.msg)
       })
       .error(error => {
         reject(error.status);

@@ -11,6 +11,7 @@ import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErr
 import { Formik, Form, Field, ErrorMessage, useFormik, validateYupSchema } from 'formik';
 import * as Yup from 'yup';
 import { setBusiness } from "../../reducers/business";
+
 import { setReload, setSnackbar } from "../../reducers/user";
 
 
@@ -27,6 +28,7 @@ export default function FabButton () {
     const [phoneNumber, setPhoneNumber] = useState(null);
     const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
+    const permissionLevel = useSelector((state) => state.user.permissions);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -280,7 +282,7 @@ export default function FabButton () {
 
                             <ErrorMessage name="notes" component="div" />
 
-                            <Button variant="contained" type="submit">Submit</Button>
+                            <Button disabled={(permissionLevel === 3) ? true: false} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</Button>
                         </Stack>
                         </Form>
                     )}

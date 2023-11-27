@@ -1,6 +1,9 @@
 import React, { useState, useEffect} from "react";  
 import { Box, Container, Alert, AlertTitle, Typography, Collapse, IconButton} from "@mui/material"
 import CloseIcon from '@mui/icons-material/Close';
+
+
+
 export default function AlertError({open, setOpen, title, body}) {
     const closeAlert = () => {
         setOpen(false);

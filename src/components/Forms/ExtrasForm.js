@@ -14,6 +14,7 @@ export default function ExtrasForm() {
     const [loading, setLoading] = useState(false);
     const business = useSelector((state) => state.business);
     const settings = useSelector((state) => state.business.settings.present);
+    const permissionLevel = useSelector((state) => state.user.permissions);
     const dispatch = useDispatch();
 
 
@@ -31,9 +32,6 @@ export default function ExtrasForm() {
         waittime: settings.waittime,
     };
 
-    
-
-
     const handleSubmit = (values) => {
         setLoading(true);
         const payload = { values, b_id: business._id}
@@ -48,10 +46,6 @@ export default function ExtrasForm() {
             setLoading(false)
         })
     };
-
-   
-
-
     return(
         <>
             <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
@@ -71,7 +65,7 @@ export default function ExtrasForm() {
                         
                     </Stack>
                     <br/>
-                    <Button sx={{borderRadius: 15}} variant="contained" type="submit">Save</Button>
+                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{borderRadius: 10}} variant="contained" type="submit">Save</Button>
                     </Form>
                 )}
             </Formik>

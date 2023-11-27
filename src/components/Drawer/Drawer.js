@@ -14,12 +14,16 @@ import { getHeaders } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { WAITLIST, SERVING, APPOINTMENT } from "../../static/static";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
+import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
+import DoNotDisturbRoundedIcon from '@mui/icons-material/DoNotDisturbRounded';
+import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+
 
 export default function Drawer({client, setClient}) {
 
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
-
 
     const [value, setValue] = React.useState('1');
     const [payload, setPayload] = useState(null);
@@ -75,7 +79,6 @@ export default function Drawer({client, setClient}) {
     }
 
     const sendClientServing = (clientId) => {
-
         moveClientServing(clientId)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
@@ -90,24 +93,31 @@ export default function Drawer({client, setClient}) {
         })
     }
 
-    const sendClientNoShow = (clientId) => {
-        requestNoShow(clientId)
-        .then(response => {
-            dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
-            setLoading(false)
-        })  
-        .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
-            setLoading(false)
-        })
-        .finally(() => {
+    // This is a issue
+    const sendClientNoShow = (payload) => {
+        requestNoShow(payload._id, payload.type)
+          .then((client) => {
+            console.log(client)
+            if (!client) {
+              return;
+            } else {
+              // Assuming completeClientAppointment returns a promise
+              return completeClientAppointment(client);
+            }
+          })
+          .then((completeResponse) => {
+            dispatch(setSnackbar({ requestMessage: completeResponse, requestStatus: true }));
+          })
+          .catch((error) => {
+            dispatch(setSnackbar({ requestMessage: error.data, requestStatus: true }));
+            setLoading(false);
+          })
+          .finally(() => {
             closeDrawer();
-            dispatch(setReload(true))
-            
-        })
-    }
-
-
+            //dispatch(setReload(true));
+          });
+      };
+      
 
     return(
         <>
@@ -148,10 +158,10 @@ export default function Drawer({client, setClient}) {
                             justifyContent="space-between"
                             alignItems="center">
                             <Grid item>
-                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Served</Typography>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Served</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography fontWeight={'bold'} variant="body2">{payload && (payload.status.serving === true ? ("Served at " + DateTime.fromISO(payload.status.serve_time).toFormat("hh:mm a")) : ('Not yet'))}</Typography>
+                                <Typography variant="body2">{payload && (payload.status.serving === true ? ("Served at " + DateTime.fromISO(payload.status.serve_time).toFormat("hh:mm a")) : ('Not yet'))}</Typography>
                             </Grid>
                         </Grid>
                         <br/>
@@ -164,10 +174,10 @@ export default function Drawer({client, setClient}) {
                                     justifyContent="space-between"
                                     alignItems="center">
                                     <Grid item>
-                                        <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Created on</Typography>
+                                        <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Created on</Typography>
                                     </Grid>
                                     <Grid sx={{ justifyContent: 'right'}} item>
-                                        <Typography fontWeight={'bold'} variant="body2">{payload && (DateTime.fromISO(payload.timestamp).toFormat("LLL mm yyyy")) }</Typography>
+                                        <Typography variant="body2">{payload && (DateTime.fromISO(payload.timestamp).toFormat("LLL mm yyyy")) }</Typography>
                                     </Grid>
                                 </Grid>
                                 <br/>
@@ -180,14 +190,14 @@ export default function Drawer({client, setClient}) {
                         justifyContent="space-between"
                         alignItems="center">
                             <Grid item>
-                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Status</Typography>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Status</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography variant="body2" fontWeight={'bold'}>{payload && (payload.status.late ? "Late": null) }</Typography>
-                                <Typography variant="body2" fontWeight={'bold'}>{payload && (payload.status.parking ? "Parked": null) }</Typography>
-                                <Typography variant="body2" fontWeight={'bold'}>{payload && (payload.status.here ? "Checked in": null) }</Typography>
-                                <Typography variant="body2" fontWeight={'bold'}>{payload && (payload.status.cancelled ? "Cancelled": null) }</Typography>
-                                <Typography variant="body2" fontWeight={'bold'}>{payload && (payload.status.noShow ? "No show": null) }</Typography>
+                                <Typography variant="body2" >{payload && (payload.status.late ? "Late": null) }</Typography>
+                                <Typography variant="body2" >{payload && (payload.status.parking ? "Parked": null) }</Typography>
+                                <Typography variant="body2" >{payload && (payload.status.here ? "Checked in": null) }</Typography>
+                                <Typography variant="body2" >{payload && (payload.status.cancelled ? "Cancelled": null) }</Typography>
+                                <Typography variant="body2" >{payload && (payload.status.noShow ? "No show": null) }</Typography>
                             </Grid>
                         </Grid>
                         <br/>
@@ -198,10 +208,10 @@ export default function Drawer({client, setClient}) {
                         justifyContent="space-between"
                         alignItems="center">
                             <Grid item>
-                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Phone</Typography>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Phone</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography fontWeight={'bold'} variant="body2">{payload && payload.phone}</Typography>
+                                <Typography  variant="body2">{payload && payload.phone}</Typography>
 
                             </Grid>
                         </Grid>
@@ -211,10 +221,10 @@ export default function Drawer({client, setClient}) {
                         justifyContent="space-between"
                         alignItems="center">
                             <Grid item>
-                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Service</Typography>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Service</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography fontWeight={'bold'} variant="body2">{payload && findService(payload.serviceTag).title}</Typography>
+                                <Typography variant="body2">{payload && findService(payload.serviceTag).title}</Typography>
 
                             </Grid>
                         </Grid>
@@ -224,10 +234,10 @@ export default function Drawer({client, setClient}) {
                         justifyContent="space-between"
                         alignItems="center">
                             <Grid item>
-                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'light'}>Staff</Typography>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Staff</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography fontWeight={'bold'} variant="body2">{payload && findEmployee(payload.employeeTag).fullname}</Typography>
+                                <Typography variant="body2">{payload && findEmployee(payload.employeeTag).fullname}</Typography>
                             </Grid>
                         </Grid>
 
@@ -235,12 +245,52 @@ export default function Drawer({client, setClient}) {
 
                     </TabPanel>
                     <TabPanel value="2">
-                        <Typography variant="body2">{payload && payload.notes}</Typography>
+                        <Typography variant="body2">{payload && payload.notes ? payload.notes: 'No notes.'}</Typography>
                     </TabPanel>
                     <TabPanel value="3">
                         <List dense={true}>
-                        {analytics && analytics.summary ? (
-                            analytics.summary.map((object, index) => {
+
+
+                        {analytics.waitlist_summmary && 
+                        analytics.waitlist_summmary.map((object, index) => {
+                            if (index === 0) {
+                                return (
+                                    <>
+                                    <Typography variant="subtitle1">Waitlist</Typography>
+                                    <Divider />
+                                    </>
+                                )
+                            }
+                            return (
+                                <>
+                                    <ListItem>
+                                        <ListItemIcon>
+                                            <CalendarMonthIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText>
+                                            <Typography variant="body2"> { DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
+                                            <Typography variant="body2"> { findEmployee(object.employee).fullname }</Typography>
+                                            <Typography variant="caption"> { object.notes ? object.notes: 'No notes.' }</Typography>
+                                        </ListItemText>
+                                        
+                                    </ListItem>
+                                    { index === (analytics.summary.length - 1) ? null : <Divider/> }
+                                </>
+                            )
+                        })}
+                        
+
+                        {
+                            analytics.appointment_summary && 
+                            analytics.appointment_summary.map((object, index) => {
+                                if (index === 0) {
+                                    return (
+                                        <>
+                                        <Typography variant="subtitle1">Appointments</Typography>
+                                        <Divider />
+                                        </>
+                                    )
+                                }
                                 return (
                                     <>
                                         <ListItem>
@@ -249,6 +299,7 @@ export default function Drawer({client, setClient}) {
                                             </ListItemIcon>
                                             <ListItemText>
                                                 <Typography variant="body2"> { DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
+                                                <Typography variant="body2"> { findEmployee(object.employee).fullname }</Typography>
                                                 <Typography variant="caption"> { object.notes ? object.notes: 'No notes.' }</Typography>
                                             </ListItemText>
                                             
@@ -257,11 +308,13 @@ export default function Drawer({client, setClient}) {
                                     </>
                                 )
                             })
-                        ): (
-                            <ListItem>
-                                <Typography variant="body2"> New client.</Typography>
-                            </ListItem>
-                        )}
+                        }
+                        { Object.keys(analytics).length === 0 ? <ListItem>
+                                <Typography variant="body2">New Client.</Typography>
+                            </ListItem>: null
+                        }
+
+                        
                         </List>
                     </TabPanel>
                 </TabContext>
@@ -279,7 +332,7 @@ export default function Drawer({client, setClient}) {
                         client.fromComponent === SERVING &&
                         (
                             <Stack direction={'row'}>
-                                {payload ? <Button color="secondary" variant="contained" sx={{borderRadius: 10}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
+                                {payload ? <Button startIcon={<CheckCircleRoundedIcon/>} color="secondary" variant="contained" sx={{borderRadius: 10}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
                                 <Button variant="contained" sx={{borderRadius: 10}}>Move Waitlist</Button>
                             </Stack>
                         )
@@ -289,9 +342,9 @@ export default function Drawer({client, setClient}) {
                         (client.fromComponent === WAITLIST || client.fromComponent === APPOINTMENT) &&
                         (
                             <Stack direction={'row'}>
-                                {payload ? <Button color="error" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNoShow(payload._id)}>No show</Button>: null}
-                                <Button color="secondary" variant="contained" sx={{borderRadius: 10, margin: 1}}>Notify</Button>
-                                {payload ? <Button color="primary" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
+                                {payload ? <Button startIcon={<DoNotDisturbRoundedIcon/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
+                                <Button startIcon={<NotificationsActiveRoundedIcon />} color="secondary" variant="contained" sx={{borderRadius: 10, margin: 1}}>Notify</Button>
+                                {payload ? <Button startIcon={<NavigateNextRoundedIcon />} color="primary" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
 
                             </Stack>
                         )
