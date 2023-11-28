@@ -6,6 +6,7 @@ import { Grid, FormControlLabel, Switch, Button, FormLabel, Stack, Box, Typograp
 import { validationSchema, LABELS, requestExtraChanges, TITLE } from "../FormHelpers/ExtraFormsHelper";
 import business from "../../reducers/business";
 import { setSnackbar } from "../../reducers/user";
+import { reloadBusinessData } from "../../hooks/hooks";
 
 
 export default function ExtrasForm() {
@@ -19,8 +20,8 @@ export default function ExtrasForm() {
 
 
     useEffect(() => {
-
-    },[])
+        reloadBusinessData(dispatch);
+      }, [loading])
 
     const initialValues = {
         position: settings.position,

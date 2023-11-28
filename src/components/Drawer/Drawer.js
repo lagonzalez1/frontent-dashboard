@@ -93,12 +93,13 @@ export default function Drawer({client, setClient}) {
         })
     }
 
-    // This is a issue
+
     const sendClientNoShow = (payload) => {
         requestNoShow(payload._id, payload.type)
           .then((client) => {
             console.log(client)
             if (!client) {
+                console.log("null", client);
               return;
             } else {
               // Assuming completeClientAppointment returns a promise
@@ -114,7 +115,7 @@ export default function Drawer({client, setClient}) {
           })
           .finally(() => {
             closeDrawer();
-            //dispatch(setReload(true));
+            dispatch(setReload(true));
           });
       };
       

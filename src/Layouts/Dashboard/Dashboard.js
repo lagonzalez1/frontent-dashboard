@@ -47,16 +47,13 @@ export default function Dashboard () {
     const dispatch = useDispatch();
     const signOut = useSignOut();
     const reload = useSelector((state) => state.user.reload);
-    const permissionLevel = useSelector((state) => state.user.permissions);
     const [loading, setLoading] = useState(false);
+
     const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
-
     const [openNav, setOpenNav] = useState(false);
-
 
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
     const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
-
 
     async function checkAuthStatus() {
         setLoading(true);
@@ -78,16 +75,10 @@ export default function Dashboard () {
         }
     }
 
-
-
-
     useEffect(() => { 
         console.log("Dashboard-render.");
-        console.log("Permission level" )
         checkAuthStatus();
     },[reload])
-
-
 
 
     const RenderLocation = () => {
@@ -120,13 +111,9 @@ export default function Dashboard () {
                 return <Help /> 
 
             default:
-                <ErrorPage errorMessage={"Failed to load the current location."} type={404} />
-            
+                <ErrorPage errorMessage={"Failed to load the current location."} type={404} /> 
         }
     }
-
-
-    
 
     return (
         <>

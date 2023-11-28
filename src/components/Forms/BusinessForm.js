@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
+import { reloadBusinessData } from '../../hooks/hooks';
 
 const validationSchema = Yup.object().shape({
   businessName: Yup.string().required(),
@@ -37,6 +38,10 @@ const BusinessForm = () => {
       setLoading(false);
     })
   };
+
+  useEffect(() => {
+    reloadBusinessData(dispatch);
+  }, [loading])
 
   const initialValue = {
     businessName: business ? business.businessName : "",

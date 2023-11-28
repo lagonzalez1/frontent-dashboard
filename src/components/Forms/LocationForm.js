@@ -7,6 +7,7 @@ import axios from 'axios';
 import { setSnackbar } from '../../reducers/user';
 import { getAccessToken } from '../../auth/Auth';
 import { useNavigate, useParams } from "react-router-dom";
+import { reloadBusinessData } from '../../hooks/hooks';
 
 
 const validationSchema = Yup.object().shape({
@@ -17,6 +18,8 @@ const validationSchema = Yup.object().shape({
 const LocationForm = () => {
 
   const business = useSelector((state) => state.business);
+  const settings = useSelector((state) => state.business.settings);
+
   const permissionLevel = useSelector((state) => state.user.permissions);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -56,23 +59,29 @@ const LocationForm = () => {
       })
   };
 
+  useEffect(() => {
+    reloadBusinessData(dispatch);
+  }, [loading])
+
   const checkValidString = (input) => {
     const pattern = /^[a-zA-Z0-9_]+$/;
     return pattern.test(input);
 }
 
 
-  const openWaitList = (endpoint) => {
+  const openWaitList = () => {
     const url = `https://waitonline.us/welcome/${business.publicLink}/waitlist`
     window.open(url, '_blank');
   };
 
   const navigateToWaitlist = () => {
-    // Check if allowed to.
-    if (business) {
+    
+    if (settings.present.waitlist === true) {
       openWaitList();
+    }else {
+      setErrors('Waitlist is not enabled.');
+      return;
     }
-    console.log("Business public link undefined.");
 }
 
   const initialValue = {
@@ -93,7 +102,7 @@ const LocationForm = () => {
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {({ errors, touched, setFieldValue }) => (
+      {({ errors, touched }) => (
         <Form>
           <Grid container spacing={2}>
             <Grid item xs={12}>

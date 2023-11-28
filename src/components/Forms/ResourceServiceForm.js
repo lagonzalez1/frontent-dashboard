@@ -6,7 +6,8 @@ import { Typography, ListItem, ListItemText, List, ListItemButton, Dialog, Dialo
 import CloseIcon from "@mui/icons-material/Close";
 import { validationSchemaService, validationSchemaResource, updateResource, updateService, requestRemoveService, requestRemoveResource } from "../FormHelpers/ResourceServiceFormHelper";
 import { useSelector, useDispatch } from "react-redux";
-import user, { setReload, setSnackbar } from "../../reducers/user";
+import { setReload, setSnackbar } from "../../reducers/user";
+import { reloadBusinessData } from "../../hooks/hooks";
 
 
 export default function ResourceServiceForm () {
@@ -54,6 +55,10 @@ export default function ResourceServiceForm () {
         setServiceId(item._id)
     }
 
+    useEffect(() => {
+        reloadBusinessData(dispatch);
+      }, [loading])
+
     const serviceSubmit = (value) => {
         setLoading(true);
         if (value.delete === true) {
@@ -68,7 +73,6 @@ export default function ResourceServiceForm () {
                 dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
             })
             .finally(() => {
-                dispatch(setReload(true))
                 setLoading(false);
             })
             return;
@@ -82,9 +86,7 @@ export default function ResourceServiceForm () {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true))
             setLoading(false);
-
         })
 
     }
@@ -101,7 +103,6 @@ export default function ResourceServiceForm () {
                 dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
             })
             .finally(() => {
-                dispatch(setReload(true))
                 setLoading(false);
             })
             return;
@@ -116,20 +117,15 @@ export default function ResourceServiceForm () {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true))
             setLoading(false);
-
         })
     }
-
-    
 
     const initialValuesServices = { 
         title: userSelected ? userSelected.title : '',
         duration: userSelected ? userSelected.duration: '',
         delete: false,
     }
-
 
     const initialValuesResources = { 
         title: userSelected ? userSelected.title : '',
@@ -139,7 +135,6 @@ export default function ResourceServiceForm () {
         delete: false
     }
 
-    
 
     return (
         <>

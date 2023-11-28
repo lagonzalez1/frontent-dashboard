@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Grid, FormControlLabel, Switch, Button, FormLabel, Typography} from "@mui/material";
 import { requestInputFieldChange, validationSchema, LABELS, TITLE } from "../FormHelpers/ClientFormHelpers";
 import { setSnackbar } from "../../reducers/user";
+import { reloadBusinessData } from "../../hooks/hooks";
 
 
 export default function ClientForm() {
@@ -13,9 +14,13 @@ export default function ClientForm() {
     const settings = useSelector((state) => state.business.settings.inputFields);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
-    useEffect(() => {
 
-    },[])
+
+    useEffect(() => {
+        reloadBusinessData(dispatch);
+      }, [loading])
+
+
     const initialValues = {
         email: settings.email,
         notes: settings.notes,

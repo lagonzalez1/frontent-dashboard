@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { DateTime } from 'luxon';
+import { reloadBusinessData } from '../../hooks/hooks';
 
 
 
@@ -35,6 +36,10 @@ export default function EmployeeScheduleForm({employee}) {
             }
         }
     }, [employee])
+
+    useEffect(() => {
+        reloadBusinessData(dispatch);
+      }, [loading])
 
     let initialValues = { 
         Sunday: {

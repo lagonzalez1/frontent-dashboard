@@ -7,6 +7,7 @@ import axios from 'axios';
 import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { requestNotificationChange } from "../FormHelpers/NotificationFormHelper";
+import { reloadBusinessData } from '../../hooks/hooks';
 
 
 const NotificationForm = () => {
@@ -31,6 +32,10 @@ const NotificationForm = () => {
     })
     
   };
+
+  useEffect(() => {
+    reloadBusinessData(dispatch);
+  }, [loading])
 
   const initialValue = {
         title: business ? business.notifications.title : '',

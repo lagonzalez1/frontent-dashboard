@@ -17,7 +17,7 @@ import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGener
 
 
 
-export default function Settings(permissionLevel) {
+export default function Settings() {
 
     const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(true);

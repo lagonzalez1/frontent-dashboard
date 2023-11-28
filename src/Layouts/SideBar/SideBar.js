@@ -67,7 +67,7 @@ export default function SideBar({navState, openNav}) {
                 >
                   <AccessTimeOutlinedIcon htmlColor={ currentLocation === 0 ? '#ffc34d' : '' } />
                 </ListItemIcon>
-                <ListItemText primary={"Waitlist"} sx={{ opacity: navState ? 1 : 0 }} />
+                <ListItemText primary={"Waitlist"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
               </BootstrapTooltip>
             </ListItem>
@@ -91,7 +91,7 @@ export default function SideBar({navState, openNav}) {
                 >
                   <ListIcon htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
                 </ListItemIcon>
-                <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0 }} />
+                <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
               </BootstrapTooltip>
             </ListItem>
@@ -116,7 +116,7 @@ export default function SideBar({navState, openNav}) {
                 >
                   <CheckBoxOutlinedIcon htmlColor={ currentLocation === 2 ? '#ffc34d' : '' } />
                 </ListItemIcon>
-                <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0 }} />
+                <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
               </BootstrapTooltip>
             </ListItem>
@@ -141,7 +141,7 @@ export default function SideBar({navState, openNav}) {
                 >
                   <WidgetsOutlinedIcon htmlColor={ currentLocation === 3 ? '#ffc34d' : '' } />
                 </ListItemIcon>
-                <ListItemText primary={"Resources"} sx={{ opacity: navState ? 1 : 0 }} />
+                <ListItemText primary={"Resources"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
               </BootstrapTooltip>
             </ListItem>
@@ -165,7 +165,7 @@ export default function SideBar({navState, openNav}) {
                   >
                     <FactCheckOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
                   </ListItemIcon>
-                  <ListItemText primary={"Services "} sx={{ opacity: navState ? 1 : 0 }} />
+                  <ListItemText primary={"Services "} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
                 </BootstrapTooltip>
               </ListItem>
@@ -189,7 +189,7 @@ export default function SideBar({navState, openNav}) {
                 >
                   <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' }/>
                 </ListItemIcon>
-                <ListItemText primary={"Customers"} sx={{ opacity: navState ? 1 : 0 }} />
+                <ListItemText primary={"Customers"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
               </BootstrapTooltip>
             </ListItem>
@@ -217,7 +217,7 @@ export default function SideBar({navState, openNav}) {
                   >
                     <SettingsOutlinedIcon  htmlColor={ currentLocation === 6 ? '#ffc34d' : '' } />
                   </ListItemIcon>
-                  <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0 }} />
+                  <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
                 </BootstrapTooltip>
               </ListItem>
@@ -245,7 +245,7 @@ export default function SideBar({navState, openNav}) {
                   >
                     <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 7 ? '#ffc34d' : '' } />
                   </ListItemIcon>
-                  <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0 }} />
+                  <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
                 </BootstrapTooltip>
               </ListItem>

@@ -7,15 +7,14 @@ let GET_BUSINESS = '/api/internal/reload_business/'
 
 
 export const reloadBusinessData = (dispatch) => {
-    const { user, _ } = getStateData();
-    if (!user ) { return new Error('Data not found.')}
+    const { _, business } = getStateData();
     const accessToken = getAccessToken();
     const headers = { headers: {'x-access-token': accessToken} }
-    const id = user.id;
+    const id = business._id;
     const ENDPOINT = GET_BUSINESS + id;
     axios.get(ENDPOINT, headers)
     .then(response => {
-        dispatch(setBusiness(response.data.business));
+        dispatch(setBusiness(response.data.result));
     })
     .catch(error => {
         console.log(error);
@@ -51,15 +50,16 @@ export const requestNoShow = (clientId, type) => {
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       const payload = { bId: business._id, clientId, type}
-      axios.put('/api/internal/noShow', payload, headers)
+      axios.post('/api/internal/noShow', payload, headers)
       .then(response => {
         if(response.status === 200){
           resolve(response.data.client)
+        }else {
+            reject(response.data.msg)
         }
-        reject(response.data.msg)
       })
-      .error(error => {
-        reject(error.status);
+      .catch(error => {
+        reject(error);
       })
   
     })

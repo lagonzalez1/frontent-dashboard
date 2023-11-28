@@ -28,19 +28,6 @@ export default function Resources() {
         active: null,
         publicValue: null
     })
-
-    
-    
-
-    const styles = {
-        container: {
-          display: 'flex', // Set the container's display to flex
-          flexDirection: 'row', // Set the main axis to be horizontal
-          flexWrap: 'wrap', // Allow the items to wrap to the next row if there's not enough space
-          justifyContent: 'flex-start', // Start the items from the left (you can adjust this to center or space-between if needed)
-        }
-    };
-
     const handleResourceClick = (object) => {
         setDialog(true);
         setResource(object);
@@ -57,25 +44,24 @@ export default function Resources() {
     }
 
     const handleUpdateResource = async () => {
-        setLoading(true);
         if (!form){ return; }
+        setLoading(true);
         updateResources(form)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
-            setLoading(false)
             handleCloseDialog();
         })
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true))
+            setLoading(false);
         })
       };
 
       useEffect(() => {
-        
-      }, [])
+        reloadBusinessData(dispatch);
+      }, [loading])
 
     return(
         <>
@@ -93,8 +79,8 @@ export default function Resources() {
         </Grid>
 
         
-        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap-reverse' }} columnSpacing={2} rowSpacing={2} >
-            { resourceData? resourceData.map((resource, index) => (
+        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} columnSpacing={2} rowSpacing={2} >
+            { resourceData ? resourceData.map((resource, index) => (
                 <Grid item key={resource._id} xs={4} sm={4} md={4} lg={1}>
                         <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>

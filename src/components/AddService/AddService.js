@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Fab,
   TextField,
@@ -14,6 +14,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { submitService } from './Helper';
 import { setReload, setSnackbar } from '../../reducers/user';
+import { reloadBusinessData } from '../../hooks/hooks';
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -48,6 +49,7 @@ const validationSchema = Yup.object().shape({
 const AddService = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const employees = useSelector((state) => state.business.employees);
   const dispatch = useDispatch();
   const permissionLevel = useSelector((state) => state.user.permissions);
@@ -61,6 +63,7 @@ const AddService = () => {
   };
 
   const handleSubmit = (values) => {
+    setLoading(true)
     submitService(values)
     .then(response => {
         dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
@@ -70,9 +73,14 @@ const AddService = () => {
 
     })
     .finally(() => {
-      dispatch(setReload(true))
+      handleClose();
+      setLoading(false);
     })
   };
+
+  useEffect(() => {
+    reloadBusinessData(dispatch);
+  }, [loading])
 
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>

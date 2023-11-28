@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton, Stack, Divider, Typography   } from '@mui/material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
@@ -31,6 +31,7 @@ const initialValues = {
 
 export default function AddResource() {
   const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
   const serviceList = getServicesAvailable();
   const dispatch = useDispatch();
@@ -46,6 +47,7 @@ export default function AddResource() {
   };
 
   const handleSubmit = (values) => {
+    setLoading(true);
     addResource(values)
     .then(data => {
       dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
@@ -55,10 +57,15 @@ export default function AddResource() {
       dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
     })
     .finally(() => {
-      dispatch(setReload(true))
+      setLoading(false);
+      //dispatch(setReload(true))
     })
     
   };
+
+  useEffect(() => {
+    reloadBusinessData(dispatch);
+  }, [loading])
 
   const TextFieldEdit = () => { return <TextField multiline={true} rows={3} label="Description" />}
 

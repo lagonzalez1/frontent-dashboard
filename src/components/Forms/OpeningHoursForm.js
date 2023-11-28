@@ -98,7 +98,6 @@ const OpeningHoursForm = () => {
         return;
       }
     }
-    console.log("Employee tag" + employeeTag)
     setLoading(true);
     requestClosedDate(selectedDate.toISO(), employeeTag, start, end)
     .then(response => {
@@ -149,7 +148,7 @@ const OpeningHoursForm = () => {
   }
 
   useEffect(() => {
-    //reloadBusinessData(dispatch);
+    reloadBusinessData(dispatch);
   }, [loading])
   
 

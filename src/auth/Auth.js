@@ -10,6 +10,7 @@
 import axios from "axios";
 import { setBusiness } from "../reducers/business";
 import { setIndex, setLocation, setUser } from "../reducers/user";
+import { useSelector } from "react-redux";
 const TOKEN_KEY = 'access_token';
 const BUSINESS = 'business';
 const USER = 'user';
@@ -95,7 +96,7 @@ const USER = 'user';
       dispatch(setBusiness(status.business));
       dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions}))
       dispatch(setIndex(status.defaultIndex));
-      dispatch(setLocation(0))
+      dispatch(setLocation(0));
       return true;
     } catch (error) {
       return false;

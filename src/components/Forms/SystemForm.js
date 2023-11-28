@@ -8,6 +8,7 @@ import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { reloadBusinessData } from '../../hooks/hooks';
 
+
 export default function SystemForm() {
 
     const settings = useSelector((state) => state.business.system);
@@ -47,7 +48,6 @@ export default function SystemForm() {
             dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
         })
         .finally(() => {
-            dispatch(setReload(true));
             setLoading(false);
         })
 
@@ -67,7 +67,7 @@ export default function SystemForm() {
 
 
     useEffect(() => {
-        //reloadBusinessData(dispatch);
+        reloadBusinessData(dispatch);
     }, [loading])
 
     return (

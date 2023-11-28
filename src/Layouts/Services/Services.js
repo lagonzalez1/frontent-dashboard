@@ -54,7 +54,8 @@ export default function Services() {
         setForm({serviceId: null,
             employeeId: null,
             active: null,
-            public: null})
+            public: null
+        })
     }
 
 
@@ -63,7 +64,6 @@ export default function Services() {
         updateService(form)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
-            setLoading(false)
             handleClose();
         })
         .catch(error => {
@@ -71,7 +71,6 @@ export default function Services() {
             setLoading(false);
         })
         .finally(() =>{
-            dispatch(setReload(true));
             setLoading(false)
         })
 
@@ -90,14 +89,13 @@ export default function Services() {
             dispatch(setSnackbar(error))
         })
         .finally(() =>{
-            dispatch(setReload(true));
             setLoading(false)
-
         })
     }
 
-    useEffect(() => {        
-    },[])
+    useEffect(() => {  
+        reloadBusinessData(dispatch);      
+    },[loading])
 
     return(
         <>
@@ -119,7 +117,7 @@ export default function Services() {
         </Grid>
 
         
-        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap-reverse' }} columnSpacing={2} rowSpacing={2}>
+        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} columnSpacing={2} rowSpacing={2}>
             { serviceList ? serviceList.map((service) => (
                 <Grid item key={service._id}>
                     <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleClick(service)}>

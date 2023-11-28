@@ -37,12 +37,17 @@ export default function Personalization () {
         }
     }, [])
 
+    useEffect(() => {
+        reloadBusinessData(dispatch);
+      }, [loading])
+
     const generateQRCode = () => {
         setChecked(!checked);
     }
 
 
     const getCurrentProfileImage = () => {
+        setLoading(true);
         axios.get('api/internal/get_profile_image/'+imageRef)
         .then(response => {
             console.log(response);
@@ -95,7 +100,7 @@ export default function Personalization () {
         formData.append('profile_image', file, image.name);
         formData.append('b_id', business._id)
         formData.append('profileImage', imageRef ? imageRef: null);
-    
+        setLoading(true);
         axios.post('/api/internal/upload_profile_image', formData, config)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
@@ -104,7 +109,7 @@ export default function Personalization () {
             dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true))
+            //dispatch(setReload(true))
             setLoading(false);
 
         })

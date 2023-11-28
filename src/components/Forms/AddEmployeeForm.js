@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/Lock';
+import { reloadBusinessData } from '../../hooks/hooks';
 
 
 
@@ -23,11 +24,8 @@ export default function AddEmployeeForm({employee}) {
     const WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     useEffect(() => {
-        if (employee) {
-            console.log(employee);
-            console.log(employee.schedule.Friday);
-        }
-    }, [employee])
+      reloadBusinessData(dispatch);
+    }, [loading])
 
     let initialValues = { 
         fullname: employee ? employee.fullname: '',
@@ -84,7 +82,7 @@ export default function AddEmployeeForm({employee}) {
         })
         .finally(() => {
             setLoading(false);
-            dispatch(setReload(true))
+            //dispatch(setReload(true))
         })
     }
     

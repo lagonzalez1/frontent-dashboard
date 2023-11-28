@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Skeleton ,Typography, Stack, Tooltip, Button, Table, 
-    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, Container, IconButton, Icon } from "@mui/material";
+    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, IconButton } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
-
 import { useSelector, useDispatch } from "react-redux";
-import  {  getUserTable, columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable, getWaitlistServingTable } from "../../hooks/hooks";
+import  { columns, completeClientAppointment } from "./Helper";
+import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable, getWaitlistServingTable, reloadBusinessData } from "../../hooks/hooks";
 import "../../css/Serving.css";
-import { setReload, setSnackbar } from "../../reducers/user";
+import { setSnackbar } from "../../reducers/user";
 
 
 export default function Serving({setClient}) {
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
+    const [loading, setLoading] = useState(false);
 
     let servingList = getServingTable();
     let appointmentServing = getAppointmentServingTable();
@@ -21,27 +21,29 @@ export default function Serving({setClient}) {
     let { groupCount, groupTotalCount } = getServingCount();
 
     useEffect(() => {
-        
-    }, [])
+        reloadBusinessData(dispatch);
+    }, [loading])
 
     const checkoutClient = (client) => {
+        if (!client) {
+            return;
+        }
+        setLoading(true)
         completeClientAppointment(client)
         .then(response => {
-            console.log(response);
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         }).catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true))
+            //dispatch(setReload(true))
+            setLoading(false);
         })
     }
 
     const displayClientInformation = (client) => {
-        console.log(client);
         setClient({payload: client, open: true, fromComponent: 'Serving'})
     }
-
 
     return(
         <div className="servingContainer">
