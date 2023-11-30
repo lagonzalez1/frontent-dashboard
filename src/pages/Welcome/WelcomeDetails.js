@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, InputLabel, Select, MenuItem, Alert, Divider, AlertTitle } from "@mui/material";
+    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, InputLabel, Select, MenuItem, Alert, Divider, AlertTitle, Chip, Grid, Dialog, DialogContent, DialogTitle, DialogContentText } from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
 import { allowClientJoin, getBuisnessForm, waitlistRequest,checkDuplicatesRequest } from "./WelcomeHelper";
@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { DateTime } from "luxon";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import CloseIcon from '@mui/icons-material/Close';
+
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 
 export default function WelcomeDetails() {
@@ -43,6 +46,7 @@ export default function WelcomeDetails() {
     const [phoneNumber, setPhoneNumber] = useState(null);
     const [preview, setPreview] = useState(null);
     const [appointmentsOnly, setAppointmentsOnly] = useState(false);
+    const [showDisclosure, setShowDisclosure] = useState(false);
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
 
 
@@ -66,6 +70,11 @@ export default function WelcomeDetails() {
             setLoading(false)
         }
     }, []);
+
+
+    const closeDisclosure = () => {
+        setShowDisclosure(false);
+    }
 
     const getPreview = () => {
         const clientJson = sessionStorage.getItem(CLIENT);
@@ -257,8 +266,8 @@ export default function WelcomeDetails() {
                                 Join waitlist
                             </Typography> 
                             </Button> 
-                            </Stack>
 
+                            </Stack>
                             </form>
 
                             {
@@ -316,15 +325,60 @@ export default function WelcomeDetails() {
                                         </Box>
                                     </>
                                 ) : null
-                            }      
+                            } 
+
+                               
                 
                     </CardContent>
-                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
-                    
-                        <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 4}}>
+
+                        <Stack spacing={2}>
+                            <Chip 
+                                sx={{ maxWidth: '80x'}} variant="outlined" size="small" clickable={true} 
+                                onClick={() => setShowDisclosure(true)} icon={<InfoOutlinedIcon fontSize="small"/>} 
+                                label={'Disclosure'}> 
+                            </Chip> 
+                            <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+
+                        </Stack>
                     </CardActions>
                 </Card>
             </Box>
+
+
+            <Dialog
+                id={'disclosure'}
+                open={showDisclosure}
+                onClose={closeDisclosure}
+            >
+                <DialogTitle> 
+                    <Typography variant="h6" fontWeight="bold">{"Disclosure"}
+                </Typography> 
+                <IconButton
+                    aria-label="close"
+                    onClick={closeDisclosure}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <Typography variant="caption">
+                    By entering your email address and phone number on our webpage, you authorize us to send periodic reminders and notifications 
+                    related to the subscribed service. These communications may include appointment confirmations, updates, promotions, 
+                    or other relevant information. We assure you that your contact details will be used exclusively for reminder purposes 
+                    and will not be shared, sold, or distributed to third parties without your explicit consent, except when required by law. 
+                    You reserve the right to opt-out from receiving reminders at any time by following the instructions in our communications or contacting us directly. 
+                    Please be aware that standard message and data rates may apply for SMS notifications based on your mobile carrier and plan. 
+                    Your submission implies your acceptance of these terms regarding the usage of your email address and phone number for reminder purposes.
+                    </Typography>
+                </DialogContent>
+            </Dialog>
 
 
         </>

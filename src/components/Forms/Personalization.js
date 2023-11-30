@@ -4,6 +4,7 @@ import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import UploadIcon from '@mui/icons-material/Upload';
+import { reloadBusinessData } from '../../hooks/hooks';
 
 import { getAccessToken, getStateData } from "../../auth/Auth";
 

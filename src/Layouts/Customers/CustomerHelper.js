@@ -45,6 +45,21 @@ export function searchAnalyticsKeyword (word) {
     })
 }
 
+export function removeFromAnalytics (id) {
+    return new Promise((resolve, reject) => {
+       const { user, business} = getStateData();
+       const headers = getHeaders();
+       const payload = {b_id: business._id, eid: id}
+       axios.post('/api/internal/analytics_remove', payload, headers)
+       .then(response => {
+        resolve(response.data.msg);
+       }) 
+       .catch(error => {
+        reject(error);
+       })
+    })
+}
+
 export function getLastVisit (waitlist, appointments) {
     if (!waitlist || !appointments) { return "NA";}
     let lastVisit = waitlist.length > 0 ? waitlist[0].timestamp : appointments[0].appointmentDate;

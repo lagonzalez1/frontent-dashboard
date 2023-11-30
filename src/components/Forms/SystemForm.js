@@ -7,6 +7,7 @@ import axios from 'axios';
 import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { reloadBusinessData } from '../../hooks/hooks';
+import { DateTime } from 'luxon';
 
 
 export default function SystemForm() {
@@ -109,8 +110,8 @@ export default function SystemForm() {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Typography variant='subtitle2' fontWeight={'bold'}>Maximum Open Dates Control. </Typography>
-                    <Typography variant='body2'>Configure the number of open dates in your Date Calendar with precision. For example, limit the availability to a maximum of {initialValues.maxAppointmentDate} days from the current date.</Typography>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>Maximum Open Dates Control </Typography>
+                    <Typography variant='body2'>Configure the number of open dates in your Date Calendar with precision. For example, limit the availability to a maximum of {initialValues.maxAppointmentDate} days ~ untill {DateTime.local().plus({days: initialValues.maxAppointmentDate}).toFormat('LLL dd yyyy')}</Typography>
                     <br/>
                     <Field
                         as={TextField}

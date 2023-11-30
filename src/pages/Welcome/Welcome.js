@@ -172,6 +172,7 @@ export default function Welcome() {
                     )}
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 2, pt: 7}}>
                         <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                        <br/>
                     </CardActions>
                 </Card>
             </Box>

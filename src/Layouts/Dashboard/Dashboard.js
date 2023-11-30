@@ -27,20 +27,13 @@ import FabAppointment from "../../components/AddAppointment/FabAppointment";
 
 /**
  * 
- * Strucutre:
+ * Structure:
  *          Have the user change the retrived state from mongo by only storing into local storage.
  *          User makes a request. Update all from localStorage.
  *             
  */
 
 
-
-/**
- * Drawer: implement status
- * Welcome: Implement status checks
- *          Implement view waitlist.
- *          
- */
 
 
 export default function Dashboard () {

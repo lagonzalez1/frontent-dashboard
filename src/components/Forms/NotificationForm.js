@@ -1,10 +1,8 @@
-import React, { useState} from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Grid, Stack } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
-import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { requestNotificationChange } from "../FormHelpers/NotificationFormHelper";
 import { reloadBusinessData } from '../../hooks/hooks';

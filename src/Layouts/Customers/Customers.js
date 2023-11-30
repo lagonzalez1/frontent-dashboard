@@ -8,7 +8,7 @@ import StateSelect from '../../components/Select/StateSelect';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch, useSelector } from 'react-redux';
-import { columns, getLastVisit, searchAnalyticsKeyword, sortClientData, Transition} from './CustomerHelper';
+import { columns, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword, sortClientData, Transition} from './CustomerHelper';
 import { findEmployee, findService, getAnalyticsClients } from '../../hooks/hooks';
 import { setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
@@ -29,7 +29,7 @@ const Customers = () => {
 
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchTermError, setSearchTermError] = useState({status: false, title: null});
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
   const [sort, setSort] = useState();
   const [stateSort, setStateSort] = useState();
@@ -74,7 +74,6 @@ const Customers = () => {
   };
 
   const handleDeleteAll = () => {
-    console.log('Delete All action');
     handleClose();
   };
 
@@ -110,13 +109,24 @@ const Customers = () => {
       setAlertMessage({title: 'Error', body: 'Unable to find client to view.'})
       return;
     }
+    setLoading(true);
+    removeFromAnalytics(client._id)
+    .then((response) => {
+      dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
+    })
+    .error(error => {
+      dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
+    })
+    .finally(() => {
+      setLoading(false);
+    })
 
     console.log('Delete client', client);
   }
 
   useEffect(() => {
     loadCustomers(sort, stateSort);
-  }, [refresh, sort, stateSort])
+  }, [loading, sort, stateSort])
 
 
 

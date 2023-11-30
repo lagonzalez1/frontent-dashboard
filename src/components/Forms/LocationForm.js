@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Grid, Alert, Box, CircularProgress } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
@@ -66,8 +66,7 @@ const LocationForm = () => {
   const checkValidString = (input) => {
     const pattern = /^[a-zA-Z0-9_]+$/;
     return pattern.test(input);
-}
-
+  }
 
   const openWaitList = () => {
     const url = `https://waitonline.us/welcome/${business.publicLink}/waitlist`
@@ -122,9 +121,7 @@ const LocationForm = () => {
             </Button>
             </Grid>
 
-            <Grid item xs={12}>
-              
-              {console.log(permissionLevel)}
+            <Grid item xs={12}>              
             <Button disabled={ (permissionLevel === 2 || permissionLevel === 3 || permissionLevel === 1) ? true: false} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 10}}>
                 {loading ? <CircularProgress /> : 'Save'}
             </Button>
