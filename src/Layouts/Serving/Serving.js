@@ -14,14 +14,17 @@ export default function Serving({setClient}) {
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(false);
+    const [appointmentServing, setAppointmentServing] = useState(null);
+    const [servingList, setServingList] = useState(null);
 
-    let servingList = getServingTable();
-    let appointmentServing = getAppointmentServingTable();
-    let waitlistServing = getWaitlistServingTable();
     let { groupCount, groupTotalCount } = getServingCount();
 
     useEffect(() => {
         reloadBusinessData(dispatch);
+        let appointmentServing = getAppointmentServingTable();
+        let servingList = getServingTable();
+        setServingList(servingList);
+        setAppointmentServing(appointmentServing)
     }, [loading])
 
     const checkoutClient = (client) => {
@@ -36,7 +39,7 @@ export default function Serving({setClient}) {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            //dispatch(setReload(true))
+            console.log("Called")
             setLoading(false);
         })
     }

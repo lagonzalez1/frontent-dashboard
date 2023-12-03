@@ -4,7 +4,7 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent, Ale
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { allowClientJoin, requestBusinessArguments, requestBusinessSchedule, waitlistRequest } from "./WelcomeHelper";
+import { allowClientJoin, getProfileImage, requestBusinessArguments, requestBusinessSchedule, waitlistRequest } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 
@@ -21,7 +21,6 @@ export default function Welcome() {
     const [args, setArgs] = useState();
     const [schedule, setSchedule] = useState({});
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
-    const [appointmentsOnly, setAppointmentsOnly] = useState(false);
     const [nextDate, setNextAvailableDate] = useState({});
 
     const navigate = useNavigate();
@@ -36,6 +35,9 @@ export default function Welcome() {
         gatherBusinessData();
     }, [])
 
+    
+    
+
 
     const gatherBusinessData = () => {
         setLoading(true);
@@ -48,9 +50,9 @@ export default function Welcome() {
         .then(([scheduleResponse, argsResponse, stateResponse]) => {
             setSchedule(scheduleResponse.schedule);
             setNextAvailableDate(scheduleResponse.nextAvailable);
+            console.log(argsResponse)
             setArgs(argsResponse);
             if (stateResponse.status === 200){
-                
                 setAcceptingStatus({ waitlist: stateResponse.data.isAccepting, appointments: stateResponse.data.accpetingAppointments});
                 if (stateResponse.data.isAccepting === false && stateResponse.data.accpetingAppointments === false) {
                     navigate(`/welcome/${link}`);
@@ -92,39 +94,25 @@ export default function Welcome() {
 
 
     const CheckBusinessArguments = () => {
-
+        
+        const start = DateTime.fromFormat( nextDate.start, "HH:mm").toFormat('h:mm a')
+        const end = DateTime.fromFormat(nextDate.end, "HH:mm").toFormat('h:mm a')
         if (acceptingStatus.waitlist === false && acceptingStatus.appointments === false) {
             return (
                 <>
-                    <Typography variant="h5" fontWeight='bold'>
+                    <Typography sx={{  pt: 2}} variant="h5" fontWeight='bold'>
                             This waitlist is currently closed.
                     </Typography>
 
-                    <Container sx={{ justifyContent: 'center', justifyItems: 'center'}}>
+                    <Container sx={{ justifyContent: 'center', justifyItems: 'center', pt: 2}}>
                     <Stack spacing={0.5}>
-                        {
-                            schedule ? Object.keys(schedule).map((item, key) => {
-                                if(item === "_id"){
-                                    return null;
-                                }
-                                
-                                if (nextDate === item) {
-                                    const start = DateTime.fromFormat(schedule[item].start, "HH:mm").toFormat("h:mm a")
-                                    const end = DateTime.fromFormat(schedule[item].end, "HH:mm").toFormat("h:mm a")
-                                    return (
-                                        <>
-                                        <Typography variant="subtitle1">
-                                            {"Waitlist will open again"}
-                                        </Typography>
-                                        <Typography variant="body2" fontWeight={'bold'}>
-                                            <strong>{item}</strong>
-                                            {" from "+  start + " - " + end}
-                                        </Typography>
-                                        </>
-                                    )
-                                }
-                            }): null
-                        }
+                        <Typography variant="subtitle1">
+                            {"Waitlist will open again"}
+                        </Typography>
+                        <Typography variant="body2" fontWeight={'bold'}>
+                            <strong>{nextDate.day}</strong>
+                            {" from "+  start + " - " + end }
+                        </Typography>
                     </Stack>
                     </Container>
                 </>
@@ -133,7 +121,7 @@ export default function Welcome() {
 
         return (
             <>
-            <Typography variant="h4" component="div" fontWeight="bold" gutterBottom>Welcome</Typography>
+            <Typography variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome</Typography>
             { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
             <ShowBusinessArguments businessArgs={args}/>
@@ -165,6 +153,11 @@ export default function Welcome() {
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             {link}
                         </Typography>
+                        {args ? (
+                        <Avatar sx={{ width: 56, height: 56, mx: 'auto' }} src={args.profileLink} />
+                    ) : null}
+
+
                         <CheckBusinessArguments />
         
                     </CardContent>

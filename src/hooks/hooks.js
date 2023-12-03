@@ -1,5 +1,5 @@
 
-import axios from "axios";
+import axios, { all } from "axios";
 import { DateTime } from "luxon";
 import { getStateData, getAccessToken, getHeaders } from "../auth/Auth";
 import { setBusiness } from "../reducers/business";
@@ -63,6 +63,26 @@ export const requestNoShow = (clientId, type) => {
       })
   
     })
+  }
+
+  // Allow employees that sign in to change their availability.
+  // Also allow managment and root edit.
+  export function allowEmployeeEdit(permissionLevel, signOnEmail, employeeFromList) {
+
+    let allow = false;
+    if (signOnEmail === employeeFromList.employeeUsername) {
+        allow = false;
+    }
+    else {
+        if (permissionLevel === 0 || permissionLevel === 1 || permissionLevel === 2){
+            allow = false
+        }
+        else {
+            allow = true;
+        }
+    }
+    return allow;
+    
   }
 
 

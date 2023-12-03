@@ -12,7 +12,7 @@ import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone,
   requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate,validateTimerange, DAYOFWEEK } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
-import { findEmployee, getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
+import { allowEmployeeEdit, findEmployee, getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
 
 
 
@@ -22,6 +22,8 @@ const OpeningHoursForm = () => {
   const schedule = useSelector((state) => state.business.schedule);
   const closedDays = useSelector((state) => state.business.closedDates);
   const permissionLevel = useSelector((state) => state.user.permissions);
+  const userEmail = useSelector((state) => state.user.email);
+
   const [message, setMessage] = useState(null);
   const [timerange, setTimerange] = React.useState(() => [
     DateTime.local(),
@@ -257,7 +259,7 @@ const initialValuesSchedule = {
                     <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 15}} onClick={() => setScheduleDialog(true)} fullWidth={false} variant="outlined" color="primary">
                       Set Opening Hours
                     </Button>
-                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 15}} variant="outlined" onClick={() => setClosedDialog(true)} fullWidth={false}  color="primary">
+                    <Button sx={{ borderRadius: 15}} variant="outlined" onClick={() => setClosedDialog(true)} fullWidth={false}  color="primary">
                       Closed on Days
                     </Button>
                   
@@ -474,7 +476,7 @@ const initialValuesSchedule = {
                                 </Typography>
                               </TableCell>
                               <TableCell>
-                                  <Button size="small" onClick={() => removeClosedDate(item._id) }>
+                                  <Button disabled={allowEmployeeEdit(permissionLevel, userEmail, findEmployee(item.employeeTag)) } size="small" onClick={() => removeClosedDate(item._id) }>
                                     delete
                                   </Button>
                               </TableCell>
@@ -499,8 +501,8 @@ const initialValuesSchedule = {
                         onChange={handleEmployeeChange}
                         fullWidth={true}
                       >
-                        {employeeList.map((employee, index) => (
-                          <MenuItem value={employee._id}>
+                        {employeeList && employeeList.map((employee, index) => (
+                          <MenuItem key={index} disabled={allowEmployeeEdit(permissionLevel, userEmail, employee)} value={employee._id}>
                             <Typography variant='body2'>{employee.fullname}</Typography>
                           </MenuItem>
                         ))}
@@ -531,7 +533,7 @@ const initialValuesSchedule = {
                                 onChange={(newValue) => setTimerange(newValue)}
                                 />
                               <br/>
-                            <Typography variant='caption' gutterBottom>Enter the time range you will be available.</Typography>
+                            <Typography variant='caption' gutterBottom>Enter the time range you <strong>will</strong> be available.</Typography>
  
                             </Box>
                           </Grow>

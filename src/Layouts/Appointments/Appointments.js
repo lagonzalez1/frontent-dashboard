@@ -8,7 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 
-import { findEmployee, getAppointmentClients, moveClientServing, findService, getAppointmentTable } from "../../hooks/hooks";
+import { findEmployee, getAppointmentClients, moveClientServing, findService, getAppointmentTable, allowEmployeeEdit } from "../../hooks/hooks";
 import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -22,6 +22,8 @@ export default function Appointments({setClient, setEditClient}) {
 
     const [loading, setLoading] = useState(false);
     const business = useSelector((state) => state.business);
+    const permissionLevel = useSelector((state) => state.user.permissions);
+    const userEmail = useSelector((state) => state.user.email);
     const currentDate = DateTime.local().setZone(business.timezone);
     const [selectedDate, setSelectedDate] = useState();
     const [highlightedDays, setHighlightedDays] = useState([]);
@@ -185,7 +187,10 @@ export default function Appointments({setClient, setEditClient}) {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    { data ? data.map((client, index) => (
+                                    
+                                    { data ? data.map((client, index) => {
+                                        const disabled = allowEmployeeEdit(permissionLevel, userEmail, findEmployee(client.employeeTag));
+                                    return (
                                         <TableRow>
                                             <TableCell>
                                                 <Typography fontWeight={'bold'} variant="body2">
@@ -221,20 +226,20 @@ export default function Appointments({setClient, setEditClient}) {
                                             </TableCell>
                                             <TableCell>
                                                 <Stack direction={'row'} spacing={1}>
-                                                <IconButton onClick={() => sendClientServing(client._id)}>
+                                                <IconButton disabled={disabled} onClick={() => sendClientServing(client._id)}>
                                                     <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                                 </IconButton>
-                                                <IconButton onClick={() => sendClientNotification(client._id)}>
+                                                <IconButton disabled={disabled}  onClick={() => sendClientNotification(client._id)}>
                                                     <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                                 </IconButton>
-                                                <IconButton onClick={() => editClientInfo(client)}>
+                                                <IconButton disabled={disabled}  onClick={() => editClientInfo(client) }>
                                                     <EditIcon fontSize="small" />
                                                 </IconButton>
 
                                                 </Stack>
                                             </TableCell>
                                         </TableRow>
-                                    )): null}
+                                    )}): null}
                                 </TableBody>
                             </Table>
                         </TableContainer>

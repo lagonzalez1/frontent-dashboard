@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import { Avatar, Typography ,Button, TextField, Link, Box, Grid, Container, Alert, ToggleButtonGroup, ToggleButton, Tooltip, IconButton, Collapse} from "@mui/material";
+import { Avatar, Typography ,Button, TextField, Link, Box, Grid, Container, Alert, ToggleButtonGroup, ToggleButton, Tooltip, IconButton, Collapse, Paper} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useNavigate  } from "react-router-dom";
 import { useSignIn } from "react-auth-kit";
@@ -11,6 +11,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { useSelector, useDispatch } from 'react-redux';
 import { setLocation, setPermisisons, setUser } from '../../reducers/user';
 import { DateTime } from "luxon";
+import loginImage from "../../assets/images/login.jpg"
 
 
 export default function Login() {
@@ -135,27 +136,23 @@ export default function Login() {
 
 	return(
         <>
-            <Container sx={{ pt: 1, p: 2}}>
-                <Grid container>
-                    <Grid item>
-                        
-                    </Grid>
-                    <Grid item>
+            <Container sx={{ pt: 1, p: 2, mt:0, mb:0, height: '100%', width: '100%'}}>
                     
-
-                    { isRoot === "root" ? 
-                    (
-                    <Box
-                        sx={{
-                        my: 8,
-                        mx: 4,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        }}
-                    >
+            
+            { isRoot === "root" ? 
+                (
+                <Box
+                    sx={{
+                    pt: 1,
+                    my: 8,
+                    mx: 4,
+                    pb: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    }}
+                >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-
                 </Avatar>
                 <Typography component="h1" variant="h5">
                     Sign in
@@ -245,18 +242,20 @@ export default function Login() {
                     {'.'}
                     </Typography>
                 </Box>
-                    </Box>
-                    ): 
-                    (
-                        <Box
-                        sx={{
-                        my: 8,
-                        mx: 4,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        }}
-                    >
+                </Box>
+                ): 
+                (
+                <Box
+                sx={{
+                pt: 1,
+                pb: 1,
+                my: 8,
+                mx: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                }}
+                >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary' }}>
                 </Avatar>
                 <Typography component="h1" variant="h5">
@@ -370,9 +369,6 @@ export default function Login() {
                         </ToggleButton>
                         </ToggleButtonGroup>
                     </Container>
-                
-                    </Grid>
-                </Grid>
             </Container>
 
         </>

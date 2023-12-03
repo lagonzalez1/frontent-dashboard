@@ -23,10 +23,8 @@ export default function Settings() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if (business){
-            setLoading(false);
-        }
-    }, [loading])
+
+    }, [])
 
 
     

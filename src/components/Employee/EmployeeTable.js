@@ -13,12 +13,14 @@ import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import { DateTime } from "luxon";
+import { allowEmployeeEdit } from "../../hooks/hooks";
 // Show table of employees
 // Allow to delete and add employees
 export default function EmployeeTable() {
 
     const employees = useSelector((state) => state.business.employees);
     const permissionLevel = useSelector((state) => state.user.permissions);
+    const userEmail = useSelector((state) => state.user.email);
     const today = DateTime.local();
     const [employeeDialog, setEmployeeDialog] = useState(false);
     const [employee, setEmployee] = useState(null);
@@ -76,7 +78,7 @@ export default function EmployeeTable() {
     }
     const cancelEmployeeDelete = () => {
         setDeleteConfirm(false);
-        setEmployeeId(id);
+        setEmployeeId(null);
     }
 
     const editSchedule = (employee) => {
@@ -145,7 +147,7 @@ export default function EmployeeTable() {
                                             {++index}
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton aria-label="InfoClick" size="small" onClick={() => showQuickActions(employee)}>
+                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} aria-label="InfoClick" size="small" onClick={() => showQuickActions(employee)}>
                                                 <VisibilityRoundedIcon fontSize="small"/>
                                             </IconButton>
                                         </TableCell>
@@ -161,13 +163,13 @@ export default function EmployeeTable() {
                                         </TableCell>
                                         <TableCell>
                                             <Stack direction={'row'}>
-                                            <IconButton onClick={() => confirmDelete(employee._id)}>
+                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} onClick={() => confirmDelete(employee._id)}>
                                                 <DeleteIcon fontSize="Small" />
                                             </IconButton>
-                                            <IconButton onClick={() => editEmployee(employee)}>
+                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} onClick={() => editEmployee(employee)}>
                                                 <BorderColorRoundedIcon fontSize="small"/>
                                             </IconButton>
-                                            <IconButton onClick={() => editSchedule(employee)}>
+                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} onClick={() => editSchedule(employee)}>
                                                 <CalendarMonthIcon fontSize="small"/>
                                             </IconButton>
                                             </Stack>
@@ -247,8 +249,6 @@ export default function EmployeeTable() {
                 <AddEmployeeForm employee={employee}/>
             </DialogContent>
             </Dialog>
-
-
 
             <Dialog
                 open={employeeScheduleDialog}

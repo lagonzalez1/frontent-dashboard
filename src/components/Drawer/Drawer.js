@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, styled } from "@mui/material";
+import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Toolbar, styled } from "@mui/material";
 import { Container, Box, Stack, Drawer as SIDEBAR, Typography, Button, Paper, Tab} from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -18,7 +18,7 @@ import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsAct
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import DoNotDisturbRoundedIcon from '@mui/icons-material/DoNotDisturbRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-
+import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 
 export default function Drawer({client, setClient}) {
 
@@ -71,7 +71,7 @@ export default function Drawer({client, setClient}) {
         const headers = getHeaders();
         axios.post('/api/internal/analytics_search', data, headers)
         .then(response => {
-            setAnalytics(response.data.client);
+            setAnalytics(response.data.result);
         }) 
         .catch(error => {
             console.log(error)
@@ -251,66 +251,53 @@ export default function Drawer({client, setClient}) {
                     <TabPanel value="3">
                         <List dense={true}>
 
-
-                        {analytics.waitlist_summmary && 
+                        { analytics && analytics.waitlist_summmary ?
                         analytics.waitlist_summmary.map((object, index) => {
-                            if (index === 0) {
-                                return (
-                                    <>
-                                    <Typography variant="subtitle1">Waitlist</Typography>
-                                    <Divider />
-                                    </>
-                                )
-                            }
+                            
                             return (
                                 <>
                                     <ListItem>
-                                        <ListItemIcon>
-                                            <CalendarMonthIcon fontSize="small" />
-                                        </ListItemIcon>
+                                        <ListItemAvatar>
+                                            <PlaylistAddRoundedIcon fontSize="small" />
+                                        </ListItemAvatar>
                                         <ListItemText>
-                                            <Typography variant="body2"> { DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
-                                            <Typography variant="body2"> { findEmployee(object.employee).fullname }</Typography>
-                                            <Typography variant="caption"> { object.notes ? object.notes: 'No notes.' }</Typography>
+                                            <Typography variant="body2"> { "Date: " + DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
+                                            <Typography variant="body2"> { "Employee: " + findEmployee(object.employee).fullname }</Typography>
+                                            <Typography variant="caption"> {"Notes: "} { object.notes ? object.notes: 'No notes.' }</Typography>
                                         </ListItemText>
                                         
                                     </ListItem>
-                                    { index === (analytics.summary.length - 1) ? null : <Divider/> }
+                                    { index === (analytics.waitlist_summmary.length - 1) ? null : <Divider/> }
                                 </>
                             )
-                        })}
+                        }): null}
                         
 
                         {
-                            analytics.appointment_summary && 
+                            analytics && analytics.appointment_summary ? 
                             analytics.appointment_summary.map((object, index) => {
-                                if (index === 0) {
-                                    return (
-                                        <>
-                                        <Typography variant="subtitle1">Appointments</Typography>
-                                        <Divider />
-                                        </>
-                                    )
-                                }
+                                
                                 return (
                                     <>
                                         <ListItem>
-                                            <ListItemIcon>
+                                            <ListItemAvatar>
                                                 <CalendarMonthIcon fontSize="small" />
-                                            </ListItemIcon>
+                                            </ListItemAvatar>
                                             <ListItemText>
-                                                <Typography variant="body2"> { DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
-                                                <Typography variant="body2"> { findEmployee(object.employee).fullname }</Typography>
-                                                <Typography variant="caption"> { object.notes ? object.notes: 'No notes.' }</Typography>
+                                                <Typography variant="body2"> <strong>{'Date: '}</strong>{DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
+                                                <Typography variant="body2"> <strong>{"Employee: "}</strong>{ findEmployee(object.employee).fullname }</Typography>
+                                                <Typography variant="body2"> <strong>{'Service: '}</strong> { findService(object.serviceTag).title }</Typography>
+                                                <Typography variant="caption"> <strong>{"Notes: "}</strong> { object.notes ? object.notes: 'No notes.' }</Typography>
                                             </ListItemText>
                                             
                                         </ListItem>
-                                        { index === (analytics.summary.length - 1) ? null : <Divider/> }
+                                        { index === (analytics.appointment_summary.length - 1) ? null : <Divider/> }
                                     </>
                                 )
-                            })
+                            }): null
                         }
-                        { Object.keys(analytics).length === 0 ? <ListItem>
+
+                        { analytics && Object.keys(analytics).length === 0 ? <ListItem>
                                 <Typography variant="body2">New Client.</Typography>
                             </ListItem>: null
                         }

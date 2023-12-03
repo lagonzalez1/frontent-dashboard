@@ -55,6 +55,7 @@ export default function Resources() {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
+            console.log("Called")
             setLoading(false);
         })
       };
@@ -81,7 +82,7 @@ export default function Resources() {
         
         <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} columnSpacing={2} rowSpacing={2} >
             { resourceData ? resourceData.map((resource, index) => (
-                <Grid item key={resource._id} xs={4} sm={4} md={4} lg={1}>
+                    <Grid item key={resource._id}>
                         <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>
                         <CardContent>

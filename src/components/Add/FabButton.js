@@ -8,7 +8,7 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { Transition, addCustomerWaitlist  } from "./Helper";
 import { useSelector, useDispatch } from "react-redux";
 import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
-import { Formik, Form, Field, ErrorMessage, useFormik, validateYupSchema } from 'formik';
+import { Field, ErrorMessage, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { setBusiness } from "../../reducers/business";
 
@@ -43,6 +43,7 @@ export default function FabButton () {
     }, [])
 
     const handleSubmit = (payload) => {
+        console.log("Called")
         addCustomerWaitlist(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
@@ -56,6 +57,8 @@ export default function FabButton () {
         })
     }
 
+    const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
+
     const initialValues = {
         fullname: '',
         email: '',
@@ -66,11 +69,10 @@ export default function FabButton () {
         employee_id: '',
         notes: ''
       };
-      const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
 
       const validationSchema = Yup.object({
         fullname: Yup.string().required('Full name is required'),
-        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format xxx-xx-xxxx'),
+        phone: Yup.string().matches(phoneRegex, 'Phone number must be in the format xxx-xx-xxxx').required('Req'),
         email: Yup.string().required(),
         size: Yup.number().default(1),
         service_id: Yup.string(),
@@ -79,16 +81,14 @@ export default function FabButton () {
         notes: Yup.string()
       });
 
-
-    const formik = useFormik({
+      const formik = useFormik({
         initialValues: initialValues,
         validationSchema: validationSchema,
         onSubmit: handleSubmit
 
     })
-
-
-    // Need to implement this later on
+    
+      // Need to implement this later on
     // Stops cursor at 12 long and inputs dashes for US numbers
     const formatPhoneNumber = (input) => {
         const digits = input.replace(/\D/g, '');
@@ -110,6 +110,7 @@ export default function FabButton () {
         }
         setPhoneNumber(phoneNumber);
     }
+
 
     return(
         <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
@@ -146,39 +147,32 @@ export default function FabButton () {
 
                     { errors ? <Alert severity="error">{errors}</Alert>: null }
 
-                    <Formik
-                    initialValues={initialValues}
-                    onSubmit={handleSubmit}
-                    validationSchema={validationSchema}
-                    >
-                    {({ errors, touched, handleChange, handleBlur }) => (
-                        <Form>
+                    <form onSubmit={formik.handleSubmit}>
+                    
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="fullname"
                             name="fullname"
                             size="small"
                             label="Customer name"
                             placeholder="Customer name"
-                            error={touched.fullname && !!errors.fullname}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            value={formik.values.fullname}
+                            error={formik.touched.fullname && Boolean(formik.errors.fullname)}
+                            onChange={formik.handleChange}
                             />
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="email"
                             name="email"
                             size="small"
                             label="Customer email"
                             placeholder="Email"
-                            error={touched.email && !!errors.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            value={formik.values.email}
+
+                            error={formik.touched.email && Boolean(formik.errors.email)}
+                            onChange={formik.handleChange}
                             />
 
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="phone"
                             name="phone"
                             label="Phone"
@@ -186,31 +180,32 @@ export default function FabButton () {
                             value={phoneNumber}
                             onChange={(event) => phoneNumberChange(event)}
                             placeholder="xxx-xxx-xxxx"
-                            error={touched.phone && !!errors.phone}
-                            onBlur={handleBlur}
+                            
+                            error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                            helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
                             />
 
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="size"
                             name="size"
                             size="small"
                             label="Party size"
+                            value={formik.values.size}
+
                             placeholder="1"
-                            error={touched.size && !!errors.size}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            error={formik.touched.size && Boolean(formik.errors.size)}
+                            onChange={formik.handleChange}
                             />
 
                             {business ? (
                             <>
                                 <InputLabel id="services">Services</InputLabel>
-                                <Field
-                                as={Select}
+                                <Select
                                 labelId="services"
                                 name="service_id"
                                 size="small"
-                                onChange={handleChange}
+                                value={formik.values.service_id}
+                                onChange={formik.handleChange}
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
                                 { Array.isArray(serviceList) ? serviceList.map((service) => (
@@ -222,19 +217,20 @@ export default function FabButton () {
                             
                                     </MenuItem>
                                 )):null }
-                                </Field>
+                                </Select>
                             </>
                             ) : null}
 
                             {business ? (
                             <>
                                 <InputLabel id="resources">Resources</InputLabel>
-                                <Field
-                                as={Select}
+                                <Select
                                 id="resources"
                                 name="resource_id"
                                 size="small"
-                                onChange={handleChange}
+                                value={formik.values.resource_id}
+
+                                onChange={formik.handleChange}
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
                                 {Array.isArray(resourceList) ? resourceList.map((resource) => (
@@ -245,19 +241,20 @@ export default function FabButton () {
                                         <Typography variant="body2">{resource.title} </Typography>
                                     </MenuItem>
                                 )) : null}
-                                </Field>
+                                </Select>
                             </>
                             ) : null}
 
                         {business ? (
                             <>
                                 <InputLabel id="employees">Employee preference</InputLabel>
-                                <Field
-                                as={Select}
+                                <Select
                                 id="employee_id"
                                 name="employee_id"
+                                value={formik.values.employee_id}
+
                                 size="small"
-                                onChange={handleChange}
+                                onChange={formik.handleChange}
                                 >
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
@@ -265,28 +262,24 @@ export default function FabButton () {
                                         <Typography variant="body2">{employee.fullname} </Typography>
                                     </MenuItem>
                                 )) : null}
-                                </Field>
+                                </Select>
                             </>
                             ) : null}
 
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="notes"
                             name="notes"
                             size="small"
                             placeholder="Additional notes"
-                            error={touched.notes && !!errors.notes}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            value={formik.values.notes}
+
+                            error={formik.touched.notes && !!formik.errors.notes}
+                            onChange={formik.handleChange}
                             />
-
-                            <ErrorMessage name="notes" component="div" />
-
                             <Button disabled={(permissionLevel === 3) ? true: false} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</Button>
                         </Stack>
-                        </Form>
-                    )}
-                    </Formik>
+                    
+                    </form>
 
                 </DialogContent>
 
