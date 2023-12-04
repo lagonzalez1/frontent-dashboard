@@ -136,9 +136,9 @@ export default function Login() {
 
 	return(
         <>
-            <Container sx={{ pt: 1, p: 2, mt:0, mb:0, height: '100%', width: '100%'}}>
+            <Container sx={{ pt: 1, p: 2, mt:0, mb:0, height: '100vh', width: '100%'}}>
                     
-            
+
             { isRoot === "root" ? 
                 (
                 <Box
@@ -221,9 +221,9 @@ export default function Login() {
                     Sign In
                 </Button>
                 }
-                <Grid container>
+                <Grid container sx={{ textAlign: 'center'}}>
                     <Grid item xs>
-                    <Link href="#" variant="caption">
+                    <Link href="/ForgotPassword" variant="caption">
                         Forgot password?
                     </Link>
                     </Grid>
@@ -233,14 +233,7 @@ export default function Login() {
                         </Link>
                     </Grid>
                 </Grid>
-                <Typography pt={2} variant="caption" color="text.secondary" align="center">
-                    {'Copyright © '}
-                    <Link color="inherit" href="/">
-                        waitonline.us
-                    </Link>{' '}
-                    {new Date().getFullYear()}
-                    {'.'}
-                    </Typography>
+                
                 </Box>
                 </Box>
                 ): 
@@ -325,9 +318,9 @@ export default function Login() {
                     Sign In
                 </Button>
                 }
-                <Grid container>
+                <Grid container sx={{ textAlign: 'center'}}>
                     <Grid item xs>
-                    <Link href="#" variant="caption">
+                    <Link href="/ForgotPassword" variant="caption">
                         Forgot password?
                     </Link>
                     </Grid>
@@ -337,18 +330,25 @@ export default function Login() {
                         </Link>
                     </Grid>
                 </Grid>
-                <Typography pt={2} variant="caption" color="text.secondary" align="center">
-                    {'Copyright © '}
-                    <Link color="inherit" href="/">
-                        waitonline.us
-                    </Link>{' '}
-                    {new Date().getFullYear()}
-                    {'.'}
-                    </Typography>
+                
                 </Box>
-                    </Box> 
-                    )
+                
+                </Box> 
+                )
+
+                
                     }
+
+                    <Container sx={{ textAlign:'center', pb: 1}}>
+                    <Typography pt={2} variant="caption" color="text.secondary" align="center">
+                            {'Copyright © '}
+                            <Link color="inherit" href="/">
+                                waitonline.us
+                            </Link>{' '}
+                            {new Date().getFullYear()}
+                            {'.'}
+                    </Typography>
+                    </Container>
 
                     <Container sx={{  display: 'flex', justifyContent: 'center'}}>
                         <ToggleButtonGroup
@@ -368,7 +368,15 @@ export default function Login() {
                             </Tooltip>
                         </ToggleButton>
                         </ToggleButtonGroup>
+
+                        
                     </Container>
+                    
+
+
+                    
+
+
             </Container>
 
         </>
