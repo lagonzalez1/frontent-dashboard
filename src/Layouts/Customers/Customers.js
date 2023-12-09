@@ -120,8 +120,6 @@ const Customers = () => {
     .finally(() => {
       setLoading(false);
     })
-
-    console.log('Delete client', client);
   }
 
   useEffect(() => {

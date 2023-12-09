@@ -1,7 +1,8 @@
 import React, { useState, useEffect} from "react";
 import { Stack, Typography, Button, List, ListItem, Menu, MenuItem, ListItemText, Grid,
-     IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton  } from "@mui/material";
-     
+     IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer,
+    TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton 
+} from "@mui/material";     
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import AccessAlarmsIcon from '@mui/icons-material/AccessAlarms';
@@ -13,8 +14,7 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-
-import {  findClient, findResource, findService, moveClientServing } from "../../hooks/hooks";
+import { findResource, findService, moveClientServing } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 

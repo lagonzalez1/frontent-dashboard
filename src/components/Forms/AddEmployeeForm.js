@@ -150,7 +150,7 @@ export default function AddEmployeeForm({employee}) {
                   </Stack>
                 </AccordionDetails>
             </Accordion>
-              <InputLabel id="permissionLevel">Attach employee?</InputLabel>
+              <InputLabel id="permissionLevel">Permission level</InputLabel>
               <Field 
                 id="permissionLevel"
                 name="permissionLevel"

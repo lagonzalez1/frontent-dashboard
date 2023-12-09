@@ -71,6 +71,7 @@ export default function Drawer({client, setClient}) {
         const headers = getHeaders();
         axios.post('/api/internal/analytics_search', data, headers)
         .then(response => {
+            console.log(response);
             setAnalytics(response.data.result);
         }) 
         .catch(error => {
@@ -78,8 +79,8 @@ export default function Drawer({client, setClient}) {
         })
     }
 
-    const sendClientServing = (clientId) => {
-        moveClientServing(clientId)
+    const sendClientServing = (clientId, type) => {
+        moveClientServing(clientId, type)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
@@ -332,7 +333,7 @@ export default function Drawer({client, setClient}) {
                             <Stack direction={'row'}>
                                 {payload ? <Button startIcon={<DoNotDisturbRoundedIcon/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
                                 <Button startIcon={<NotificationsActiveRoundedIcon />} color="secondary" variant="contained" sx={{borderRadius: 10, margin: 1}}>Notify</Button>
-                                {payload ? <Button startIcon={<NavigateNextRoundedIcon />} color="primary" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
+                                {payload ? <Button startIcon={<NavigateNextRoundedIcon />} color="primary" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
 
                             </Stack>
                         )

@@ -14,6 +14,7 @@ export default function BusinessWaitlist () {
     const [args, setArgs] = useState(null);
     const [waitlist,setWaitlist] = useState();
     const [isOpen, setIsOpen] = useState(null);
+    
 
 
     useEffect(() => {

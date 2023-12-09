@@ -128,6 +128,7 @@ export default function Waiting() {
     
     const loadUserAndBusinessArgs = () => {
         const timestamp = DateTime.local().toUTC();
+        setLoading(true);
         Promise.all([
             getIdentifierData(link, unid, timestamp),
             requestBusinessArguments(link)
@@ -349,7 +350,6 @@ export default function Waiting() {
                         {message}
                         </Alert>
                     </Collapse>
-                    
                     </Box>
 
 
@@ -849,7 +849,7 @@ export default function Waiting() {
                 </Container>
             </DialogContent>
             <DialogActions>
-                <Button sx={{ borderRadius: 10}} variant="contained" onClick={() => statusRequest()}>Update</Button>
+                <Button startIcon={<NotificationsActiveRoundedIcon fontSize="small"/>} sx={{ borderRadius: 10}} variant="contained" onClick={() => statusRequest()}>Update</Button>
             </DialogActions>
             </Dialog>
 

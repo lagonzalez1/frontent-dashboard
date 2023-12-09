@@ -31,6 +31,7 @@ export default function FabAppointment () {
     const [appointments, setAppointments] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
     const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [phoneNumber, setPhoneNumber] = useState(null);
 
     const serviceList = getServicesAvailable();
     const employeeList = getEmployeeList();
@@ -101,19 +102,27 @@ export default function FabAppointment () {
         setSelectedDate(date);
     };
 
-    const formatPhoneNumber = (value) => {
-        if (!value) return value; // Handle empty values
-      
-        // Remove any non-numeric characters (e.g., hyphens)
-        const numericValue = value.replace(/\D/g, '');
-      
-        // Add hyphens after the first three and the next three characters
-        if (numericValue.length > 3) {
-          return `${numericValue.slice(0, 3)}-${numericValue.slice(3, 6)}-${numericValue.slice(6)}`;
-        } else {
-          return numericValue;
+
+    const formatPhoneNumber = (input) => {
+        const digits = input.replace(/\D/g, '');
+        if (digits.length <= 3) {
+            return digits;
+            } else if (digits.length <= 6) {
+            return `${digits.slice(0, 3)}-${digits.slice(3)}`;
+            } else {
+            return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
         }
-      };
+    }
+    const phoneNumberChange = (event) => {
+        const input = event.target.value;
+        // Apply formatting to the input and update the state
+        const phoneNumber = formatPhoneNumber(input);
+        if (phoneNumber.length === 12) {
+            console.log("Completed", phoneNumber);
+            formik.setFieldValue('phone', phoneNumber);
+        }
+        setPhoneNumber(phoneNumber);
+    }
 
     const initialValues = {
         fullname: '',
