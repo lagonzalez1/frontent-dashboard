@@ -14,7 +14,7 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-import { findResource, findService, moveClientServing } from "../../hooks/hooks";
+import { findResource, findService, moveClientServing, sendNotification } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
@@ -217,7 +217,14 @@ export default function Waitlist ({setClient, setEditClient}) {
     }
 
     const sendClientNotification = (clientId) => {
-        console.log(clientId)
+        const payload = {clientId: clientId, type: WAITLIST}
+        sendNotification(payload)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
     }
 
 

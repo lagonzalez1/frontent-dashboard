@@ -32,6 +32,9 @@ export const theme = createTheme({
         lightprop: {
             main: '#F3F3F3',
             opposite: '#000000'
+        },
+        alert: {
+            main: '#ffe500'
         }
     },
     

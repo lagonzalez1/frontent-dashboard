@@ -8,7 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 
-import { findEmployee, getAppointmentClients, moveClientServing, findService, getAppointmentTable, allowEmployeeEdit } from "../../hooks/hooks";
+import { findEmployee, getAppointmentClients, moveClientServing, findService, getAppointmentTable, allowEmployeeEdit, sendNotification } from "../../hooks/hooks";
 import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -83,7 +83,14 @@ export default function Appointments({setClient, setEditClient}) {
         setEditClient({payload: item, open: true, fromComponent: APPOINTMENT})
     }
     const sendClientNotification = (clientId) => {
-        console.log(clientId)
+        const payload = {clientId: clientId, type: APPOINTMENT}
+        sendNotification(payload)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
     }
 
     const handelMonthChage = (date) => {

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ListItemIcon, ListItemText, Toolbar, styled } from "@mui/material";
+import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled } from "@mui/material";
 import { Container, Box, Stack, Drawer as SIDEBAR, Typography, Button, Paper, Tab} from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -8,7 +8,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import MenuIcon from "@mui/icons-material/Menu"
 import { DateTime } from "luxon";
 import { useDispatch, useSelector } from "react-redux";
-import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow } from "../../hooks/hooks";
+import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow, sendNotification } from "../../hooks/hooks";
 import axios from "axios";
 import { getHeaders } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -19,6 +19,8 @@ import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import DoNotDisturbRoundedIcon from '@mui/icons-material/DoNotDisturbRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
+import theme from "../../theme/theme.js";
+
 
 export default function Drawer({client, setClient}) {
 
@@ -91,6 +93,17 @@ export default function Drawer({client, setClient}) {
             closeDrawer();
             dispatch(setReload(true));
 
+        })
+    }
+
+    const sendClientNotification = (clientId, type) => {
+        const payload = {clientId: clientId, type: type}
+        sendNotification(payload)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
     }
 
@@ -332,7 +345,7 @@ export default function Drawer({client, setClient}) {
                         (
                             <Stack direction={'row'}>
                                 {payload ? <Button startIcon={<DoNotDisturbRoundedIcon/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
-                                <Button startIcon={<NotificationsActiveRoundedIcon />} color="secondary" variant="contained" sx={{borderRadius: 10, margin: 1}}>Notify</Button>
+                                <Button startIcon={<NotificationsActiveRoundedIcon />} color="alert" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
                                 {payload ? <Button startIcon={<NavigateNextRoundedIcon />} color="primary" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
 
                             </Stack>

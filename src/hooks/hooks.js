@@ -1,5 +1,5 @@
 
-import axios, { all } from "axios";
+import axios from "axios";
 import { DateTime } from "luxon";
 import { getStateData, getAccessToken, getHeaders } from "../auth/Auth";
 import { setBusiness } from "../reducers/business";
@@ -404,6 +404,23 @@ export const getAppointmentServingTable = () => {
             return new Error(error); // Return an empty array or any other appropriate value
       }
 };
+
+
+export const sendNotification = (payload) => {
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const header = getHeaders();
+        const data = { ...payload, bid: business._id}
+        axios.post('/api/internal/notify_client', data, header)
+        .then(response => {
+            resolve(response.data);
+        })
+        .catch(error => {
+            reject(error);
+
+        })
+    })
+}
 
 export const getServingCount = () => {
     const { user, business } = getStateData();

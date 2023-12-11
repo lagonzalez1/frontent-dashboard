@@ -14,7 +14,7 @@ import Drawer from "../../components/Drawer/Drawer";
 
 import { useSignOut } from "react-auth-kit";
 import { DashboardHeader } from "./DashboardHelper"
-import { isAuthenticated, removeUserState, cleanTable } from "../../auth/Auth";
+import { isAuthenticated, removeUserState } from "../../auth/Auth";
 import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
 import ErrorPage from "../Error/Error";
