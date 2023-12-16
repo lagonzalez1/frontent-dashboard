@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { ThemeProvider } from '@emotion/react';
-import { theme, darkTheme } from "./theme/theme";
+import { theme } from "./theme/theme";
 import { BrowserRouter } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from "react-auth-kit";
@@ -25,13 +25,11 @@ root.render(
       cookieDomain={window.location.hostname}
       cookieSecure={false}
     >
-      <ThemeProvider theme={theme}>
         <Provider store={store}>
           <LocalizationProvider dateAdapter={AdapterLuxon}>
             <App />
           </LocalizationProvider>
         </Provider>
-      </ThemeProvider>
     </AuthProvider>
   </React.StrictMode>
 );

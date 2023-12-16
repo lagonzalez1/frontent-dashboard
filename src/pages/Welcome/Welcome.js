@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { allowClientJoin, getProfileImage, requestBusinessArguments, requestBusinessSchedule, waitlistRequest } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
+import { ThemeProvider } from "@emotion/react";
+import { theme } from "../../theme/theme";
 
 
 
@@ -140,7 +142,8 @@ export default function Welcome() {
 
 
     return (
-        <>
+        <>  
+            <ThemeProvider theme={theme}>
             <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
                 <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
                     
@@ -169,7 +172,7 @@ export default function Welcome() {
                     </CardActions>
                 </Card>
             </Box>
-
+            </ThemeProvider>
 
         </>
     )

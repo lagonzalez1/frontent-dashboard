@@ -189,7 +189,7 @@ export default function Services() {
                                 <Typography variant="body2">Allow your staff to use</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
                                     label={ form && form.active ? 'On' : 'Off'}
                                 /> 
                             </Grid>
@@ -198,7 +198,7 @@ export default function Services() {
                                 <Typography variant="body2">Allow the public to view</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
+                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
                                     label={ form && form.public ? 'On' : 'Off'}
                                 /> 
                             </Grid>

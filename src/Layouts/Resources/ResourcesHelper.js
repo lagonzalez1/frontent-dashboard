@@ -12,6 +12,8 @@ export const getServicesAvailable = () => {
   return services;
 }
 
+
+
 export const getResourcesAvailable = () => {
   const { _, business} = getStateData();
   if ( !business ) { return new Error('No business data found.');}
@@ -77,8 +79,7 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
       // Styles to apply when the card is hovered over
       transform: 'translateY(-2px)',
       boxShadow: theme.shadows[2],
-      backgroundColor: theme.palette.lightprop.main,
-      color: theme.palette.dark.main,
+
     },
   }));
 

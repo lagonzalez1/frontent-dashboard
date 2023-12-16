@@ -54,7 +54,7 @@ export default function ClientForm() {
                                 <Typography fontWeight='bold' variant="subtitle2">{TITLE[key]}</Typography>
                                 <Typography  variant="body2">{LABELS[key]}</Typography>
                                 <FormControlLabel
-                                control={<Switch color={"opposite"} checked={value} onChange={handleChange} name={key} />}
+                                control={<Switch color={'secondary'} checked={value} onChange={handleChange} name={key} />}
                                 label={value ? "On" : "Off"}
                                 />
                             </Grid>

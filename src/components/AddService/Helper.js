@@ -1,3 +1,5 @@
+import React from "react";
+import { Slide } from "@mui/material";
 import axios from "axios";
 import { getStateData, getAccessToken } from "../../auth/Auth";
 
@@ -27,3 +29,8 @@ export const submitService = (data) => {
     })
 })
 }
+
+
+export const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});

@@ -71,6 +71,8 @@ export const updateService = (data) => {
   })
 }
 
+
+
 export const removeEmployeeTag = (data) => {
   const { user, business} = getStateData();
   const accessToken = getAccessToken();
@@ -105,8 +107,6 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
     // Styles to apply when the card is hovered over
     transform: 'translateY(-2px)',
     boxShadow: theme.shadows[2],
-    backgroundColor: theme.palette.lightprop.main,
-    color: theme.palette.dark.main,
     
   },
 }));

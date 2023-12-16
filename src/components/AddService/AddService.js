@@ -12,7 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import { submitService } from './Helper';
+import { submitService, Transition } from './Helper';
 import { setReload, setSnackbar } from '../../reducers/user';
 import { reloadBusinessData } from '../../hooks/hooks';
 
@@ -84,7 +84,7 @@ const AddService = () => {
 
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-      <Fab color="primary" className={classes.fab} onClick={handleOpen}>
+      <Fab color="secondary" className={classes.fab} onClick={handleOpen}>
         <AddIcon />
       </Fab>
       <Dialog
@@ -92,6 +92,7 @@ const AddService = () => {
         onClose={handleClose}
         className={classes.modal}
         maxWidth={'xs'}
+        TransitionComponent={Transition}
         fullWidth={true}
       >
         <DialogTitle>

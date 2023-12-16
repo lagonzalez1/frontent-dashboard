@@ -40,7 +40,7 @@ export default function ServicesGrid (props) {
                                 <CardContent>
                                     <Typography variant="subtitle1"><strong>{item.title}</strong></Typography>
                                         <Typography variant="body2">Duration:
-                                            <Typography fontSize={12} variant="bod2">{item.minutes}</Typography>
+                                            <Typography fontSize={12} variant="body2">{item.minutes}</Typography>
                                         </Typography>
                                     
                                         <IconButton onClick={ () => removeService(index)}>

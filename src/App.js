@@ -17,23 +17,21 @@ import BusinessWaitlist from './pages/Waitlist/BusinessWaitlist';
 import WelcomeSelector from './pages/Welcome/WelcomeSelector';
 import LandingPage from './pages/Landing/LandingPage';
 import PasswordReset from './pages/PasswordReset/PasswordReset';
+import { ThemeProvider } from '@emotion/react';
+import { DashboardThemeLight, DashboardThemeDark, theme } from './theme/theme';
 
 
 
-
+// Handle dark and light theme changes.
 function App() {
 
 
   useEffect(() => {
-    
    }, []);
 
-
-  
   return (
     <Router>
       <div id="mainContainer">
-      
         <Routes>
           <Route path='/' element={<Homepage />}></Route>
           <Route path='/Register' element={<Register />}></Route>
@@ -48,13 +46,15 @@ function App() {
           <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
           <Route path={'/welcome/:link/waitlist'} element={<BusinessWaitlist />}></Route>
           <Route path={'/welcome/:link/:status/landingPage'} element={<LandingPage />}></Route>
-
+          
 
           <Route path={'/Dashboard'} element={
               <RequireAuth loginPath={'/Login'}>
-                <Dashboard/>
+                <ThemeProvider theme={DashboardThemeDark}>
+                  <Dashboard/>
+                </ThemeProvider>
               </RequireAuth>
-          }> </Route>
+          }></Route>
 
         </Routes>
       </div>

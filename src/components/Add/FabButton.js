@@ -114,7 +114,7 @@ export default function FabButton () {
 
     return(
         <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-            <Fab onClick={ () =>  handleClickOpen()} color="primary" aria-label="add">
+            <Fab onClick={ () =>  handleClickOpen()} color="secondary" aria-label="add">
                 <AddIcon />
             </Fab>
 

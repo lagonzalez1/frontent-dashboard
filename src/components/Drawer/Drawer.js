@@ -121,9 +121,10 @@ export default function Drawer({client, setClient}) {
             }
           })
           .then((completeResponse) => {
-            dispatch(setSnackbar({ requestMessage: completeResponse, requestStatus: true }));
+            dispatch(setSnackbar({ requestMessage: completeResponse.msg, requestStatus: true }));
           })
           .catch((error) => {
+            console.log(error);
             dispatch(setSnackbar({ requestMessage: error.data, requestStatus: true }));
             setLoading(false);
           })
@@ -334,7 +335,7 @@ export default function Drawer({client, setClient}) {
                         client.fromComponent === SERVING &&
                         (
                             <Stack direction={'row'}>
-                                {payload ? <Button startIcon={<CheckCircleRoundedIcon/>} color="secondary" variant="contained" sx={{borderRadius: 10}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
+                                {payload ? <Button startIcon={<CheckCircleRoundedIcon/>} color="success" variant="contained" sx={{borderRadius: 10}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
                                 <Button variant="contained" sx={{borderRadius: 10}}>Move Waitlist</Button>
                             </Stack>
                         )
@@ -345,8 +346,8 @@ export default function Drawer({client, setClient}) {
                         (
                             <Stack direction={'row'}>
                                 {payload ? <Button startIcon={<DoNotDisturbRoundedIcon/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
-                                <Button startIcon={<NotificationsActiveRoundedIcon />} color="alert" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
-                                {payload ? <Button startIcon={<NavigateNextRoundedIcon />} color="primary" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
+                                <Button startIcon={<NotificationsActiveRoundedIcon />} color='warning' variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
+                                {payload ? <Button startIcon={<NavigateNextRoundedIcon />} color="success" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
 
                             </Stack>
                         )

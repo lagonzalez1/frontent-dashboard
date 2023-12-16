@@ -510,6 +510,7 @@ const initialValuesSchedule = {
                       {
                         selectedDate && <FormControlLabel 
                         control={<Switch
+                          color="secondary"
                           disabled={timerange[0] === null ? true: false}
                           checked={partialDay}
                           onChange={(e) => setPartialDayPretense(e) }

@@ -516,7 +516,7 @@ export default function WelcomeSelector() {
                                                         ): null
                                                     }
                                                         <Grid item>
-                                                            <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={errorMessage.title} body={''} />\
+                                                            <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={errorMessage.title} body={''} />
                                                         </Grid>
                                                     </Grid>
                                                     </Box>

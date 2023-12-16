@@ -12,13 +12,13 @@ import { columns, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword, sor
 import { findEmployee, findService, getAnalyticsClients } from '../../hooks/hooks';
 import { setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
-import CloseIcon from '@mui/icons-material/Close';
 import AlertMessageGeneral from '../../components/AlertMessage/AlertMessageGeneral';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import BackspaceRoundedIcon from '@mui/icons-material/BackspaceRounded';
 import NotesIcon from '@mui/icons-material/Notes';
+import CloseIcon from "@mui/icons-material/Close"
 
 const Customers = () => {
 
@@ -27,6 +27,7 @@ const Customers = () => {
   const permissionLevel = useSelector((state) => state.user.permissions);
   const dispatch = useDispatch();
 
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -93,17 +94,18 @@ const Customers = () => {
     })
   }
 
-  const openClientDialog = (client) => {
+  const confirmDeleteClient = (client) => {
     setClient(client);
-    setClientSummary(true);
+    setConfirmDelete(true);
   }
 
-  const closeClientSummary = () => {
-    setClientSummary(false);
+  const cancelDeleteClient = () => {
     setClient(null);
+    setConfirmDelete(false);
   }
 
-  const deleteClientAnalytics = (client) => {
+
+  const deleteClientAnalytics = () => {
     if (!client) {
       setAlert(true);
       setAlertMessage({title: 'Error', body: 'Unable to find client to view.'})
@@ -114,11 +116,12 @@ const Customers = () => {
     .then((response) => {
       dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
     })
-    .error(error => {
+    .catch(error => {
       dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
     })
     .finally(() => {
       setLoading(false);
+      cancelDeleteClient();
     })
   }
 
@@ -157,7 +160,7 @@ const Customers = () => {
           <TableCell align="left">{getLastVisit(row.waitlist_summary, row.appointment_summary)}</TableCell>
           <TableCell align="left">{row.status.flag ? "True": "False"}</TableCell>
           <TableCell align="left">
-            <IconButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} aria-label="delete row" onClick={() => deleteClientAnalytics(row)}>
+            <IconButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} aria-label="delete row" onClick={() => confirmDeleteClient(row)}>
               <BackspaceRoundedIcon fontSize='small' />
             </IconButton>
           </TableCell>
@@ -356,110 +359,112 @@ const Customers = () => {
       </React.Fragment>
     );
   }
+
+  const closeConfirmDelete = () => {
+    setConfirmClose(false);
+  }
   
 
   return (
-    <div className='customerContainer'>
-      <Grid container>
+    <>
+      <div className='customerContainer'>
+        <Grid container>
 
-        <Grid item xs={12} md={6} sm={12} lg={6}>
-        <Stack>
-            <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
-            <Typography variant="h5"><strong>Customers</strong></Typography>
-        </Stack>
-        </Grid>
-        <Grid item xs={12} md={6} sm={12} lg={6}>
-          
-        </Grid>
-      </Grid>
-      <Grid sx={{pt: 1}} container  spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
-        <Grid item xs={12} sm={12} md={6} lg={6}>
-          <Stack direction="row" spacing={1}>
-            <TextField
-            label="Search"
-            variant="outlined"
-            size="small"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-          <IconButton onClick={handleSearch}>
-            <SearchIcon />
-          </IconButton>
-        </Stack>
-        </Grid>
-
-        <Grid sx={{ display: 'flex', justifyContent: 'right'}} item xs={12} sm={12} md={6} lg={6}>
-          <Stack direction="row" spacing={1}>
-              <DateSelect set={setSort} />
-              <StateSelect set={setStateSort} />
-
-              <IconButton
-                aria-controls="dropdown-menu"
-                aria-haspopup="true"
-                onClick={handleClick}
-                color="inherit"
-              >
-                <MoreVertIcon />
-              </IconButton>
-              <Menu
-                id="dropdown-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-              >
-                <MenuItem onClick={handlePrint}>Print</MenuItem>
-                <MenuItem onClick={handleDeleteAll}>Delete All</MenuItem>
-              </Menu>
-
+          <Grid item xs={12} md={6} sm={12} lg={6}>
+          <Stack>
+              <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
+              <Typography variant="h5"><strong>Customers</strong></Typography>
           </Stack>
+          </Grid>
+          <Grid item xs={12} md={6} sm={12} lg={6}>
+            
+          </Grid>
         </Grid>
-      </Grid>
+        <Grid sx={{pt: 1}} container  spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
+          <Grid item xs={12} sm={12} md={6} lg={6}>
+            <Stack direction="row" spacing={1}>
+              <TextField
+              label="Search"
+              variant="outlined"
+              size="small"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              onKeyPress={handleKeyPress}
+            />
+            <IconButton onClick={handleSearch}>
+              <SearchIcon />
+            </IconButton>
+          </Stack>
+          </Grid>
 
-      <div className="customersTable">
-          <Paper sx={{ width: '100%', overflow: 'hidden'}}>
-              <TableContainer>
-                  <Table stickyHeader aria-label='main_table'>
-                      <TableHead>
-                          <TableRow>
-                              <TableCell/>
-                              {
-                                  columns.map((col) => (
-                                  <TableCell key={col.id} align='left'>
-                                      <Typography variant="subtitle2" fontWeight="bold">{ col.title }</Typography>
-                                  </TableCell>
-                                  )) 
-                              }
-                          </TableRow>
-                      </TableHead>
-                      <TableBody>
-                          { 
-                            data ? data.map((client, index) => (
-                              <Row key={index} row={client} />
-                            )): 
-                            null
-                          }
-                      </TableBody>
-                  </Table>
-              </TableContainer>
-          </Paper>
+          <Grid sx={{ display: 'flex', justifyContent: 'right'}} item xs={12} sm={12} md={6} lg={6}>
+            <Stack direction="row" spacing={1}>
+                <DateSelect set={setSort} />
+                <StateSelect set={setStateSort} />
+
+                <IconButton
+                  aria-controls="dropdown-menu"
+                  aria-haspopup="true"
+                  onClick={handleClick}
+                  color="inherit"
+                >
+                  <MoreVertIcon />
+                </IconButton>
+                <Menu
+                  id="dropdown-menu"
+                  anchorEl={anchorEl}
+                  keepMounted
+                  open={Boolean(anchorEl)}
+                  onClose={handleClose}
+                >
+                  <MenuItem onClick={handlePrint}>Print</MenuItem>
+                  <MenuItem onClick={handleDeleteAll}>Delete All</MenuItem>
+                </Menu>
+
+            </Stack>
+          </Grid>
+        </Grid>
+
+        <div className="customersTable">
+            <Paper sx={{ width: '100%', overflow: 'hidden'}}>
+                <TableContainer>
+                    <Table stickyHeader aria-label='main_table'>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell/>
+                                {
+                                    columns.map((col) => (
+                                    <TableCell key={col.id} align='left'>
+                                        <Typography variant="subtitle2" fontWeight="bold">{ col.title }</Typography>
+                                    </TableCell>
+                                    )) 
+                                }
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            { 
+                              data ? data.map((client, index) => (
+                                <Row key={index} row={client} />
+                              )): 
+                              null
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Paper>
+        </div>
+
       </div>
 
       <Dialog
-        open={clientSummary}
-        onClose={closeClientSummary}
-        id="clientSummary"
-        TransitionComponent={Transition}
-        keepMounted
+        id="confirmDelete"
+        open={confirmDelete}
+        onClose={cancelDeleteClient}
       >
-        <DialogTitle> 
-                <Typography variant="h6" fontWeight="bold">
-                    { "Customer"}
-                </Typography> 
-                <IconButton
+        <DialogTitle>
+            <IconButton
                     aria-label="close"
-                    onClick={closeClientSummary}
+                    onClick={cancelDeleteClient}
                     sx={{
                         position: 'absolute',
                         right: 8,
@@ -468,26 +473,20 @@ const Customers = () => {
                     }}
                     >
                     <CloseIcon />
-                </IconButton>
-          </DialogTitle>
+                </IconButton> 
+                <Typography variant="h5" fontWeight={'bold'}>Confirm </Typography>
+            </DialogTitle>
 
-          <DialogContent>
-              <AlertMessageGeneral open={alert} onClose={setAlert} title={alertMessage.title} body={alertMessage.body} />
-              <Stack sx={{pt: 2}} spacing={2}>
-                <TextField id="filled-basic" label="Fullname" disabled defaultValue={client && client.fullname}/>
-                <TextField id="filled-basic" label="Phone" disabled defaultValue={client && client.phone} />
-                <TextField id="filled-basic" label="Email" disabled defaultValue={client && client.email} />
-              </Stack>
+            <DialogContent>
+              <Typography variant='body2'>Please confirm if you wish to remove client.</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button sx={{borderRadius: 10}} variant='contained' color='error' onClick={() => deleteClientAnalytics()}>Delete</Button>
+              <Button sx={{borderRadius: 10}} variant='contained' color='success'>Cancel</Button>
+            </DialogActions>
 
-          
-          </DialogContent>
-          <DialogActions>
-            <Button color='error' sx={{borderRadius: 10}} variant='contained' onClick={() => deleteClientAnalytics()}>Delete</Button>
-          </DialogActions>
       </Dialog>
-
-
-    </div>
+    </>
   );
 };
 

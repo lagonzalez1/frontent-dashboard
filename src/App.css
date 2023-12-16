@@ -14,8 +14,8 @@
 }
 
 body { 
-  background-color: #F4F4F6 !important;
-
+  /*Causing dark mode to load gray background.*/
+  /*background-color: #F4F4F6 !important; */
   font-family: 'Raleway' !important;
 }
 

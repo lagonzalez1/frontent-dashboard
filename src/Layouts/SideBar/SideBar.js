@@ -65,7 +65,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <AccessTimeOutlinedIcon htmlColor={ currentLocation === 0 ? '#ffc34d' : '' } />
+                  <AccessTimeOutlinedIcon htmlColor={ currentLocation === 0 ? '#ff6d00' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Waitlist"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -89,7 +89,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <ListIcon htmlColor={ currentLocation === 1 ? '#ffc34d' : '' } />
+                  <ListIcon htmlColor={ currentLocation === 1 ? '#ff6d00' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -114,7 +114,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckBoxOutlinedIcon htmlColor={ currentLocation === 2 ? '#ffc34d' : '' } />
+                  <CheckBoxOutlinedIcon htmlColor={ currentLocation === 2 ? '#ff6d00' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -139,7 +139,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <WidgetsOutlinedIcon htmlColor={ currentLocation === 3 ? '#ffc34d' : '' } />
+                  <WidgetsOutlinedIcon htmlColor={ currentLocation === 3 ? '#ff6d00' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Resources"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -163,7 +163,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <FactCheckOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ffc34d' : '' } />
+                    <FactCheckOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ff6d00' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Services "} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
@@ -187,7 +187,7 @@ export default function SideBar({navState, openNav}) {
                     justifyContent: 'center',
                   }}
                 >
-                  <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 5 ? '#ffc34d' : '' }/>
+                  <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 5 ? '#ff6d00' : '' }/>
                 </ListItemIcon>
                 <ListItemText primary={"Customers"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -215,7 +215,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <SettingsOutlinedIcon  htmlColor={ currentLocation === 6 ? '#ffc34d' : '' } />
+                    <SettingsOutlinedIcon  htmlColor={ currentLocation === 6 ? '#ff6d00' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
@@ -243,7 +243,7 @@ export default function SideBar({navState, openNav}) {
                       justifyContent: 'center',
                     }}
                   >
-                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 7 ? '#ffc34d' : '' } />
+                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 7 ? '#ff6d00' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>

@@ -4,11 +4,10 @@ import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
-import { addResource } from "./Helper";
+import { addResource, Transition } from "./Helper";
 import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setReload, setSnackbar } from '../../reducers/user';
-import { setBusiness} from "../../reducers/business";
 import CloseIcon from "@mui/icons-material/Close"
 
 const validationSchema = Yup.object({
@@ -71,10 +70,10 @@ export default function AddResource() {
 
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-      <Fab color="primary" onClick={handleOpen}>
+      <Fab color="secondary" onClick={handleOpen}>
         <AddIcon/>
       </Fab>
-      <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="xs">
+      <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="xs" TransitionComponent={Transition}>
         <DialogTitle>
           <IconButton
                     aria-label="close"

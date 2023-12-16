@@ -19,7 +19,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
 import ErrorPage from "../Error/Error";
 import Success from "../../components/Snackbar/Success";
-import { reloadBusinessData } from "../../hooks/hooks";
+import { cleanTable } from "../../hooks/hooks";
 import EditClient from "../../components/Dialog/EditClient";
 import Appointments from "../Appointments/Appointments";
 import FabAppointment from "../../components/AddAppointment/FabAppointment";
@@ -30,6 +30,12 @@ import FabAppointment from "../../components/AddAppointment/FabAppointment";
  * Structure:
  *          Have the user change the retrived state from mongo by only storing into local storage.
  *          User makes a request. Update all from localStorage.
+ * 
+ * 
+ * Light and dark mode: using localStorage
+ *                        - Define light mode as true, in app.js proccess any changes and update theme.
+ *                        - Handle changess in Dashboard.js
+ * 
  *             
  */
 
@@ -51,13 +57,14 @@ export default function Dashboard () {
     async function checkAuthStatus() {
         setLoading(true);
         try {
-            const isAuth = await isAuthenticated(dispatch);
-            //const clean = await cleanTable(); Need to clean the old values.
+            const isAuth = await isAuthenticated(dispatch);            
             if (!isAuth) {
                 removeUserState();
                 signOut();
                 return;
             }
+            checkPresistentTables();
+            
         }catch(error) {
             removeUserState();
             signOut();
@@ -66,6 +73,15 @@ export default function Dashboard () {
             setLoading(false);
             setAuthCompleted(true)
         }
+    }
+    async function checkPresistentTables () {
+        cleanTable()
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        })
     }
 
     useEffect(() => { 

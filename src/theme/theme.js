@@ -38,7 +38,53 @@ export const theme = createTheme({
         }
     },
     
+    
 });
+
+
+export const DashboardThemeLight = createTheme({
+    palette: {
+        mode: 'light',
+        primary: {
+          main: '#455a64',
+        },
+        secondary: {
+          main: '#ff6d00',
+        },
+        error: {
+          main: '#d50000',
+        },
+      },
+      typography: {
+        h3: {
+          fontSize: '4rem',
+          fontWeight: 500,
+          color: 'blue',
+        },
+      },
+})
+
+export const DashboardThemeDark = createTheme({
+    palette: {
+        mode: 'dark',
+        primary: {
+          main: '#455a64',
+        },
+        secondary: {
+          main: '#ff6d00',
+        },
+        error: {
+          main: '#d50000',
+        },
+      },
+      typography: {
+        h3: {
+          fontSize: '4rem',
+          fontWeight: 500,
+          color: 'blue',
+        },
+      },
+})
 
 export const darkTheme = createTheme({
     palette: {

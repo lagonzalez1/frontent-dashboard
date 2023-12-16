@@ -234,7 +234,7 @@ export default function Resources() {
                                 <Typography variant="body2">Allow your staff to use</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
                                     label={ form && form.active ? 'On' : 'Off'}
                                 /> 
                             </Grid>
@@ -243,7 +243,7 @@ export default function Resources() {
                                 <Typography variant="body2">Allow the public to view</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="opposite" inputProps={{ 'aria-label': 'controlled' }} checked={form.publicValue} onChange={e => setForm((item) => ({...item, publicValue: e.target.checked}) ) } />}
+                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.publicValue} onChange={e => setForm((item) => ({...item, publicValue: e.target.checked}) ) } />}
                                     label={ form && form.public ? 'On' : 'Off'}
                                 /> 
                             </Grid>

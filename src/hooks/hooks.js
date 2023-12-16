@@ -125,6 +125,22 @@ export const requestNoShow = (clientId, type) => {
     })
   } 
 
+  export const cleanTable = () => {
+    return new Promise((resolve, reject) => {
+      const token = getAccessToken();
+      const { user, business} = getStateData();
+      const currentDate = DateTime.local().setZone(business.timezone).toISO();
+      axios.put(`/api/internal/clean_tables/${currentDate}/${business._id}`, { headers: {'x-access-token': token} })
+      .then(response => {
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error);
+      })
+
+    })
+  }
+
 
   // Type: Appointment type can be either appointment, waitlist
   export const moveClientServing = (clientId, type) => {
