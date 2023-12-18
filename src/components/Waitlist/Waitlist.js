@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, memo} from "react";
 import { Stack, Typography, Button, List, ListItem, Menu, MenuItem, ListItemText, Grid,
      IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer,
     TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton 
@@ -25,19 +25,13 @@ import { WAITLIST } from "../../static/static";
 
 
 
-
-export default function Waitlist ({setClient, setEditClient}) {
+const Waitlist = ({setClient, setEditClient}) => {
     
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
     const permissionLevel = useSelector((state) => state.user.permissions);
-
-
-    let tableData = getUserTable();
-    let accepting = acceptingRejecting();
-
 
     const [anchorElVert, setAnchorElVert] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -47,6 +41,16 @@ export default function Waitlist ({setClient, setEditClient}) {
 
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
+
+    let tableData = getUserTable();
+    let accepting = acceptingRejecting();
+
+    useEffect(() => {
+        tableData = getUserTable();        
+        return() => {
+            dispatch(setReload(false));
+        }
+    }, [reload])
 
 
     const handleClickListItem = (event) => {
@@ -192,13 +196,7 @@ export default function Waitlist ({setClient, setEditClient}) {
         setEditClient({payload: item, open: true, fromComponent: WAITLIST})
     }
 
-    useEffect(() => {
-        console.log(permissionLevel )
-        tableData = getUserTable();
-        return() => {
-            dispatch(setReload(false));
-        }
-    }, [reload])
+    
 
 
 
@@ -465,3 +463,5 @@ export default function Waitlist ({setClient, setEditClient}) {
         </>
     )
 }
+
+export default Waitlist;

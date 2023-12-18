@@ -121,7 +121,7 @@ export default function FabButton () {
             <Dialog
                 open={open}
                 TransitionComponent={Transition}
-                keepMounted
+                keepMounted={true}
                 onClose={handleClose}
                 aria-describedby="addClient"
                 maxWidth={'xs'}

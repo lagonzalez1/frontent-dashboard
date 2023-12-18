@@ -18,7 +18,9 @@ import WelcomeSelector from './pages/Welcome/WelcomeSelector';
 import LandingPage from './pages/Landing/LandingPage';
 import PasswordReset from './pages/PasswordReset/PasswordReset';
 import { ThemeProvider } from '@emotion/react';
-import { DashboardThemeLight, DashboardThemeDark, theme } from './theme/theme';
+import { DashboardThemeLight, DashboardThemeDark } from './theme/theme';
+import { useSelector } from 'react-redux';
+import { useTheme } from './theme/ThemeContext';
 
 
 
@@ -26,8 +28,11 @@ import { DashboardThemeLight, DashboardThemeDark, theme } from './theme/theme';
 function App() {
 
 
+  const { theme } = useTheme();
+
   useEffect(() => {
-   }, []);
+    console.log(theme)
+  }, []);
 
   return (
     <Router>
@@ -50,9 +55,10 @@ function App() {
 
           <Route path={'/Dashboard'} element={
               <RequireAuth loginPath={'/Login'}>
-                <ThemeProvider theme={DashboardThemeDark}>
-                  <Dashboard/>
-                </ThemeProvider>
+                  <ThemeProvider theme={theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
+                    <Dashboard/>                
+                  </ThemeProvider>
+            
               </RequireAuth>
           }></Route>
 

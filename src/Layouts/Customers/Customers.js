@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import '../../css/Customers.css';
 import { Stack, Grid, Menu, MenuItem, IconButton, TextField, Typography,
    Skeleton, Table, TableCell, TableBody, TableHead, TableContainer, TableRow,Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip,
@@ -19,6 +19,7 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import BackspaceRoundedIcon from '@mui/icons-material/BackspaceRounded';
 import NotesIcon from '@mui/icons-material/Notes';
 import CloseIcon from "@mui/icons-material/Close"
+import NotesDialog from '../../components/Dialog/NotesDialog';
 
 const Customers = () => {
 
@@ -35,11 +36,18 @@ const Customers = () => {
   const [sort, setSort] = useState();
   const [stateSort, setStateSort] = useState();
   const [client, setClient] = useState(null);
-  const [clientSummary, setClientSummary] = useState(false);
+  const [clientNotes, setClientNotes] = useState(false);
+  const [notes, setNotes] = useState({timestamp: null, notes: null});
+
   const [alert, setAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState({title: null, body: null});
 
 
+
+  const closeClientNotes = useCallback(() => {
+    setClientNotes(false);
+    setNotes({timestamp: null, notes: null});
+  }, [])
 
   const handleSearch = () => {
     if (searchTerm.length === 0){
@@ -92,6 +100,11 @@ const Customers = () => {
       console.log(error);
       dispatch(setSnackbar({requestMessage: "Error", requestStatus: true}))
     })
+  }
+
+  const showNotes = (payload) => {
+    setNotes({timestamp: payload.timestamp, notes: payload.notes});
+    setClientNotes(true);
   }
 
   const confirmDeleteClient = (client) => {
@@ -225,7 +238,7 @@ const Customers = () => {
                           <TableRow>
                               <TableCell>
                                 <Tooltip followCursor title={summary.notes}>
-                                  <IconButton>
+                                  <IconButton onClick={() => showNotes({timestamp: summary.timestamp, notes: summary.notes}) }>
                                     <NotesIcon fontSize="small"/>
                                   </IconButton>
                                 </Tooltip>
@@ -313,7 +326,7 @@ const Customers = () => {
                           <TableRow>
                               <TableCell>
                                 <Tooltip title={summary.notes}>
-                                  <IconButton>
+                                <IconButton onClick={() => showNotes({timestamp: summary.timestamp, notes: summary.notes}) }>
                                     <NotesIcon fontSize="small"/>
                                   </IconButton>
                                 </Tooltip>
@@ -360,9 +373,7 @@ const Customers = () => {
     );
   }
 
-  const closeConfirmDelete = () => {
-    setConfirmClose(false);
-  }
+
   
 
   return (
@@ -481,11 +492,16 @@ const Customers = () => {
               <Typography variant='body2'>Please confirm if you wish to remove client.</Typography>
             </DialogContent>
             <DialogActions>
-              <Button sx={{borderRadius: 10}} variant='contained' color='error' onClick={() => deleteClientAnalytics()}>Delete</Button>
-              <Button sx={{borderRadius: 10}} variant='contained' color='success'>Cancel</Button>
+              <Button sx={{borderRadius: 10}} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
+              <Button sx={{borderRadius: 10}} onClick={cancelDeleteClient} variant='contained' color='primary'>Cancel</Button>
             </DialogActions>
 
       </Dialog>
+
+
+      <NotesDialog payload={notes} onClose={closeClientNotes} open={clientNotes} />
+
+      
     </>
   );
 };

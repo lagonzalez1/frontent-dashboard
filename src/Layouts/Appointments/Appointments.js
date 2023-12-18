@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react";
+import React, { useState, useEffect, memo} from "react";
 import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, Table, 
     TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton, Badge } from "@mui/material";
 
@@ -17,7 +17,7 @@ import { DatePicker, PickersDay } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 
 
-export default function Appointments({setClient, setEditClient}) {
+const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
 
     const [loading, setLoading] = useState(false);
@@ -261,5 +261,5 @@ export default function Appointments({setClient, setEditClient}) {
     )
 };
 
-
+export default Appointments
 

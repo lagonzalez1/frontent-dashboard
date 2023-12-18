@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TextField, Button, Grid, Alert, Box, CircularProgress } from '@mui/material';
+import { TextField, Button, Grid, Alert, Box, CircularProgress, Select, Menu, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { useSelector, useDispatch } from 'react-redux';
@@ -19,8 +19,9 @@ const LocationForm = () => {
 
   const business = useSelector((state) => state.business);
   const settings = useSelector((state) => state.business.settings);
-
+  const options = useSelector((state) => state.user.options);
   const permissionLevel = useSelector((state) => state.user.permissions);
+  const [businessSelect, setBusiness] = useState(business._id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -88,6 +89,12 @@ const LocationForm = () => {
     companyLogo: business.img
   }
 
+  // Need to handle this change on the backend.
+  // This will call refresh_index ...
+  const handleBusinessChange = (e) => {
+    setBusiness(e.target.value)
+  }
+
   return (
     <>
     { errors ? (
@@ -104,6 +111,33 @@ const LocationForm = () => {
       {({ errors, touched }) => (
         <Form>
           <Grid container spacing={2}>
+            <Grid item xs={12}>
+                { options ? (
+                  <>
+                  <FormControl fullWidth>
+                    <InputLabel id="all-business">All business</InputLabel>
+                    <Select
+                      labelId="all-business"
+                      id="all-business"
+                      value={businessSelect}
+                      label="Age"
+                      onChange={handleBusinessChange}
+                    >
+                      {
+                        options.map((item, index) => {
+                          return (
+                            <MenuItem key={index} value={item._id}>
+                              { item.businessName}
+                            </MenuItem>
+                          )
+                        })
+                      }
+                    </Select>
+                    </FormControl>
+                  </>
+                ): null}
+                
+            </Grid>
             <Grid item xs={12}>
               <Field
                 name="locationUrl"

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, memo, useMemo } from "react";
 import { Box, CircularProgress, Backdrop } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
@@ -58,7 +58,8 @@ export default function Dashboard () {
         setLoading(true);
         try {
             const isAuth = await isAuthenticated(dispatch);            
-            if (!isAuth) {
+            console.log(isAuth);
+            if (isAuth === false) {
                 removeUserState();
                 signOut();
                 return;
@@ -92,13 +93,14 @@ export default function Dashboard () {
 
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
-        console.log("RENDER CALLE");
         switch(location) {
             case 0:
-                return( <> 
+                return( 
+                <> 
                     <Waitlist setClient={setClient} setEditClient={setEditClient} />
                     <FabButton />
-                    </> );
+                </>
+                );
             case 1:
                 return (
                     <>
@@ -123,7 +125,9 @@ export default function Dashboard () {
                 <ErrorPage errorMessage={"Failed to load the current location."} type={404} /> 
         }
     }
+    const MemoizedRenderLocation = useMemo(() => RenderLocation, [reload]);
 
+    
     return (
         <>
             <Box sx={{ display: 'flex' }}>
@@ -138,7 +142,7 @@ export default function Dashboard () {
                       >
                         <CircularProgress color="inherit" />
                       </Backdrop>)
-                       : <RenderLocation />}
+                       : <MemoizedRenderLocation />}
                       <Success/>
                  </Box>      
                  { client.open ? <Drawer setClient={setClient} client={client} />  : null}

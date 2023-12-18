@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Button, Link, Typography, Avatar, Grow, Stack, CircularProgress, Alert} from "@mui/material"
+import { Box, Container, Button, Link, Typography, Avatar, Grow, Stack, CircularProgress, Alert, Switch, FormControl, FormControlLabel} from "@mui/material"
 import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -7,9 +7,10 @@ import UploadIcon from '@mui/icons-material/Upload';
 import { reloadBusinessData } from '../../hooks/hooks';
 
 import { getAccessToken, getStateData } from "../../auth/Auth";
+import { useTheme } from "../../theme/ThemeContext";
 
 export default function Personalization () {
-
+    const { theme, updateTheme } = useTheme();
     const link = useSelector((state) => state.business.publicLink);
     const imageRef = useSelector((state) => state.business.settings.profileImage);
     const permissionLevel = useSelector((state) => state.user.permissions);
@@ -18,6 +19,7 @@ export default function Personalization () {
 
     const [error, setError] = useState(null);
     const [image, setImage] = useState(null);
+    const [currentTheme, setTheme] = useState(theme);
     const [profileImage, setProfileImage] = useState(null);
 
 
@@ -63,6 +65,13 @@ export default function Personalization () {
         .finally(() => {
             setLoading(false);
         })
+    }
+
+    function handleThemeChange (e) {
+        const change = e.target.checked;
+        setTheme(change === true? 'light':'dark');
+        updateTheme(change === true ? 'light': 'dark');
+
     }
 
     const onImageChange = (event) => {
@@ -140,6 +149,14 @@ export default function Personalization () {
                     {error}
                     </Alert>
                 ): null}
+
+                <Typography variant="subtitle2" fontWeight={'bold'}>Dashboard theme</Typography>
+                <FormControlLabel
+                    control={<Switch color="secondary" checked={currentTheme === "light"? true: false} onChange={handleThemeChange} name={'Theme'} />}
+                    label={currentTheme === "light" ? "Light" : "Dark"}
+                />
+                <br/>
+
                 <Typography variant="subtitle2" fontWeight={'bold'}>Generate QR code</Typography>
                 <Button size="small" sx={{ borderRadius: 15 }} variant="outlined" onClick={() => generateQRCode()}>QR code</Button>
                 <Box sx={{ display: 'flex' }}>

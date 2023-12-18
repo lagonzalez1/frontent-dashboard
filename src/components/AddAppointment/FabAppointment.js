@@ -1,18 +1,16 @@
 import React, { useState, useEffect} from "react";ListItemIcon
 import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, Grid, 
-    ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card, CircularProgress} from "@mui/material";
+    ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card, CircularProgress, useForkRef} from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
 import { Transition } from "./FabHelper";
 import { useSelector, useDispatch } from "react-redux";
 import { getAvailableAppointments, getEmployeeList, getServicesAvailable } from "../../hooks/hooks";
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import {createAppointmentPretense } from "./FabHelper";
 import { setReload, setSnackbar } from "../../reducers/user";
-import axios from "axios";
-import { getHeaders } from "../../auth/Auth";
 import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 
@@ -74,18 +72,16 @@ export default function FabAppointment () {
         if (!payload && !selectedAppointment && !selectedDate) {
             console.log(payload);
             console.log(selectedDate);
-            console.log(selectedAppointment); // index
-            
+            console.log(selectedAppointment); 
         }
-        const timestamp = DateTime.local(business.timezone).toISO();
-        const appointment = selectedAppointment;
-        const data = { ...payload, appointmentDate: selectedDate.toISO(), appointment, timestamp};
+        const timestamp = DateTime.local().setZone(business.timezone).toISO();
+        const data = { ...payload, appointmentDate: selectedDate.toISO(), appointment: selectedAppointment, timestamp};
         createAppointmentPretense(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
+            dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}));
         })
         .finally(() => {
             dispatch(setReload(true));
@@ -148,6 +144,12 @@ export default function FabAppointment () {
         notes: Yup.string(),
       });
 
+      const formik = useFormik({
+        initialValues: initialValues,
+        validationSchema: validationSchema,
+        onSubmit: handleSubmit
+      })
+
       const FutureDatePicker = ({ label, value, onChange }) => {
         const currentDate = DateTime.local().setZone(business.timezone);
     
@@ -176,7 +178,7 @@ export default function FabAppointment () {
             <Dialog
                 open={open}
                 TransitionComponent={Transition}
-                keepMounted
+                keepMounted={true}
                 onClose={handleClose}
                 aria-describedby="addClient"
                 maxWidth={'xs'}
@@ -200,65 +202,57 @@ export default function FabAppointment () {
                 </DialogTitle>
                 <DialogContent>
                     { errors ? <Alert severity="error">{errors}</Alert>: null }
-                    <Formik
-                        initialValues={initialValues}
-                        onSubmit={handleSubmit}
-                        validationSchema={validationSchema}
-                    >
-                    {({ errors, touched, handleChange, handleBlur, values }) => (
-                        <Form>
+                    <form onSubmit={formik.handleSubmit}>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                             {nextStep ? null : 
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="fullname"
                             name="fullname"
                             size="small"
                             label="Customer name"
                             placeholder="Customer name"
-                            error={touched.fullname && !!errors.fullname}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            error={formik.touched.fullname && !!errors.fullname}
+                            onChange={formik.handleChange}
+                            value={formik.values.fullname}
+
                             />
                             }
                             {nextStep ? null : 
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="email"
                             size="small"
                             name="email"
                             label="Customer email"
                             placeholder="Email"
-                            error={touched.email && !!errors.email}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            error={formik.touched.email && Boolean(formik.errors.email)}
+                            onChange={formik.handleChange}
+                            value={formik.values.email}
                             />
                             }
                             {nextStep ? null : 
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="phone"
                             name="phone"
                             size="small"
                             label="Phone"
                             placeholder="xxx-xxx-xxxx"
-                            error={touched.phone && !!errors.phone}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            error={formik.touched.phone && !!errors.phone}
+                            onChange={(event) => phoneNumberChange(event)}
+                            value={phoneNumber}
                             />
                             }
                             {nextStep ? null : 
 
-                            <Field
-                            as={TextField}
+                            <TextField
                             id="size"
                             size="small"
                             name="size"
                             label="Party size"
                             placeholder="1"
-                            error={touched.size && !!errors.size}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
+                            type="number"
+                            error={formik.touched.size && !!errors.size}
+                            onChange={formik.handleChange}
+                            value={formik.values.size}
                             />
                             }
                             <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
@@ -266,37 +260,38 @@ export default function FabAppointment () {
                             {business ? (
                             <>
                                 <Typography fontWeight={'bold'} variant="subtitle2">Employee preference</Typography>
-                                <Field
-                                as={Select}
+                                <Select
                                 id="employee_id"
                                 name="employee_id"
                                 size="small"
-                                onChange={handleChange}
+                                value={formik.values.employee_id}
+
+                                onChange={formik.handleChange}
                                 >
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
                                     <MenuItem key={employee._id} value={employee._id}>
                                         <Typography variant="body2">{employee.fullname} </Typography>
                                     </MenuItem>
                                 )) : null}
-                                </Field>
+                                </Select>
                             </>
                             ) : null}
 
-                            {values.employee_id ? (
+                            {formik.values.employee_id ? (
                                 
                             <>
                                 <Typography fontWeight={'bold'} variant="subtitle2">Services available</Typography>
-                                <Field
-                                as={Select}
+                                <Select
                                 id="services"
                                 name="service_id"
                                 size="small"
-                                onChange={handleChange}
+                                value={formik.values.service_id}
+                                onChange={formik.handleChange}
                                 >
                                 { Array.isArray(serviceList) ?
                                 
                                 serviceList
-                                .filter((service) => service.employeeTags.includes(values.employee_id))
+                                .filter((service) => service.employeeTags.includes(formik.values.employee_id))
                                 .map((service) => (
                                     <MenuItem key={service._id} value={service._id}>
                                         <Stack>
@@ -306,21 +301,19 @@ export default function FabAppointment () {
                             
                                     </MenuItem>
                                 )):null }
-                                </Field>
+                                </Select>
                             </>
                             ) : null}
 
 
-                            <Field
-                                as={TextField}
+                            <TextField
                                 id="notes"
                                 size="small"
                                 name="notes"
                                 label="Notes"
                                 placeholder="Additional notes"
-                                error={touched.notes && !!errors.notes}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
+                                onChange={formik.handleChange}
+                                value={formik.values.notes}
                             />
 
                             { loading ? <CircularProgress/> : null} 
@@ -368,7 +361,6 @@ export default function FabAppointment () {
                             :
                             null}
 
-                            <ErrorMessage name="notes" component="div" />
                             {nextStep ? 
                             (
                             <>
@@ -376,13 +368,10 @@ export default function FabAppointment () {
                             <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</Button>
                             </>
                             ): 
-                            <Button variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(values.employee_id, values.service_id)}> search</Button>
+                            <Button variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>
                             }
                         </Stack>
-                        </Form>
-                    )}
-                    </Formik>
-
+                    </form>
                 </DialogContent>        
             </Dialog>
         </Box>

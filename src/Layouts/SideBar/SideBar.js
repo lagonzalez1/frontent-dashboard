@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip, Typography} from "@mui/material";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -17,7 +17,7 @@ import { setLocation } from "../../reducers/user";
 import { DrawerHeader, Drawer, BootstrapTooltip  } from "./SideBarHelper";
 
 
-export default function SideBar({navState, openNav}) {
+const SideBar = ({navState, openNav}) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const currentLocation = useSelector((state) => state.user.location);
@@ -256,3 +256,5 @@ export default function SideBar({navState, openNav}) {
       </>
     )
 }
+
+export default memo(SideBar);

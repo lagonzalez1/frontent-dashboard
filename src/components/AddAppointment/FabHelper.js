@@ -40,6 +40,7 @@ export const createAppointmentPretense = (payload) => {
             resolve(createResponse.data.msg);
         })
         .catch((error) => {
+            
             // Handle any errors that occurred during validation or appointment creation
             reject(error);
         });

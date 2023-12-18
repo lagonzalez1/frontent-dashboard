@@ -9,7 +9,7 @@
  */
 import axios from "axios";
 import { setBusiness } from "../reducers/business";
-import { setIndex, setLocation, setUser } from "../reducers/user";
+import { setIndex, setLocation, setOptions, setUser } from "../reducers/user";
 import { useSelector } from "react-redux";
 const TOKEN_KEY = 'access_token';
 const BUSINESS = 'business';
@@ -64,6 +64,28 @@ const USER = 'user';
     removeAccessToken();
     removeBusinessState();
   }
+
+
+  /**
+   * 
+   * 
+   */
+
+
+  export const updateBusinessIndex = async (businessId) => {
+    const header = getHeaders();
+    const { user, _ } = getStateData();
+    const [id, email] = [user.id, user.email];
+    return new Promise((resolve, reject) => {
+      axios.post('/api/internal/update_business_index', {id, email, businessId}, header)
+      .then(response => {
+        resolve(response.data.msg)
+      })
+      .catch(error => {
+        reject(error);
+      })
+    })
+  }
   
 
   /**
@@ -81,6 +103,7 @@ const USER = 'user';
       dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions}))
       dispatch(setIndex(status.defaultIndex));
       dispatch(setLocation(0));
+      dispatch(setOptions(status.businessOptions));
       return true;
     } catch (error) {
       return false;
@@ -92,16 +115,22 @@ const USER = 'user';
   //        The token used in cookie-parse rather.
   //        What i need to do: Configure a header object and pass it via Auth Bearer 'Token'
   async function checkAccessToken() {
-    const token = getAccessToken();
-    const { user, _ } = getStateData();
-    const id = user.id;
-    const email = user.email;
     try {
-      const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: {'x-access-token': token} });
-      console.log(response.data);
-      return response.data;
+      const token = getAccessToken();
+      const { user } = getStateData();
+      const id = user.id;
+      const email = user.email;
+  
+      const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: { 'x-access-token': token } });
+  
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error('Failed to refresh access token');
+      }
     } catch (error) {
-      console.log(error);
-      throw new Error(error);
+      console.error('Error refreshing access token:', error);
+      throw error; // Re-throw the error to propagate it to the caller
     }
   }
+  

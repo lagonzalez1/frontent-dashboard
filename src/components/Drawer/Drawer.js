@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {memo, useEffect, useState} from "react";
 import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled } from "@mui/material";
 import { Container, Box, Stack, Drawer as SIDEBAR, Typography, Button, Paper, Tab} from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
@@ -22,7 +22,7 @@ import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import theme from "../../theme/theme.js";
 
 
-export default function Drawer({client, setClient}) {
+const Drawer = ({client, setClient}) => {
 
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
@@ -116,7 +116,6 @@ export default function Drawer({client, setClient}) {
                 console.log("null", client);
               return;
             } else {
-              // Assuming completeClientAppointment returns a promise
               return completeClientAppointment(client);
             }
           })
@@ -124,7 +123,6 @@ export default function Drawer({client, setClient}) {
             dispatch(setSnackbar({ requestMessage: completeResponse.msg, requestStatus: true }));
           })
           .catch((error) => {
-            console.log(error);
             dispatch(setSnackbar({ requestMessage: error.data, requestStatus: true }));
             setLoading(false);
           })
@@ -141,8 +139,7 @@ export default function Drawer({client, setClient}) {
                 anchor={'right'}
                 open={client.open}
                 hideBackdrop={true}
-                
-                >  
+            >  
             {(loading && !payload) ? <CircularProgress/>:
             <Container sx={{ paddingTop: 8, width: 400}} disableGutters>
             <Toolbar>
@@ -359,3 +356,5 @@ export default function Drawer({client, setClient}) {
         </>
     )
 }
+
+export default Drawer;

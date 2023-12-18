@@ -14,6 +14,7 @@ const initialState = {
   requestType: null,
   location: null,
   searchDate: null,
+  options: null,
 };
 
 
@@ -50,10 +51,14 @@ const userSlice = createSlice({
     },
     setReload: (state, action) => {
       state.reload = action.payload;
+    },
+    setOptions: (state, action) => {
+      state.options = action.payload;
     }
+    
   },
 });
 
 export const { setUser, logoutUser, setPermisisons, setIndex, setLocation, 
-  setSnackbar, setBusinessRef, setReload, setSearchDate } = userSlice.actions;
+  setSnackbar, setBusinessRef, setReload, setSearchDate, setOptions } = userSlice.actions;
 export default userSlice.reducer;
