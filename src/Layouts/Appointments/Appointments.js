@@ -15,6 +15,7 @@ import { setReload, setSnackbar } from "../../reducers/user";
 import { columns, getHighlightedDays } from "./AppointmentsHelper";
 import { DatePicker, PickersDay } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
+import FabAppointment from "../../components/AddAppointment/FabAppointment";
 
 
 const Appointments = ({setClient, setEditClient}) => {
@@ -254,6 +255,16 @@ const Appointments = ({setClient, setEditClient}) => {
                 </div>
                 : <CircularProgress />
                 }
+
+                
+                {
+                    /**
+                     * Handle Appointment request 
+                     * 
+                     * 
+                     */
+                }
+                <FabAppointment />
                 
         </div>
         

@@ -7,15 +7,15 @@ import CloseIcon from "@mui/icons-material/Close";
 import { validationSchemaService, validationSchemaResource, updateResource, updateService, requestRemoveService, requestRemoveResource } from "../FormHelpers/ResourceServiceFormHelper";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
-import { reloadBusinessData } from "../../hooks/hooks";
+import { usePermission } from "../../auth/Permissions";
 
 
-export default function ResourceServiceForm () {
+export default function ResourceServiceForm ({setLoading, loading}) {
 
+
+    const { checkPermission } = usePermission();
     const [resourceDialog, setResourceDialog] = useState(false)
     const [servicesDialog, setServiceDialog] = useState(false);
-    const permissionLevel = useSelector((state) => state.user.permissions);
-    const [loading, setLoading] = useState(false);
 
     const [resourceId, setResourceId] = useState(null)
     const [serviceId, setServiceId] = useState(null)
@@ -55,12 +55,7 @@ export default function ResourceServiceForm () {
         setServiceId(item._id)
     }
 
-    useEffect(() => {
-        reloadBusinessData(dispatch);
-      }, [loading])
-
     const serviceSubmit = (value) => {
-        setLoading(true);
         if (value.delete === true) {
             console.log(serviceId);
             const payload = { ...value, serviceId }
@@ -73,7 +68,7 @@ export default function ResourceServiceForm () {
                 dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
             })
             .finally(() => {
-                setLoading(false);
+                setLoading(true);
             })
             return;
         }
@@ -86,14 +81,12 @@ export default function ResourceServiceForm () {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            setLoading(false);
+            setLoading(true);
         })
 
     }
     const resourceSubmit = (value) => {
-        setLoading(true);
         if (value.delete === true) {
-            console.log(resourceId);
             const payload = { ...value, resourceId }
             requestRemoveResource(payload)
             .then(response => {
@@ -103,12 +96,11 @@ export default function ResourceServiceForm () {
                 dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
             })
             .finally(() => {
-                setLoading(false);
+                setLoading(true);
             })
             return;
         }
         const payload = { ...value, resourceId }
-
         updateResource(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
@@ -117,13 +109,14 @@ export default function ResourceServiceForm () {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            setLoading(false);
+            setLoading(true);
         })
     }
 
     const initialValuesServices = { 
         title: userSelected ? userSelected.title : '',
         duration: userSelected ? userSelected.duration: '',
+        description: userSelected ? userSelected.description: '',
         delete: false,
     }
 
@@ -145,7 +138,7 @@ export default function ResourceServiceForm () {
             {
                 resources ? resources.map((item) => (
                     <ListItem disablePadding>
-                        <ListItemButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} onClick={() => openResourceDialog(item) }>
+                        <ListItemButton onClick={() => openResourceDialog(item) }>
                             <ListItemText primary={item.title} secondary={item.description} />
                         </ListItemButton>
                     </ListItem>
@@ -161,7 +154,7 @@ export default function ResourceServiceForm () {
             {
                 services ? services.map((item) => (
                     <ListItem disablePadding>
-                        <ListItemButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} onClick={() => openServiceDialog(item) }>
+                        <ListItemButton onClick={() => openServiceDialog(item) }>
                             <ListItemText primary={item.title} secondary={item.description} />
                         </ListItemButton>
                     </ListItem>
@@ -170,11 +163,11 @@ export default function ResourceServiceForm () {
             </List>
 
             <Dialog
+                id="resourceDialog"
                 open={servicesDialog}
                 onClose={closeServiceDialog}
                 maxWidth={'xs'}
                 fullWidth={'xs'}
-
             >
                 <DialogTitle>
                         <IconButton
@@ -237,6 +230,15 @@ export default function ResourceServiceForm () {
                                 error={touched.duration && !!errors.duration}
                                 helperText={touched.duration && errors.duration}
                             />
+                            <Field
+                                name="description"
+                                as={TextField}
+                                label="Description"
+                                variant="outlined"
+                                fullWidth
+                                error={touched.description && !!errors.description}
+                                helperText={touched.description && errors.description}
+                            />
                             <Box sx={{ textAlign: 'left'}}>
                             <Stack direction="row" alignContent={'center'} alignItems={'center'}>
 
@@ -282,9 +284,6 @@ export default function ResourceServiceForm () {
                     </Box>
                         </DialogContent>
                         }
-                
-
-
                 <DialogActions>
                     
                 </DialogActions>
@@ -292,11 +291,11 @@ export default function ResourceServiceForm () {
 
 
             <Dialog
+                id="resourceDialog"
                 open={resourceDialog}
                 onClose={closeResourceDialog}
                 maxWidth={'xs'}
                 fullWidth={'xs'}
-
             >
                 <DialogTitle>
                     <IconButton
@@ -312,7 +311,7 @@ export default function ResourceServiceForm () {
                             <CloseIcon />
                         </IconButton> 
                         <strong>
-                        Resources
+                            Resources
                         </strong>
 
                     </DialogTitle>
@@ -329,7 +328,6 @@ export default function ResourceServiceForm () {
                     initialValues={initialValuesResources}
                     validationSchema={validationSchemaResource}
                     onSubmit={resourceSubmit}
-
                     >
                 {({errors, touched, values, setFieldValue}) => (
                     <Form>
@@ -379,15 +377,14 @@ export default function ResourceServiceForm () {
                                     control={
                                         <Checkbox
                                             color="primary"
-                                        
                                         />
                                     }
                                     />
                             </Stack>
                         </Box>
                         
-                    <Button variant='contained' type="submit"  sx={{borderRadius: 15}}>
-                        Save
+                    <Button disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit"  sx={{borderRadius: 10}}>
+                        confirm
                     </Button>
                     </Stack>
                     

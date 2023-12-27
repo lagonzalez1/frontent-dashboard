@@ -1,102 +1,98 @@
 import React, { useState, useEffect } from 'react';
-import {
-  CardElement,
-  useStripe,
-  useElements,
-  Elements,
-  ElementsConsumer,
-} from '@stripe/react-stripe-js';
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea } from '@mui/material';
 
 
 const SubscriptionForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
 
-  const [selectedPlan, setSelectedPlan] = useState('');
+
+  const [selectedPlan, setSelectedPlan] = useState(0);
   const [cardError, setCardError] = useState(null);
-
-  const handlePlanChange = (event) => {
-    setSelectedPlan(event.target.value);
-  };
+  const plans = {
+    0: 'ID_BASIC_PLAN',
+    1: 'ID_FULL_PLAN',
+    2: 'ID_MED_PLAN'
+  }
 
   const handleSubmit = async (event, elements, stripe) => {
-    event.preventDefault();
-
-    if (!stripe || !elements) {
-      // Stripe.js has not loaded yet
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
-
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
-    });
-
-    if (error) {
-      console.log('Error:', error);
-      setCardError(error.message);
-    } else {
-      console.log('PaymentMethod:', paymentMethod);
-      // Send paymentMethod.id to your server to complete the subscription creation
-    }
+    
   };
 
+  const handlePlanChange = (planNumber) => {
+    setSelectedPlan(planNumber)
+  };
+
+  
+
   return (
-    <form onSubmit={(e) => handleSubmit(e, elements, stripe)}>
-      <TextField label="Cardholder Name" variant="outlined" required fullWidth />
+    <>
+      <Container id="plans">
+        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === 0 ? "lightgray": ""}} variant="outlined" id="waitlist">
+        <CardActionArea onClick={() => handlePlanChange(0)} >
+          <CardContent>
+          <Typography variant='caption' color="text.secondary" gutterBottom>
+              Basic
+            </Typography>
+            <Typography color="primary" variant="subtitle1" fontWeight={'bold'} component="div">
+              Waitlist
+            </Typography>
+            <Typography sx={{ mb: 1.5 }} color="secondary">
+              Price: $5.99 USD
+            </Typography>
+            <Typography variant="body2">
+              This allows you to manage an online waitlist with client reminders. 
+              Add employees, resources, and services. 
+            </Typography>
+          </CardContent>
+          </CardActionArea>
+        </Card>
+        <br/>
+        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === 1 ? "lightgray": ""}} variant="outlined" id="appointment">
+        <CardActionArea onClick={() => handlePlanChange(1)}>
+          <CardContent>
+          <Typography variant='caption' color="text.secondary" gutterBottom>
+              Best value
+            </Typography>
+            <Typography color="primary" variant="subtitle1" fontWeight={'bold'} component="div">
+              Waitlist & Appointments & Customers
+            </Typography>
+            <Typography sx={{ mb: 1.5 }} color="secondary">
+              Price: $9.99 USD
+            </Typography>
+            <Typography variant="body2">
+              This allows you to manage an online waitlist with client reminders. 
+              Add employees, resources, and services. 
+            </Typography>
+          </CardContent>
+          </CardActionArea>
+        </Card>
+        <br/>
 
-      <FormControl variant="outlined" required fullWidth>
-        <InputLabel id="select-plan-label">Subscription Plan</InputLabel>
-        <Select
-          labelId="select-plan-label"
-          value={selectedPlan}
-          onChange={handlePlanChange}
-          label="Subscription Plan"
-        >
-          <MenuItem value="plan1">Plan 1</MenuItem>
-          <MenuItem value="plan2">Plan 2</MenuItem>
-          {/* Add more MenuItem components for other subscription plans */}
-        </Select>
-      </FormControl>
+        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === 2 ? "silver": ""}} variant="outlined">
+          <CardActionArea onClick={() => handlePlanChange(2)}>
+          <CardContent>
+            <Typography variant='caption' color="text.secondary" gutterBottom>
+              Good
+            </Typography>
+            <Typography color="primary" variant="subtitle1" fontWeight={'bold'} component="div">
+              Waitlist & appointments 
+            </Typography>
+            <Typography sx={{ mb: 1.5 }} color="secondary">
+              Price: $7.99 USD
+            </Typography>
+            <Typography variant="body2">
+              This allows you to manage an online waitlist with client reminders. 
+              Add employees, resources, and services. 
+            </Typography>
+          </CardContent>
+          </CardActionArea>
+        </Card>
+      </Container>
 
-      <CardElement
-        options={{
-          style: {
-            base: {
-              fontSize: '16px',
-              '::placeholder': {
-                color: '#aab7c4',
-              },
-            },
-          },
-        }}
-      />
-      {cardError && <p>{cardError}</p>}
-
-      <Button type="submit" variant="contained" color="primary" disabled={!stripe}>
-        Subscribe
-      </Button>
-    </form>
+      <Container id="process">
+        
+      </Container>
+    </>
   );
 };
 
-const WrappedSubscriptionForm = () => (
-  <ElementsConsumer>
-    {({ elements, stripe }) => (
-      <SubscriptionForm elements={elements} stripe={stripe} />
-    )}
-  </ElementsConsumer>
-);
-
-const StripeSubscription = () => {
-  return (
-    <Elements stripe={''}>
-      <WrappedSubscriptionForm />
-    </Elements>
-  );
-};
-
-export default StripeSubscription;
+export default SubscriptionForm;

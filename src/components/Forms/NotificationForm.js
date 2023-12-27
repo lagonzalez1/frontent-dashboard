@@ -5,19 +5,16 @@ import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { setSnackbar } from '../../reducers/user';
 import { requestNotificationChange } from "../FormHelpers/NotificationFormHelper";
-import { reloadBusinessData } from '../../hooks/hooks';
+import { usePermission } from '../../auth/Permissions';
 
 
-const NotificationForm = () => {
+const NotificationForm = ({setLoading, loading}) => {
   
-  const [loading, setLoading] = useState(false);
+  const { checkPermission } = usePermission();
   const business = useSelector((state) => state.business);
-  const permissionLevel = useSelector((state) => state.user.permissions);
   const dispatch = useDispatch();
   
-  const handleSubmit = (values) => {
-    setLoading(true);
-    
+  const handleSubmit = (values) => {    
     requestNotificationChange(values)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
@@ -26,14 +23,9 @@ const NotificationForm = () => {
       dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
+      setLoading(true);
     })
-    
   };
-
-  useEffect(() => {
-    reloadBusinessData(dispatch);
-  }, [loading])
 
   const initialValue = {
         title: business ? business.notifications.title : '',
@@ -94,7 +86,7 @@ const NotificationForm = () => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <Button disabled={!checkPermission('NOTI_SETTINGS')} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </Grid>

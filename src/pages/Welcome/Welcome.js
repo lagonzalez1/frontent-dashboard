@@ -4,11 +4,11 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent, Ale
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { allowClientJoin, getProfileImage, requestBusinessArguments, requestBusinessSchedule, waitlistRequest } from "./WelcomeHelper";
+import { allowClientJoin, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 import { ThemeProvider } from "@emotion/react";
-import { theme } from "../../theme/theme";
+import { ClientWelcomeTheme } from "../../theme/theme";
 
 
 
@@ -143,10 +143,9 @@ export default function Welcome() {
 
     return (
         <>  
-            <ThemeProvider theme={theme}>
+            <ThemeProvider theme={ClientWelcomeTheme}>
             <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
                 <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
-                    
                     { loading ? <Box>
                         <CircularProgress/>
                         </Box> : 
@@ -159,10 +158,7 @@ export default function Welcome() {
                         {args ? (
                         <Avatar sx={{ width: 56, height: 56, mx: 'auto' }} src={args.profileLink} />
                     ) : null}
-
-
                         <CheckBusinessArguments />
-        
                     </CardContent>
                     </>
                     )}

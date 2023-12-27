@@ -28,11 +28,13 @@ import { useTheme } from './theme/ThemeContext';
 function App() {
 
 
-  const { theme } = useTheme();
+  const { theme, getCurrentTheme, updateTheme } = useTheme();
 
   useEffect(() => {
-    console.log(theme)
-  }, []);
+    // Get the current theme from localStorage and update the state
+    const currentTheme = getCurrentTheme();
+    updateTheme(currentTheme);
+  }, [updateTheme]);
 
   return (
     <Router>
@@ -43,6 +45,8 @@ function App() {
           <Route path='/Login' element={<Login />}></Route>
           <Route path='/PasswordReset/:token' element={<PasswordReset />}></Route>
           <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
+
+          
           <Route path={'/welcome/:link'} element={<Welcome />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/selector'} element={<WelcomeSelector />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/size'} element={<WelcomeSize />}></Route> { /** Check if business open. Advance if so. */}
@@ -55,7 +59,7 @@ function App() {
 
           <Route path={'/Dashboard'} element={
               <RequireAuth loginPath={'/Login'}>
-                  <ThemeProvider theme={theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
+                  <ThemeProvider theme={theme && theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
                     <Dashboard/>                
                   </ThemeProvider>
             

@@ -22,11 +22,14 @@ import { handleOpenNewTab, requestChangeAccept, options, columns,
     removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState} from "./Helpers";
 import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
 import { WAITLIST } from "../../static/static";
+import FabButton from "../Add/FabButton";
+import { usePermission } from "../../auth/Permissions";
 
 
 
 const Waitlist = ({setClient, setEditClient}) => {
     
+    const { checkPermission } = usePermission();
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
@@ -196,11 +199,6 @@ const Waitlist = ({setClient, setEditClient}) => {
         setEditClient({payload: item, open: true, fromComponent: WAITLIST})
     }
 
-    
-
-
-
-
     const sendClientServing = (clientId) => {
         moveClientServing(clientId, WAITLIST)
         .then(response => {
@@ -232,7 +230,6 @@ const Waitlist = ({setClient, setEditClient}) => {
             <div id="UpperBar">
                 <Grid container
                     spacing={2}
-                    
                 >
                     <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack>
@@ -254,7 +251,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                         aria-label="when device is locked."
                         aria-expanded={open ? 'true' : undefined}
                         onClick={handleClickListItem}
-                        disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} 
+                        disabled={!checkPermission('OPEN_LOCK')} 
                         
                         >
                         {accepting ? 
@@ -454,9 +451,15 @@ const Waitlist = ({setClient, setEditClient}) => {
                         </TableContainer>
                     </Paper>
                 </div>
+            {
+                /**
+                 * Handle Waitlist request.
+                 * 
+                 * 
+                 */
+            }
 
-
-
+            <FabButton />
 
             </div>
         

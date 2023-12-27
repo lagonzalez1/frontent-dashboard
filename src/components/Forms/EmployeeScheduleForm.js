@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { DateTime } from 'luxon';
-import { reloadBusinessData } from '../../hooks/hooks';
+import { usePermission } from '../../auth/Permissions';
 
 
 
@@ -25,7 +25,6 @@ export default function EmployeeScheduleForm({employee}) {
     const dispatch = useDispatch();
     const [errors, setErrors] = useState(null);
     const [alert, setAlert] = useState(false);
-    const [username, setUsername] = useState(null);
 
 
     useEffect(() => {
@@ -36,10 +35,6 @@ export default function EmployeeScheduleForm({employee}) {
             }
         }
     }, [employee])
-
-    useEffect(() => {
-        reloadBusinessData(dispatch);
-      }, [loading])
 
     let initialValues = { 
         Sunday: {
@@ -210,7 +205,7 @@ export default function EmployeeScheduleForm({employee}) {
                         </Grid>              
                     </div>
                 ))}
-                <Button sx={{ borderRadius: 15}} variant="contained" color="primary" type="submit">
+                <Button sx={{ borderRadius: 10}} variant="contained" color="primary" type="submit">
                     Save
                 </Button>
                 </Form>

@@ -13,13 +13,15 @@ import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import { DateTime } from "luxon";
-import { allowEmployeeEdit } from "../../hooks/hooks";
+import { allowEmployeeEdit, findEmployee } from "../../hooks/hooks";
+import { usePermission } from "../../auth/Permissions";
 // Show table of employees
 // Allow to delete and add employees
-export default function EmployeeTable() {
+export default function EmployeeTable({setLoading, loading}) {
 
+
+    const { canEmployeeEdit, checkPermission } = usePermission();
     const employees = useSelector((state) => state.business.employees);
-    const permissionLevel = useSelector((state) => state.user.permissions);
     const userEmail = useSelector((state) => state.user.email);
     const today = DateTime.local();
     const [employeeDialog, setEmployeeDialog] = useState(false);
@@ -58,7 +60,7 @@ export default function EmployeeTable() {
             dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true))
+            setLoading(true);
         })
     }
     const editEmployee = (employee) => {
@@ -108,7 +110,7 @@ export default function EmployeeTable() {
             dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
         })
         .finally(() => {
-            dispatch(setReload(true))
+            setLoading(true);
         })
 
     }
@@ -147,7 +149,7 @@ export default function EmployeeTable() {
                                             {++index}
                                         </TableCell>
                                         <TableCell>
-                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} aria-label="InfoClick" size="small" onClick={() => showQuickActions(employee)}>
+                                            <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} aria-label="InfoClick" size="small" onClick={() => showQuickActions(employee)}>
                                                 <VisibilityRoundedIcon fontSize="small"/>
                                             </IconButton>
                                         </TableCell>
@@ -163,13 +165,13 @@ export default function EmployeeTable() {
                                         </TableCell>
                                         <TableCell>
                                             <Stack direction={'row'}>
-                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} onClick={() => confirmDelete(employee._id)}>
+                                            <IconButton disabled={!checkPermission('EMPL_REMOVE')} onClick={() => confirmDelete(employee._id)}>
                                                 <DeleteIcon fontSize="Small" />
                                             </IconButton>
-                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} onClick={() => editEmployee(employee)}>
+                                            <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editEmployee(employee)}>
                                                 <BorderColorRoundedIcon fontSize="small"/>
                                             </IconButton>
-                                            <IconButton disabled={allowEmployeeEdit(permissionLevel, userEmail,employee)} onClick={() => editSchedule(employee)}>
+                                            <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editSchedule(employee)}>
                                                 <CalendarMonthIcon fontSize="small"/>
                                             </IconButton>
                                             </Stack>
@@ -184,7 +186,7 @@ export default function EmployeeTable() {
                 </Table>
             </Stack>
             <br/>
-            <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} onClick={() => showEmployeeModal()} sx={{borderRadius: 15}} variant="contained">
+            <Button disabled={!checkPermission('EMPL_ADD')} onClick={() => showEmployeeModal()} sx={{borderRadius: 15}} variant="contained">
                 Add
             </Button>
 
@@ -214,17 +216,18 @@ export default function EmployeeTable() {
             <Divider/>
 
             <DialogContent>
-                <Typography variant="body2">Delete employee from buisness?</Typography>
+                <Typography variant="body2">Delete {findEmployee(employeeId).fullname} from buisness?</Typography>
                 
             </DialogContent>
             <DialogActions>
                 <Button sx={{ borderRadius: 15}} variant="outlined" color="error" onClick={() => removeEmployee(employeeId)} >yes</Button>
-                        <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => cancelEmployeeDelete()}>no</Button>
+                <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => cancelEmployeeDelete()}>no</Button>
             </DialogActions>
             </Dialog>
 
 
             <Dialog
+                id="addNewEmployee"
                 open={employeeDialog}
                 onClose={closeEmployeeModal}
             >
@@ -251,6 +254,7 @@ export default function EmployeeTable() {
             </Dialog>
 
             <Dialog
+                id="employeeSchedule"
                 open={employeeScheduleDialog}
                 onClose={closeEditSchedule}
                 fullWidth={'xs'}
@@ -279,6 +283,7 @@ export default function EmployeeTable() {
             </Dialog>
 
             <Dialog
+                id="quickActions"
                 open={quickActions}
                 onClose={handleActionClose}
                 fullWidth={'xs'}
@@ -303,7 +308,8 @@ export default function EmployeeTable() {
 
             <DialogContent>
                 <Typography variant="body2">Make employee invisable for waitlist and appointments for the rest of today, {DateTime.local().toFormat('dd LLLL yyyy')}.</Typography>
-                <Typography variant="body2">{ employee && today.hasSame(DateTime.fromISO(employee.blockOff.lastUpdate), 'day') ? DateTime.fromISO(employee.blockOff.lastUpdate).toString() : '' }</Typography>
+                <Typography variant="body2" fontWeight={'bold'}>{ employee && today.hasSame(DateTime.fromISO(employee.blockOff.lastUpdate), 'day') ? "Blocked for  " + DateTime.fromISO(employee.blockOff.lastUpdate).toLocaleString() : '' }</Typography>
+                <br/>
                 <FormControl>
                     <FormLabel id="demo-controlled-radio-buttons-group">Block employee</FormLabel>
                     <RadioGroup

@@ -7,7 +7,7 @@ import axios from 'axios';
 import { setSnackbar } from '../../reducers/user';
 import { getAccessToken } from '../../auth/Auth';
 import { useNavigate, useParams } from "react-router-dom";
-import { reloadBusinessData } from '../../hooks/hooks';
+import { usePermission } from '../../auth/Permissions';
 
 
 const validationSchema = Yup.object().shape({
@@ -15,8 +15,9 @@ const validationSchema = Yup.object().shape({
   companyLogo: Yup.mixed(),
 });
 
-const LocationForm = () => {
+const LocationForm = ({setLoading, loading}) => {
 
+  const { checkPermission } = usePermission();
   const business = useSelector((state) => state.business);
   const settings = useSelector((state) => state.business.settings);
   const options = useSelector((state) => state.user.options);
@@ -27,15 +28,12 @@ const LocationForm = () => {
 
 
   const [errors, setErrors] = useState(null);
-  const [loading, setLoading] = useState(false);
   
   const handleSubmit = (values) => {
     if (!checkValidString(values.locationUrl)){
       setErrors('Public link cannot include special or spaces.');
-      setLoading(false);
       return;
     }
-    setLoading(true);
     axios.get('/api/internal/unique_link/'+ values.locationUrl )
       .then((response) => {
         if(response.status === 200){
@@ -56,13 +54,11 @@ const LocationForm = () => {
           setErrors(error);
       })
       .finally(() => {
-        setLoading(false);
+        setLoading(true);
       })
   };
 
-  useEffect(() => {
-    reloadBusinessData(dispatch);
-  }, [loading])
+  
 
   const checkValidString = (input) => {
     const pattern = /^[a-zA-Z0-9_]+$/;
@@ -72,6 +68,7 @@ const LocationForm = () => {
   const openWaitList = () => {
     const url = `https://waitonline.us/welcome/${business.publicLink}/waitlist`
     window.open(url, '_blank');
+    return;
   };
 
   const navigateToWaitlist = () => {
@@ -156,7 +153,7 @@ const LocationForm = () => {
             </Grid>
 
             <Grid item xs={12}>              
-            <Button disabled={ (permissionLevel === 2 || permissionLevel === 3 || permissionLevel === 1) ? true: false} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 10}}>
+            <Button disabled={ !checkPermission('LOC_URL')} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 10}}>
                 {loading ? <CircularProgress /> : 'Save'}
             </Button>
             </Grid>

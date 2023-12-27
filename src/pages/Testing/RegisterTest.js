@@ -11,7 +11,11 @@ export const HOURS_LIST = () => {
     const SIZE = 24
     let result = [];
     for (let i = 1; i <= SIZE; i++) {
-        result.push(`${i}` + ":00");
+        if(i < 10){
+            result.push(`0${i}` + ":00");
+        }else {
+            result.push(`${i}` + ":00");
+        }
     }
     return result;
 }

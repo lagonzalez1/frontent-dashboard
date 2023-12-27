@@ -1,8 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { IANAZone, DateTime } from "luxon";
 
-
-
 /**
  * 
  * @returns The current timezone by the user browser. 
@@ -56,7 +54,7 @@ export function checkObjectData (object) {
     let missing = {}
     let status = false;
     Object.keys(object).forEach( (key) => {
-        if (object[key] === '' || object[key] === {}){
+        if (object[key] === '' || object[key] === null){
             missing[key] = true;
             status = true;
         }else {

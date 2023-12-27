@@ -20,11 +20,13 @@ import BackspaceRoundedIcon from '@mui/icons-material/BackspaceRounded';
 import NotesIcon from '@mui/icons-material/Notes';
 import CloseIcon from "@mui/icons-material/Close"
 import NotesDialog from '../../components/Dialog/NotesDialog';
+import { usePermission } from '../../auth/Permissions';
 
 const Customers = () => {
 
+
+  const { checkPermission } = usePermission();
   const business = useSelector((state) => state.business);
-  const refresh = useSelector((state) => state.refresh);
   const permissionLevel = useSelector((state) => state.user.permissions);
   const dispatch = useDispatch();
 
@@ -492,7 +494,7 @@ const Customers = () => {
               <Typography variant='body2'>Please confirm if you wish to remove client.</Typography>
             </DialogContent>
             <DialogActions>
-              <Button sx={{borderRadius: 10}} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
+              <Button sx={{borderRadius: 10}} disabled={!checkPermission('CUST_REMOVAL')} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
               <Button sx={{borderRadius: 10}} onClick={cancelDeleteClient} variant='contained' color='primary'>Cancel</Button>
             </DialogActions>
 

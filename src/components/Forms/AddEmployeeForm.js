@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from 'react';
-import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress, Select, MenuItem, Accordion, AccordionSummary, AccordionDetails, InputLabel } from '@mui/material';
+import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress, Select, MenuItem, Accordion, AccordionSummary, AccordionDetails, InputLabel, Tooltip, Alert, AlertTitle } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
 import {permissionLevel, requestEmployeeChange } from "../FormHelpers/AddNewEmployeeFormHelper";
 import * as Yup from 'yup';
@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/Lock';
-import { reloadBusinessData } from '../../hooks/hooks';
+import { usePermission } from '../../auth/Permissions';
 
 
 
@@ -17,15 +17,20 @@ import { reloadBusinessData } from '../../hooks/hooks';
 
 export default function AddEmployeeForm({employee}) {
 
+    const { checkPermission } = usePermission();
+    const [permissionMessage, setPermissionMessage] = useState(null);
     const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(false);
+
     const dispatch = useDispatch();
 
     const WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     useEffect(() => {
-      reloadBusinessData(dispatch);
-    }, [loading])
+      if (checkPermission('EMPL_ADD') === false) {
+        setPermissionMessage('User does not have permissions to add new employees.');
+      }
+    }, [])
 
     let initialValues = { 
         fullname: employee ? employee.fullname: '',
@@ -65,16 +70,12 @@ export default function AddEmployeeForm({employee}) {
         })
       });
 
-
-
     // Two potential submits, EDIT and NEW
     const handleSubmit = (values) => {
         setLoading(true);
-        console.log(values);
         const payload = {...values, originalUsername: employee ? employee.employeeUsername : '' }
         requestEmployeeChange(payload)
         .then(res => {
-            console.log(res);
             dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
         })
         .catch(error => {
@@ -85,9 +86,19 @@ export default function AddEmployeeForm({employee}) {
             //dispatch(setReload(true))
         })
     }
-    
+
     return (
     <Box sx={{ pt: 2}}>
+
+        { /** Display permissions limitations */}
+        { permissionMessage ? (
+          <Alert color='info'>
+            <AlertTitle>
+                Permissions message
+            </AlertTitle>
+        { permissionMessage && permissionMessage }
+      </Alert>) : null }
+
     {loading ? (
         <Container sx={{p: 3}}>
           <Typography variant='caption'>Saving your information...</Typography>
@@ -213,7 +224,8 @@ export default function AddEmployeeForm({employee}) {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button sx={{ borderRadius: 15}} type="submit" variant="contained" color="primary">
+              
+              <Button disabled={!checkPermission('EMPL_ADD')} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </Grid>

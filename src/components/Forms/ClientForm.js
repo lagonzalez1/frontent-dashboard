@@ -4,21 +4,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Grid, FormControlLabel, Switch, Button, FormLabel, Typography} from "@mui/material";
 import { requestInputFieldChange, validationSchema, LABELS, TITLE } from "../FormHelpers/ClientFormHelpers";
 import { setSnackbar } from "../../reducers/user";
-import { reloadBusinessData } from "../../hooks/hooks";
+import { usePermission } from "../../auth/Permissions";
 
 
-export default function ClientForm() {
+export default function ClientForm({setLoading, loading}) {
     
-    const [loading, setLoading] = useState(false);
-    const permissionLevel = useSelector((state) => state.user.permissions);
+
+    const { checkPermission } = usePermission();
     const settings = useSelector((state) => state.business.settings.inputFields);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
-
-
-    useEffect(() => {
-        reloadBusinessData(dispatch);
-      }, [loading])
 
 
     const initialValues = {
@@ -28,9 +23,6 @@ export default function ClientForm() {
     };
 
     const handleSubmit = (values) => {
-        // Handle form submission (e.g., send data to backend)
-        setLoading(true);
-        console.log(values);
         const payload = { b_id: business._id, values}
         requestInputFieldChange(payload)
         .then(response => {
@@ -40,7 +32,7 @@ export default function ClientForm() {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            setLoading(false);
+            setLoading(true);
         })
     };
     return(
@@ -61,7 +53,7 @@ export default function ClientForm() {
                             ))}
                         </Grid>
                         <br/>
-                        <Button sx={{borderRadius: 10}} disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} variant="contained" type="submit">Save</Button>
+                        <Button sx={{borderRadius: 10}} disabled={!checkPermission('CLIENT_FORM')} variant="contained" type="submit">Save</Button>
                     </Form>
                     )}
             </Formik>

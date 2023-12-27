@@ -12,12 +12,14 @@ import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone,
   requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate,validateTimerange, DAYOFWEEK } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
-import { allowEmployeeEdit, findEmployee, getEmployeeList, reloadBusinessData } from '../../hooks/hooks';
+import { allowEmployeeEdit, findEmployee, getEmployeeList } from '../../hooks/hooks';
+import { usePermission } from '../../auth/Permissions';
 
 
 
-const OpeningHoursForm = () => {
+const OpeningHoursForm = ({setLoading, loading}) => {
 
+  const { checkPermission, canEmployeeEdit } = usePermission();
   const business = useSelector((state) => state.business);
   const schedule = useSelector((state) => state.business.schedule);
   const closedDays = useSelector((state) => state.business.closedDates);
@@ -36,13 +38,10 @@ const OpeningHoursForm = () => {
   const [scheduleDialog, setScheduleDialog] = useState(false);
   const [closedDialog, setClosedDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
-  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
 
   const timzoneSubmit = (timezone) => {
-    setLoading(true);
-    console.log(timezone);
     if(business.timezone === timezone.timezone){
       dispatch(setSnackbar({requestMessage: 'No changes made.', requestStatus: true}));
       return;
@@ -55,13 +54,12 @@ const OpeningHoursForm = () => {
       dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
+      setLoading(true);
     })
   
   };
 
   const scheduleSubmit = (schedule) => {
-    setLoading(true);
     requestScheduleChange(schedule)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
@@ -70,7 +68,7 @@ const OpeningHoursForm = () => {
       dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
+      setLoading(true);
       closeScheduleDialog();
     })
 
@@ -100,7 +98,6 @@ const OpeningHoursForm = () => {
         return;
       }
     }
-    setLoading(true);
     requestClosedDate(selectedDate.toISO(), employeeTag, start, end)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
@@ -109,13 +106,12 @@ const OpeningHoursForm = () => {
       dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
+      setLoading(true);
     })
 
   }
 
   const removeClosedDate = (dateId) => {
-    setLoading(true);
     requestRemoveCloseDate(dateId)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
@@ -125,7 +121,7 @@ const OpeningHoursForm = () => {
       dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
+      setLoading(true);
     })
   }
 
@@ -148,10 +144,6 @@ const OpeningHoursForm = () => {
     setMessage(null);
     
   }
-
-  useEffect(() => {
-    reloadBusinessData(dispatch);
-  }, [loading])
   
 
   const TimeInput = ({ label, name }) => {
@@ -299,10 +291,7 @@ const initialValuesSchedule = {
                 </strong>
 
             </DialogTitle>
-          {loading ? <DialogContent>
-            <CircularProgress /> 
-          </DialogContent>:
-          <DialogContent>
+            <DialogContent>
             <Divider />
             <Box sx={{textAlign: 'left', pb: 1}}>
             <Typography variant='caption'>Any changes will reflect immediately.</Typography>
@@ -358,7 +347,7 @@ const initialValuesSchedule = {
                 </Box>
                 <DialogActions>
                   
-                  <Button sx={{ borderRadius: 10}} type="submit" variant='contained' color="primary">
+                  <Button disabled={!checkPermission('HOUR_OPEN_HR')} sx={{ borderRadius: 10}} type="submit" variant='contained' color="primary">
                     Save
                   </Button>
                 </DialogActions>
@@ -367,11 +356,11 @@ const initialValuesSchedule = {
             )}
           </Formik>
           </DialogContent>
-          }
       </Dialog>
 
 
       <Dialog
+        id="closedOnDates"
         open={closedDialog}
         onClose={closeClosedDialog}
         maxWidth={'sm'}
@@ -396,11 +385,7 @@ const initialValuesSchedule = {
                 </strong>
 
             </DialogTitle>
-          {loading ? <DialogContent>
-            <CircularProgress/>
-          </DialogContent> :
-
-          <DialogContent>
+            <DialogContent>
             {
               // Future update: Change this to be side by side.
               // Table next to the fields.
@@ -476,7 +461,7 @@ const initialValuesSchedule = {
                                 </Typography>
                               </TableCell>
                               <TableCell>
-                                  <Button disabled={allowEmployeeEdit(permissionLevel, userEmail, findEmployee(item.employeeTag)) } size="small" onClick={() => removeClosedDate(item._id) }>
+                                  <Button disabled={ !canEmployeeEdit(item.employeeTag, 'HOUR_CLOSE_DEL')} size="small" onClick={() => removeClosedDate(item._id) }>
                                     delete
                                   </Button>
                               </TableCell>
@@ -502,7 +487,7 @@ const initialValuesSchedule = {
                         fullWidth={true}
                       >
                         {employeeList && employeeList.map((employee, index) => (
-                          <MenuItem key={index} disabled={allowEmployeeEdit(permissionLevel, userEmail, employee)} value={employee._id}>
+                          <MenuItem key={index} disabled={!canEmployeeEdit(employee._id, 'HOUR_CLOSE_DEL')} value={employee._id}>
                             <Typography variant='body2'>{employee.fullname}</Typography>
                           </MenuItem>
                         ))}
@@ -549,9 +534,8 @@ const initialValuesSchedule = {
               </Grid>
 
           </DialogContent>
-          }
           <DialogActions>
-            <Button sx={{ borderRadius: 10}} variant='contained' onClick={() => saveCloseDate()}>save</Button>
+            <Button disabled={!canEmployeeEdit(employeeTag, 'EMPL_ATTACH')} sx={{ borderRadius: 10}} variant='contained' onClick={() => saveCloseDate()}>save</Button>
           </DialogActions>
         
       </Dialog>

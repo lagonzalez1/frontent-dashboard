@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
-import { reloadBusinessData } from '../../hooks/hooks';
+import { usePermission } from '../../auth/Permissions';
 
 const validationSchema = Yup.object().shape({
   businessName: Yup.string().required(),
@@ -15,15 +15,13 @@ const validationSchema = Yup.object().shape({
   businessPhone: Yup.string()
 });
 
-const BusinessForm = () => {
+const BusinessForm = ({loading, setLoading}) => {
   
-  const [loading, setLoading] = useState(false);
+  const { checkPermission } = usePermission();
   const business = useSelector((state) => state.business);
-  const permissionLevel = useSelector((state) => state.user.permissions);
   const dispatch = useDispatch();
   
   const handleSubmit = (values) => {
-    setLoading(true);
     const accessToken = getAccessToken();
     const headers = { headers: {'x-access-token': accessToken}}
     const payload = { ...values, b_id: business._id}
@@ -35,13 +33,11 @@ const BusinessForm = () => {
       dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
+      setLoading(true);
     })
   };
 
-  useEffect(() => {
-    reloadBusinessData(dispatch);
-  }, [loading])
+  
 
   const initialValue = {
     businessName: business ? business.businessName : "",
@@ -104,7 +100,7 @@ const BusinessForm = () => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <Button disabled={!checkPermission('BUSI_INFO')} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </Grid>

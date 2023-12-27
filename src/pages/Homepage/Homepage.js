@@ -39,13 +39,10 @@ export default function Homepage() {
     const StyledCard = styled(Card)(({ theme }) => ({
         // Default styles for the card
         transition: '0.2s',
-        boxShadow: theme.shadows[1],
         borderRadius: 20,
         '&:hover': {
         // Styles to apply when the card is hovered over
         transform: 'translateY(-15px)',
-        boxShadow: theme.shadows[5],
-        backgroundColor: theme.palette.opposite.main,
         
         },
     }));

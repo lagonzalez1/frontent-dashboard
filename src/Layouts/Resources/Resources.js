@@ -9,8 +9,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
+import { usePermission } from "../../auth/Permissions.js";
 
 export default function Resources() {
+
+    const { checkPermission } = usePermission();
     const {active, inactive} = getResourcesTotal();
 
     const employeeList = useSelector((state) => state.business.employees);
@@ -271,7 +274,7 @@ export default function Resources() {
 
 
                 <DialogActions>
-                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}} variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
+                    <Button disabled={!checkPermission('RESO_CHANGE','EMPL_ATTACH')} sx={{ borderRadius: 10}} variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
                 </DialogActions> 
         </Dialog>
 

@@ -19,6 +19,7 @@ const ENDPOINT_ACCEPTING = '/api/internal/update_accepting'
 export const handleOpenNewTab = (endpoint) => {
     const url = 'https://waitonline.us/welcome/'+endpoint;
     window.open(url, '_blank');
+    return;
 };
 
 

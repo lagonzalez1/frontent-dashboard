@@ -142,6 +142,23 @@ export const requestNoShow = (clientId, type) => {
   }
 
 
+  export const undoClientServing = (payload) => {
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const headers = getHeaders();
+        const data = { ...payload, b_id: business._id}
+        axios.post('/api/internal/undo_serving', data, headers)
+        .then(response => {
+          resolve(response.data);
+        })
+        .catch(error => {
+          reject(error.response.data);
+        }) 
+        
+      })
+  }
+
+
   // Type: Appointment type can be either appointment, waitlist
   export const moveClientServing = (clientId, type) => {
     return new Promise((resolve, reject) => {
@@ -165,7 +182,7 @@ export const requestNoShow = (clientId, type) => {
         const { user, business } = getStateData();
         const header = getHeaders();
         const currentTime = DateTime.local().setZone(business.timezone).toISO();
-        const payload = {client: {...client}, b_id: business._id, currentTime}
+        const payload = {client: {...client}, b_id: business._id, currentTime, saveClient: true, clientNotes: ''}
         axios.post('/api/internal/complete_appointment', payload, header)
         .then(response => {
             resolve(response.data);

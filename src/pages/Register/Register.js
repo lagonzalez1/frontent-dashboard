@@ -25,6 +25,7 @@ import { useSignIn } from "react-auth-kit";
 
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { DateTime } from "luxon";
 
 
 
@@ -570,7 +571,9 @@ export default function Register(props){
                                                     value={operationsObject.start}
                                                     >
                                                     { HOURS && HOURS.map((item, index) =>(
-                                                        <MenuItem key={index} value={item}>{item}</MenuItem>
+                                                        <MenuItem key={index} value={item}>
+                                                            {DateTime.fromFormat(item,'hh:mm').toFormat('hh:mm a')}
+                                                        </MenuItem>
                                                         ) )}
                                                     
                                                     </Select>

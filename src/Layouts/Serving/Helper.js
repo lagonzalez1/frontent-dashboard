@@ -12,13 +12,12 @@ export const currentTimePosition = () => {
 
 }
 
-
-export const completeClientAppointment = (client) => {
+export const completeClientAppointment = (client, clientNotes, saveClient) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
         const currentTime = DateTime.local().setZone(business.timezone).toISO();
-        const payload = {client: {...client}, b_id: business._id, currentTime}
+        const payload = {client: {...client}, b_id: business._id, currentTime, clientNotes, saveClient}
         axios.post('/api/internal/complete_appointment', payload, header)
         .then(response => {
             resolve(response.data);
@@ -29,10 +28,6 @@ export const completeClientAppointment = (client) => {
         
     })
 }
-
-
-
-
 
 export const columns = [
     { id: 'position', label: '#', minWidth: 10 },

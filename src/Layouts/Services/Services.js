@@ -10,16 +10,17 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
+import { usePermission } from "../../auth/Permissions.js";
 
 
 export default function Services() {
 
+
+    const { checkPermission, canEmployeeEdit} = usePermission();
     const [dialog, setDialog] = useState(false);
     const {active, unactive} = getServicesTotal();
     const [service, setService] = useState({});
     const [loading, setLoading] = useState(false);
-    const permissionLevel = useSelector((state) => state.user.permissions);
-
 
     const serviceList = useSelector((state) => state.business.services);
     const dispatch = useDispatch();
@@ -78,7 +79,6 @@ export default function Services() {
 
     const removeEmployeeService = (id, serviceId) => {
         setLoading(true);
-        if (!id) { return; }
         const data = { employeeId: id, serviceId: serviceId}
         removeEmployeeTag(data)
         .then(response => {
@@ -248,7 +248,7 @@ export default function Services() {
                                                     <TableCell>
                                                     <Tooltip title="Remove employee from service.">
 
-                                                    <IconButton onClick={() => removeEmployeeService(employee._id, service._id)} aria-label="delete">
+                                                    <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_DETACH')} onClick={() => removeEmployeeService(employee._id, service._id)} aria-label="delete">
                                                         <DeleteIcon />
                                                     </IconButton> 
                                                     </Tooltip>
@@ -273,7 +273,7 @@ export default function Services() {
             )}
 
                 <DialogActions>
-                    <Button sx={{ borderRadius: 10}} disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} variant="contained" onClick={() => handleUpdateService()} > Save</Button>
+                    <Button sx={{ borderRadius: 10}} disabled={!checkPermission('SERV_CHANGE')} variant="contained" onClick={() => handleUpdateService()} > Save</Button>
                 </DialogActions> 
         </Dialog>
 

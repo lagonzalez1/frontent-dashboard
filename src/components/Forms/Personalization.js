@@ -4,18 +4,19 @@ import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import UploadIcon from '@mui/icons-material/Upload';
-import { reloadBusinessData } from '../../hooks/hooks';
-
 import { getAccessToken, getStateData } from "../../auth/Auth";
 import { useTheme } from "../../theme/ThemeContext";
+import { usePermission } from "../../auth/Permissions";
 
-export default function Personalization () {
+export default function Personalization ({setLoading, loading}) {
+
     const { theme, updateTheme } = useTheme();
+    const { checkPermission } = usePermission();
+
     const link = useSelector((state) => state.business.publicLink);
     const imageRef = useSelector((state) => state.business.settings.profileImage);
     const permissionLevel = useSelector((state) => state.user.permissions);
     const dispatch = useDispatch();
-    const [loading, setLoading] = useState(true);
 
     const [error, setError] = useState(null);
     const [image, setImage] = useState(null);
@@ -35,25 +36,18 @@ export default function Personalization () {
             const fullLink = "https://waitonline.us/welcome/" + link;
             setPublicLink(fullLink)
         }
-        return () => {
-            setLoading(false);
-        }
+        
     }, [])
 
-    useEffect(() => {
-        reloadBusinessData(dispatch);
-      }, [loading])
-
+    
     const generateQRCode = () => {
         setChecked(!checked);
     }
 
 
     const getCurrentProfileImage = () => {
-        setLoading(true);
         axios.get('api/internal/get_profile_image/'+imageRef)
         .then(response => {
-            console.log(response);
             if (response.status === 200) {
                 setProfileImage(response.data);
                 return;
@@ -63,7 +57,7 @@ export default function Personalization () {
             setError(error.response.data.msg);
         })
         .finally(() => {
-            setLoading(false);
+            setLoading(true);
         })
     }
 
@@ -110,7 +104,6 @@ export default function Personalization () {
         formData.append('profile_image', file, image.name);
         formData.append('b_id', business._id)
         formData.append('profileImage', imageRef ? imageRef: null);
-        setLoading(true);
         axios.post('/api/internal/upload_profile_image', formData, config)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
@@ -119,16 +112,13 @@ export default function Personalization () {
             dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
         })
         .finally(() => {
-            //dispatch(setReload(true))
-            setLoading(false);
-
+            setLoading(true);
         })
         
     }
 
     return (
         <>
-            {loading ? <CircularProgress /> :
             <Box>
                 { error ? (
                     <Alert
@@ -223,12 +213,11 @@ export default function Personalization () {
                 (
                 <>
                 <br/>
-                <Button size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</Button>
+                <Button disabled={!checkPermission('PERS_IMG')} size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</Button>
                 </>)
                 : null}             
         
             </Box>
-            }
             
         </>
     )

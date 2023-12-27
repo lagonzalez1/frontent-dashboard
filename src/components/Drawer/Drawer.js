@@ -1,14 +1,13 @@
 import React, {memo, useEffect, useState} from "react";
-import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled } from "@mui/material";
+import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled, Chip } from "@mui/material";
 import { Container, Box, Stack, Drawer as SIDEBAR, Typography, Button, Paper, Tab} from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import CloseIcon from "@mui/icons-material/Close"
-import MenuIcon from "@mui/icons-material/Menu"
 import { DateTime } from "luxon";
 import { useDispatch, useSelector } from "react-redux";
-import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow, sendNotification } from "../../hooks/hooks";
+import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow, sendNotification, undoClientServing } from "../../hooks/hooks";
 import axios from "axios";
 import { getHeaders } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -19,8 +18,13 @@ import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import DoNotDisturbRoundedIcon from '@mui/icons-material/DoNotDisturbRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
-import theme from "../../theme/theme.js";
-
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
+import WatchLaterIcon from '@mui/icons-material/WatchLater';
+import DoNotDisturbAltRoundedIcon from '@mui/icons-material/DoNotDisturbAltRounded';
+import RuleRoundedIcon from '@mui/icons-material/RuleRounded';
+import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
+import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 
 const Drawer = ({client, setClient}) => {
 
@@ -33,7 +37,6 @@ const Drawer = ({client, setClient}) => {
     const [analytics, setAnalytics] = useState({});
 
     useEffect(() => {
-        console.log("Drawer-Render")
         setPayload(client.payload);
         getAnalytics(client.payload);
         return() => {
@@ -93,6 +96,17 @@ const Drawer = ({client, setClient}) => {
             closeDrawer();
             dispatch(setReload(true));
 
+        })
+    }
+
+    const undoClient = (clientId) => {
+        const data = {clientId, type: payload.type}
+        undoClientServing(data)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
     }
 
@@ -190,7 +204,7 @@ const Drawer = ({client, setClient}) => {
                                         <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Created on</Typography>
                                     </Grid>
                                     <Grid sx={{ justifyContent: 'right'}} item>
-                                        <Typography variant="body2">{payload && (DateTime.fromISO(payload.timestamp).toFormat("LLL mm yyyy")) }</Typography>
+                                        <Typography variant="body2">{payload && ( DateTime.fromISO(payload.timestamp).toFormat("LLL dd yyyy")) }</Typography>
                                     </Grid>
                                 </Grid>
                                 <br/>
@@ -206,11 +220,14 @@ const Drawer = ({client, setClient}) => {
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Status</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography variant="body2" >{payload && (payload.status.late ? "Late": null) }</Typography>
-                                <Typography variant="body2" >{payload && (payload.status.parking ? "Parked": null) }</Typography>
-                                <Typography variant="body2" >{payload && (payload.status.here ? "Checked in": null) }</Typography>
-                                <Typography variant="body2" >{payload && (payload.status.cancelled ? "Cancelled": null) }</Typography>
-                                <Typography variant="body2" >{payload && (payload.status.noShow ? "No show": null) }</Typography>
+                                <Stack spacing={0.5}>
+                                {payload && (payload.status.late) ? (<Chip variant="outlined" icon={<WatchLaterIcon />} label="Here" />) : null }
+                                {payload && (payload.status.parking) ? (<Chip variant="outlined" icon={<DirectionsCarFilledIcon />} label="Parking" />) : null }
+                                {payload && (payload.status.here) ? (<Chip variant="outlined" icon={<EmojiPeopleIcon />} label="Here" />) : null }
+                                {payload && (payload.status.cancelled) ? (<Chip variant="outlined" icon={<DoNotDisturbAltRoundedIcon />} label="Cancelled" />) : null }
+                                {payload && (payload.status.noShow) ? (<Chip variant="outlined" icon={<RuleRoundedIcon />} label="No show" />) : null }
+                                {payload && (payload.status.serving) ? (<Chip variant="outlined" icon={<NavigateNextRoundedIcon />} label="Serving" />) : null }
+                                </Stack>
                             </Grid>
                         </Grid>
                         <br/>
@@ -242,10 +259,11 @@ const Drawer = ({client, setClient}) => {
                             </Grid>
                         </Grid>
                         <br/>
-                        <Grid container
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center">
+                        <Grid 
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center">
                             <Grid item>
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Staff</Typography>
                             </Grid>
@@ -253,7 +271,20 @@ const Drawer = ({client, setClient}) => {
                                 <Typography variant="body2">{payload && findEmployee(payload.employeeTag).fullname}</Typography>
                             </Grid>
                         </Grid>
+                        <br/>
 
+                        <Grid 
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center">
+                            <Grid item>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Notified</Typography>
+                            </Grid>
+                            <Grid sx={{ justifyContent: 'right'}} item>
+                            {payload && (payload.status.notified) ? (<Chip variant="outlined" icon={<NotificationsActiveRoundedIcon />} label="Notified" />) : null }
+                            </Grid>
+                        </Grid>
                         </>
 
                     </TabPanel>
@@ -326,14 +357,13 @@ const Drawer = ({client, setClient}) => {
 
             <Divider/>
             <Container sx={{ mt: 'auto', mb: 2}}>
-                <Box sx={{ display: 'flex', justifyContent: 'center'}}> 
 
                     {
                         client.fromComponent === SERVING &&
                         (
-                            <Stack direction={'row'}>
-                                {payload ? <Button startIcon={<CheckCircleRoundedIcon/>} color="success" variant="contained" sx={{borderRadius: 10}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
-                                <Button variant="contained" sx={{borderRadius: 10}}>Move Waitlist</Button>
+                            <Stack alignContent={'center'} justifyContent={'center'} spacing={0.5} direction={'row'}>
+                                {payload ? <Button disableElevation startIcon={<CheckCircleRoundedIcon fontSize="small"/>} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => moveClientComplete(payload)}>Move Complete</Button>: null}
+                                <Button disableElevation onClick={() => undoClient(payload._id, client.fromComponent)} startIcon={<UndoRoundedIcon fontSize="small"/>} variant="contained" sx={{borderRadius: 10, margin: 0}}>Undo</Button>
                             </Stack>
                         )
                     }
@@ -341,15 +371,14 @@ const Drawer = ({client, setClient}) => {
                     {
                         (client.fromComponent === WAITLIST || client.fromComponent === APPOINTMENT) &&
                         (
-                            <Stack direction={'row'}>
-                                {payload ? <Button startIcon={<DoNotDisturbRoundedIcon/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
-                                <Button startIcon={<NotificationsActiveRoundedIcon />} color='warning' variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
-                                {payload ? <Button startIcon={<NavigateNextRoundedIcon />} color="success" variant="contained" sx={{borderRadius: 10, margin: 1}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
+                            <Stack alignContent={'center'} justifyContent={'center'} spacing={0.5} direction={'row'}>
+                                {payload ? <Button disableElevation startIcon={<DoNotDisturbRoundedIcon fontSize="small"/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
+                                <Button disableElevation startIcon={<NotificationsRoundedIcon fontSize="small"/>} color='warning' variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
+                                {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
 
                             </Stack>
                         )
                     }
-                </Box>
             </Container>        
             </SIDEBAR> 
 

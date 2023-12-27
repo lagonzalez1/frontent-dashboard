@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton, Stack, Divider, Typography   } from '@mui/material';
+import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton, Stack, Divider, Typography, Checkbox, FormLabel   } from '@mui/material';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { addResource, Transition } from "./Helper";
-import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks";
+import { getServicesAvailable } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setReload, setSnackbar } from '../../reducers/user';
 import CloseIcon from "@mui/icons-material/Close"
+import { usePermission } from '../../auth/Permissions';
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -29,12 +30,12 @@ const initialValues = {
 };
 
 export default function AddResource() {
+  const { checkPermission } = usePermission();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
   const serviceList = getServicesAvailable();
   const dispatch = useDispatch();
-  const permissionLevel = useSelector((state) => state.user.permissions);
 
 
   const handleOpen = () => {
@@ -56,15 +57,11 @@ export default function AddResource() {
       dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
-      //dispatch(setReload(true))
+      dispatch(setReload(true))
     })
     
   };
 
-  useEffect(() => {
-    reloadBusinessData(dispatch);
-  }, [loading])
 
   const TextFieldEdit = () => { return <TextField multiline={true} rows={3} label="Description" />}
 
@@ -100,7 +97,6 @@ export default function AddResource() {
             {({ errors, touched, handleBlur, handleChange }) => (
               <Form>
                 <Stack spacing={1.5}>
-                  <InputLabel id="services" sx={{fontWeight: 'bold'}}>Title *</InputLabel>
                     <Field
                       name="title"
                       as={TextField}
@@ -109,13 +105,10 @@ export default function AddResource() {
                       onChange={handleChange}
                       fullWidth={true}
                       error={touched.title && !!errors.title}
-                    />
-         
-
-                  
+                    />           
                   {business ? (
                       <>
-                          <InputLabel id="services" sx={{fontWeight: 'bold'}}>Services *</InputLabel>
+                          <InputLabel id="services" sx={{fontWeight: 'bold'}}>Attach serivce? </InputLabel>
                           <Field
                           as={Select}
                           id="services"
@@ -139,7 +132,6 @@ export default function AddResource() {
                       as={TextFieldEdit}
                       fullWidth={true}  
                       onChange={handleChange}
-                    
                       variant="outlined"
                       error={touched.description && !!errors.description}
                     />
@@ -153,28 +145,38 @@ export default function AddResource() {
                       variant="outlined"
                       error={touched.serveSize && !!errors.serveSize}
                     />
+                    <Grid container>
+                      <Grid item>
+                    <FormLabel id="active">Set active ?</FormLabel>
                     <Field
+                      id="active"
                       name="active"
                       type="checkbox"
-                      as={TextField}
+                      as={Checkbox}
                       fullWidth={true}
                       onChange={handleChange}
                       label="Set active"
                       error={touched.active && !!errors.active}
                     />
+                    </Grid>
+                    <Grid item>
+                    <FormLabel id="publicValue">Set public ?</FormLabel>
                     <Field
+                      id="publicValue"
                       name="publicValue"
                       type="checkbox"
-                      as={TextField}
+                      as={Checkbox}
                       fullWidth={true}
                       onChange={handleChange}
                       label="Set public"
                       error={touched.publicValue && !!errors.publicValue}
-                    />  
+                    /> 
+                    </Grid>
+                    </Grid>
+                    <Button disabled={!checkPermission('RESO_ADD')} sx={{ borderRadius: 10}}  variant="contained" type="submit">submit</Button>
 
                   </Stack>
                 <DialogActions>
-                  <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}}  variant="contained" type="submit">Save</Button>
                 </DialogActions>
               </Form>
             )}

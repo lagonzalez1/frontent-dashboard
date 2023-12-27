@@ -15,6 +15,7 @@ import * as Yup from 'yup';
 import { submitService, Transition } from './Helper';
 import { setReload, setSnackbar } from '../../reducers/user';
 import { reloadBusinessData } from '../../hooks/hooks';
+import { usePermission } from '../../auth/Permissions';
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -47,6 +48,7 @@ const validationSchema = Yup.object().shape({
 });
 
 const AddService = () => {
+  const { checkPermission } = usePermission();
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -213,7 +215,7 @@ const AddService = () => {
                 </Grid>
               </Grid>
             
-              <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 10}}  fullWidth={true} variant="contained" type="submit">Submit</Button>
+              <Button disabled={!checkPermission('SERV_ADD')} sx={{borderRadius: 10}}  fullWidth={true} variant="contained" type="submit">Submit</Button>
               </Stack>
             </Form>
             )}

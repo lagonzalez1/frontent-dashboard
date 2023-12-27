@@ -3,8 +3,8 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent,
     Fade, CircularProgress, Stack, Select, MenuItem, IconButton, Menu, TextField, InputLabel,ListItemIcon} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-
+import { ThemeProvider } from "@emotion/react";
+import { ClientWelcomeTheme } from "../../theme/theme";
 import { useParams } from "react-router-dom";
 import { allowClientJoin, getExtras } from "./WelcomeHelper";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -102,9 +102,10 @@ export default function WelcomeExtras() {
         navigate(`/welcome/${link}`)
     }
     return (
-        <>
+        <>  
+            <ThemeProvider theme={ClientWelcomeTheme}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-                <Card sx={{ maxWidth: '100vh', minWidth: '40%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+                <Card className="custom-card" sx={{ maxWidth: '100vh', minWidth: '40%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
 
                     {loading ? <CircularProgress/> : (<>
                     <Container sx={{ textAlign: 'left'}}>
@@ -196,14 +197,14 @@ export default function WelcomeExtras() {
                                 </Field>
                             </>
                             ) : null}
-                             <InputLabel id="notes" textAlign="left">Additional notes</InputLabel>
+                            <InputLabel id="notes" textAlign="left">Anything we need to know before ?</InputLabel>
 
                             <Field
                             as={TextField}
                             id="notes"
                             name="notes"
                             label="Notes"
-                            placeholder="Additional notes"
+                            placeholder="notes"
                             error={touched.notes && !!errors.notes}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -236,7 +237,7 @@ export default function WelcomeExtras() {
                     </CardActions>
                 </Card>
             </Box>
-
+            </ThemeProvider>
 
         </>
     )

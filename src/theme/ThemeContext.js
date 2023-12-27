@@ -12,8 +12,16 @@ export const ThemeProvider = ({ children }) => {
     setTheme(newTheme);
   };
 
+  const getCurrentTheme = () => {
+    // Get the theme value from localStorage
+    const storedTheme = localStorage.getItem('theme');
+  
+    // Return the stored theme, or a default theme if not found
+    return storedTheme || 'light';
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, updateTheme }}>
+    <ThemeContext.Provider value={{ theme, updateTheme, getCurrentTheme }}>
       {children}
     </ThemeContext.Provider>
   );

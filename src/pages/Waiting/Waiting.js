@@ -1,7 +1,7 @@
 import React, {useState, useEffect } from "react";
 import { Box, Swtich , Paper, Slide, Alert, Card, CardContent, Typography, Stack, Container, Button, Divider, CardActions,
     AlertTitle, Dialog, DialogContent, DialogTitle, RadioGroup, FormControlLabel, Radio, DialogActions, ButtonBase, Snackbar, CircularProgress, Link, 
-Collapse, IconButton, DialogContentText, Grow, TextField, Select, Grid, Menu, MenuItem, CardActionArea, Chip, LinearProgress} from "@mui/material";
+Collapse, IconButton, DialogContentText, Grow, TextField, Select, Grid, Menu, MenuItem, CardActionArea, Chip, LinearProgress, ThemeProvider} from "@mui/material";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 
@@ -24,7 +24,6 @@ import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
 import IosShareRoundedIcon from '@mui/icons-material/IosShareRounded';
 import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
-
 import FormatListNumberedRoundedIcon from '@mui/icons-material/FormatListNumberedRounded';
 import * as Yup from 'yup';
 import "../../css/Waiting.css";
@@ -36,6 +35,7 @@ import { Field, Formik,Form, ErrorMessage } from "formik";
 import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
     getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX } from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";
+import { ClientWaitingTheme } from "../../theme/theme.js";
 
 export default function Waiting() {
 
@@ -61,7 +61,6 @@ export default function Waiting() {
     const [editClient, setEditClient] = useState(false);
     const [selectedDate, setSelectedDate] = useState(null);
     const [updateClient, setUpdateClient] = useState(false);
-    const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [serviceList, setServiceList] = useState(null);
     const [employeeList, setEmployeeList] = useState(null);
 
@@ -120,6 +119,11 @@ export default function Waiting() {
 
     const handleStatusClose = () => {
         setUpdateClient(false);
+        setClientStatus({
+            here: false,
+            parking: false,
+            late: false
+        })
     }
 
     useEffect(() => {
@@ -219,7 +223,7 @@ export default function Waiting() {
             setMessage('Please only select one status button.');
             return;
         }
-        const payload = { unid, link, ...clientStatus}
+        const payload = { unid, link, ...clientStatus, type: user.type}
         requestClientStatus(payload)
         .then(response => {
             setMessage(response);
@@ -327,11 +331,14 @@ export default function Waiting() {
 
     return(
         <>
+
+            <ThemeProvider theme={ClientWaitingTheme}>
             <Box className="center-box" sx={{ pt: 3 }}>
                     <Card className="custom-card" sx={{ textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
                     <Box sx={{ width: '100%' }}>
                     <Collapse in={alert}>
                         <Alert
+                        severity="info"
                         action={
                             <IconButton
                             aria-label="close"
@@ -735,10 +742,10 @@ export default function Waiting() {
                             type === WAITLIST && (
                                 <>
                                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
-                                    <Stack direction={'row'} spacing={0.5}>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<IosShareRoundedIcon fontSize="small" />} onClick={() => copyToClipboardHandler()}>Share</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<FormatListNumberedRoundedIcon fontSize="small"/>} onClick={() => navigateToWaitlist() }> Waitlist</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<BlockRoundedIcon fontSize="small"/>} onClick={() => setOpen(true)}> Cancel</Button>
+                                    <Stack direction={'row'} spacing={2}>
+                                        <Button disabled={errors ? true: false} size="small" variant="text" color="warning" startIcon={<IosShareRoundedIcon color="warning" fontSize="small" />} onClick={() => copyToClipboardHandler()}>Share</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="text" color="info" startIcon={<FormatListNumberedRoundedIcon color="info" fontSize="small"/>} onClick={() => navigateToWaitlist() }> Waitlist</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="text" color="error" startIcon={<BlockRoundedIcon color="error" fontSize="small"/>} onClick={() => setOpen(true)}> Cancel</Button>
                                     </Stack>
                                 </Container>
                                 </>
@@ -748,10 +755,10 @@ export default function Waiting() {
                             type === APPOINTMENT && (
                                 <>
                                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
-                                    <Stack direction={'row'} spacing={0.5}>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<NotificationsActiveRoundedIcon fontSize="small"/>} onClick={() => setUpdateClient(true)}>Status</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<BorderColorRoundedIcon fontSize="small"/>} onClick={() => setEditClient(true)}>Edit</Button>
-                                        <Button disabled={errors ? true: false} size="small" variant="info" startIcon={<BlockRoundedIcon fontSize="small"/>} onClick={() => setOpen(true)}>Cancel</Button>
+                                    <Stack direction={'row'} spacing={2}>
+                                        <Button disabled={errors ? true: false} size="small" variant="text" color="warning" startIcon={<NotificationsActiveRoundedIcon color="warning" fontSize="small"/>} onClick={() => setUpdateClient(true)}>Status</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="text" color="info" startIcon={<BorderColorRoundedIcon color="info" fontSize="small"/>} onClick={() => setEditClient(true)}>Edit</Button>
+                                        <Button disabled={errors ? true: false} size="small" variant="text" color="error" startIcon={<BlockRoundedIcon color="error" fontSize="small"/>} onClick={() => setOpen(true)}>Cancel</Button>
                                     </Stack>
                                 </Container>
                                 </>
@@ -802,13 +809,13 @@ export default function Waiting() {
                 <Divider />
 
                 <DialogContentText>
-                    {type === APPOINTMENT && (<Typography variant="caption">Are you sure you want to give up your appointment?</Typography> )}
-                    {type === WAITLIST && (<Typography variant="caption">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography> )}
+                    {type === APPOINTMENT && (<Typography variant="body2">Are you sure you want to give up your appointment?</Typography> )}
+                    {type === WAITLIST && (<Typography variant="body2">This means that you will no longer receive notifications or updates regarding your position in the queue.</Typography> )}
                 </DialogContentText>   
             </DialogContent>
             <DialogActions>
-                <Button sx={{ borderRadius: 10}} variant="contained" color="primary" onClick={() => handleClose()}>No</Button>
-                <Button sx={{ borderRadius: 10}} variant="outlined" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
+                <Button sx={{ borderRadius: 10}} variant="outlined" color="primary" onClick={() => handleClose()}>No</Button>
+                <Button sx={{ borderRadius: 10}} variant="contained" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
             </DialogActions>
             </Dialog>
 
@@ -842,14 +849,15 @@ export default function Waiting() {
                 <Container sx={{ width: '100%', mt: 1}}>
                 <Stack spacing={1}>
                     <Typography gutterBottom variant="body2">Let us know where you are at!</Typography>  
-                    <Button size="large" color="primary" sx={{ borderRadius: 10}} variant={clientStatus.late ? "contained" : "outlined"} startIcon={<WatchLaterIcon /> } onClick={() => setClientStatus((prev) => ({...prev, late: !clientStatus.late})) }>Late</Button>
-                    <Button size="large"  color="primary"sx={{ borderRadius: 10}} variant={clientStatus.here ? "contained" : "outlined"}  startIcon={<EmojiPeopleIcon /> } onClick={() => setClientStatus((prev) => ({...prev, here: !clientStatus.here})) }>Here</Button>
-                    <Button size="large"  color="primary" sx={{ borderRadius: 10}} variant={clientStatus.parking ? "contained" : "outlined"}  startIcon={<DirectionsCarFilledIcon /> } onClick={() => setClientStatus((prev) => ({...prev, parking: !clientStatus.parking})) }>Parking</Button>
+                    <Button size="large"  color="primary"sx={{ borderRadius: 10}} variant={clientStatus.here ? "contained" : "outlined"}  startIcon={<EmojiPeopleIcon /> } onClick={() => setClientStatus((prev) => ({...prev, here: !clientStatus.here})) }>Here 1-2 min</Button>
+                    <Button size="large"  color="warning" sx={{ borderRadius: 10}} variant={clientStatus.parking ? "contained" : "outlined"}  startIcon={<DirectionsCarFilledIcon /> } onClick={() => setClientStatus((prev) => ({...prev, parking: !clientStatus.parking})) }>Parking 3-5 min</Button>
+                    <Button size="large" color="error" sx={{ borderRadius: 10}} variant={clientStatus.late ? "contained" : "outlined"} startIcon={<WatchLaterIcon /> } onClick={() => setClientStatus((prev) => ({...prev, late: !clientStatus.late})) }>Late 7-15 min</Button>
+
                 </Stack>
                 </Container>
             </DialogContent>
             <DialogActions>
-                <Button startIcon={<NotificationsActiveRoundedIcon fontSize="small"/>} sx={{ borderRadius: 10}} variant="contained" onClick={() => statusRequest()}>Update</Button>
+                <Button sx={{ borderRadius: 10}} variant="contained" onClick={() => statusRequest()}>Update</Button>
             </DialogActions>
             </Dialog>
 
@@ -862,7 +870,7 @@ export default function Waiting() {
             >
             </Snackbar>
             
-        
+            </ThemeProvider>
         </>
     )
 }

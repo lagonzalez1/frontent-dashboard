@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField } from "@mui/material";
+    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, ThemeProvider } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
@@ -9,6 +9,7 @@ import { allowClientJoin, getMax, requestBusinessArguments} from "./WelcomeHelpe
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { CLIENT } from "../../static/static";
 import "../../css/Welcome.css";
+import { ClientWelcomeTheme } from "../../theme/theme";
 
 
 export default function Welcome() {
@@ -124,6 +125,8 @@ export default function Welcome() {
 
     return (
         <>
+
+        <ThemeProvider theme={ClientWelcomeTheme}>
             <Box className="center-box" sx={{ pt: 3 }}>
                 <Card className="custom-card"  sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
                     <Container sx={{ textAlign: 'left'}}>
@@ -190,7 +193,7 @@ export default function Welcome() {
                     </CardActions>
                 </Card>
             </Box>
-
+        </ThemeProvider>
 
         </>
     )

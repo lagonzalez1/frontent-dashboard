@@ -41,6 +41,54 @@ export const theme = createTheme({
     
 });
 
+export const ClientWelcomeTheme = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
+      main: '#2196f3',
+    },
+    secondary: {
+      main: '#ff5722',
+    },
+    info: {
+      main: '#616161',
+    },
+    error: {
+      main: '#f44336',
+    },
+    warning: {
+      main: '#ff9800',
+    },
+    success: {
+      main: '#4caf50',
+    },
+  }
+})
+
+export const ClientWaitingTheme = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
+      main: '#2196f3',
+    },
+    secondary: {
+      main: '#ff5722',
+    },
+    info: {
+      main: '#424242',
+    },
+    error: {
+      main: '#f44336',
+    },
+    warning: {
+      main: '#ff9800',
+    },
+    success: {
+      main: '#4caf50',
+    },
+  }
+})
+
 
 export const DashboardThemeLight = createTheme({
     palette: {

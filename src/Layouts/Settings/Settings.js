@@ -4,8 +4,8 @@ import LocationForm from "../../components/Forms/LocationForm";
 import OpeningHoursForm from "../../components/Forms/OpeningHoursForm";
 import BusinessForm from "../../components/Forms/BusinessForm";
 import PaymentForm from "../../components/Forms/PaymentForm";
-import { useSelector } from "react-redux";
-import ExtrasForm from "../../components/Forms/ExtrasForm";
+import { useDispatch, useSelector } from "react-redux";
+import ClientSignForm from "../../components/Forms/ClientSignForm";
 import ClientForm from "../../components/Forms/ClientForm";
 import SystemForm from "../../components/Forms/SystemForm";
 import ResourceServiceForm from "../../components/Forms/ResourceServiceForm";
@@ -14,16 +14,25 @@ import EmployeeTable from "../../components/Employee/EmployeeTable";
 import Personalization from "../../components/Forms/Personalization";
 import NotificationForm from "../../components/Forms/NotificationForm";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
+import { reloadBusinessData } from '../../hooks/hooks';
 
 
 
 export default function Settings() {
 
     const business = useSelector((state) => state.business);
+    const dispatch = useDispatch();
+
+
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-
-    }, [])
+        console.log("CALLED in settings")
+        reloadBusinessData(dispatch);
+        return () => {
+            setLoading(false);
+        }
+    }, [loading])
 
 
     
@@ -51,7 +60,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <LocationForm />
+                                <LocationForm setLoading={setLoading} loading={loading} />
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
@@ -69,7 +78,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <Personalization />
+                                <Personalization setLoading={setLoading} loading={loading} />
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
@@ -86,7 +95,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <OpeningHoursForm/>
+                                <OpeningHoursForm setLoading={setLoading} loading={loading}/>
                             </Grid>
                         </Grid>
 
@@ -103,7 +112,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <SystemForm/>
+                                <SystemForm setLoading={setLoading} loading={loading} />
                             </Grid>
                         </Grid>
 
@@ -124,7 +133,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <NotificationForm />
+                                <NotificationForm setLoading={setLoading} loading={loading} />
                             </Grid>
                         </Grid>
 
@@ -141,7 +150,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <BusinessForm/>
+                                <BusinessForm setLoading={setLoading} loading={loading}/>
                             </Grid>
                         </Grid>
 
@@ -162,7 +171,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <EmployeeTable/>
+                                <EmployeeTable setLoading={setLoading} loading={loading}/>
                             </Grid>
                         </Grid>
 
@@ -180,7 +189,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <ExtrasForm/>
+                                <ClientSignForm setLoading={setLoading} loading={loading}/>
                             </Grid>
                         </Grid>
 
@@ -197,7 +206,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <ClientForm/>
+                                <ClientForm setLoading={setLoading} loading={loading}/>
                             </Grid>
                         </Grid>
 
@@ -219,7 +228,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <ResourceServiceForm/>
+                                <ResourceServiceForm setLoading={setLoading} loading={loading}/>
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
@@ -236,7 +245,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                Free
+                                <PaymentForm />
                             </Grid>
                         </Grid>
 

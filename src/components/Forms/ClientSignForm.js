@@ -4,22 +4,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Grid, FormControlLabel, Switch, Button, FormLabel, Stack, Box, Typography} from "@mui/material";
 import { validationSchema, LABELS, requestExtraChanges, TITLE } from "../FormHelpers/ExtraFormsHelper";
 import { setSnackbar } from "../../reducers/user";
-import { reloadBusinessData } from "../../hooks/hooks";
+import { usePermission } from "../../auth/Permissions";
 
 
-export default function ExtrasForm() {
+export default function ClientSignForm({setLoading, loading}) {
 
-
-    const [loading, setLoading] = useState(false);
+    const { checkPermission } = usePermission();
     const business = useSelector((state) => state.business);
     const settings = useSelector((state) => state.business.settings.present);
-    const permissionLevel = useSelector((state) => state.user.permissions);
     const dispatch = useDispatch();
 
 
-    useEffect(() => {
-        reloadBusinessData(dispatch);
-      }, [loading])
+   
 
     const initialValues = {
         position: settings.position,
@@ -32,7 +28,6 @@ export default function ExtrasForm() {
     };
 
     const handleSubmit = (values) => {
-        setLoading(true);
         const payload = { values, b_id: business._id}
         requestExtraChanges(payload)
         .then(response => {
@@ -42,7 +37,7 @@ export default function ExtrasForm() {
             dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
         })
         .finally(() => {
-            setLoading(false)
+            setLoading(true);
         })
     };
     return(
@@ -64,7 +59,7 @@ export default function ExtrasForm() {
                         
                     </Stack>
                     <br/>
-                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{borderRadius: 10}} variant="contained" type="submit">Save</Button>
+                    <Button disabled={!checkPermission('CLIENT_SIGNU')} sx={{borderRadius: 10}} variant="contained" type="submit">Save</Button>
                     </Form>
                 )}
             </Formik>

@@ -3,7 +3,6 @@ import { Box, CircularProgress, Backdrop } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
 import Waitlist from "../../components/Waitlist/Waitlist";
-import FabButton from "../../components/Add/FabButton";
 import Resources from "../Resources/Resources";
 import Serving from "../Serving/Serving";
 import Settings from "../Settings/Settings";
@@ -22,7 +21,7 @@ import Success from "../../components/Snackbar/Success";
 import { cleanTable } from "../../hooks/hooks";
 import EditClient from "../../components/Dialog/EditClient";
 import Appointments from "../Appointments/Appointments";
-import FabAppointment from "../../components/AddAppointment/FabAppointment";
+import { PermissionProvider } from "../../auth/Permissions";
 
 
 /**
@@ -38,9 +37,6 @@ import FabAppointment from "../../components/AddAppointment/FabAppointment";
  * 
  *             
  */
-
-
-
 
 export default function Dashboard () {
     const dispatch = useDispatch();
@@ -58,14 +54,12 @@ export default function Dashboard () {
         setLoading(true);
         try {
             const isAuth = await isAuthenticated(dispatch);            
-            console.log(isAuth);
             if (isAuth === false) {
                 removeUserState();
                 signOut();
                 return;
             }
             checkPresistentTables();
-            
         }catch(error) {
             removeUserState();
             signOut();
@@ -84,30 +78,18 @@ export default function Dashboard () {
             console.log(error);
         })
     }
-
     useEffect(() => { 
         console.log("Dashboard-render.");
         checkAuthStatus();
     },[reload])
 
-
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
         switch(location) {
             case 0:
-                return( 
-                <> 
-                    <Waitlist setClient={setClient} setEditClient={setEditClient} />
-                    <FabButton />
-                </>
-                );
+                return <Waitlist setClient={setClient} setEditClient={setEditClient} />;
             case 1:
-                return (
-                    <>
-                    <Appointments setClient={setClient} setEditClient={setEditClient} />
-                    <FabAppointment />
-                    </>
-                )
+                return <Appointments setClient={setClient} setEditClient={setEditClient} />;
             case 2:
                 return <Serving setClient={setClient} />
             case 3:
@@ -134,6 +116,7 @@ export default function Dashboard () {
                 <NavBar navState={openNav} openNav={setOpenNav} />
                 <SideBar navState={openNav} openNav={setOpenNav} />
                  <Box component="main" id="innerDashboard" sx={{ flexGrow: 1, p: 1 , width : "100%"}}>
+                    <PermissionProvider>
                       <DashboardHeader />
                       {!authCompleted ? 
                       (<Backdrop
@@ -144,6 +127,7 @@ export default function Dashboard () {
                       </Backdrop>)
                        : <MemoizedRenderLocation />}
                       <Success/>
+                      </PermissionProvider>
                  </Box>      
                  { client.open ? <Drawer setClient={setClient} client={client} />  : null}
                  { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }

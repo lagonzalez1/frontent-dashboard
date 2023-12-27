@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, InputLabel, Select, MenuItem, Alert, Divider, AlertTitle, Chip, Grid, Dialog, DialogContent, DialogTitle, DialogContentText } from "@mui/material";
+     Stack, IconButton, TextField, InputLabel, Alert, Divider, AlertTitle, Chip, 
+     Dialog, DialogContent, DialogTitle } from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
 import { allowClientJoin, getBuisnessForm, waitlistRequest,checkDuplicatesRequest } from "./WelcomeHelper";
@@ -11,11 +12,13 @@ import * as Yup from 'yup';
 import { DateTime } from "luxon";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-
+import { ThemeProvider } from "@emotion/react";
+import { ClientWelcomeTheme } from "../../theme/theme";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
+import LoadingButton from '@mui/lab/LoadingButton';
+
 
 export default function WelcomeDetails() {
-
     
     const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;
     const validationSchema = Yup.object({
@@ -126,7 +129,6 @@ export default function WelcomeDetails() {
         }catch(error) {
             setLoading(false);
             redirectBack();
-            console.log(error);
         }
     }
 
@@ -189,9 +191,10 @@ export default function WelcomeDetails() {
         navigate(`/welcome/${link}/selector`)
     }
     return (
-        <>
+        <>  
+            <ThemeProvider theme={ClientWelcomeTheme}>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-                <Card sx={{ maxWidth: '100vh', minWidth: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+                <Card className="custom-card" sx={{ maxWidth: '100vh', minWidth: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
                     <Container sx={{ textAlign: 'left'}}>
                         <IconButton onClick={ () => redirectBack() }>
                             <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
@@ -261,11 +264,11 @@ export default function WelcomeDetails() {
                             
                             
                              <Divider/>
-                             <Button sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+                             <LoadingButton loading={loading} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                              <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
                                 Join waitlist
                             </Typography> 
-                            </Button> 
+                            </LoadingButton> 
 
                             </Stack>
                             </form>
@@ -296,6 +299,8 @@ export default function WelcomeDetails() {
                                                     preview && preview.TYPE === WAITLIST ? (
                                                         <>
                                                         <Typography variant="caption">For today — <strong>{DateTime.local().toFormat('LLL dd yyyy')}</strong></Typography>
+                                                        <Typography variant="caption">For today — <strong>{DateTime.local().toFormat('LLL dd yyyy')}</strong></Typography>
+
                                                         <br/>   
                                                         { preview.fullname && (<>
                                                             <Typography variant="caption">Employee assigned — <strong>{preview.fullname}</strong></Typography>
@@ -379,7 +384,7 @@ export default function WelcomeDetails() {
                     </Typography>
                 </DialogContent>
             </Dialog>
-
+            </ThemeProvider>
 
         </>
     )

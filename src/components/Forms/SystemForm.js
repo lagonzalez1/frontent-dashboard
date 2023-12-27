@@ -6,20 +6,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
-import { reloadBusinessData } from '../../hooks/hooks';
 import { DateTime } from 'luxon';
+import { usePermission } from '../../auth/Permissions';
 
 
 
 
-export default function SystemForm() {
+export default function SystemForm({setLoading, loading}) {
+
+
+    const { checkPermission } = usePermission();
 
     const settings = useSelector((state) => state.business.system);
-    const permissionLevel = useSelector((state) => state.user.permissions);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
-
-    const [loading, setLoading] = useState(false);
 
     const initialValues = {
         equalDate: settings.equalDate,
@@ -39,7 +39,6 @@ export default function SystemForm() {
     });
 
     const handleSubmit = (values) => {
-        setLoading(true);
         const accessToken = getAccessToken();
         const payload = { ...values, b_id: business._id}
         const headers = { headers: { 'x-access-token': accessToken } };
@@ -51,7 +50,7 @@ export default function SystemForm() {
             dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
         })
         .finally(() => {
-            setLoading(false);
+            setLoading(true);
         })
 
     };
@@ -67,11 +66,6 @@ export default function SystemForm() {
         equalDate: 'Waitlist will only show current day appointments.',
         autoDelete: 'Automatically delete missed once a new day is present. Otherwise, all missed clients will be marked as no show.',
     }
-
-
-    useEffect(() => {
-        reloadBusinessData(dispatch);
-    }, [loading])
 
     return (
         <>
@@ -127,7 +121,7 @@ export default function SystemForm() {
                 </Grid>
             </Grid>
             <br/>
-                <Button variant='contained' type="submit" sx={{borderRadius: 10}} disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false}>Save</Button>
+                <Button variant='contained' type="submit" sx={{borderRadius: 10}} disabled={!checkPermission('SYSTEM')}>Save</Button>
             </Form>
         )}
         </Formik>
