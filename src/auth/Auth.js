@@ -100,7 +100,7 @@ const USER = 'user';
     try {
       const status = await checkAccessToken();
       dispatch(setBusiness(status.business));
-      dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions}))
+      dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription}))
       dispatch(setIndex(status.defaultIndex));
       dispatch(setLocation(0));
       dispatch(setOptions(status.businessOptions));

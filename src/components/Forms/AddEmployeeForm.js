@@ -1,13 +1,14 @@
 import React, { useEffect, useState} from 'react';
 import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress, Select, MenuItem, Accordion, AccordionSummary, AccordionDetails, InputLabel, Tooltip, Alert, AlertTitle } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
-import {permissionLevel, requestEmployeeChange } from "../FormHelpers/AddNewEmployeeFormHelper";
+import {permissionLevel, requestEmployeeAdd, requestEmployeeChange, requestEmployeeEdit } from "../FormHelpers/AddNewEmployeeFormHelper";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/Lock';
 import { usePermission } from '../../auth/Permissions';
+import { useSubscription } from '../../auth/Subscription';
 
 
 
@@ -15,11 +16,11 @@ import { usePermission } from '../../auth/Permissions';
  handleCheckBoxChange This function will not trigger casuing the WEEK days to update.
 */
 
-export default function AddEmployeeForm({employee}) {
+export default function AddEmployeeForm ({ employee, closeModal }) {
 
     const { checkPermission } = usePermission();
+    const { checkSubscription } = useSubscription();
     const [permissionMessage, setPermissionMessage] = useState(null);
-    const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
@@ -73,18 +74,35 @@ export default function AddEmployeeForm({employee}) {
     // Two potential submits, EDIT and NEW
     const handleSubmit = (values) => {
         setLoading(true);
-        const payload = {...values, originalUsername: employee ? employee.employeeUsername : '' }
-        requestEmployeeChange(payload)
-        .then(res => {
-            dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
-        })
-        .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
-        })
-        .finally(() => {
-            setLoading(false);
-            //dispatch(setReload(true))
-        })
+        // Employee edit
+        if (employee === null || employee === undefined) {
+          const payload = {...values }
+          requestEmployeeAdd(payload)
+          .then(res => {
+              dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
+          })
+          .catch(error => {
+              dispatch(setSnackbar({requestMessage: error.response, requestStatus: true}))
+          })
+          .finally(() => {
+              setLoading(false);
+              closeModal()
+          })
+        } else { // New request.
+          const payload = {...values, originalUsername: employee ? employee.employeeUsername : '' }
+          requestEmployeeEdit(payload)
+          .then(res => {
+              dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
+          })
+          .catch(error => {
+              dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
+          })
+          .finally(() => {
+              setLoading(false);
+              closeModal()
+          })
+        }
+        
     }
 
     return (
@@ -102,9 +120,7 @@ export default function AddEmployeeForm({employee}) {
     {loading ? (
         <Container sx={{p: 3}}>
           <Typography variant='caption'>Saving your information...</Typography>
-          <Box>
             <CircularProgress />
-          </Box>
         </Container>
     ) :  
     <Formik

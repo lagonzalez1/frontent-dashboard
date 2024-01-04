@@ -293,11 +293,10 @@ const initialValuesSchedule = {
             </DialogTitle>
             <DialogContent>
             <Divider />
-            <Box sx={{textAlign: 'left', pb: 1}}>
-            <Typography variant='caption'>Any changes will reflect immediately.</Typography>
-            <br/>
-            <Typography variant='caption'>Submit your 
-              time based on 24 hour time (Ex. 08:00~8AM, 18:00~6PM.)</Typography>
+            <Box sx={{textAlign: 'left'}}>
+            <Typography variant='body2'>Any changes will reflect immediately.</Typography>
+            <Typography variant='body2'>Submit your 
+              time based on 24 hour time <strong> (Ex. 08:00~8AM, 18:00~6PM.)</strong></Typography>
             <br/>
             <Divider />
             </Box>
@@ -386,10 +385,7 @@ const initialValuesSchedule = {
 
             </DialogTitle>
             <DialogContent>
-            {
-              // Future update: Change this to be side by side.
-              // Table next to the fields.
-            }
+              
             <Collapse in={message ? true: false}>
                 <Alert
                 action={
@@ -409,9 +405,72 @@ const initialValuesSchedule = {
                 {message}
                 </Alert>
             </Collapse>
-
+              
+              <Divider />
               <Grid container spacing={1} rowSpacing={1} sx={{ pt: 1}}>
-                  <Grid item xs>
+                  <Grid item xs={12}>
+                    <Typography variant='body2'>Specify the dates you wish to not be available from either waitlist and appointments.</Typography>
+                    <Typography variant='body2'>Note: for partial dates please enter the times you <strong>WILL</strong> be available to work.</Typography>
+                    <Divider/>
+
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Stack spacing={1}> 
+                      <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
+                      <InputLabel id="employeeTag">Attach employee?</InputLabel>
+                      <Select 
+                        sx={{ pt: 1}}
+                        id="employeeTag"
+                        size="small"
+                        value={employeeTag}
+                        onChange={handleEmployeeChange}
+                        fullWidth={true}
+                      >
+                        {employeeList && employeeList.map((employee, index) => (
+                          <MenuItem key={index} disabled={!canEmployeeEdit(employee._id, 'HOUR_CLOSE_DEL')} value={employee._id}>
+                            <Typography variant='body2'>{employee.fullname}</Typography>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {
+                        selectedDate && <FormControlLabel 
+                        control={<Switch
+                          color="secondary"
+                          disabled={timerange[0] === null ? true: false}
+                          checked={partialDay}
+                          onChange={(e) => setPartialDayPretense(e) }
+                          inputProps={{ 'aria-label': 'controlled' }}
+                        />
+                      }
+                      label="Partial day?"
+                      />
+                      }
+                      
+                      {
+                        partialDay ? (
+                          <Grow in={partialDay}>
+                            <Box>
+                              <SingleInputTimeRangeField 
+                                label="Start and end"
+                                value={timerange}
+                                fullWidth={true}
+                                disabled={timerange[0] === null ? true: false}
+                                size={'small'}
+                                onChange={(newValue) => setTimerange(newValue)}
+                                />
+                              <br/>
+                            <Typography variant='caption' gutterBottom>Enter the time range you <strong>will</strong> be available.</Typography>
+ 
+                            </Box>
+                          </Grow>
+                        ):
+                        null
+                      }
+                      
+
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={12}>
                   <TableContainer style={{ maxHeight: '350px', overflowY: 'auto' }}>
                     <Table size='small'>
                       { closedDays ?
@@ -474,62 +533,7 @@ const initialValuesSchedule = {
                   </Grid>
 
 
-                  <Grid item xs>
-                    <Stack spacing={1}> 
-                      <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
-                      <InputLabel id="employeeTag">Attach employee?</InputLabel>
-                      <Select 
-                        sx={{ pt: 1}}
-                        id="employeeTag"
-                        size="small"
-                        value={employeeTag}
-                        onChange={handleEmployeeChange}
-                        fullWidth={true}
-                      >
-                        {employeeList && employeeList.map((employee, index) => (
-                          <MenuItem key={index} disabled={!canEmployeeEdit(employee._id, 'HOUR_CLOSE_DEL')} value={employee._id}>
-                            <Typography variant='body2'>{employee.fullname}</Typography>
-                          </MenuItem>
-                        ))}
-                      </Select>
-                      {
-                        selectedDate && <FormControlLabel 
-                        control={<Switch
-                          color="secondary"
-                          disabled={timerange[0] === null ? true: false}
-                          checked={partialDay}
-                          onChange={(e) => setPartialDayPretense(e) }
-                          inputProps={{ 'aria-label': 'controlled' }}
-                        />
-                      }
-                      label="Partial day?"
-                      />
-                      }
-                      
-                      {
-                        partialDay ? (
-                          <Grow in={partialDay}>
-                            <Box>
-                              <SingleInputTimeRangeField 
-                                label="Start and end"
-                                value={timerange}
-                                fullWidth={true}
-                                disabled={timerange[0] === null ? true: false}
-                                size={'small'}
-                                onChange={(newValue) => setTimerange(newValue)}
-                                />
-                              <br/>
-                            <Typography variant='caption' gutterBottom>Enter the time range you <strong>will</strong> be available.</Typography>
- 
-                            </Box>
-                          </Grow>
-                        ):
-                        null
-                      }
-                      
-
-                    </Stack>
-                  </Grid>
+                  
 
               </Grid>
 

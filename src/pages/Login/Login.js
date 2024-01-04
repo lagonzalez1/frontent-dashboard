@@ -55,7 +55,7 @@ export default function Login() {
                         authState: { id: response.data.id },
                     });
                     setAccessToken(response.data.accessToken);
-                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions}));
+                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions }));
                     navigate('/Dashboard');
                     setLoading(false);
                     return;
@@ -158,7 +158,7 @@ export default function Login() {
                     Sign in
                 </Typography>
                 <Typography component="subtitle2" variant="caption">
-                    (Root user)
+                    Root user
                 </Typography>
                 <Box component="form" noValidate sx={{ mt: 1 }}>
                 <Collapse in={alert}>

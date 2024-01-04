@@ -134,7 +134,7 @@ export default function BusinessWaitlist () {
     return(
         <>
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3, pl: 2, pr: 2 }}>
+            <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3, pl: 2, pr: 2 }}>
                 <Card sx={{ textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
                     <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                         <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>

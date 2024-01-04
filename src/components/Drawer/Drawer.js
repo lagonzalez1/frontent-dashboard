@@ -25,11 +25,16 @@ import DoNotDisturbAltRoundedIcon from '@mui/icons-material/DoNotDisturbAltRound
 import RuleRoundedIcon from '@mui/icons-material/RuleRounded';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
+import { useSubscription } from '../../auth/Subscription';
+import ServingClient from "../Dialog/ServingClient";
+
+
 
 const Drawer = ({client, setClient}) => {
 
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
+    const { checkSubscription } = useSubscription();
 
     const [value, setValue] = React.useState('1');
     const [payload, setPayload] = useState(null);
@@ -43,7 +48,6 @@ const Drawer = ({client, setClient}) => {
             setLoading(false);
         }
     }, [client])
-
 
     const closeDrawer = () => {
         setClient({ payload: null, open: false })
@@ -68,6 +72,10 @@ const Drawer = ({client, setClient}) => {
 
 
     const getAnalytics = (payload) => {
+        if (!checkSubscription('APPOINTMENTS')){
+            // Reject a lookup
+            return;
+        }
         if (!payload) { return; }
         const bid = business._id;
         const email = payload.email;
@@ -84,19 +92,20 @@ const Drawer = ({client, setClient}) => {
         })
     }
 
-    const sendClientServing = (clientId, type) => {
-        moveClientServing(clientId, type)
-        .then(response => {
-            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
-        })
-        .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
-        })
-        .finally(() => {
-            closeDrawer();
-            dispatch(setReload(true));
+    const [serveDialog, setServeDialog] = useState(false);
+    const [clientId, setClientId] = useState(null);
 
-        })
+    const sendClientServing = (clientId) => {
+        setServeDialog(true);
+        setClientId(clientId);
+    }
+
+    const closeClientServing = () => {
+        setServeDialog(false);
+        setClientId(null);
+        
+        dispatch(setReload(true));
+        closeDrawer();
     }
 
     const undoClient = (clientId) => {
@@ -107,6 +116,10 @@ const Drawer = ({client, setClient}) => {
         })
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
+        .finally(() =>{
+            dispatch(setReload(true));
+            closeDrawer();
         })
     }
 
@@ -119,6 +132,7 @@ const Drawer = ({client, setClient}) => {
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
+        
     }
 
 
@@ -340,7 +354,16 @@ const Drawer = ({client, setClient}) => {
                             }): null
                         }
 
-                        { analytics && Object.keys(analytics).length === 0 ? <ListItem>
+
+                        { !checkSubscription('APPOINTMENTS') ? 
+                            <ListItem>
+                                <Typography variant="body2">Please upgrade to use this feature.</Typography>
+                            </ListItem>: null
+                        }
+                        
+
+                        { analytics && Object.keys(analytics).length === 0 && checkSubscription('APPOINTMENTS') ? 
+                            <ListItem>
                                 <Typography variant="body2">New Client.</Typography>
                             </ListItem>: null
                         }
@@ -374,13 +397,15 @@ const Drawer = ({client, setClient}) => {
                             <Stack alignContent={'center'} justifyContent={'center'} spacing={0.5} direction={'row'}>
                                 {payload ? <Button disableElevation startIcon={<DoNotDisturbRoundedIcon fontSize="small"/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
                                 <Button disableElevation startIcon={<NotificationsRoundedIcon fontSize="small"/>} color='warning' variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
-                                {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
+                                {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
 
                             </Stack>
                         )
                     }
             </Container>        
             </SIDEBAR> 
+
+            {serveDialog && <ServingClient onClose={closeClientServing} open={serveDialog} type={client.fromComponent} clientId={clientId} />}
 
         </>
     )

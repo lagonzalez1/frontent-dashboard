@@ -290,6 +290,15 @@ export const columns = [
     { id: 'actions', label: '', minWidth: 160 },
 ];
 
+export const noShowColumns = [
+  { id: 'position', label: '#', minWidth: 5 },
+  { id: 'name', label: 'Name', minWidth: 150 },
+  { id: 'size', label: 'Party size', minWidth: 50 },
+  { id: 'resource', label: 'Resource', minWidth: 50 },
+  { id: 'created', label: 'Created on', minWidth: 40 },
+  { id: 'actions', label: '', minWidth: 160 },
+];
+
 export const clientOptions = [
     {id: 'move-up', label: 'Move up', icon: <NorthRoundedIcon/>},
     {id: 'move-down', label: 'Move down', icon: <SouthRoundedIcon/>},

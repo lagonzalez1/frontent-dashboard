@@ -160,15 +160,18 @@ export default function WelcomeSelector() {
         allowClientJoin(currentTime, link)
         .then(response => {
             if (response.status === 200) {
-                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.accpetingAppointments});
-                if (response.data.isAccepting === false && response.data.accpetingAppointments === false) {
+                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
+                if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
                 }
             }           
         })
         .catch(error => {
-            console.log(error);
+            if (error.response.status === 404) {
+                navigate(`/welcome/${link}`);
+                return;
+            }
             setError('Error found when trying to reach business.');
         })
     }
@@ -179,7 +182,11 @@ export default function WelcomeSelector() {
             setArguments(data);
         })
         .catch(error => {
-            console.log(error);
+            if (error.response.status === 400) {
+                navigate(`/welcome/${link}`);
+                return;
+            }
+            console.log(error)
         })
         .finally(() => {
             setLoading(false);
@@ -385,7 +392,6 @@ export default function WelcomeSelector() {
                                             onChange={(newDate) => handleDateChange(newDate) }
                                             defaultValue={currentDate} 
                                             maxDate={args && DateTime.fromISO(args.maxDateAvailable)}
-                                            
                                         />
                                             <Box sx={{pt: 1, display: openEmployees ? 'flex': 'none'}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
@@ -431,6 +437,7 @@ export default function WelcomeSelector() {
                                             <Box sx={{pt: 1, display: openServices ? 'flex': 'none'}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
                                             </Box>
+                                            
                                             <Box id="serviceSelect" className="scroll-left" sx={{pt: 0, display: openServices ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
                                                 <Fade in={openServices}>
                                                     <Grid
@@ -477,10 +484,6 @@ export default function WelcomeSelector() {
                                                     </Grid>
                                                 </Fade>
                                             </Box>
-                                            {
-                                                // Slots is causing the entire width to span, overFlowX is not containing the width.
-                                                // Oct 12
-                                            }
                                         
                                             <Box sx={{ pt: 1, display: openAvailabity ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
@@ -530,7 +533,7 @@ export default function WelcomeSelector() {
 
                                             {
                                                 (openSummary && systemTypeSelected === APPOINTMENT) ? (
-                                                    <Box sx={{ pt: 2, display: openSummary ? "flex": 'none', width: '100%', maxWidth: '100%'}}>
+                                                    <Box sx={{ pt: 2, display: openSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
                                                         <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
                                                             <AlertTitle><Typography variant="body1"><strong>Details saved</strong></Typography></AlertTitle>
                                                             <Typography variant="caption">Date assigned — <strong>{appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>
@@ -553,8 +556,6 @@ export default function WelcomeSelector() {
                                 <Box id="waitlistSection"  sx={{pt: 2}}>
                                     
                                     <Stack sx={{ pt: 1 }} direction="column" spacing={1.5} textAlign="left">
-
-
                                     {employees && present.employees === true ? (
                                         <>
                                             <InputLabel id="employee">Employee preference</InputLabel>
@@ -626,7 +627,7 @@ export default function WelcomeSelector() {
                                             </Select>
                                         </>
                                         ) : null}
-                                        <InputLabel id="notes" textAlign="left">Anything we need to know before hand?</InputLabel>
+                                        <InputLabel id="notes" textAlign="left"><strong>Anything we need to know before hand?</strong></InputLabel>
                                         <TextField
                                         id="notes"
                                         name="notes"
@@ -639,7 +640,7 @@ export default function WelcomeSelector() {
 
                                     {
                                         (openWaitlistSummary && systemTypeSelected === WAITLIST) ? (
-                                            <Box sx={{ pt: 1, display: openWaitlistSummary ? "flex": 'none', width: '100%', maxWidth: '100%'}}>
+                                            <Box sx={{ pt: 1, display: openWaitlistSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
                                                 <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
                                                     <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
                                                     { (waitlistData && waitlistData.fullname === true) ? (

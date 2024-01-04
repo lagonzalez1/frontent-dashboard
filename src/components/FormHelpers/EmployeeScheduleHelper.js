@@ -10,27 +10,49 @@ import { getHeaders, getStateData } from '../../auth/Auth';
  * @param {Object} schedule 
  * @returns If false that means the break time is not within the start and end time.
  */
-export const validateBreak = (employeeSchedule, schedule) => {
-    console.log(employeeSchedule);
-    console.log(schedule);
+export const validateBreak = (incomingSchedule, schedule) => {
+    console.log("ENTER")
+    let employeeSchedule = formatEmployeeSchedule(incomingSchedule);
+    console.log("Formated", employeeSchedule);
     for (var key in employeeSchedule){
         if (employeeSchedule[key].start === '' || employeeSchedule[key].start === undefined || employeeSchedule[key].start === null){
             continue;
         }else {
-            console.log(employeeSchedule[key].start);
             const employeeBreakStart = DateTime.fromFormat(employeeSchedule[key].start, 'HH:mm').toFormat('HH:mm a');
-            console.log(employeeBreakStart)
             const scheduleStartTime = DateTime.fromFormat(schedule[key].start, 'HH:mm').toFormat('HH:mm a');
             const scheduleEndTime = DateTime.fromFormat(schedule[key].end, 'HH:mm').toFormat('HH:mm a');
             const isBetween = employeeBreakStart >= scheduleStartTime && employeeBreakStart <= scheduleEndTime;
             if (!isBetween) {
-                return false;
+                return {validated: false, employeeSchedule};
             }
             continue;
         }
     }
-    return true;
+    return {validated: true, employeeSchedule};
 }
+
+
+function formatEmployeeSchedule (ins){
+    let schedule = {...ins};
+    console.log("enter function formatEmployeeSchedule(d)")
+    for(var key in schedule){
+        if (DateTime.isDateTime(schedule[key].start)) {
+            const convert = schedule[key].start.toFormat('HH:mm');
+            schedule[key] = {
+                ...schedule[key],
+                start: convert,
+            };
+        }else{
+            schedule[key] = {
+                ...schedule[key],
+                start: '',
+            };
+        }
+        
+    }
+    return schedule;
+}
+
 
 
 export const requestScheduleChange = (payload) => {

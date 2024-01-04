@@ -1,7 +1,7 @@
 import React, { useState, useEffect, memo} from "react";
 import { Stack, Typography, Button, List, ListItem, Menu, MenuItem, ListItemText, Grid,
      IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer,
-    TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton 
+    TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton, Divider 
 } from "@mui/material";     
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -19,11 +19,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT, acceptingRejecting,
-    removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState} from "./Helpers";
-import { reloadBusinessData, getUserTable } from "../../hooks/hooks";
+    removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState, noShowColumns} from "./Helpers";
+import { getUserTable, getNoShowTable, getWaitlistWaittime } from "../../hooks/hooks";
 import { WAITLIST } from "../../static/static";
 import FabButton from "../Add/FabButton";
 import { usePermission } from "../../auth/Permissions";
+import { DateTime } from "luxon";
+import ServingClient from "../Dialog/ServingClient";
 
 
 
@@ -34,27 +36,40 @@ const Waitlist = ({setClient, setEditClient}) => {
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
-    const permissionLevel = useSelector((state) => state.user.permissions);
 
     const [anchorElVert, setAnchorElVert] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
     const [clientId, setClientId] = useState();
+    const [waittime, setWaittime] = useState(null);
 
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
 
     let tableData = getUserTable();
+    let noShowData = getNoShowTable();
     let accepting = acceptingRejecting();
 
     useEffect(() => {
-        tableData = getUserTable();        
+        tableData = getUserTable();   
+        noShowData = getNoShowTable();   
+        getWaittime();
         return() => {
             dispatch(setReload(false));
         }
     }, [reload])
 
+
+    const getWaittime = () => {
+        getWaitlistWaittime()
+        .then(response => {
+            setWaittime(response);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 
     const handleClickListItem = (event) => {
         setAnchorEl(event.currentTarget);
@@ -116,7 +131,10 @@ const Waitlist = ({setClient, setEditClient}) => {
     const handleOptionChange = (optionId) => {
         switch (optionId){
             case OPTIONS_SELECT.NO_SHOW:
-                setLoading(true)
+                setLoading(true);
+
+
+                // This is the wrong noshow.
                 requestNoShow(clientId)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
@@ -191,7 +209,6 @@ const Waitlist = ({setClient, setEditClient}) => {
     }
 
     const openClientDrawer = (item) => {
-        console.log(item);
         setClient({payload: item, open: true, fromComponent: WAITLIST});
     }
 
@@ -199,17 +216,19 @@ const Waitlist = ({setClient, setEditClient}) => {
         setEditClient({payload: item, open: true, fromComponent: WAITLIST})
     }
 
+    const [serveDialog, setServeDialog] = useState(false);
+
     const sendClientServing = (clientId) => {
-        moveClientServing(clientId, WAITLIST)
-        .then(response => {
-            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
-        })
-        .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
-        })
-        .finally(() => {
-            dispatch(setReload(true));
-        })
+        setServeDialog(true);
+        setClientId(clientId);
+    }
+
+    const closeClientServing = () => {
+        setServeDialog(false);
+        setClientId(null);
+        
+        dispatch(setReload(true));
+        closeDrawer();
     }
 
     const sendClientNotification = (clientId) => {
@@ -324,7 +343,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                             </Tooltip>
                             <Tooltip title="The estimated time for the next person that joins your line." placement="right">
                                 <Button sx={{ backgroundColor: 'white'}}  variant="outlined" startIcon={<AccessAlarmsIcon />}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>5-10</strong> min wait.</Typography>
+                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>{waittime}</strong> min wait.</Typography>
                                 </Button>
                             </Tooltip>
                         </Stack>
@@ -414,16 +433,11 @@ const Waitlist = ({setClient, setEditClient}) => {
                                             <MoreVertIcon fontSize="small"  />
                                         </IconButton>
 
-                        
-                                
-
                                             <Menu
                                                 id="long-menu"
-                                                MenuListProps={{
-                                                'aria-labelledby': 'long-button',
-                                                }}
+                                                MenuListProps={{'aria-labelledby': 'long-button'}}
                                                 anchorEl={anchorElVert}
-                                                open={clientId === item._id}
+                                                open={clientId === item._id && openVert ===  true}
                                                 onClose={handleCloseVert}
                                             >
                                                 {
@@ -443,7 +457,8 @@ const Waitlist = ({setClient, setEditClient}) => {
                                 </TableCell>            
                             </TableRow>
                         )}) 
-                    ): null
+                    ): 
+                    null
                 }
                                     
                                 </TableBody>
@@ -451,17 +466,113 @@ const Waitlist = ({setClient, setEditClient}) => {
                         </TableContainer>
                     </Paper>
                 </div>
-            {
-                /**
-                 * Handle Waitlist request.
-                 * 
-                 * 
-                 */
-            }
+
+                <br/>
+                <Divider />
+                <br/>
+
+                
+
+                {
+                    noShowData.length > 0 ? (
+                        <div className="table_content">
+                    <Paper sx={{ width: '100%', overflow: 'hidden'}}>
+                        <TableContainer>
+                            <Table stickyHeader aria-label='main_table'>
+                                <TableHead>
+                                <TableRow >
+                                    <TableCell align="left" colSpan={12}>
+                                        <Typography variant="h6" fontWeight={'bold'}>No shows</Typography>
+                                    </TableCell>
+                                </TableRow>
+                                <TableRow>
+                                        {
+                                           noShowColumns.map((col) => (
+                                            <TableCell key={col.id} align='left'>
+                                                <Typography variant="subtitle2">{ col.label }</Typography>
+                                            </TableCell>
+                                           )) 
+                                        }
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+
+                        {noShowData.map((item, index) => {
+                            return (
+                            <TableRow key={item._id}>
+                                     
+                                <TableCell align="left">
+                                    <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'left'}>
+                                        <IconButton onClick={() => openClientDrawer(item)}>
+                                            <InfoOutlinedIcon fontSize="small" /> 
+                                        </IconButton>
+                                        <Typography>{++index}</Typography>                                   
+                                    </Stack>
+                                </TableCell>
+
+                                <TableCell align="left">
+                                    <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
+                                    <Typography fontWeight="normal" variant="caption">
+                                        { item.serviceTag ? findService(item.serviceTag).title: null }
+                                    </Typography>
+                            
+                                </TableCell>
+
+                                <TableCell align="left">
+                                    <Typography variant="subtitle2" fontWeight="bold">{item.partySize}</Typography>
+                                </TableCell>
+
+                                <TableCell align="left">
+                                    <Typography fontWeight="bold" variant="body2">
+                                        { item.resourceTag ? findResource(item.resourceTag).title : null }
+                                    </Typography>
+                                </TableCell>
+
+                                <TableCell align="left">
+                                    <Typography variant="subtitle2" fontWeight="bold">
+                                        {DateTime.fromJSDate(new Date(item.timestampOrigin)).toFormat('LLL dd yyyy hh:mm a')}
+                                    </Typography>
+                                </TableCell>   
+
+                                <TableCell align="right">
+                                    <Stack
+                                        direction="row"
+                                        spacing={1}
+                                    >
+                                        
+                                        <IconButton onClick={() => sendClientServing(item._id)}>
+                                            <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
+                                        </IconButton>
+                                        <IconButton onClick={() => sendClientNotification(item._id)}>
+                                            <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
+                                        </IconButton>
+                                        <IconButton onClick={() => editClientInfo(item)}>
+                                            <EditIcon fontSize="small" />
+                                        </IconButton>
+                                        
+                                                 
+                                    </Stack>
+                                </TableCell> 
+
+                            </TableRow>
+                        )}) }
+                        </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
+                </div>
+                    ): null
+                }
+                                    
+                                
+        
 
             <FabButton />
 
             </div>
+
+            {serveDialog && <ServingClient onClose={closeClientServing} open={serveDialog} type={WAITLIST} clientId={clientId} />}
+
         
         </>
     )

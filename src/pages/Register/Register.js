@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Grid, Typography, LinearProgress, TextField, Box, Button, FormHelperText,
 Tooltip, IconButton, Stack, Alert, CardContent, CardMedia, Checkbox , FormControl, Select,
 InputLabel, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText, 
-InputAdornment, Backdrop, CircularProgress, Chip, Paper  } from "@mui/material";
+InputAdornment, Backdrop, CircularProgress, Chip, Paper, AlertTitle, ThemeProvider, Card, CardActionArea  } from "@mui/material";
 import axios, { AxiosError } from 'axios';
 import {  Navbar as N} from 'react-bootstrap';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -26,6 +26,7 @@ import { useSignIn } from "react-auth-kit";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { DateTime } from "luxon";
+import { RegisterTheme } from "../../theme/theme.js";
 
 
 
@@ -57,12 +58,12 @@ export default function Register(props){
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(10);
     const [mode, setMode] = useState(0);
-    const [error, setErrors] = useState();
+    const [error, setErrors] = useState({title: '', message: '', severity: ''});
     const [passwordError, setPasswordError] = useState(false);
 
     
     const [operationsObject, setOperations] = useState({ start: '', end: ''});
-    const [servicesObject, setServices] = useState({ title: '', minutes: 0});
+    const [servicesObject, setServices] = useState({ title: '', duration: 0});
     const [servicesModal, setServicesModal] = useState(false);
     const [user,setUser] = useState({
         fullName: '',
@@ -75,7 +76,7 @@ export default function Register(props){
         businessAddress: '',
         country: '',
         mode: 0,
-        services: [],
+        services: [{title: 'default', duration: 10}],
         schedule: {},
         timezone: timezone,
         timestamp: timestamp,
@@ -105,11 +106,6 @@ export default function Register(props){
     };
     
     function closeServicesModal () { setServicesModal(false); }
-
-    useEffect(() => {
-
-    }, [])
-
    
 
     /**
@@ -132,11 +128,11 @@ export default function Register(props){
      */
     const businessInfo = () => {
         if (!user.publicLink) {
-          setErrors('Missing your public link.');
+          setErrors({title: 'Input error', message: 'Missing your public link.', severity: 'warning'});
           return;
         }
         if (!checkValidString(user.publicLink)){
-            setErrors('Public link cannot include special or spaces.');
+            setErrors({title: 'Input error', message: 'Public link cannot include spaces.', severity: 'warning'});
             return;
         }else {
             setLoading(true);
@@ -145,22 +141,22 @@ export default function Register(props){
                 switch (response.status){
                     case 200:
                         setStep((prev) => prev + 22.5);
-                        setErrors();
+                        setErrors({title: '', message: '', severity: ''});
                         setLoading(false);
                         return;
                     case 201:
-                        setErrors(response.data.msg);
+                        setErrors({title: 'Response', message: response.data.msg, severity: 'error'});
                         setLoading(false);
                         return;
                     default:
-                        setErrors(response.status);
+                        setErrors({title: 'Response', message: response.data.msg, severity: 'error'});
                         setLoading(false);
                         return;
                 }
               })
               .catch((error) => {
                 setLoading(false)
-                setErrors(error);
+                setErrors({title: 'Response', message: error.data.msg, severity: 'error'});
                 return;
               })
         }
@@ -214,7 +210,7 @@ export default function Register(props){
             ...prev, 
             services: [ ...prev.services, servicesObject ]
         }));
-        setServices({ title: '', minutes: 0})
+        setServices({ title: '', duration: 0})
         setServicesModal(false);
     }
 
@@ -239,9 +235,6 @@ export default function Register(props){
         return passwordRegex.test(password);
     };
 
-    
-
-
     /**
      * 
      * @param {Object} missing       Missing key values as key strings.
@@ -249,7 +242,7 @@ export default function Register(props){
      */
     const displayErrors = (missing) => {
         setUserErrors(missing);
-        setErrors(`Errors found!`);
+        setErrors({title: `Errors found!`, message: 'Incomplete values found when trying to register', severity: 'error'});
     }
 
 
@@ -271,7 +264,7 @@ export default function Register(props){
     const submitBusinessInfo = () => {
         setLoading(true);
         const {status, missing} = checkObjectData(user);
-        if (!status){
+        if (!status){           
             const data = JSON.stringify(user);
             const formData = new FormData();
             formData.append('RegisterData',data);
@@ -292,13 +285,13 @@ export default function Register(props){
                     return;
                 }else {
                     setLoading(false);
-                    setErrors('Status: ' + response.status + 'Unable to proccess request at the moment.');
+                    setErrors({title: `Register error ${response.status}`, message: response.data.msg, severity: 'error'});
                     return;
                 }
             })
             .catch(error => {
                 console.log(error);
-                setErrors('Axios: ' + error.response.data.msg);
+                setErrors({title: 'Server responded:', message: error.data.msg, severity: 'error'});
                 setLoading(false);
                 return;
             })
@@ -313,13 +306,17 @@ export default function Register(props){
 
     return(
         <>  
-            
+            <ThemeProvider theme={RegisterTheme}>
             <Container className="container" sx={{ pt: 5, pb: 3}}>       
                 { step === 10 ?(
                         <Container className="content_container" sx={{ p: 3}}>
                         <Box sx={{ flexGrow: 1, p: 1}}>
                             <Typography variant="h3">Tell us about your business.</Typography>
-                            {error ? (<Alert severity="error">{error}</Alert>): null}         
+                            {error.title !== "" ? 
+                            (<Alert severity={error && error.severity}>
+                            <AlertTitle sx={{textAlign: 'left', fontWeight:'bold'}}>{error.title}</AlertTitle>
+                            {error && error.message} — <strong>check it out!</strong>
+                          </Alert>): null}         
 
                             <Grid
                                 sx={{ pt: 2, p: 2}}
@@ -335,21 +332,21 @@ export default function Register(props){
                                 <FormHelperText id="component-helper-text">
                                     <Typography variant="subtitle2"><strong>Business name *</strong></Typography>
                                 </FormHelperText>
-                                    <TextField 
-                                    name="businessName" error={userErrors.businessName}  id="business-name" variant="filled" value={user.businessName} 
+                                    <TextField sx={{backgroundColor: '#F1f1f1'}}
+                                    name="businessName" error={userErrors.businessName}  id="business-name" variant="outlined" value={user.businessName} 
                                     onChange={e => setUser((prev) => ({ ...prev, businessName: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
                                         <Typography variant="body2"><strong>Company website (optional)</strong></Typography>
                                     </FormHelperText>
-                                    <TextField error={userErrors.businessWebsite}  name="businessWebsite" variant="filled" value={user.businessWebsite} onChange={e => setUser((prev) => ({ ...prev, businessWebsite: e.target.value}))} fullWidth/>
+                                    <TextField sx={{backgroundColor: '#F1f1f1'}} error={userErrors.businessWebsite}  name="businessWebsite" variant="outlined" value={user.businessWebsite} onChange={e => setUser((prev) => ({ ...prev, businessWebsite: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
                                         <Typography variant="body2"><strong>Choose public link*</strong>
-                                        <Tooltip title="This link will allow users to join.
-                                                        Only use underscore _ if needed to split input. 
+                                        <Tooltip title="Here is the link your customers will use.
+                                                        Only use underscore if needed to split. 
                                                         Ex. BusinessName_LA">
                                             <IconButton>
                                                 <InfoOutlinedIcon fontSize="small" />
@@ -358,21 +355,23 @@ export default function Register(props){
                                         
                                         </Typography>
                                     </FormHelperText>
-                                    <TextField error={userErrors.publicLink} InputProps={{
+                                    <TextField sx={{backgroundColor: '#F1f1f1'}} error={userErrors.publicLink} InputProps={{
                                             startAdornment: <InputAdornment position="start">waitonline.us/welcome/</InputAdornment>,
-                                        }} name="publicLink" variant="filled" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
+                                        }} name="publicLink" variant="outlined" value={user.publicLink} onChange={e => setUser((prev) => ({ ...prev, publicLink: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
                                     <Typography variant="body2"><strong>Country*</strong></Typography>
+                                    </FormHelperText>
 
                                     <Select
                                         labelId="Country-simple-select-label"
                                         id="Country-simple-select"
                                         label="Country"
-                                        variant="filled"
+                                        variant="outlined"
                                         fullWidth
                                         name="country"
+                                        sx={{backgroundColor: '#F1f1f1'}}
                                         onChange={e => setUser((prev) => ({...prev, country: e.target.value }))}
                                         error={userErrors.country}
                                     >
@@ -382,23 +381,22 @@ export default function Register(props){
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                    </FormHelperText>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
                                         <Typography variant="body2"><strong>Your role</strong></Typography>
                                     </FormHelperText>
-                                    <TextField disabled={true} name="role" variant="filled" value={user.role} onChange={e => setUser((prev) => ({ ...prev, role: e.target.value}))} fullWidth/>
+                                    <TextField sx={{backgroundColor: '#F1f1f1'}} disabled={true} name="role" variant="outlined" value={user.role} onChange={e => setUser((prev) => ({ ...prev, role: e.target.value}))} fullWidth/>
                                 </Grid>
                                 <Grid item sm={12} xs={12} md={6}>
                                     <FormHelperText id="component-helper-text">
                                         <Typography variant="body2"><strong>Business address (optional)</strong></Typography>
                                     </FormHelperText>
-                                    <TextField name="businessAddress" value={user.businessAddress} onChange={e => setUser((prev) => ({ ...prev, businessAddress: e.target.value}))}  variant="filled" fullWidth/>
+                                    <TextField sx={{backgroundColor: '#F1f1f1'}} name="businessAddress" value={user.businessAddress} onChange={e => setUser((prev) => ({ ...prev, businessAddress: e.target.value}))}  variant="outlined" fullWidth/>
                                 </Grid>
                             </Grid>
                         </Box>
-                        <Button sx={{ mt: 3, width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => businessInfo() }>Next</Button>
+                        <Button sx={{ mt: 3, width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => businessInfo() }>Next</Button>
                         { loading ? (
                             <Backdrop
                             sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -406,7 +404,7 @@ export default function Register(props){
                             
                           >
                             <CircularProgress color="inherit" />
-                            <Typography variant="body2" sx={{ color: 'white'}}>Checking public link...</Typography>
+                            <Typography variant="body2" sx={{ color: 'white'}}> Verifying public link ...</Typography>
                           </Backdrop>
                         ) : null}
                         </Container>
@@ -429,11 +427,11 @@ export default function Register(props){
                                     spacing={2}
                                 >
                                     <Grid item xs={12} sm={6} md={4}>
-                                        <StyledCard sx={{ backgroundColor: mode === 0 ? '#ffc34d': '',boxShadow: mode === 1 ? 3: 0 }}  onClick={() => handleCardClick(0) } id="selection_card">
+                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 0 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(0) }>
+                                            <CardActionArea>
                                                 <CardContent>
-                                                    <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Set up waitlist</strong></Typography>
-                                                    <Typography sx={{ textAlign: 'left', pt: 2}} variant="subtitle2" color="dark">Let my clients wait from anywhere.</Typography>
-                                                    <Typography sx={{ textAlign: 'left', pt: 0}} variant="body2" color="dark">Free.</Typography>
+                                                    <Typography sx={{ textAlign: 'left', pl: 1}} variant="h5"><strong>Set up waitlist</strong></Typography>
+                                                    <Typography sx={{ textAlign: 'left', pt: 2, pl: 1, fontWeight: 600}} variant="subtitle2">Let my clients wait from anywhere.</Typography>
 
                                                     <CardMedia
                                                         component="img"
@@ -442,15 +440,16 @@ export default function Register(props){
                                                         alt="Live from space album cover"
                                                     />
                                                 </CardContent>
-                                                
-                                        </StyledCard>
+                                            </CardActionArea>
+                                        </Card>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={4}>
-                                    <StyledCard sx={{ backgroundColor: mode === 1 ? '#ffc34d': '',boxShadow: mode === 1 ? 3: 0 }} id="selection_card" onClick={() => handleCardClick(1) } >
+                                    <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 1 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(1) } >
+                                        <CardActionArea>
+
                                             <CardContent>
-                                                <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Analytics</strong></Typography>
-                                                <Typography sx={{ textAlign: 'left',  pt: 2}} variant="subtitle2" color="dark">View business trends.</Typography>
-                                                <Typography sx={{ textAlign: 'left', pt: 0}} variant="body2" color="dark">$</Typography>
+                                                <Typography sx={{ textAlign: 'left',pl: 1}} variant="h5" color="dark"><strong>Schedule appointments</strong></Typography>
+                                                <Typography sx={{ textAlign: 'left',  pt: 2,pl: 1, fontWeight: 600}} variant="subtitle2" color="dark">Let my clients schedule in advance.</Typography>
                                                 <CardMedia
                                                 component="img"
                                                 sx={{ width: '100%', height: '100%'}}
@@ -458,15 +457,15 @@ export default function Register(props){
                                                 alt="Live from space album cover"
                                                 />
                                             </CardContent>
-                                            
-                                        </StyledCard>
+                                            </CardActionArea>
+                                        </Card>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={4}>
-                                        <StyledCard sx={{ backgroundColor: mode === 2 ? '#ffc34d': '',boxShadow: mode === 2 ? 3: 0 }} id="selection_card" onClick={() => handleCardClick(2) }>
+                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 2 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(2) }>
+                                            <CardActionArea>
                                             <CardContent>
-                                                <Typography sx={{ textAlign: 'left'}} variant="h5" color="dark"><strong>Analytics + Advertisments</strong></Typography>
-                                                <Typography sx={{ textAlign: 'left',  pt: 2}} variant="subtitle2" color="dark">View business trends and advertise.</Typography>
-                                                <Typography sx={{ textAlign: 'left', pt: 0}} variant="body2" color="dark">$$</Typography>
+                                                <Typography sx={{ textAlign: 'left',pl: 1}} variant="h5" color="dark"><strong>Both</strong></Typography>
+                                                <Typography sx={{ textAlign: 'left',  pt: 2,pl: 1, fontWeight: 600}} variant="subtitle2" color="dark">Let my clients do both.</Typography>
                                                 <CardMedia
                                                 component="img"
                                                 sx={{ width: '100%', height: '100%'}}
@@ -474,15 +473,15 @@ export default function Register(props){
                                                 alt="Live from space album cover"
                                                 />
                                             </CardContent>
-                                            
-                                        </StyledCard>
+                                            </CardActionArea>
+                                        </Card>
                                     </Grid>
 
                                 </Grid>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
                                 <Stack sx={{ pt: 3}} direction="row" spacing={2}>
-                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => durationInfo() }>Next</Button>
+                                    <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                    <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => durationInfo() }>Next</Button>
                                 </Stack>
                                 </Box>
                                 
@@ -498,7 +497,7 @@ export default function Register(props){
                         <Container className="content_container" sx={{ p: 3}}>
                             <Box sx={{ flexGrow: 1, p: 1}}>
                                 <Typography variant="h3">Let users choose the service they want.</Typography>
-                                <Typography variant="h6">Use our examples below or add your own.</Typography>
+                                <Typography sx={{pt: 1}} variant="h6">If you have services or resources, you can add them and assign to your customers when they join your waitlist.</Typography>
 
                                 <Container sx={{ pt: 5}}>
                                     <Button onClick={() => setServicesModal(true)} endIcon={ <ControlPointRoundedIcon fontSize="large" /> } size="large" variant="outlined" color="primary">
@@ -516,13 +515,13 @@ export default function Register(props){
                                         </DialogTitle>
                                         <DialogContent>
                                         <DialogContentText id="alert-dialog-description">
-                                            <Typography typography="subtitle2"> For example, mens haircut with a duration of 45 min till completion.</Typography>
+                                            <Typography typography="subtitle2"> For example: Title: mens haircut, with a duration of 45 minutes.</Typography>
                                         </DialogContentText>
                                         
                                         <Box sx={{ p: 1, pt: 2}}>
                                             <Stack direction="row" spacing={2}>
                                                 <TextField variant="filled" label="Title" onChange={e => setServices((prev) => ({ ...prev, title: e.target.value}))}/>
-                                                <TextField variant="filled" label="Duration (in min)" type="number" onChange={e => setServices((prev) => ({ ...prev, minutes: e.target.value}))}/>
+                                                <TextField variant="filled" label="Duration (in min)" type="number" onChange={e => setServices((prev) => ({ ...prev, duration: e.target.value}))}/>
                                             </Stack>
                                         </Box>
                                     
@@ -539,8 +538,8 @@ export default function Register(props){
                             </Box>
                             <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
                                 <Stack sx={{ pt: 3}} direction="row" spacing={2}>
-                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
+                                    <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                    <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
                                 </Stack>
                             </Box>
                             
@@ -595,7 +594,7 @@ export default function Register(props){
 
                                                     >
                                                     { HOURS && HOURS.map((item, index) =>(
-                                                        <MenuItem key={index} value={item}>{item}</MenuItem>
+                                                        <MenuItem key={index} value={item}>{DateTime.fromFormat(item,'hh:mm').toFormat('hh:mm a')}</MenuItem>
                                                     ) )}
                                                     </Select>
                                                 </FormControl>
@@ -622,7 +621,7 @@ export default function Register(props){
                                                                 onClick={() => handleCheckedEvent(item) }
                                                                 inputProps={{ 'aria-label': 'controlled' }}
                                                                 />
-                                                            <Typography variant="subtitle2" textAlign="center" color="gray">{item}</Typography>
+                                                            <Typography sx={{fontWeight: 600}} variant="subtitle2" textAlign="center">{item}</Typography>
 
                                                             </StyledCardService>
 
@@ -637,8 +636,8 @@ export default function Register(props){
                                 </Box>
                                 <Box sx={{ display: 'flex', pt: 3 ,justifyContent: 'center', alignItems: 'center'}}>
                                     <Stack sx={{ pt: 3}} direction="row" spacing={2}>
-                                        <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                        <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
+                                        <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                        <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => operationHoursInfo() }>Next</Button>
                                     </Stack>
                                 </Box>
                                 
@@ -651,15 +650,19 @@ export default function Register(props){
                         <Container className='content_container'>
                             <Box sx={{ pl: 2, pr: 2}}>
                                 <Typography variant="h3">Finally, Login information, Last step!</Typography>
-                                {error ? (<Alert severity="error">{error}</Alert>): null}         
+                                {error.title !== "" ? 
+                                    (<Alert severity={error && error.severity}>
+                                    <AlertTitle sx={{textAlign: 'left', fontWeight:'bold'}}>{error.title}</AlertTitle>
+                                    {error && error.message} — <strong>check it out!</strong>
+                                </Alert>): null}     
 
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} md={4} lg={4}></Grid>
                                         <Grid item xs={12} md={4} lg={4}>
                                         <Stack direction="column" sx={{ pt: 2}} spacing={2}>
-                                            <TextField error={userErrors.fullName} name="fullName" value={user.fullName} onChange={e => (setUser((prev) => ({...prev, fullName: e.target.value}) )) }
-                                            label="Full name" variant="filled"></TextField>
-                                            <TextField helperText="Password must container one uppercase, special character and a number." name="password" 
+                                            <TextField sx={{backgroundColor: '#F1f1f1'}} error={userErrors.fullName} name="fullName" value={user.fullName} onChange={e => (setUser((prev) => ({...prev, fullName: e.target.value}) )) }
+                                            label="Full name" variant='outlined'></TextField>
+                                            <TextField sx={{backgroundColor: '#F1f1f1'}} helperText="Password must container one uppercase, special character and a number." name="password" 
                                             label="Password" value={user.password} onChange={handlePasswordChange} error={passwordError} type={ showPassword ? "text": "password"} 
                                             InputProps={{ endAdornment: (
                                                 <InputAdornment position="end">
@@ -668,10 +671,9 @@ export default function Register(props){
                                                     </IconButton>
                                                 </InputAdornment>
                                             )}} 
-                                            pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="filled"></TextField>
-                                            <TextField error={userErrors.email} name="email" label="Email" value={user.email} 
-                                            
-                                            onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="filled"></TextField>
+                                            pattern="/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,20}$/" variant="outlined"></TextField>
+                                            <TextField sx={{backgroundColor: '#F1f1f1'}} error={userErrors.email} name="email" label="Email" value={user.email} 
+                                            onChange={e => (setUser((prev) => ({...prev, email: e.target.value}) ))} type="email" variant="outlined"></TextField>
                                             <Box sx={{ minWidth: 120 }}>
                                                     <Stack spacing={1}>
                                                         <Chip label={timezone} variant="outlined" />
@@ -691,13 +693,13 @@ export default function Register(props){
                                                     open={loading}
                                                     >   
                                                             <CircularProgress color="inherit" />
-                                                            <Typography variant="body2" sx={{ color: 'white'}}>Checking values...</Typography>
+                                                            <Typography variant="body2" sx={{ color: 'white'}}>Verifying...</Typography>
                                                        
                                                   </Backdrop>
                                                 ):
                                                 <>
-                                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                                    <Button sx={{ width: '100px', borderRadius: 10}} variant="contained" color="primary" onClick={() => submitBusinessInfo() }>submit</Button>
+                                                    <Button sx={{width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
+                                                    <Button sx={{width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => submitBusinessInfo() }>submit</Button>
                                                 </>
                                                 }
                                             </Stack>
@@ -720,6 +722,7 @@ export default function Register(props){
                     <Typography sx={{ pt: 1, pb: 1}} textAlign='center' variant="subtitle2"><strong>Your business</strong></Typography>
                 </Box>
             </N>
+            </ThemeProvider>
         </>
     )
 }

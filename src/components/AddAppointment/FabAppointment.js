@@ -1,6 +1,6 @@
 import React, { useState, useEffect} from "react";ListItemIcon
 import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, Grid, 
-    ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card, CircularProgress, useForkRef} from "@mui/material";
+    ListItemAvatar, ListItemButton, ListItemIcon, CardContent, Container, Card, CircularProgress, useForkRef, AlertTitle} from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
@@ -13,10 +13,15 @@ import {createAppointmentPretense } from "./FabHelper";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
+import { useSubscription } from "../../auth/Subscription";
+import { usePermission } from "../../auth/Permissions";
 
 
 export default function FabAppointment () {
+
     const dispatch = useDispatch();
+    const { checkSubscription} = useSubscription();
+    const { checkPermission } = usePermission();
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
     const [success, setSuccess] = useState();
@@ -39,7 +44,12 @@ export default function FabAppointment () {
     };
 
     const handleClose = () => {
+        setSelectedAppointment(null);
+        setAppointments(null);
+        setPhoneNumber(null)
+        setSelectedDate(null)
         setOpen(false);
+        setError();
     };
 
     useEffect(() => {
@@ -201,6 +211,11 @@ export default function FabAppointment () {
                 </IconButton>
                 </DialogTitle>
                 <DialogContent>
+                    { employeeList && employeeList.length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order to use appointments, you must have employees with schedules ready to book. 
+                    Check out settings page under <u> add employees!</u></Alert>): null}
+
+                    { serviceList && serviceList
+                                .filter((service) => service.employeeTags.includes(formik.values.employee_id)).length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order for your customers to book appointments you need to attach your employees to your services! Check out the side bar <u>Services</u></Alert>): null}
                     { errors ? <Alert severity="error">{errors}</Alert>: null }
                     <form onSubmit={formik.handleSubmit}>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
@@ -265,7 +280,6 @@ export default function FabAppointment () {
                                 name="employee_id"
                                 size="small"
                                 value={formik.values.employee_id}
-
                                 onChange={formik.handleChange}
                                 >
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
@@ -365,7 +379,7 @@ export default function FabAppointment () {
                             (
                             <>
                             <Button variant="outlined" sx={{ borderRadius: 10}} onClick={() => setNextStep(false)}> back</Button>
-                            <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</Button>
+                            <Button variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</Button>
                             </>
                             ): 
                             <Button variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>

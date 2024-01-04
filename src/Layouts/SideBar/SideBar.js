@@ -10,6 +10,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import ListIcon from '@mui/icons-material/List';
+import { useSubscription } from '../../auth/Subscription';
 
 import { LOCATIONS } from "./SideBarHelper";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +22,7 @@ const SideBar = ({navState, openNav}) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const currentLocation = useSelector((state) => state.user.location);
+    const { checkSubscription } = useSubscription();
 
 
     /**
@@ -80,6 +82,7 @@ const SideBar = ({navState, openNav}) => {
                   justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
+                disabled={!checkSubscription('APPOINTMENTS')}
                 onClick={() => changeLocation(LOCATIONS.Appointments)}
               >
                 <ListItemIcon
@@ -178,6 +181,7 @@ const SideBar = ({navState, openNav}) => {
                   justifyContent: navState ? 'initial' : 'center',
                   px: 2.5,
                 }}
+                disabled={!checkSubscription('ANALYTICS')}
                 onClick={() => changeLocation(LOCATIONS.Customers)}
               >
                 <ListItemIcon
@@ -207,6 +211,7 @@ const SideBar = ({navState, openNav}) => {
                     px: 2.5,
                   }}
                   onClick={() => changeLocation(LOCATIONS.Settings)}
+                  
                 >
                   <ListItemIcon
                     sx={{

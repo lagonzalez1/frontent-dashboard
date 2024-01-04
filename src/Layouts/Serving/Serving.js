@@ -9,10 +9,11 @@ import {  findResource, findService, getServingTable, getServingCount, getAppoin
 import "../../css/Serving.css";
 import { setSnackbar } from "../../reducers/user";
 import CloseIcon from "@mui/icons-material/Close"
-import { DateTime } from "luxon";
-
+import { useSubscription } from "../../auth/Subscription";
 
 export default function Serving({setClient}) {
+    const { checkSubscription } = useSubscription();
+
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(false);
@@ -41,6 +42,10 @@ export default function Serving({setClient}) {
 
 
     const openCheckoutNotes = (client) => {
+        // Check if they can save to analytics.
+        if (!checkSubscription('ANALYTICS')){
+            checkoutClient();
+        }
         setCurrentClient(client);
         setUpdateNotesDialog(true);
     }

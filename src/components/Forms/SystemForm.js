@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Formik, Form, Field } from 'formik';
-import { Switch, FormControlLabel, Grid, Button, Container, Typography, TextField, InputLabel  } from '@mui/material';
+import { Switch, FormControlLabel, Grid, Button, Container, Typography, TextField, InputLabel, Tooltip  } from '@mui/material';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
@@ -8,14 +8,13 @@ import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
 import { usePermission } from '../../auth/Permissions';
-
-
-
+import { useSubscription } from '../../auth/Subscription';
 
 export default function SystemForm({setLoading, loading}) {
 
 
     const { checkPermission } = usePermission();
+    const { checkSubscription } = useSubscription();
 
     const settings = useSelector((state) => state.business.system);
     const business = useSelector((state) => state.business);
@@ -76,6 +75,20 @@ export default function SystemForm({setLoading, loading}) {
                 {
                 Object.entries(values).map(([key, value]) => {
                     if (typeof value === 'boolean') {
+                        if (!checkSubscription('APPOINTMENTS') && key === "appointments") {
+                            return (
+                                <Grid item xs={12} key={key}>
+                                    <Typography variant='subtitle2' fontWeight={'bold'}>{TITLE[key]}</Typography>
+                                    <Typography variant="body2">{LABELS[key]}</Typography>
+                                    <Tooltip title="Please upgrade plan to access this field.">
+                                    <FormControlLabel
+                                        control={<Switch color={"secondary"} disabled={true} checked={value} onChange={handleChange} name={key} />}
+                                        label={value ? "On" : "Off"}
+                                    />
+                                    </Tooltip>
+                                </Grid>
+                                );
+                        }
                         return (
                         <Grid item xs={12} key={key}>
                             <Typography variant='subtitle2' fontWeight={'bold'}>{TITLE[key]}</Typography>
@@ -109,15 +122,34 @@ export default function SystemForm({setLoading, loading}) {
                     <Typography variant='subtitle2' fontWeight={'bold'}>Maximum Open Dates Control </Typography>
                     <Typography variant='body2'>Configure the number of open dates in your Date Calendar with precision. For example, limit the availability to a maximum of {initialValues.maxAppointmentDate} days ~ untill {DateTime.local().plus({days: initialValues.maxAppointmentDate}).toFormat('LLL dd yyyy')}</Typography>
                     <br/>
-                    <Field
-                        as={TextField}
-                        name="maxAppointmentDate"
-                        label="Open dates control"
-                        type="number"
-                        error={touched.maxAppointmentDate && Boolean(errors.maxAppointmentDate)}
-                        helperText={touched.maxAppointmentDate && errors.maxAppointmentDate}
-                        fullWidth={false}
-                    />
+                    {
+                        checkSubscription('APPOINTMENTS') ? (
+                            <Field
+                                as={TextField}
+                                name="maxAppointmentDate"
+                                label="Open dates control"
+                                type="number"
+                                error={touched.maxAppointmentDate && Boolean(errors.maxAppointmentDate)}
+                                helperText={touched.maxAppointmentDate && errors.maxAppointmentDate}
+                                fullWidth={false}
+                            />
+                        ):
+                        (
+                            <Tooltip title="Please upgrade plan to access this field.">
+                                <Field
+                                as={TextField}
+                                name="maxAppointmentDate"
+                                label="Open dates control"
+                                type="number"
+                                disabled={!checkSubscription('APPOINTMENTS')}
+                                error={touched.maxAppointmentDate && Boolean(errors.maxAppointmentDate)}
+                                helperText={touched.maxAppointmentDate && errors.maxAppointmentDate}
+                                fullWidth={false}
+                                    />
+                            </Tooltip>
+                        )
+                    }
+                    
                 </Grid>
             </Grid>
             <br/>

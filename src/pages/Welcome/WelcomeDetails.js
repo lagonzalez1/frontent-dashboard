@@ -16,6 +16,7 @@ import { ThemeProvider } from "@emotion/react";
 import { ClientWelcomeTheme } from "../../theme/theme";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import LoadingButton from '@mui/lab/LoadingButton';
+import "../../css/Welcome.css";
 
 
 export default function WelcomeDetails() {
@@ -61,7 +62,10 @@ export default function WelcomeDetails() {
         })
         .catch(error => {
             setErrors(errors);
-            console.log(error);
+            if (error.response.status === 404) {
+                navigate(`/welcome/${link}`);
+                return;
+            }
         })
     }
 
@@ -95,15 +99,18 @@ export default function WelcomeDetails() {
         allowClientJoin(currentTime, link)
         .then(response => {
             if (response.status === 200) {
-                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.accpetingAppointments});
-                if (response.data.isAccepting === false && response.data.accpetingAppointments === false) {
+                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
+                if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
                 }
             }            
         })
         .catch(error => {
-            console.log(error);
+            if (error.response.status === 404) {
+                navigate(`/welcome/${link}`);
+                return;
+            }
             setErrors('Error found when trying to reach business.');
         })
     }
@@ -112,11 +119,11 @@ export default function WelcomeDetails() {
         let timestamp = DateTime.local().toUTC();
         try {
             const response = await allowClientJoin(timestamp, link);
-            const { isAccepting, accpetingAppointments } = response.data;
-            if ( accpetingAppointments === true || isAccepting === true ) {
+            const { isAccepting, acceptingAppointments } = response.data;
+            if ( acceptingAppointments === true || isAccepting === true ) {
                 externalWaitlistRequest(values);
             }
-            else if (accpetingAppointments === false && isAccepting === false){
+            else if (acceptingAppointments === false && isAccepting === false){
                 setErrors('Business is currently not accpeting appointments and waitlist request.');
                 setLoading(false);
                 return;
@@ -139,6 +146,7 @@ export default function WelcomeDetails() {
             navigate(`/welcome/${link}`);
             return
         }
+        // This might be causing my issues
         const clientStorage = JSON.parse(clientPayload);
         let timestamp = DateTime.local().toISO();
         let payload = { link, timestamp, timestampOrigin: timestamp, ...clientStorage, ...values}
@@ -180,20 +188,18 @@ export default function WelcomeDetails() {
         // Apply formatting to the input and update the state
         const phoneNumber = formatPhoneNumber(input);
         if (phoneNumber.length === 12) {
-            console.log("Completed", phoneNumber);
             formik.setFieldValue('phoneNumber', phoneNumber);
         }
         setPhoneNumber(phoneNumber);
     }
 
     const redirectBack = () => {
-
         navigate(`/welcome/${link}/selector`)
     }
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
+            <Box className="center-box" >
                 <Card className="custom-card" sx={{ maxWidth: '100vh', minWidth: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
                     <Container sx={{ textAlign: 'left'}}>
                         <IconButton onClick={ () => redirectBack() }>
@@ -276,7 +282,7 @@ export default function WelcomeDetails() {
                             {
                                 preview ? (
                                     <>
-                                        <Box sx={{ pt: 2, display: 'flex', width: '100%', maxWidth: '100%'}}>
+                                        <Box sx={{ pt: 2, display: 'block', width: '100%', maxWidth: '100%'}}>
                                             <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
                                                 <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
 
@@ -298,7 +304,6 @@ export default function WelcomeDetails() {
 {
                                                     preview && preview.TYPE === WAITLIST ? (
                                                         <>
-                                                        <Typography variant="caption">For today — <strong>{DateTime.local().toFormat('LLL dd yyyy')}</strong></Typography>
                                                         <Typography variant="caption">For today — <strong>{DateTime.local().toFormat('LLL dd yyyy')}</strong></Typography>
 
                                                         <br/>   

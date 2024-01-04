@@ -7,13 +7,31 @@ import { getHeaders, getStateData } from "../../auth/Auth";
  * @param {Object} payload 
  * @returns 
  */
-export const requestEmployeeChange = (payload) => {
+export const requestEmployeeAdd = (payload) => {
     return new Promise((resolve, reject) => {
         const { user, business} = getStateData();
         const b_id = business._id;
         const headers = getHeaders();
         const data = { payload: {...payload}, b_id}
-        axios.post('/api/internal/add_edit_employee', data, headers)
+        axios.post('/api/internal/add_employee', data, headers)
+        .then(response => {
+            resolve(response.data.msg);
+        })
+        .catch(error => {
+            reject(error.response.data);
+        })
+
+
+    })
+} 
+
+export const requestEmployeeEdit = (payload) => {
+    return new Promise((resolve, reject) => {
+        const { user, business} = getStateData();
+        const b_id = business._id;
+        const headers = getHeaders();
+        const data = { payload: {...payload}, b_id}
+        axios.post('/api/internal/edit_employee', data, headers)
         .then(response => {
             resolve(response.data.msg);
         })

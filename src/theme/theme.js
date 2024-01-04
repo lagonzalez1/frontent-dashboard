@@ -61,7 +61,7 @@ export const ClientWelcomeTheme = createTheme({
     },
     success: {
       main: '#4caf50',
-    },
+    }
   }
 })
 
@@ -133,6 +133,30 @@ export const DashboardThemeDark = createTheme({
         },
       },
 })
+
+export const RegisterTheme = createTheme({
+  palette: {
+    type: 'dark',
+    primary: {
+      main: '#673ab7',
+    },
+    secondary: {
+      main: '#b73a71',
+    },
+    info: {
+      main: '#424242',
+    },
+    error: {
+      main: '#f44336',
+    },
+    warning: {
+      main: '#ff9800',
+    },
+    success: {
+      main: '#4caf50',
+    },
+  },
+});
 
 export const darkTheme = createTheme({
     palette: {

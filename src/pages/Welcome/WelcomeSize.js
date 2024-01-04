@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, ThemeProvider } from "@mui/material";
+    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, ThemeProvider, paperClasses } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
@@ -17,12 +17,16 @@ export default function Welcome() {
     const { link } = useParams();
 
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [size,setSize] = useState(1);
+
     const [maxSize, setMaxSize] = useState(0);
-    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
-    const [args, setArgs] = useState(null);
-    const [waitlistSize, setWaitlistSize ] = useState(null);
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
+    const [errors, setErrors] = useState(null);
+
+    const [present, setPresent] = useState(null);
+    const [waittime, setWaittime] = useState(null);
+    const [position, setPosition] = useState(null);
 
     const navigate = useNavigate();
 
@@ -59,7 +63,7 @@ export default function Welcome() {
     const businessArguments = () => {
         requestBusinessArguments(link)
         .then(response => {
-            setArgs(response);
+            setPresent(response.present);
         })
         .catch(error => {
             console.log(error)
@@ -83,9 +87,10 @@ export default function Welcome() {
         allowClientJoin(currentTime, link)
         .then(response => {
             if (response.status === 200) {
-                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.accpetingAppointments});
-                setWaitlistSize(response.data.waitlistLength);
-                if (response.data.isAccepting === false && response.data.accpetingAppointments === false) {
+                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
+                setPosition(response.data.waitlistLength);
+                setWaittime(response.data.waittime);
+                if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
                 }
@@ -93,8 +98,12 @@ export default function Welcome() {
             
         })
         .catch(error => {
-            console.log(error);
-            setError('Error found when trying to reach business.');
+            if (error.response.status === 404) {
+                navigate(`/welcome/${link}`);
+            }
+            else {
+                setErrors('Error found when collecting data.');
+            }
         })
     }
    
@@ -112,15 +121,15 @@ export default function Welcome() {
         navigate(`/welcome/${link}`)
     }
 
-    const ShowBusinessArguments = ({businessArgs, accepting}) => {
-        console.log(businessArgs);
-        if (accepting.waitlist === true) {
-            return (
-                <Box>
-                    { businessArgs && businessArgs.present.position ?  <Typography variant="subtitle1" gutterBottom>Currenlty {waitlistSize} ahead of you.</Typography>: null }                
-                </Box>
-            )
-        }
+    
+
+    const PresentWaitlineInformation = ({present}) => {
+        return (
+            <Box>
+                { present.position === true && <Typography variant="body1" gutterBottom>Currently <strong>{position}</strong> in line</Typography>}     
+                { present.waittime === true && <Typography variant="body1" gutterBottom>est. <strong>{waittime}</strong> min</Typography>}                
+            </Box>
+        )
     }
 
     return (
@@ -171,12 +180,9 @@ export default function Welcome() {
                             </Fade>
                         </Box>
 
-
-                        { 
-                            // Current wait time needs to be calculated. 
-                        }
-                        <ShowBusinessArguments businessArgs={args} accepting={acceptingStatus}/>
-                        <Container sx={{ pt: 3}}>
+                        {present && <PresentWaitlineInformation present={present}/>}
+                        
+                        <Container sx={{ pt: 2}}>
                             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
                                 <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
                                     Next

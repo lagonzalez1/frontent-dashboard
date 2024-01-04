@@ -15,12 +15,14 @@ import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import { DateTime } from "luxon";
 import { allowEmployeeEdit, findEmployee } from "../../hooks/hooks";
 import { usePermission } from "../../auth/Permissions";
+import { useSubscription } from "../../auth/Subscription";
 // Show table of employees
 // Allow to delete and add employees
 export default function EmployeeTable({setLoading, loading}) {
 
 
     const { canEmployeeEdit, checkPermission } = usePermission();
+    const { checkSubscription } = useSubscription();
     const employees = useSelector((state) => state.business.employees);
     const userEmail = useSelector((state) => state.user.email);
     const today = DateTime.local();
@@ -89,8 +91,9 @@ export default function EmployeeTable({setLoading, loading}) {
     }
 
     const closeEditSchedule = () => {
-        setEmployee(null);
         setEmployeeScheduleDialog(false);
+        setEmployee(null);
+
     }
 
     const changeVisability = () => {
@@ -122,16 +125,16 @@ export default function EmployeeTable({setLoading, loading}) {
                     <TableHead>
                         <TableRow>
                             <TableCell>
-                                #
+                                <strong>#</strong>
                             </TableCell>
                             <TableCell>
-                                Visable
+                                <strong>Visable</strong>
                             </TableCell>
                             <TableCell>
-                                Fullname
+                                <strong>Visable</strong>
                             </TableCell>
                             <TableCell>
-                                Permissions
+                                <strong>Permissions</strong>
                             </TableCell>
                             <TableCell>
                                 
@@ -165,15 +168,21 @@ export default function EmployeeTable({setLoading, loading}) {
                                         </TableCell>
                                         <TableCell>
                                             <Stack direction={'row'}>
+                                            <Tooltip title="delete employee" placement="top">
                                             <IconButton disabled={!checkPermission('EMPL_REMOVE')} onClick={() => confirmDelete(employee._id)}>
                                                 <DeleteIcon fontSize="Small" />
                                             </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="edit employee schedule" placement="top">
                                             <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editEmployee(employee)}>
                                                 <BorderColorRoundedIcon fontSize="small"/>
                                             </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="add employee schedule" placement="top">
                                             <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editSchedule(employee)}>
                                                 <CalendarMonthIcon fontSize="small"/>
                                             </IconButton>
+                                            </Tooltip>
                                             </Stack>
                                         </TableCell>
                                     </TableRow>
@@ -186,7 +195,7 @@ export default function EmployeeTable({setLoading, loading}) {
                 </Table>
             </Stack>
             <br/>
-            <Button disabled={!checkPermission('EMPL_ADD')} onClick={() => showEmployeeModal()} sx={{borderRadius: 15}} variant="contained">
+            <Button disabled={!checkPermission('EMPL_ADD') || !checkSubscription('APPOINTMENTS')} onClick={() => showEmployeeModal()} sx={{borderRadius: 10}} variant="contained">
                 Add
             </Button>
 
@@ -210,18 +219,18 @@ export default function EmployeeTable({setLoading, loading}) {
                     >
                     <CloseIcon />
                 </IconButton> 
-                <Typography variant="h5" fontWeight={'bold'}> Delete employee</Typography>
+                <Typography variant="h5" fontWeight={'bold'}> Delete employee? </Typography>
                 
             </DialogTitle>
             <Divider/>
 
             <DialogContent>
-                <Typography variant="body2">Delete {findEmployee(employeeId).fullname} from buisness?</Typography>
+                <Typography variant="body2">Please confirm removal of <strong>{findEmployee(employeeId).fullname}</strong> from employee list. </Typography>
                 
             </DialogContent>
             <DialogActions>
-                <Button sx={{ borderRadius: 15}} variant="outlined" color="error" onClick={() => removeEmployee(employeeId)} >yes</Button>
-                <Button sx={{ borderRadius: 15}} variant="contained" onClick={() => cancelEmployeeDelete()}>no</Button>
+                <Button sx={{ borderRadius: 7}} variant="contained" color="error" onClick={() => removeEmployee(employeeId)} >yes</Button>
+                <Button sx={{ borderRadius: 7}} variant="contained" onClick={() => cancelEmployeeDelete()}>no</Button>
             </DialogActions>
             </Dialog>
 
@@ -230,6 +239,8 @@ export default function EmployeeTable({setLoading, loading}) {
                 id="addNewEmployee"
                 open={employeeDialog}
                 onClose={closeEmployeeModal}
+                maxWidth="sm"
+                fullWidth={false}
             >
             <DialogTitle>
             <IconButton
@@ -249,7 +260,7 @@ export default function EmployeeTable({setLoading, loading}) {
            <Divider/>
 
             <DialogContent>
-                <AddEmployeeForm employee={employee}/>
+                <AddEmployeeForm employee={employee} closeModal={closeEmployeeModal}/>
             </DialogContent>
             </Dialog>
 

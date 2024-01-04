@@ -18,10 +18,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
 import ErrorPage from "../Error/Error";
 import Success from "../../components/Snackbar/Success";
-import { cleanTable } from "../../hooks/hooks";
+import { cleanTable, reloadBusinessData } from "../../hooks/hooks";
 import EditClient from "../../components/Dialog/EditClient";
 import Appointments from "../Appointments/Appointments";
 import { PermissionProvider } from "../../auth/Permissions";
+import { SubscriptionProvider } from "../../auth/Subscription";
 
 
 /**
@@ -81,7 +82,20 @@ export default function Dashboard () {
     useEffect(() => { 
         console.log("Dashboard-render.");
         checkAuthStatus();
-    },[reload])
+    },[reload]);
+
+
+    useEffect(() => {
+        const myFunction = () => {
+            reloadBusinessData(dispatch);
+        };
+        // Reload after 1.5 min
+        const intervalId = setInterval(myFunction, 90000);
+        return () => {
+          // Clear the interval to avoid memory leaks
+            clearInterval(intervalId);
+        };
+      }, []); 
 
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
@@ -109,29 +123,29 @@ export default function Dashboard () {
     }
     const MemoizedRenderLocation = useMemo(() => RenderLocation, [reload]);
 
-    
     return (
         <>
             <Box sx={{ display: 'flex' }}>
+            <SubscriptionProvider>
                 <NavBar navState={openNav} openNav={setOpenNav} />
                 <SideBar navState={openNav} openNav={setOpenNav} />
                  <Box component="main" id="innerDashboard" sx={{ flexGrow: 1, p: 1 , width : "100%"}}>
                     <PermissionProvider>
-                      <DashboardHeader />
-                      {!authCompleted ? 
-                      (<Backdrop
-                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                        open={loading}
-                      >
-                        <CircularProgress color="inherit" />
-                      </Backdrop>)
-                       : <MemoizedRenderLocation />}
-                      <Success/>
+                            <DashboardHeader />
+                            {!authCompleted ? 
+                            (<Backdrop
+                                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                                open={loading}
+                            >
+                                <CircularProgress color="inherit" />
+                            </Backdrop>)
+                            : <MemoizedRenderLocation />}
+                            <Success/>
                       </PermissionProvider>
                  </Box>      
                  { client.open ? <Drawer setClient={setClient} client={client} />  : null}
                  { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }
-
+                 </SubscriptionProvider>
             </Box>
 
         </>

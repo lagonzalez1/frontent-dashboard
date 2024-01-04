@@ -141,6 +141,22 @@ export const requestNoShow = (clientId, type) => {
     })
   }
 
+  export const getWaitlistWaittime = () => {
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const headers = getHeaders();
+        const date = DateTime.local().setZone(business.timezone).toISO();
+        axios.get(`/api/internal/waittime/${date}/${business._id}`, headers)
+        .then(response => {
+          resolve(response.data.waittime);
+        })
+        .catch(error => {
+          reject(error.response.data);
+        }) 
+        
+      })
+  }
+
 
   export const undoClientServing = (payload) => {
     return new Promise((resolve, reject) => {
@@ -160,12 +176,12 @@ export const requestNoShow = (clientId, type) => {
 
 
   // Type: Appointment type can be either appointment, waitlist
-  export const moveClientServing = (clientId, type) => {
+  export const moveClientServing = (clientId, type, employeeId) => {
     return new Promise((resolve, reject) => {
       const { user, business } = getStateData();
       const headers = getHeaders();
       const currentTime = new DateTime.local().setZone(business.timezone).toISO();
-      const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type }
+      const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type, employeeId }
       axios.post('/api/internal/client_to_serving', payload, headers)
       .then(response => {
         resolve(response.data);
@@ -524,6 +540,25 @@ export const getAppointmentTable = (date) => {
         return new Error(error); // Return an empty array or any other appropriate value
     }
 }
+
+export const getNoShowTable = () => {
+    const { user, business } = getStateData();
+    try {
+            let currentClients = business.currentClients;
+            let clients = [];
+            for (var client of currentClients){
+                if (client.status.noShow === true) {
+                    clients.push(client);
+                }
+            }
+            const sortNoShow = clients.sort(sortBaseTime);
+            return sortNoShow;
+      } catch (error) {
+            // Handle the error here
+            console.error(error);
+            return new Error(error); // Return an empty array or any other appropriate value
+      }
+};
 
 
 

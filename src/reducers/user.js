@@ -15,6 +15,7 @@ const initialState = {
   location: null,
   searchDate: null,
   options: null,
+  subscription: null,
 };
 
 
@@ -28,6 +29,7 @@ const userSlice = createSlice({
       state.id = action.payload.id;
       state.isLoggedIn = true;
       state.permissions = action.payload.permissions;
+      state.subscription = action.payload.subscription;
     },
     logoutUser: (state) => {
       state.email = null;

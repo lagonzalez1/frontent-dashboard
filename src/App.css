@@ -3,6 +3,24 @@
 
 }
 
+@font-face {
+  font-family: 'Lato' !important;
+  src: local('Lato'), url('./Fonts/Lato-Regular.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Lato' !important;
+    font-weight: 900;
+    src: local('Lato'), url('./Fonts/Lato-Bold.ttf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Lato' !important;
+    font-weight: 900;
+    src: local('Lato'), url('./Fonts/Lato-Black.ttf') format('opentype');
+}
+
+
 #mainContainer {
   margin-left: 0%;
   margin-right: 0%;
@@ -13,11 +31,6 @@
   height: 100%;
 }
 
-body { 
-  /*Causing dark mode to load gray background.*/
-  /*background-color: #F4F4F6 !important; */
-  font-family: 'Raleway' !important;
-}
 
 .App-logo {
   height: 40vmin;

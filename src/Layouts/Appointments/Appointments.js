@@ -165,7 +165,7 @@ const Appointments = ({setClient, setEditClient}) => {
                             onChange={handleDateChange}
                             renderInput={(params) => <TextField {...params} />}
                             minDate={currentDate}
-
+                            
                             slots={{
                                 day: ServerDay,
                               }}
@@ -256,7 +256,6 @@ const Appointments = ({setClient, setEditClient}) => {
                 : <CircularProgress />
                 }
 
-                
                 {
                     /**
                      * Handle Appointment request 
