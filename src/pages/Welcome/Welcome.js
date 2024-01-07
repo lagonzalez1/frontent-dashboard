@@ -97,11 +97,11 @@ export default function Welcome() {
         });
     }
 
-    const PresentWaitlineInformation = ({present}) => {
+    const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
             <Box>
-                { present.position === true && <Typography variant="subtitle1" gutterBottom>Currently <strong>{position}</strong> in line.</Typography>}     
-                { present.waitime === true && <Typography variant="subtitle1" gutterBottom>Est {waittime} min.</Typography>}                
+                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Currently <strong>{position}</strong> in line.</Typography>}     
+                { (present.waitime === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Est {waittime} min.</Typography>}                
             </Box>
         )
     }
@@ -160,7 +160,7 @@ export default function Welcome() {
             <Typography variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
             { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
-            {present && <PresentWaitlineInformation present={present}/> }
+            {present && <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/> }
             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
                 <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
                     { acceptingStatus.waitlist && acceptingStatus.appointments ? 'Join waitlist' : 'create appointment'}
@@ -214,13 +214,14 @@ export default function Welcome() {
                 id="businessInfo"
             >
             <DialogTitle><strong>Business information</strong></DialogTitle>
+            <Divider />
             <DialogContent>
                 { businessDetails ? (
                     <>
-                        <Typography variant="subtitle1"> {businessDetails.name} </Typography>
-                        <Typography variant="subtitle1"><u>Address</u> { businessDetails.address} </Typography>
-                        <Typography variant="subtitle1"><u>Phone</u> { businessDetails.phone} </Typography>
-                        <Typography variant="subtitle1"><u>Website</u> { businessDetails.website} </Typography>
+                        <Typography variant="subtitle1"><strong>Name</strong> {businessDetails.name} </Typography>
+                        <Typography variant="subtitle1"><strong>Address</strong> { businessDetails.address} </Typography>
+                        <Typography variant="subtitle1"><strong>Phone</strong> { businessDetails.phone} </Typography>
+                        <Typography variant="subtitle1"><strong>Website</strong> { businessDetails.website} </Typography>
                     </>
                 )
                 : null}

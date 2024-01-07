@@ -24,8 +24,7 @@ export default function Footer () {
               About Us
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              We are XYZ company, dedicated to providing the best service to our
-              customers.
+              Small web company working on creating a simple appointment and waitlist tracker.
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -33,13 +32,13 @@ export default function Footer () {
               Contact Us
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              123 Main Street, Anytown, USA
+              P.O box Comming soon
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Email: info@example.com
+              Email: lag.webservice@example.com
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Phone: +1 234 567 8901
+              
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4}>

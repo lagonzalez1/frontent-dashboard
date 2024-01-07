@@ -69,6 +69,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
             })
             .finally(() => {
                 setLoading(true);
+                closeServiceDialog();
             })
             return;
         }
@@ -82,6 +83,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
         })
         .finally(() => {
             setLoading(true);
+            closeServiceDialog();
         })
 
     }
@@ -97,6 +99,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
             })
             .finally(() => {
                 setLoading(true);
+                closeResourceDialog()
             })
             return;
         }
@@ -110,6 +113,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
         })
         .finally(() => {
             setLoading(true);
+            closeResourceDialog()
         })
     }
 

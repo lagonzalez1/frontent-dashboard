@@ -63,7 +63,9 @@ const ServingClient = ({open, onClose, clientId, type}) => {
                 label="Employees"
                 fullWidth
                 onChange={e => setEmployeeId(e.target.value)}
-            >
+            >   
+                <MenuItem value={''}>{'NONE'}</MenuItem>
+
                 {employeeList ? employeeList.map((employee) => {
                     return (
                         <MenuItem value={employee._id}>{employee.fullname}</MenuItem>

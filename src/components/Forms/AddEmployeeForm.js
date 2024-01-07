@@ -9,6 +9,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import LockIcon from '@mui/icons-material/Lock';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import { reloadBusinessData } from '../../hooks/hooks';
 
 
 
@@ -87,6 +88,8 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
           .finally(() => {
               setLoading(false);
               closeModal()
+              dispatch(setReload(true))
+
           })
         } else { // New request.
           const payload = {...values, originalUsername: employee ? employee.employeeUsername : '' }
@@ -99,10 +102,10 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
           })
           .finally(() => {
               setLoading(false);
-              closeModal()
+              closeModal();
+              dispatch(setReload(true))
           })
         }
-        
     }
 
     return (
@@ -119,8 +122,10 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
 
     {loading ? (
         <Container sx={{p: 3}}>
-          <Typography variant='caption'>Saving your information...</Typography>
+          <Stack direction={'column'} alignContent={'center'}>
             <CircularProgress />
+            <Typography variant='caption' textAlign={'center'}>Saving your information...</Typography>
+            </Stack>
         </Container>
     ) :  
     <Formik

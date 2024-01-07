@@ -1,11 +1,12 @@
 import React, {useState, useEffect } from "react";
 import { Box, Swtich , Paper, Slide, Alert, Card, CardContent, Typography, Stack, Container, Button, Divider, CardActions,
-    AlertTitle, Dialog, DialogContent, DialogTitle,DialogActions, ButtonBase, Snackbar, CircularProgress, Link, 
+    AlertTitle, Dialog, DialogContent, DialogTitle,DialogActions, ButtonBase, Snackbar, CircularProgress, Link, Rating ,
 Collapse, IconButton, DialogContentText, Grow, TextField, Select, Grid, Menu, MenuItem, CardActionArea, Chip, LinearProgress, ThemeProvider} from "@mui/material";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import StarIcon from '@mui/icons-material/Star';
 
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
@@ -27,15 +28,15 @@ import FormatListNumberedRoundedIcon from '@mui/icons-material/FormatListNumbere
 import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
-import { Field, Formik,Form, ErrorMessage } from "formik";
+import { Field, Formik,Form, ErrorMessage, useFormik } from "formik";
 import ErrorIcon from '@mui/icons-material/Error';
-import { CheckCircle, Check } from "phosphor-react";
+import { CheckCircle, Check, Star, Calendar  } from "phosphor-react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
 
 import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
-    getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle } from "./WaitingHelper.js";
+    getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle, requestClientReview } from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ClientWaitingTheme } from "../../theme/theme.js";
 
@@ -49,14 +50,12 @@ export default function Waiting() {
     const [alert, setAlert] = useState({title: null, message: null, color: null, open: false});
     const [message, setMessage] = useState(null);
     
-    const [success, setSuccess] = useState(null);
     const [loading, setLoading] = useState(true);
     const [wait, setWait] = useState(false);
 
     const [errors, setErrors] = useState(null);
     const [user, setUser] = useState(null);
     const [open, setOpen] = useState(false);
-    const [titles, setTitles] = useState({});
     const [status, setStatus] = useState(false);
     const [type, setType] = useState(null);
 
@@ -68,17 +67,20 @@ export default function Waiting() {
     const [serviceList, setServiceList] = useState(null);
     const [employeeList, setEmployeeList] = useState(null);
     const [position, setPosition] = useState(null);
+    const [serving, setServing] = useState(false);
+    const [review, setReview] = useState(false);
 
 
-    const [openStatus, setOpenStatus ] = useState(false);
+
     const [openSnack, setOpenSnack] = useState(false);
-    const [args, setArgs] = useState(null);
+    const [presentArgs, setPresent] = useState(null);
 
     const [clientStatus, setClientStatus] = useState({
         noShow: false,
         here: false,
         parking: false,
-        late: false
+        late: false,
+        complete: false,
     })
 
     let initialValues = {
@@ -107,6 +109,8 @@ export default function Waiting() {
         appointmentDate: Yup.string(),
         notes: Yup.string(),
     });
+
+    
 
 
     function isOnlyOneTrue(obj) {
@@ -144,22 +148,27 @@ export default function Waiting() {
             requestBusinessArguments(link)
         ])
         .then(([userResponse, argsResponse]) => {
+            if (userResponse.status === 203){
+                setReview(userResponse.data.review);
+            }
             if (userResponse.status === 201) {
                 setErrors(userResponse.data.msg);
                 setUser(userResponse.data.client);
             }  
             if (userResponse.status === 200) {
                 const user = userResponse.data.client;
+                setServing(user.status.serving);
                 setPosition(userResponse.data.clientPosition);
                 setUser(userResponse.data.client);
                 setClientStatus({ here: user.status.here, parking: user.status.parking, late: user.status.late, noShow: user.status.noShow});
                 setStatus(userResponse.data.statusTrigger); 
                 setType(userResponse.data.type);
+                // Display the notifications
                 if (user.status.notified === true){
-                    setAlert({title: 'Notification', message: 'You have been notified from the business!', color: 'warning', open: true})
+                    setAlert({title: argsResponse.notification.title, message: argsResponse.notification.message, color: 'warning', open: true});
                 }
             }
-            setArgs(argsResponse);
+            setPresent(argsResponse.present);
             setServiceList(argsResponse.services);
         })
         .catch(error => {
@@ -337,8 +346,12 @@ export default function Waiting() {
         })
     }
 
+    
 
-    const LoadHeader = () => {
+    
+
+
+    const LoadHeader = ({presentArgs}) => {
         // No show case
         if(clientStatus.noShow === true) {
             return (
@@ -354,13 +367,29 @@ export default function Waiting() {
                 
             )
         }
+
+        if (serving === true) {
+            return (
+                <Stack direction={'column'}>
+                    
+                    <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <div className="blob_appointment">
+                        <Star size={88} color="white" weight="thin" />
+                    </div>
+                </Container>
+                    <Typography variant="h4" fontWeight="bold" > {'Thanks for choosing us!'} </Typography>
+                    <Typography variant="body2" fontWeight={'bold'}> {'Enjoy your service'} </Typography>
+                </Stack>
+            )
+        }
+        
         // Appointment case
         if (type === APPOINTMENT) {
             return (
             <Stack spacing={2.5}>
                 <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <div className="blob_appointment">
-                        <EventAvailableRoundedIcon htmlColor="#fff8e5" sx={{ fontSize: 50 }} />
+                        <Calendar color="white" size={70} weight="light"/>
                     </div>
                 </Container>
                 <Typography variant="h5" fontWeight="bold"> Appointment details </Typography>
@@ -378,13 +407,39 @@ export default function Waiting() {
                 <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 
                 <div className="circle_green">
-                    { position <= 9 ? placementTitle[position].icon : <Check size={88} color="#40932a" weight="bold" />}
+                    { presentArgs.position === true ? (
+                        <>
+                        { position <= 9 ? placementTitle[position].icon : <Check size={88} color="#40932a" weight="bold" />}
+
+                        </>
+                    ): 
+                        <>
+                            <Check size={88} color="#40932a" weight="bold" />
+                        </>
+                    }
                 </div>
                 </Container>
-
+                {
+                    presentArgs.position === true ? (
+                        <>
+                        <Typography variant="h4" fontWeight="bold" > {position <= 9 ? placementTitle[position].message : 'Thank you for joining!'} </Typography>
+                        <Stack>
+                            <Typography variant="body2" fontWeight={'bold'}> { position <= 9 ? `Currently ${position}` + placementTitle[position].abrv + ' in line': null } </Typography>
+                            <Typography variant="body2" fontWeight={'bold'}> { position <= 9 ? placementTitle[position].message2 : 'Please check back often for any updates'} </Typography>
+                        </Stack>        
+                        </>
+                    ):
+                    (
+                        <>
+                        <Typography variant="h4" fontWeight="bold" > {'Thank you for joining!'} </Typography>
+                        <Stack>
+                            <Typography variant="body2" fontWeight={'bold'}> {'Keep an eye out for any notifications on this page'} </Typography>
+                            <Typography variant="body2" fontWeight={'bold'}> { 'Please check back often'} </Typography>
+                        </Stack>  
+                        </>
+                    )
+                }
                 
-                <Typography variant="h4" fontWeight="bold" > {position <= 9 ? placementTitle[position].message : 'Thank you for joining!'} </Typography>
-                <Typography variant="body2" fontWeight={'bold'}> { position <= 9 ? `Currently ${position}` + placementTitle[position].abrv + ' in line.' + placementTitle[position].message2  : 'Please check back often for any updates' } </Typography>
                 {status ? 
                     (
                         <>
@@ -489,6 +544,132 @@ export default function Waiting() {
         }
     }
 
+    const ReviewHeader = () => {
+        return (
+            <Stack direction={'column'}>
+                <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <div className="blob_appointment">
+                    <Star size={88} color="white" weight="thin" />
+                </div>
+            </Container>
+                <Typography variant="h4" fontWeight="bold" > {'Thank you for choosing us'} </Typography>
+                <Typography variant="body2" fontWeight={'bold'}> {'Enjoyed your service ? '} </Typography>
+                <Typography variant="body2" fontWeight={'bold'}> {'Leave us a review'} </Typography>
+
+            </Stack>
+        )
+    }
+
+    const submitReview = (reviewValue, comment) => {
+        setLoading(true)
+        requestClientReview({rate: reviewValue, comment, link, unid})
+        .then(response => {
+            setAlert({title: response.msg, open: true, message: 'Your review is appreciated', color:'success'});
+            setTimeout(() => {
+                // Call your useEffect function here
+                // For example:
+                loadUserAndBusinessArgs();
+              }, 5000);
+        })
+        .catch(error => {
+            console.log(error)
+            setErrors(error.response.data.msg);
+            setUser(null)
+            setReview(null)
+            console.log(error)
+        })
+        .finally(() => {
+            setLoading(false);
+            setUser(null)
+            setReview(null)
+        })
+
+    }
+
+
+    const ReviewBody = () => {
+
+        const [reviewValue, setReviewValue] = useState(2);
+        const [hover, setHover] = useState(-1);
+        const [reviewComment, setReviewComment] = useState('');
+
+        const labels = {
+            0.5: 'Useless',
+            1: 'Useless+',
+            1.5: 'Poor',
+            2: 'Poor+',
+            2.5: 'Ok',
+            3: 'Ok+',
+            3.5: 'Good',
+            4: 'Good+',
+            4.5: 'Excellent',
+            5: 'Excellent+',
+          };
+          
+        function getLabelText(value) {
+        return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
+        }
+        return (
+            <>
+                <Box
+                    sx={{
+                        width: 200,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                    >
+                    <Rating
+                        name="hover-feedback"
+                        value={reviewValue}
+                        precision={0.5}
+                        getLabelText={getLabelText}
+                        onChange={(event, newValue) => {
+                            setReviewValue(newValue);
+                        }}
+                        onChangeActive={(event, newHover) => {
+                            setHover(newHover);
+                        }}
+                        emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+                    />
+                    {reviewValue !== null && (
+                        <Box sx={{ ml: 2 }}>{labels[hover !== -1 ? hover : reviewValue]}</Box>
+                    )}
+                </Box>
+
+                <TextField value={reviewComment} onChange={e => setReviewComment(e.target.value)} multiline rows={3} label={'Comments'} />
+                <Button sx={{borderRadius: 7}} onClick={() => submitReview(reviewValue, reviewComment)} variant="contained">Submit</Button>
+            
+            </>
+        )
+    }
+
+    const CompleteCycle = () => {
+        return (
+            <Stack spacing={2}>
+                <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                
+                <div className="circle_green">
+                    <Check size={88} color="#40932a" weight="bold" />
+                </div>
+                </Container>
+                <Typography variant="h5" fontWeight={'bold'}>Thanks for completing our survey</Typography>
+                <Typography variant="body2" fontWeight={'bold'}>Feel free to close this page.</Typography>
+            </Stack>
+        )
+    }
+
+    {
+        /***
+         * 
+         * identifierRequest -> Finds user information -> [User]
+         *   -> If error, possible not found business, not found client, client under noshow. [setError, errors]( Displays Error sections) [review = false] [user = false]
+         *   -> If review, true, possible review can be completed. On submit reload the page where the state changes based on identifierRequest. [setError, errors = false]( Displays Error sections) [review = true] [user = false]
+         *          
+         ***/
+    }
+
+
     return(
         <>
             <ThemeProvider theme={ClientWaitingTheme}>
@@ -514,15 +695,22 @@ export default function Waiting() {
                         sx={{ mb: 2 }}
                         >
                         <AlertTitle textAlign="left"><strong>{alert.title}</strong></AlertTitle>
-                        {alert.message}
+                            <Typography textAlign={'left'}>{alert.message}</Typography>
                         </Alert>
                     </Collapse>
                     </Box>
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                         </Typography>
-                        {loading ? 
-                        <CircularProgress sx={{ p: 3}} /> : 
+                        {loading ? (
+                        <Box>
+                        <Grow in={loading}>
+                        <Container>
+                        <CircularProgress sx={{ p: 3}} />
+                        </Container>
+                        </Grow>
+                        </Box>)
+                        : 
                         <CardContent>
                             
                             
@@ -603,10 +791,13 @@ export default function Waiting() {
                                             </Box>
 
                                                 <Grid
+                                                    maxHeight={1}
                                                     container 
-                                                    direction={'row'}
-                                                    rowSpacing={1}
-                                                    columnSpacing={1}
+                                                    wrap='nowrap'
+                                                    flexDirection={'row'}
+                                                    rowSpacing={2}
+                                                    spacing={.5}
+                                                    alignItems="stretch"
                                                 
                                                 >
                                                     {
@@ -636,16 +827,18 @@ export default function Waiting() {
                                     
                                     {values.employee_id ? (
                                         
-                                            <Box>
+                                            <Box className="scroll-left">
                                                 <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
                                                     <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
                                                 </Box>
                                                 <Grid
+                                                    maxHeight={1}
                                                     container 
-                                                    direction={'row'}
-                                                    rowSpacing={1}
-                                                    columnSpacing={1}
-                                                    sx={{pt: 0}}
+                                                    wrap='nowrap'
+                                                    flexDirection={'row'}
+                                                    rowSpacing={2}
+                                                    spacing={.5}
+                                                    alignItems="stretch"
                                                 >
                                                     {
                                                         serviceList ? 
@@ -713,8 +906,7 @@ export default function Waiting() {
                                                             color={values.start === appointment.start ? 'primary': 'secondary'}
                                                             id={`appointment${index}`}>
                                                             <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                            <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{"-"}</Typography>
-                                                            <Typography sx={{ whiteSpace: 'nowrap' }}  variant="caption">{DateTime.fromFormat(appointment.end, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                            
                                                         </Button>
                                                     )
                                                 })
@@ -770,8 +962,16 @@ export default function Waiting() {
 
 
                             {errors && <LoadErrorHeader />}
-                            {user && <LoadHeader /> }
+
+                            {review ? <ReviewHeader  /> : null }
+                            {review === false && user === null && <CompleteCycle />}
+
+
+                            {user && <LoadHeader presentArgs={presentArgs} /> }
+
                             <Divider />
+                            {review ? <ReviewBody  /> : null }
+
                             {user && <LoadFooter />}
                             
                             <Divider />

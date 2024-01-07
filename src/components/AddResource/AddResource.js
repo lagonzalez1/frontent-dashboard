@@ -5,7 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { addResource, Transition } from "./Helper";
-import { getServicesAvailable } from "../../hooks/hooks";
+import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks";
 import Success from '../Snackbar/Success';
 import { setReload, setSnackbar } from '../../reducers/user';
 import CloseIcon from "@mui/icons-material/Close"
@@ -57,10 +57,15 @@ export default function AddResource() {
       dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
     })
     .finally(() => {
-      dispatch(setReload(true))
+      setLoading(false);
+      handleClose();
     })
     
   };
+
+  useEffect(() => {
+    reloadBusinessData(dispatch);
+  }, [loading])
 
 
   const TextFieldEdit = () => { return <TextField multiline={true} rows={3} label="Description" />}

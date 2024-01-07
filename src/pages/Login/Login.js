@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import { Avatar, Typography ,Button, TextField, Link, Box, Grid, Container, Alert, ToggleButtonGroup, ToggleButton, Tooltip, IconButton, Collapse, Paper} from "@mui/material";
+import { Avatar, Typography ,Button, TextField, Link, Box, Grid, Container, Alert, ToggleButtonGroup, ToggleButton, Tooltip, IconButton, Collapse, Paper, ThemeProvider} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useNavigate  } from "react-router-dom";
 import { useSignIn } from "react-auth-kit";
@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setLocation, setPermisisons, setUser } from '../../reducers/user';
 import { DateTime } from "luxon";
 import loginImage from "../../assets/images/login.jpg"
+import { HomePageTheme } from "../../theme/theme";
 
 
 export default function Login() {
@@ -135,7 +136,8 @@ export default function Login() {
       };
 
 	return(
-        <>
+        <>  
+            <ThemeProvider theme={HomePageTheme}>
             <Container sx={{ pt: 1, p: 2, mt:0, mb:0, height: '100vh', width: '100%'}}>
                     
 
@@ -255,7 +257,7 @@ export default function Login() {
                     Sign in
                 </Typography>
                 <Typography component="subtitle2" variant="caption">
-                    (Employee)
+                    Employee
                 </Typography>
                 <Box component="form" noValidate sx={{ mt: 1 }}>
                 <Collapse in={alert}>
@@ -337,47 +339,43 @@ export default function Login() {
                 )
 
                 
-                    }
+                }
 
-                    <Container sx={{ textAlign:'center', pb: 1}}>
-                    <Typography pt={2} variant="caption" color="text.secondary" align="center">
-                            {'Copyright © '}
-                            <Link color="inherit" href="/">
-                                waitonline.us
-                            </Link>{' '}
-                            {new Date().getFullYear()}
-                            {'.'}
-                    </Typography>
-                    </Container>
-
-                    <Container sx={{  display: 'flex', justifyContent: 'center'}}>
-                        <ToggleButtonGroup
-                        value={isRoot}
-                        exclusive
-                        onChange={handleLoginChange}
-                        >
-                        <ToggleButton value="root">
-                            <Tooltip placement="left" title="Root user login.">
-                                <PersonIcon />
-                            </Tooltip>
-                        </ToggleButton>
-
-                        <ToggleButton value="employee">
-                            <Tooltip placement="right" title="If you are an employee click here.">
-                                <BadgeIcon />
-                            </Tooltip>
-                        </ToggleButton>
-                        </ToggleButtonGroup>
-
-                        
-                    </Container>
-                    
-
-
-                    
-
-
+            <Container sx={{ textAlign:'center', pb: 1}}>
+            <Typography pt={2} variant="caption" color="text.secondary" align="center">
+                    {'Copyright © '}
+                    <Link color="inherit" href="/">
+                        waitonline.us
+                    </Link>{' '}
+                    {new Date().getFullYear()}
+                    {'.'}
+            </Typography>
             </Container>
+
+            <Container sx={{  display: 'flex', justifyContent: 'center'}}>
+                <ToggleButtonGroup
+                value={isRoot}
+                exclusive
+                onChange={handleLoginChange}
+                >
+                <ToggleButton value="root">
+                    <Tooltip placement="left" title="Root user login.">
+                        <PersonIcon />
+                    </Tooltip>
+                </ToggleButton>
+
+                <ToggleButton value="employee">
+                    <Tooltip placement="right" title="If you are an employee click here.">
+                        <BadgeIcon />
+                    </Tooltip>
+                </ToggleButton>
+                </ToggleButtonGroup>
+
+                
+            </Container>
+                
+            </Container>
+            </ThemeProvider>
 
         </>
 	)

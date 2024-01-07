@@ -8,10 +8,10 @@ export const requestNotificationChange = (data) => {
         const payload = { ...data, b_id: business._id}
         axios.post('/api/internal/update_notifications', payload, headers)
         .then(response => {
-            resolve(response.data.msg);
+            resolve(response);
         })
         .catch(error => {
-            reject(error.response.data.msg);
+            reject(error);
         })
     })
 }

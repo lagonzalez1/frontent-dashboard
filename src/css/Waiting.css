@@ -1,4 +1,14 @@
 
+/* YourComponent.css */
+.center-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: baseline;
+  height: 100vh; /* Center vertically and take the full height on smaller screens */
+  flex-direction: column;
+}
+
 
 
 .circle_yellow {
@@ -105,15 +115,7 @@
 
 
 
-/* YourComponent.css */
-.center-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  align-content: baseline;
-  height: 100vh; /* Center vertically and take the full height on smaller screens */
-  flex-direction: column;
-}
+
 
 .custom-card {
   width: 100%; /* Full width on smaller screens */
@@ -232,8 +234,8 @@
   background-color: #ffbb00;
 	border-radius: 50%;
 	margin: 10px;
-	height: 120px;
-	width: 120px;
+	height: 140px;
+	width: 140px;
 
   display: flex;
     justify-content: center;

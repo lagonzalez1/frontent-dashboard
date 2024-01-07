@@ -54,7 +54,6 @@ const AddService = () => {
   const [loading, setLoading] = useState(false);
   const employees = useSelector((state) => state.business.employees);
   const dispatch = useDispatch();
-  const permissionLevel = useSelector((state) => state.user.permissions);
 
   const handleOpen = () => {
     setOpen(true);
@@ -160,6 +159,7 @@ const AddService = () => {
                 label="Duration"
                 fullWidth={true}
                 margin="normal"
+                type="number"
                 error={touched.duration && !!errors.duration}
                 variant="outlined"
                 helperText={<ErrorMessage name="duration" />}
@@ -167,11 +167,12 @@ const AddService = () => {
               <Field
                 as={TextField}
                 name="cost"
-                label="Cost"
+                label="Cost $"
                 fullWidth={true}
                 error={touched.cost && !!errors.cost}
                 onChange={handleChange}
                 margin="normal"
+                type="number"
                 variant="outlined"
                 helperText={<ErrorMessage name="cost" />}
               />

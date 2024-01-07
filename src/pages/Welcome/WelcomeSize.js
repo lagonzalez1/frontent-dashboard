@@ -123,11 +123,11 @@ export default function Welcome() {
 
     
 
-    const PresentWaitlineInformation = ({present}) => {
+    const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
             <Box>
-                { present.position === true && <Typography variant="body1" gutterBottom>Currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && <Typography variant="body1" gutterBottom>est. <strong>{waittime}</strong> min</Typography>}                
+                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Currently <strong>{position}</strong> in line.</Typography>}     
+                { (present.waitime === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Est {waittime} min.</Typography>}                
             </Box>
         )
     }
@@ -180,7 +180,7 @@ export default function Welcome() {
                             </Fade>
                         </Box>
 
-                        {present && <PresentWaitlineInformation present={present}/>}
+                        {present && <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/>}
                         
                         <Container sx={{ pt: 2}}>
                             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>

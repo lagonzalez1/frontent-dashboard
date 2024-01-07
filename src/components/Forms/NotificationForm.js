@@ -30,14 +30,12 @@ const NotificationForm = ({setLoading, loading}) => {
   const initialValue = {
         title: business ? business.notifications.title : '',
         message: business ? business.notifications.message : '',
-        minBefore: business ? business.notifications.minBefore : '',
   }
 
-    const validationSchema = Yup.object().shape({
-        title: Yup.string(),
-        message: Yup.string(),
-        minBefore: Yup.number().min(1, 'Must be greater than 0').max(60, 'Must be less than 60 min.').required()
-    });
+  const validationSchema = Yup.object().shape({
+      title: Yup.string(),
+      message: Yup.string(),
+  });
 
   return (
     <Formik
@@ -71,16 +69,6 @@ const NotificationForm = ({setLoading, loading}) => {
                   defaultValue={initialValue.message}
                   error={touched.message && !!errors.message}
                   helperText={touched.message && errors.message}
-                />
-                <Field
-                  name="minBefore"
-                  label="Send notification before (in min)"
-                  variant="outlined"
-                  as={TextField}
-                  fullWidth
-                  defaultValue={initialValue.minBefore}
-                  error={touched.minBefore && !!errors.minBefore}
-                  helperText={touched.minBefore && errors.minBefore}
                 />
                 
               </Stack>

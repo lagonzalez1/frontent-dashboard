@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
-import { Container, Box, Typography, Table, TableCell, TableBody, TableRow, Button, Link, CardContent, TableHead, Card, CircularProgress, Alert, CardActions } from "@mui/material";
+import { Container, Box, Typography, Table, TableCell, TableBody, TableRow, Button, Link, CardContent, TableHead, Card, CircularProgress, Alert, CardActions, Collapse } from "@mui/material";
 import { requestBusinessArguments, requestBusinessWaitlist } from "./WaitlistHelper";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
+import { DateTime } from "luxon";
 
 export default function BusinessWaitlist () {
 
@@ -17,39 +18,27 @@ export default function BusinessWaitlist () {
     
 
 
+
     useEffect(() => {
-        getBusinessArgs();
-        getWaitlist();
+       
+        // Reload after 1.5 min
+        const intervalId = setInterval(getWaitlist, 30000);
+        console.log("Auto refresh")
         return () => {
-            if (args && waitlist) {
-                setLoading(false);
-            }
-        }
-    }, [])
+          // Clear the interval to avoid memory leaks
+            clearInterval(intervalId);
+        };
+      }, []); 
 
-
-    const getBusinessArgs = () => {
-        setLoading(true);
-        requestBusinessArguments(link)
-        .then(response => {
-            setArgs(response);
-        })
-        .catch(error => {
-            console.log(error);
-            setErrors('Error found when collecting arguments.')
-        })
-        .finally(() => {
-            setLoading(false);
-        })
-    }
 
     const getWaitlist = () => {
         setLoading(true);
-        console.log("ENTER")
-        requestBusinessWaitlist(link)
+        const time = DateTime.local().toISO();
+        requestBusinessWaitlist(link,time)
         .then(response => {
-            setWaitlist(response.sorted);
+            setWaitlist(response.virginList);
             setIsOpen(response.isAccepting);
+            setArgs(response.present);
         })
         .catch(error => {
             console.log(error);
@@ -72,7 +61,7 @@ export default function BusinessWaitlist () {
                     </>
                 )
             }
-            if (args.present.waitlist === false){
+            if (args.waitlist === false){
                 return (
                     <>
                         <Typography variant="h6" fontWeight='bold'>
@@ -106,17 +95,26 @@ export default function BusinessWaitlist () {
                                     {
                                         waitlist ? waitlist.map((item, index) => {
                                             return (
-                                                <TableRow>
+                                                <React.Fragment key={index}>
+                                                    <TableRow>
                                                     <TableCell>
-                                                    <Typography variant="body2" textAlign={'left'}>{++index}</Typography>
+                                                        <Typography variant="body2" textAlign={'left'}>
+                                                        {index + 1}
+                                                        </Typography>
                                                     </TableCell>
                                                     <TableCell>
-                                                    <Typography variant="body2" textAlign={'center'}>{item.fullname}</Typography>
+                                                        <Typography variant="body2" textAlign={'center'}>
+                                                        {item.fullname}
+                                                        </Typography>
                                                     </TableCell>
                                                     <TableCell>
-                                                    <Typography variant="body2" textAlign={'center'}>{item.partySize}</Typography>
+                                                        <Typography variant="body2" textAlign={'center'}>
+                                                        {item.partySize}
+                                                        </Typography>
                                                     </TableCell>
-                                                </TableRow>
+                                                    </TableRow>
+                                                    
+                                                </React.Fragment>
                                             )
                                         }) : null
                                     }
@@ -139,15 +137,8 @@ export default function BusinessWaitlist () {
                     <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                         <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                     </Typography>
-                    {loading ? 
-                    <Container sx={{ p: 3}}>
-                        <CircularProgress /> 
-                    </Container>: 
-                    
-                        <CardContent>
-                            <DisplayWaitlist />
-                        </CardContent>
-                    }
+                    <DisplayWaitlist />
+
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 2}}>
                         <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                     </CardActions>

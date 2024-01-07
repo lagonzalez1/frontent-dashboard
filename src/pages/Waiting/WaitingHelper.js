@@ -13,9 +13,9 @@ export const iconsList = (position) => {
     return iconLi[position - 1];
 }
 
-export const getIdentifierData = (link, unid) => {
+export const getIdentifierData = (link, unid, timestamp) => {
     return new Promise((resolve, reject) => {
-        axios.get('/api/external/identifierRequest',{ params: {link, unid} } )
+        axios.get('/api/external/identifierRequest',{ params: {link, unid, timestamp} } )
         .then(response => {
             resolve(response);
         })
@@ -43,10 +43,22 @@ export const getEmployeeList = (date,link) => {
 
 export const requestClientEditApp = (payload, link, unid) => {
     return new Promise((resolve, reject) => {
-        const data = {...payload} 
+        const data = {...payload, link, unid} 
         axios.post(`/api/external/editAppointment`, data)
         .then(response => {
             resolve(response.data.msg);
+        })
+        .catch(error => {
+            reject(error)
+        })       
+    })
+}
+
+export const requestClientReview = (payload) => {
+    return new Promise((resolve, reject) => {
+        axios.post(`/api/external/create_review`, payload)
+        .then(response => {
+            resolve(response.data);
         })
         .catch(error => {
             reject(error)

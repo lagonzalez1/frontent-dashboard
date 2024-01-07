@@ -68,7 +68,7 @@ export default function Serving({setClient}) {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            console.log("Called")
+            closeNotesDialog();
             setLoading(false);
         })
     }

@@ -1,21 +1,10 @@
 import axios from "axios";
 
-export const requestBusinessArguments = (link) => {
-    return new Promise((resolve, reject) => {
-        axios.get(`/api/external/businessArgs`, {params: {link}})
-        .then(response => {
-            resolve(response.data.payload);
-        }) 
-        .catch(error => {
-            reject(error);
-        })
-    })
-}
 
 
-export const requestBusinessWaitlist = (link) => {
+export const requestBusinessWaitlist = (link, time) => {
     return new Promise((resolve, reject) => {
-        axios.get(`/api/external/businessWaitlist`, {params: {link}})
+        axios.get(`/api/external/getExternalList`, {params: {link, time}})
         .then(response => {
             resolve(response.data);
         }) 

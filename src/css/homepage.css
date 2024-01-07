@@ -2,16 +2,14 @@
 
 
 
-.section_benifits {
-    background-color: white !important;
+.section_benefits {
+    background-color: #8f6bd0 !important;
     padding: 50px 0 50px 0;
 }
 
 .section_uses {
     padding: 50px 0 50px 0;
 }
-
-
 
 #service_cards {
     outline-style: solid;

@@ -9,7 +9,6 @@ import Login from './pages/Login/Login';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import Welcome from './pages/Welcome/Welcome';
 import WelcomeSize from "./pages/Welcome/WelcomeSize";
-import { RequireAuth } from "react-auth-kit";
 import WelcomeDetails from './pages/Welcome/WelcomeDetails';
 import Waiting from './pages/Waiting/Waiting';
 import WelcomeExtras from './pages/Welcome/WelcomeExtras';
@@ -17,10 +16,19 @@ import BusinessWaitlist from './pages/Waitlist/BusinessWaitlist';
 import WelcomeSelector from './pages/Welcome/WelcomeSelector';
 import LandingPage from './pages/Landing/LandingPage';
 import PasswordReset from './pages/PasswordReset/PasswordReset';
+
+
+import Resources from './pages/Resources/Resources';
+import Features from './pages/Features/Features';
+import Pricing from './pages/Pricing/Pricing';
+
+
 import { ThemeProvider } from '@emotion/react';
 import { DashboardThemeLight, DashboardThemeDark } from './theme/theme';
 import { useSelector } from 'react-redux';
 import { useTheme } from './theme/ThemeContext';
+import { RequireAuth } from "react-auth-kit";
+
 
 
 
@@ -43,6 +51,13 @@ function App() {
           <Route path='/' element={<Homepage />}></Route>
           <Route path='/Register' element={<Register />}></Route>
           <Route path='/Login' element={<Login />}></Route>
+
+
+          <Route path='/Resources' element={<Resources />}></Route>
+          <Route path='/Features' element={<Features />}></Route>
+          <Route path='/Pricing' element={<Pricing />}></Route>
+
+          
           <Route path='/PasswordReset/:token' element={<PasswordReset />}></Route>
           <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
 

@@ -37,10 +37,9 @@ export const theme = createTheme({
             main: '#ffe500'
         }
     },
-    
-    
 });
 
+// Poppins ,sans-serif
 export const ClientWelcomeTheme = createTheme({
   palette: {
     type: 'light',
@@ -62,7 +61,11 @@ export const ClientWelcomeTheme = createTheme({
     success: {
       main: '#4caf50',
     }
-  }
+  },
+  typography: {
+    fontFamily: "Poppins",
+  },
+ 
 })
 
 export const ClientWaitingTheme = createTheme({
@@ -86,8 +89,41 @@ export const ClientWaitingTheme = createTheme({
     success: {
       main: '#4caf50',
     },
-  }
-})
+  },
+  typography: {
+    fontFamily: "Poppins",
+  },
+});
+
+
+export const HomePageTheme = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
+      main: '#673ab7',
+      contrastText: 'rgba(255,255,255,0.87)',
+
+    },
+    secondary: {
+      main: '#b73a71',
+    },
+    info: {
+      main: '#424242',
+    },
+    error: {
+      main: '#f44336',
+    },
+    warning: {
+      main: '#ff9800',
+    },
+    success: {
+      main: '#4caf50',
+    },
+  },
+  typography: {
+    fontFamily: "Poppins",
+  },
+});
 
 
 export const DashboardThemeLight = createTheme({
@@ -109,6 +145,9 @@ export const DashboardThemeLight = createTheme({
           fontWeight: 500,
           color: 'blue',
         },
+      },
+      typography: {
+        fontFamily: "Poppins",
       },
 })
 
@@ -132,11 +171,14 @@ export const DashboardThemeDark = createTheme({
           color: 'blue',
         },
       },
+      typography: {
+        fontFamily: "Poppins",
+      },
 })
 
 export const RegisterTheme = createTheme({
   palette: {
-    type: 'dark',
+    type: 'light',
     primary: {
       main: '#673ab7',
     },
@@ -156,6 +198,9 @@ export const RegisterTheme = createTheme({
       main: '#4caf50',
     },
   },
+  typography: {
+    fontFamily: 'Poppins',
+  }
 });
 
 export const darkTheme = createTheme({

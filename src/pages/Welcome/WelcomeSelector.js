@@ -404,10 +404,13 @@ export default function WelcomeSelector() {
                                                 >
 
                                                     <Grid
+                                                        maxHeight={1}
                                                         container 
-                                                        direction={'row'}
-                                                        rowSpacing={1}
-                                                        columnSpacing={1}
+                                                        wrap='nowrap'
+                                                        flexDirection={'row'}
+                                                        rowSpacing={2}
+                                                        spacing={.5}
+                                                        alignItems="stretch"
                                                     >
                                                         
                                                         {   appointmentEmployees !== null ? 
@@ -441,10 +444,14 @@ export default function WelcomeSelector() {
                                             <Box id="serviceSelect" className="scroll-left" sx={{pt: 0, display: openServices ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
                                                 <Fade in={openServices}>
                                                     <Grid
+                                                        maxHeight={1}
                                                         container 
-                                                        direction={'row'}
-                                                        rowSpacing={1}
-                                                        columnSpacing={1}
+                                                        wrap='nowrap'
+                                                        flexDirection={'row'}
+                                                        rowSpacing={2}
+                                                        spacing={.5}
+                                                        alignItems="stretch"
+
                                                     >
 
                                                         {
@@ -459,12 +466,12 @@ export default function WelcomeSelector() {
 
                                                                             <Grid container alignItems="center">
                                                                                 <Grid item xs>
-                                                                                    <Typography component="div" variant="subtitle2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                                                                    <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
                                                                                 </Grid>
                                                                                 <Grid item>
                                                                                 </Grid>
                                                                             </Grid>
-                                                                            <Typography gutterBottom color="text.secondary" variant="body2">
+                                                                            <Typography gutterBottom color="text.secondary" variant="caption">
                                                                                 { service.description }
                                                                             </Typography>
                                                                             <Divider variant="middle" />                                                                    
@@ -526,7 +533,7 @@ export default function WelcomeSelector() {
                                                                 <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={errorMessage.title} body={''} />
                                                             </Grid>
                                                         </Grid>
-                                                        </Box>
+                                                    </Box>
                                                 </Grow>
                                             </Container>
                                             

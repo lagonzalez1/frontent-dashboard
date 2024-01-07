@@ -62,6 +62,7 @@ export default function EmployeeTable({setLoading, loading}) {
             dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
         })
         .finally(() => {
+            cancelEmployeeDelete();
             setLoading(true);
         })
     }
@@ -113,7 +114,9 @@ export default function EmployeeTable({setLoading, loading}) {
             dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
         })
         .finally(() => {
+            handleActionClose();
             setLoading(true);
+            
         })
 
     }
@@ -201,7 +204,7 @@ export default function EmployeeTable({setLoading, loading}) {
 
             <Dialog
                 open={deleteConfirm}
-                onClose={() => cancelEmployeeDelete()}
+                onClose={cancelEmployeeDelete}
                 maxWidth={'sm'}
                 disableBackdropClick
                 disableEscapeKeyDown
@@ -209,7 +212,7 @@ export default function EmployeeTable({setLoading, loading}) {
             <DialogTitle>
             <IconButton
                     aria-label="close"
-                    onClick={() => cancelEmployeeDelete()}
+                    onClick={cancelEmployeeDelete}
                     sx={{
                         position: 'absolute',
                         right: 8,
