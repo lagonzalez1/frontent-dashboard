@@ -173,6 +173,7 @@ export default function Waiting() {
             setServiceList(argsResponse.services);
         })
         .catch(error => {
+            console.log(error)
             setErrors('Error: ' + error.response.data.msg);
         })
         .finally(() => {
@@ -267,7 +268,11 @@ export default function Waiting() {
     }
 
     const appointmentEdit = (payload) => {
-        requestClientEditApp({...payload, appointmentDate, link, unid})
+        if (selectedDate === "" || selectedDate === null) {
+            setErrors('Please select a valid date.');
+            return 
+        }
+        requestClientEditApp({...payload, selectedDate, link, unid})
         .then(response => {
             setMessage(response);
         })
