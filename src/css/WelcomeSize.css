@@ -26,3 +26,15 @@
   #selection_card:hover {
     color: #ffffff; /* Change to your desired text color */
   }
+
+
+.custom-card {
+  width: 100%;
+  max-width: 65vh;
+  text-align: center;
+  padding: 2px;
+  overflow: auto !important;
+  border-radius: 5px;
+  box-shadow: 0;
+  min-height: 40vh;
+}

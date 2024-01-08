@@ -39,6 +39,7 @@ import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requ
     getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle, requestClientReview } from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ClientWaitingTheme } from "../../theme/theme.js";
+import { checkDuplicatesRequest, waitlistRequest } from "../Welcome/WelcomeHelper.js";
 
 
 
@@ -266,7 +267,6 @@ export default function Waiting() {
     }
 
     const appointmentEdit = (payload) => {
-        const appointmentDate = DateTime.fromISO(selectedDate).toString();
         requestClientEditApp({...payload, appointmentDate, link, unid})
         .then(response => {
             setMessage(response);
@@ -280,6 +280,8 @@ export default function Waiting() {
             
         })
     }
+
+
     const FutureDatePicker = ({ label, value, onChange }) => {
     const currentDate = DateTime.local();
 

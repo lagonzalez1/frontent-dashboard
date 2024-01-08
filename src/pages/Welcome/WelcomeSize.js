@@ -67,7 +67,7 @@ export default function Welcome() {
         })
         .catch(error => {
             console.log(error)
-            setError('Error found when trying to reach business.');
+            setErrors('Error found when trying to reach business.');
         })
 
     }

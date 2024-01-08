@@ -41,10 +41,9 @@ export const getEmployeeList = (date,link) => {
     });
   };
 
-export const requestClientEditApp = (payload, link, unid) => {
+export const requestClientEditApp = (payload) => {
     return new Promise((resolve, reject) => {
-        const data = {...payload, link, unid} 
-        axios.post(`/api/external/editAppointment`, data)
+        axios.post(`/api/external/editAppointment`, payload)
         .then(response => {
             resolve(response.data.msg);
         })

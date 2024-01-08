@@ -13,7 +13,7 @@
 
 .custom-card {
   width: 100%;
-  max-width: 100vh;
+  max-width: 65vh;
   text-align: center;
   padding: 2px;
   overflow: auto !important;
