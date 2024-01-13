@@ -15,8 +15,11 @@ export const SubscriptionProvider = ({ children }) => {
 
     let subscriptions = {
         0: ['WAITLIST'],
-        1: ['WAITLIST', 'APPOINTMENTS'],
-        2: ['WAITLIST', 'APPOINTMENTS', 'ANALYTICS'],
+        1: ['WAITLIST', 'APPOINTMENTS', 'CUSTOMERS'],
+        // Need to change this on all checkers
+        //                 disabled={!checkSubscription('ANALYTICS-customers')}
+
+        2: ['WAITLIST', 'APPOINTMENTS', 'CUSTOMERS', 'ANALYTICS'],
     }
     
     const checkSubscription = (required) => {

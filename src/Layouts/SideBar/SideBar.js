@@ -9,6 +9,7 @@ import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import ListIcon from '@mui/icons-material/List';
 import { useSubscription } from '../../auth/Subscription';
 
@@ -203,15 +204,15 @@ const SideBar = ({navState, openNav}) => {
         <Divider />
         <List>
               <ListItem disablePadding sx={{ display: 'block' }}>
-              <BootstrapTooltip title="Settings" placement="right">
+              <BootstrapTooltip title="Analytics" placement="right">
                 <ListItemButton
                   sx={{
                     minHeight: 48,
                     justifyContent: navState ? 'initial' : 'center',
                     px: 2.5,
                   }}
-                  onClick={() => changeLocation(LOCATIONS.Settings)}
-                  
+                  disabled={ !checkSubscription('ANALYTICS') }
+                  onClick={() => changeLocation(LOCATIONS.Analytics)}
                 >
                   <ListItemIcon
                     sx={{
@@ -220,13 +221,42 @@ const SideBar = ({navState, openNav}) => {
                       justifyContent: 'center',
                     }}
                   >
-                    <SettingsOutlinedIcon  htmlColor={ currentLocation === 6 ? '#ff6d00' : '' } />
+                    <BarChartIcon  htmlColor={ currentLocation === 6 ? '#ff6d00' : '' } />
                   </ListItemIcon>
-                  <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
+                  <ListItemText primary={"Analytics"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
                 </BootstrapTooltip>
               </ListItem>
 
+        </List>
+
+        <Divider/>
+        <List>
+        <ListItem disablePadding sx={{ display: 'block' }}>
+            <BootstrapTooltip title="Settings" placement="right">
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: navState ? 'initial' : 'center',
+                  px: 2.5,
+                }}
+                onClick={() => changeLocation(LOCATIONS.Settings)}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: navState ? 3 : 'auto',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <SettingsOutlinedIcon htmlColor={ currentLocation === 7 ? '#ff6d00' : '' }/>
+                </ListItemIcon>
+                <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
+              </ListItemButton>
+              </BootstrapTooltip>
+            </ListItem>
+
+          
         </List>
         
         <Divider/>
@@ -248,7 +278,7 @@ const SideBar = ({navState, openNav}) => {
                       justifyContent: 'center',
                     }}
                   >
-                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 7 ? '#ff6d00' : '' } />
+                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 8 ? '#ff6d00' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>

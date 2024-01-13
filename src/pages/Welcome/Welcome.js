@@ -98,10 +98,11 @@ export default function Welcome() {
     }
 
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
+        console.log(present);
         return (
             <Box>
-                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Currently <strong>{position}</strong> in line.</Typography>}     
-                { (present.waitime === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Est {waittime} min.</Typography>}                
+                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="subtitle1" gutterBottom>Currently <strong>{position}</strong> in line.</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="subtitle1" gutterBottom>Est {waittime} min.</Typography>}                
             </Box>
         )
     }
@@ -160,6 +161,8 @@ export default function Welcome() {
             <Typography variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
             { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
+
+            { console.log(acceptingStatus)}
             {present && <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/> }
             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
                 <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>

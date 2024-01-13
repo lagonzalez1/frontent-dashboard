@@ -51,7 +51,7 @@ export default function Waiting() {
     const [alert, setAlert] = useState({title: null, message: null, color: null, open: false});
     const [message, setMessage] = useState(null);
     
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [wait, setWait] = useState(false);
 
     const [errors, setErrors] = useState(null);
@@ -240,7 +240,6 @@ export default function Waiting() {
         if (!isOnlyOneTrue(clientStatus)){
             handleStatusClose();
             setAlert({title: 'Warning', message: 'Please only select one status button.', color: 'warning', open: true});
-            
             return;
         }
         const payload = { unid, link, ...clientStatus, type: user.type}
@@ -268,21 +267,23 @@ export default function Waiting() {
     }
 
     const appointmentEdit = (payload) => {
+        setLoading(true);
         if (selectedDate === "" || selectedDate === null) {
             setErrors('Please select a valid date.');
-            return 
+            setLoading(false);
+            return; 
         }
         requestClientEditApp({...payload, selectedDate, link, unid})
         .then(response => {
-            setMessage(response);
+            setAlert({title: 'Status', message: response, open: true, color: 'warning'});
+            setEditClient(false);
         })
         .catch(error => {
-            console.log(error)
-            setErrors(error);
+            console.log(error);
+            setAlert({title: 'Error!', message: error.response.msg, open: true, color: 'warning'});
         })
         .finally(() => {
             setLoading(false);
-            
         })
     }
 
@@ -312,8 +313,6 @@ export default function Waiting() {
         setSelectedDate(date);
     };
 
-
-
     const getAvailableEmployees = (date) => {
         const incomingDate = date.toISO();
         getEmployeeList(incomingDate,link)
@@ -329,7 +328,6 @@ export default function Waiting() {
         setFieldValue('service_id', service._id);
         searchAppointments(service._id, values.employee_id)
     }
-
 
     const searchAppointments = (service_id, employee_id) => {
         setWait(true);
@@ -352,11 +350,6 @@ export default function Waiting() {
             setWait(false);
         })
     }
-
-    
-
-    
-
 
     const LoadHeader = ({presentArgs}) => {
         // No show case
@@ -473,6 +466,9 @@ export default function Waiting() {
     }
 
     const LoadFooter = () => {
+
+        
+
         if (type === WAITLIST) {
             return(
                 <>
@@ -489,13 +485,14 @@ export default function Waiting() {
                     <Typography variant="subtitle2" sx={{ color: "gray"}}> Unique identifier </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
                 </Container>
+                {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
                         <Button disabled={errors ? true: false} size="small" variant="text" color="info" startIcon={<IosShareRoundedIcon fontSize="small" />} onClick={() => copyToClipboardHandler()}>Share</Button>
                         <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<FormatListNumberedRoundedIcon  fontSize="small"/>} onClick={() => navigateToWaitlist() }> Waitlist</Button>
                         <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}> Cancel</Button>
                     </Stack>
-                </Container>
+                </Container>}
                 </>
             )
         }
@@ -517,20 +514,20 @@ export default function Waiting() {
 
                     <Typography variant="subtitle2" sx={{ color: "gray"}}> Unique identifier </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
+                    
                 </Container>
-
+                {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
                         <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<NotificationsActiveRoundedIcon  fontSize="small"/>} onClick={() => setUpdateClient(true)}>Status</Button>
                         <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<BorderColorRoundedIcon  fontSize="small"/>} onClick={() => setEditClient(true)}>Edit</Button>
                         <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}>Cancel</Button>
                     </Stack>
-                </Container>
+                </Container>}
                 </>
             )
         }
     }
-
 
     const LoadErrorHeader = () => {
         if (errors !== null) {
@@ -573,8 +570,6 @@ export default function Waiting() {
         .then(response => {
             setAlert({title: response.msg, open: true, message: 'Your review is appreciated', color:'success'});
             setTimeout(() => {
-                // Call your useEffect function here
-                // For example:
                 loadUserAndBusinessArgs();
               }, 5000);
         })
@@ -592,7 +587,6 @@ export default function Waiting() {
         })
 
     }
-
 
     const ReviewBody = () => {
 
@@ -711,11 +705,9 @@ export default function Waiting() {
                         </Typography>
                         {loading ? (
                         <Box>
-                        <Grow in={loading}>
-                        <Container>
-                        <CircularProgress sx={{ p: 3}} />
-                        </Container>
-                        </Grow>
+                            <Container>
+                                <CircularProgress sx={{ p: 2}} />
+                            </Container>
                         </Box>)
                         : 
                         <CardContent>
@@ -971,7 +963,7 @@ export default function Waiting() {
                             {errors && <LoadErrorHeader />}
 
                             {review ? <ReviewHeader  /> : null }
-                            {review === false && user === null && <CompleteCycle />}
+                            {(review === false && user === null) && <CompleteCycle /> }
 
 
                             {user && <LoadHeader presentArgs={presentArgs} /> }

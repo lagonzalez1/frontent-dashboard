@@ -306,6 +306,7 @@ export const getServingTable = () => {
                     clients.push(client);
                 }
             }
+            console.log(clients);
             const type = business.system.equalDate;
             if (!clients) {
                 return [];
@@ -410,27 +411,15 @@ export const getAppointmentServingTable = () => {
             let appointments = [];
             let sorted = null;
 
-            // Same day waitlist active
-            if (sameDayWaitlist) {
-                for (var client of currentWaitlist){
-                    if (client.status.serving === true && currentTime.hasSame(client.timestampOrigin, 'day') ) {
-                        waitlist.push(client);
-                    }
-                }
-            }else {
-                for (var client of currentWaitlist){
-                    if (client.status.serving === true) {
-                        waitlist.push(client);
-                    }
-                }
-            }
-            // Waitlist end.
+            console.log("Current", currentAppointments);
 
             for (var client of currentAppointments) {
-                if (client.status.serving === true && client){
+                console.log(client);
+                if (client.status.serving === true){
                     appointments.push(client);
                 }
             }
+            console.log(appointments);
 
             sorted = appointments.sort(sortAppointmentTime);
             
@@ -481,6 +470,7 @@ export const getServingCount = () => {
                     clients.push(client);
                 }
             }
+            console.log(clients);
             const type = business.system.equalDate;
             if (!clients) {
                 return [];

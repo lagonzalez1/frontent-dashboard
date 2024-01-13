@@ -98,6 +98,7 @@ const Drawer = ({client, setClient}) => {
     const sendClientServing = (clientId) => {
         setServeDialog(true);
         setClientId(clientId);
+        console.log(clientId);
     }
 
     const closeClientServing = () => {

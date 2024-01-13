@@ -23,6 +23,7 @@ import EditClient from "../../components/Dialog/EditClient";
 import Appointments from "../Appointments/Appointments";
 import { PermissionProvider } from "../../auth/Permissions";
 import { SubscriptionProvider } from "../../auth/Subscription";
+import Analytics from "../Analytics/Analytics";
 
 
 /**
@@ -113,8 +114,10 @@ export default function Dashboard () {
             case 5: 
                 return <Customers />;
             case 6: 
-                return <Settings />;
+                return <Analytics />;
             case 7: 
+                return <Settings />;
+            case 8: 
                 return <Help /> 
 
             default:
