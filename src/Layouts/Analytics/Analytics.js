@@ -45,7 +45,7 @@ const Analytics = () => {
         if (employeeId === "") {
             return;
         }
-        
+        console.log("Called");
         getEmployeeAnalytics(employeeId)
         .then(response => {
             setEmployeeData(response);
