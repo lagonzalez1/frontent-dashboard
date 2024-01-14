@@ -5,6 +5,9 @@ import { getEmployeeList } from "../../hooks/hooks";
 import PersonIcon from '@mui/icons-material/Person';
 import StarIcon from '@mui/icons-material/Star';
 import ProgressBar from 'react-bootstrap/ProgressBar';
+import DonutGraph from "../../components/Vizual/DonutGraph";
+import axios from "axios";
+import { getEmployeeAnalytics } from "./AnalyticsHelper";
 
 
 
@@ -23,18 +26,35 @@ const Analytics = () => {
 
 
     const [employeeId, setEmployeeSelect] = useState('');
+    const [employeeData, setEmployeeData] = useState();
 
     const handleEmployeeClick = (event, index) => {
         setEmployeeSelect(index);
+
         setMock({waittime: Math.random(100), serve_time: Math.random(100)})
     };
 
 
     useEffect(() => {
+        getEmployeeData();
+    }, [employeeId])
 
-    }, [])
 
 
+    const getEmployeeData = () => {
+        if (employeeId === "") {
+            return;
+        }
+        
+        getEmployeeAnalytics(employeeId)
+        .then(response => {
+            setEmployeeData(response);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+        
+    }
 
     return (
     <div className="mainContainer">
@@ -79,7 +99,7 @@ const Analytics = () => {
 
             <Grid item lg={6} md={6} xs={12} sm={12}>
                 { /** Data FOR EMPLOYEES in various graph list, total, Waittime, servve_time, noshow, resorce/service average */}
-                
+                <DonutGraph employeeData={employeeData}/>
 
                 
 
