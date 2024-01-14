@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating } from "@mui/material";
+import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating, IconButton } from "@mui/material";
 import { useSelector } from "react-redux";
 import { getEmployeeList } from "../../hooks/hooks";
 import PersonIcon from '@mui/icons-material/Person';
@@ -7,8 +7,11 @@ import StarIcon from '@mui/icons-material/Star';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import DonutGraph from "../../components/Vizual/DonutGraph";
 import axios from "axios";
-import { getEmployeeAnalytics } from "./AnalyticsHelper";
-
+import { getEmployeeAnalytics, getEmployeeAnalyticsRange } from "./AnalyticsHelper";
+import { DateTime } from "luxon";
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import CachedIcon from '@mui/icons-material/Cached';
+import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 
 
 
@@ -17,7 +20,7 @@ const Analytics = () => {
 
     const business = useSelector((state) => state.business);
     const employeeList = getEmployeeList();
-
+    const [range, setRange] = useState({ start: DateTime.local().setZone(business.timezone), end: DateTime.local().setZone(business.timezone)});
 
     const [mock, setMock] = useState({
         waittime: 90,
@@ -27,6 +30,9 @@ const Analytics = () => {
 
     const [employeeId, setEmployeeSelect] = useState('');
     const [employeeData, setEmployeeData] = useState();
+    const [error, setError] = useState(false);
+    const [alert, setAlert] = useState({title: null, body: null})
+
 
     const handleEmployeeClick = (event, index) => {
         setEmployeeSelect(index);
@@ -56,24 +62,73 @@ const Analytics = () => {
         
     }
 
+    const reloadAnalyticsData = () => {
+        console.log(range)
+        if (employeeId === ""){
+            setError(true);
+            setAlert({title: 'Error', body:'No employee has been selected', open: true});
+            return;
+        }
+        if (!checkValidRange(range.start, range.end)) {
+            setError(true);
+            setAlert({title: 'Error', body:'Range is not valid, {from} must be before than {to}.', open: true});
+            return;
+        }
+        const payload = { eid: employeeId, type: 'AVERAGE', start: range.start.toISO(), end: range.end.toISO()}
+        getEmployeeAnalyticsRange(payload)
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+
+        
+    }
+
+    const closeAlert = () => {
+        setError(false);
+        setAlert({title: null, body: null})
+    }
+
+    function checkValidRange (start, end) {
+        return start < end ? true: false;
+    }
+
     return (
     <div className="mainContainer">
-        <Grid container>
+        { error === true ? (
+            <Box sx={{pt:1}}>
+                <AlertMessageGeneral open={error} onClose={closeAlert} title={alert.title} body={alert.body} />
+            </Box>
+        ): null}
 
-            <Grid item xs={12} md={6} sm={12} lg={6}>
+        <Grid container direction="row">
+            <Grid  item xs={12} md={6} sm={12} lg={6}>
                 <Stack>
                     <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
                     <Typography variant="h5"><strong>Analytics</strong></Typography>
                 </Stack>
             </Grid>
             <Grid item xs={12} md={6} sm={12} lg={6}>
+                
+                <Typography gutterBottom variant="body2">{'Date range'}</Typography>
+                <Stack direction={'row'} spacing={1} alignItems={'center'}>
+
+                    <DatePicker label="From" value={range.start} onChange={(newValue) => setRange((prev) => ({...prev, start: newValue}))} />
+                    <Typography variant="body2" fontWeight={'bold'}> {'-'} </Typography>
+                    <DatePicker label="To" value={range.end} onChange={(newValue) => setRange((prev) => ({...prev, end: newValue}))}/>
+                    <IconButton onClick={() => reloadAnalyticsData()}><CachedIcon/></IconButton>
+                </Stack>
 
             </Grid>
         </Grid>
 
 
-        <Grid container sx={{ pt: 1}}>
-            <Grid item lg={4} md={6} xs={12} sm={12}>
+        <Grid container sx={{ pt: 1}} 
+            direction="row"
+            >
+            <Grid item lg={6} md={6} xs={12} sm={12}>
                 { /** Employee list */}
                 <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
                     <Typography variant="subtitlel" fontWeight={'bold'}>Current employees</Typography>
@@ -107,8 +162,10 @@ const Analytics = () => {
 
         </Grid>
 
-        <Grid container sx={{ pt: 1}}>
-            <Grid item lg={4} md={6} xs={12} sm={12}>
+        <Grid container sx={{ pt: 1}}
+            direction="row"
+           >
+            <Grid item lg={6} md={6} xs={12} sm={12}>
                 { /** Business metrics as of total, Waittime, servve_time, noshow, resorce/service average  */ }
                 {
                     /**
@@ -119,19 +176,19 @@ const Analytics = () => {
                 }
                 <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
                     <Typography variant="subtitlel" fontWeight={'bold'}>Business metrics</Typography>
-                        <Typography variant="body2" sx={{ pt: 1}}>In line metrics</Typography>
+                        <Typography variant="subtitle1" sx={{ pt: 1}}>In line metrics</Typography>
                         <ProgressBar>
                             <ProgressBar max={mock.serve_time + mock.waittime} animated striped label={`Serve time ${mock.serve_time}`} variant="success" now={mock.serve_time} key={1} />
                             <ProgressBar max={mock.serve_time + mock.waittime} animated striped variant="danger" label={`Wait time ${mock.waittime}`} now={mock.waittime} key={2} />
                         </ProgressBar>
-                        <Typography variant="body2">Service and resource popularity</Typography>
+                        <Typography variant="subtitle1">Service and resource popularity</Typography>
                         <Stack spacing={0.5}>
                         <ProgressBar label={'Men haircut 40'} animated striped variant="success" now={40} />
                             <ProgressBar label={'Women haircut 20'}  animated striped variant="danger" now={20} />
                             <ProgressBar label={'Kids haircut 60'} animated striped variant="warning" now={60} />
                             <ProgressBar label={'Lashes haircut 80'} animated striped variant="info" now={80} />
                         </Stack>
-                        <Typography variant="body2">No shows</Typography>
+                        <Typography variant="subtitle1">No shows</Typography>
                         <ProgressBar label={'No shows 11'} animated striped variant="danger" now={11} />
 
                 </Box>

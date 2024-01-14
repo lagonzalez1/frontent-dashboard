@@ -4,7 +4,7 @@ import { getHeaders, getStateData } from "../../auth/Auth";
 
 
 
-
+// Get Totals
 export function getEmployeeAnalytics (id) {
     console.log("Called")
     return new Promise((resolve, reject) => {
@@ -20,3 +20,20 @@ export function getEmployeeAnalytics (id) {
        })
     })
 }
+
+
+// Get range
+export function getEmployeeAnalyticsRange (payload) {
+     return new Promise((resolve, reject) => {
+        const { user, business} = getStateData();
+        const headers = getHeaders();
+        const data = { bid: business._id, ...payload}
+        axios.post('/api/internal/employee_analytics_range', data,headers)
+        .then(response => {
+             resolve(response.data);
+        }) 
+        .catch(error => {
+             reject(error);
+        })
+     })
+ }
