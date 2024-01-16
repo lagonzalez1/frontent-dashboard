@@ -70,6 +70,7 @@ export default function Waiting() {
     const [position, setPosition] = useState(null);
     const [serving, setServing] = useState(false);
     const [review, setReview] = useState(false);
+    const [completed, setCompleted] = useState(false);
 
 
 
@@ -150,6 +151,7 @@ export default function Waiting() {
         ])
         .then(([userResponse, argsResponse]) => {
             if (userResponse.status === 203){
+                console.log("ENTER?")
                 setReview(userResponse.data.review);
             }
             if (userResponse.status === 201) {
@@ -173,7 +175,9 @@ export default function Waiting() {
             setServiceList(argsResponse.services);
         })
         .catch(error => {
-            console.log(error)
+            if (error.response.data.msg === "User not found"){
+
+            }
             setErrors('Error: ' + error.response.data.msg);
         })
         .finally(() => {
@@ -569,13 +573,13 @@ export default function Waiting() {
         requestClientReview({rate: reviewValue, comment, link, unid})
         .then(response => {
             setAlert({title: response.msg, open: true, message: 'Your review is appreciated', color:'success'});
+            setCompleted(true)
             setTimeout(() => {
                 loadUserAndBusinessArgs();
               }, 5000);
         })
         .catch(error => {
             console.log(error)
-            setErrors(error.response.data.msg);
             setUser(null)
             setReview(null)
             console.log(error)
@@ -962,8 +966,8 @@ export default function Waiting() {
 
                             {errors && <LoadErrorHeader />}
 
-                            {review ? <ReviewHeader  /> : null }
-                            {(review === false && user === null) && <CompleteCycle /> }
+                            {review ? <ReviewHeader /> : null }
+                            {(review === false && completed === null) && <CompleteCycle /> }
 
 
                             {user && <LoadHeader presentArgs={presentArgs} /> }
