@@ -216,7 +216,7 @@ const Analytics = () => {
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                                 <CalendarBlank alignmentBaseline="center" size={22} weight="thin" />
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
-                                                    {findResource(item.id).title}
+                                                    { findResource(item.id).title }
                                                 </Typography>
 
                                                 <Typography gutterBottom fontWeight={'normal'} variant="body2">
@@ -258,7 +258,10 @@ const Analytics = () => {
                         </Stack>
                     </Stack>
                     { /** Serve_time, Wait_time, No_show, Party_size */}
-                    <Stack sx={{pt:2}} direction={'row'} spacing={1} justifyContent={'center'}>
+
+                    {
+                        employeeData ? (
+                        <Stack sx={{pt:2}} direction={'row'} spacing={1} justifyContent={'center'}>
                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                     <HourglassHigh alignmentBaseline="center" size={22} weight="thin"/>
@@ -313,7 +316,10 @@ const Analytics = () => {
                                     </Typography>
                                 </CardContent>
                             </Card>
-                    </Stack>
+                        </Stack>
+                        ):null
+                    }
+                    
                     
                 </Grid>
                 }
