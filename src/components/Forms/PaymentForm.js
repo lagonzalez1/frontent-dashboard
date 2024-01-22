@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea } from '@mui/material';
-
+import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import NewRegister from '../Dialog/NewRegister';
 
 const SubscriptionForm = () => {
 
-
+  const [register, setRegister] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(0);
   const [cardError, setCardError] = useState(null);
   const plans = {
@@ -21,11 +22,16 @@ const SubscriptionForm = () => {
     setSelectedPlan(planNumber)
   };
 
-  
+  const onCloseRegister = () => {
+    setRegister(false);
+  }
 
   return (
     <>
       <Container id="plans">
+        <Container sx={{ width: '100%', display: 'flex', justifyContent: 'center', pb: 2}}>
+          <Button onClick={() => setRegister(true)} startIcon={<AddIcon />}> add business</Button>
+        </Container>
         <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === 0 ? "lightgray": ""}} variant="outlined" id="waitlist">
         <CardActionArea onClick={() => handlePlanChange(0)} >
           <CardContent>
@@ -88,9 +94,7 @@ const SubscriptionForm = () => {
         </Card>
       </Container>
 
-      <Container id="process">
-        
-      </Container>
+      <NewRegister open={register} onClose={onCloseRegister} />
     </>
   );
 };

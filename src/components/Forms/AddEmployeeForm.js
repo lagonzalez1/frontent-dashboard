@@ -31,6 +31,7 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
     useEffect(() => {
       if (checkPermission('EMPL_ADD') === false) {
         setPermissionMessage('User does not have permissions to add new employees.');
+        return;
       }
     }, [])
 

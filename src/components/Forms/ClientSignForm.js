@@ -14,9 +14,6 @@ export default function ClientSignForm({setLoading, loading}) {
     const settings = useSelector((state) => state.business.settings.present);
     const dispatch = useDispatch();
 
-
-   
-
     const initialValues = {
         position: settings.position,
         waitlist: settings.waitlist,

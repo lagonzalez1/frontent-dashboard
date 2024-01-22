@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating, IconButton, Select, MenuItem, Card, CardContent, CircularProgress, Divider } from "@mui/material";
 import { useSelector } from "react-redux";
-import { findResource, findService, getEmployeeList } from "../../hooks/hooks";
+import { findEmployee, findResource, findService, getEmployeeList } from "../../hooks/hooks";
 import PersonIcon from '@mui/icons-material/Person';
 import StarIcon from '@mui/icons-material/Star';
 import ProgressBar from 'react-bootstrap/ProgressBar';
@@ -153,16 +153,7 @@ const Analytics = () => {
                     <DatePicker label="From" value={range.start} onChange={(newValue) => setRange((prev) => ({...prev, start: newValue}))} />
                     <Typography variant="body2" fontWeight={'bold'}> {'-'} </Typography>
                     <DatePicker label="To" value={range.end} onChange={(newValue) => setRange((prev) => ({...prev, end: newValue}))}/>
-                    <Select
-                        labelId="select-type"
-                        id="select-type"
-                        value={type}
-                        label="Type"
-                        onChange={e => setType(e.target.value)}
-                    >
-                        <MenuItem value={'AVERAGE'}>Avg</MenuItem>
-                        <MenuItem value={'TOTAL'}>Total</MenuItem>
-                    </Select>
+                    
                     <IconButton onClick={() => reloadAnalyticsData()}><CachedIcon/></IconButton>
                 </Stack>
 
@@ -199,9 +190,9 @@ const Analytics = () => {
                 </Grid>
                 
                 {loading.employee === true ?(
-                    <Container sx={{ display: 'flex', justifyContent: 'center'}}>
+                    <Grid sx={{display:'flex', justifyContent: 'center', alignItems: 'center'}} item lg={6} md={6} xs={12} sm={12}>
                         <CircularProgress />
-                    </Container>
+                    </Grid>
                 ):
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     { /** Data FOR EMPLOYEES in various graph list, total, Waittime, servve_time, noshow, resorce/service average */}
@@ -214,7 +205,7 @@ const Analytics = () => {
                                     return (
                                         <Card elevation={0} sx={{ maxWidth: 100}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22} weight="thin" />
+                                                <CalendarBlank alignmentBaseline="center" size={22}  />
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     { findResource(item.id).title }
                                                 </Typography>
@@ -239,7 +230,7 @@ const Analytics = () => {
                                     return (
                                         <Card elevation={0} sx={{ maxWidth: 100}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22} weight="thin" />
+                                                <CalendarBlank alignmentBaseline="center" size={22}  />
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     {findService(item.id).title}
                                                 </Typography>
@@ -264,7 +255,7 @@ const Analytics = () => {
                         <Stack sx={{pt:2}} direction={'row'} spacing={1} justifyContent={'center'}>
                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                    <HourglassHigh alignmentBaseline="center" size={22} weight="thin"/>
+                                    <HourglassHigh alignmentBaseline="center" size={22} />
                                     <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                         Wait-time avg
                                     </Typography>
@@ -277,21 +268,21 @@ const Analytics = () => {
 
                         <Card elevation={0} sx={{ maxWidth: 200}}>
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                    <UserSwitch size={22} weight="thin" />
+                                    <UserSwitch size={22}  />
 
                                     <Typography gutterBottom fontWeight={'bold'} variant="body1">
                                         Serve-time avg
                                     </Typography>
 
                                     <Typography gutterBottom fontWeight={'normal'} variant="body2">
-                                        { employeeData && Math.floor(employeeData.serve_time) + " min." }
+                                        { employeeData && Math.floor(employeeData.serve_time) + " min" }
                                     </Typography>
                                 </CardContent>
                             </Card>
 
                         <Card elevation={0} sx={{ maxWidth: 200}}>
                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                    <UsersThree size={22} weight="thin" />
+                                    <UsersThree size={22}  />
                                     <Typography gutterBottom fontWeight={'bold'} variant="body1">
                                         Party size avg
                                     </Typography>
@@ -304,7 +295,7 @@ const Analytics = () => {
                             </Card>
                             <Card elevation={0} sx={{ maxWidth: 200}}>
                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                    <XCircle  size={22} weight="thin" />
+                                    <XCircle  size={22}  />
 
                                     <Typography gutterBottom fontWeight={'bold'} variant="body1">
                                         No shows
@@ -326,9 +317,15 @@ const Analytics = () => {
 
             </Grid>
             {loading.business === true && businessData === null ? (
-            <Container sx={{ display: 'flex', justifyContent: 'center'}}>
-                <CircularProgress />
-            </Container>
+            <Grid container sx={{ display: 'flex', justifyContent: 'center'}}>
+                <Grid item lg={6} md={6} xs={12} sm={12}>
+                    <CircularProgress />
+                </Grid>
+
+                <Grid item lg={6} md={6} xs={12} sm={12}>
+                    <CircularProgress />
+                </Grid>
+            </Grid>
             ):(
             <>
             <Divider />
@@ -341,10 +338,10 @@ const Analytics = () => {
                         <Typography variant="h6" fontWeight={'bold'}>Business metrics</Typography>
                             <Typography variant="subtitle1" sx={{ pt: 1}}>In line metrics</Typography>
                             {businessData ? ( 
-                            <Stack direction={'row'} spacing={0.5}>
+                            <Stack direction={'row'} spacing={0.5} justifyContent={'center'} divider={<Divider orientation="vertical" flexItem />}>
                                 <Card elevation={0} sx={{ maxWidth: 200}}>
                                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                            <CalendarBlank alignmentBaseline="center" size={22} weight="thin" />
+                                            <HourglassHigh alignmentBaseline="center" size={22}  />
                                             <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                 {'Wait time average'}
                                             </Typography>
@@ -357,7 +354,7 @@ const Analytics = () => {
 
                                     <Card elevation={0} sx={{ maxWidth: 200}}>
                                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                            <CalendarBlank alignmentBaseline="center" size={22} weight="thin" />
+                                            <UserSwitch alignmentBaseline="center" size={22}  />
                                             <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                 {'Serve time average'}
                                             </Typography>
@@ -369,17 +366,18 @@ const Analytics = () => {
                                     </Card>
                             </Stack>) : null }
 
-                            <Typography gutterBottom variant="subtitle1">Service and resource popularity <strong>average</strong></Typography>
+                            <Typography gutterBottom variant="subtitle1">Service and resource popularity</Typography>
                             {businessData ? (
                                 <>
-                                <Stack direction={'row'} spacing={1}>
+                                <Stack sx={{ flexWrap: 'wrap'}} direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
+                                    justifyContent={'center'}>
                                 {
                                     businessData.services.map((item, count) => {
 
                                         return (
                                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22} weight="thin" />
+                                                <CalendarBlank alignmentBaseline="center" size={22}/>
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     {findService(item.id).title}
                                                 </Typography>
@@ -397,14 +395,15 @@ const Analytics = () => {
                                     })
                                 }
                                 </Stack>
-                                <Stack direction={'row'} spacing={1}>
+                                <Stack direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
+                                    justifyContent={'center'}>
                                 {
                                     businessData.resources.map((item, count) => {
 
                                         return (
                                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22} weight="thin" />
+                                                <CalendarBlank alignmentBaseline="center" size={22}  />
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     {findResource(item.id).title}
                                                 </Typography>
@@ -427,22 +426,41 @@ const Analytics = () => {
 
                             <Typography variant="subtitle1">No shows</Typography>
                             {businessData ? (
-                                <ProgressBar label={`No show ${businessData.no_show}`} animated striped variant="danger" now={10} />
+                                <Stack direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
+                                justifyContent={'center'}>
+                                <Card elevation={0} sx={{ maxWidth: 200}}>
+                                    <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                        <XCircle alignmentBaseline="center" size={22}  />
+                                        <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                            {"No shows"}
+                                        </Typography>
+
+                                        <Typography fontWeight={'normal'} variant="body2">
+                                        { "Total " + businessData.no_show }
+                                        </Typography>
+                                        
+                                    </CardContent>
+                                </Card>
+                                </Stack>
                             ): null}
                     </Box>
                 </Grid>
 
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     { /** Ratings */}
-                    <Typography variant="h6" fontWeight={'bold'}>Employee metrics</Typography>
+                    <Typography variant="h6" fontWeight={'bold'}>Employee Ratings</Typography>
                     <List component="nav" aria-label="employeeSelect" sx={{maxHeight: 300}}>
 
-                            {employeeList && employeeList.map((item, index) => {
+                            {businessData && businessData.employeeRatings.map((item, index) => {
+                                const id = item.id;
+                                const employee = findEmployee(id);
+                                const rating = Math.ceil(item.data.ratingSum / item.data.ratingCount);
+                                const count = item.data.ratingCount;
                                 return (
                                     <ListItem alignItems="flex-start">
                                         
-                                        <ListItemText primary={item.fullname}
-                                        secondary={
+                                        <ListItemText primary={employee.fullname}
+                                            secondary={
                                             <React.Fragment>
                                             <Typography
                                                 sx={{ display: 'inline' }}
@@ -450,12 +468,12 @@ const Analytics = () => {
                                                 variant="body2"
                                                 color="text.primary"
                                             >
-                                                Ratings
+                                                {`Ratings (${count})`} 
                                             </Typography>
                                             <Box>
                                             <Rating
                                                 name="text-feedback"
-                                                value={Math.floor(Math.random() * 5)}
+                                                value={rating}
                                                 readOnly
                                                 precision={0.5}
                                                 emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
@@ -474,6 +492,18 @@ const Analytics = () => {
 
             </Grid>
             
+
+            { loading.business === true && businessData === null ? (
+                <Grid container sx={{pt: 2}} id="visual_bars">
+                <Grid item lg={6} md={6} xs={12} sm={12}>
+                    <CircularProgress />
+                </Grid>
+
+                <Grid item lg={6} md={6} xs={12} sm={12}>
+                    <CircularProgress />
+                </Grid>
+            </Grid>
+            ):
             <Grid container sx={{pt: 2}} id="visual_bars">
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     <BarGraphApp data={businessData} />
@@ -483,6 +513,7 @@ const Analytics = () => {
                     <BarGraphWait data={businessData} />
                 </Grid>
             </Grid>
+            }
             </>
             )}
         

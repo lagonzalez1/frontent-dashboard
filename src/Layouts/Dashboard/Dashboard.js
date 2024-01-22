@@ -55,8 +55,10 @@ export default function Dashboard () {
     async function checkAuthStatus() {
         setLoading(true);
         try {
-            const isAuth = await isAuthenticated(dispatch);            
+            const isAuth = await isAuthenticated(dispatch);     
+            console.log(isAuth)       
             if (isAuth === false) {
+                
                 removeUserState();
                 signOut();
                 return;
@@ -118,8 +120,7 @@ export default function Dashboard () {
             case 7: 
                 return <Settings />;
             case 8: 
-                return <Help /> 
-
+                return <Help />;
             default:
                 <ErrorPage errorMessage={"Failed to load the current location."} type={404} /> 
         }
@@ -135,7 +136,7 @@ export default function Dashboard () {
                  <Box component="main" id="innerDashboard" sx={{ flexGrow: 1, p: 1 , width : "100%"}}>
                     <PermissionProvider>
                             <DashboardHeader />
-                            {!authCompleted ? 
+                            {!authCompleted ?                             
                             (<Backdrop
                                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                                 open={loading}

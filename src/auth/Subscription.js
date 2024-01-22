@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
-const PermissionContext = createContext();
+const SubscriptionContext = createContext();
 
 
 // Since the authentication is still taking place while this has completed the render. 
@@ -26,13 +26,13 @@ export const SubscriptionProvider = ({ children }) => {
         return subscriptions[currentSubscription].includes(required);
     };
     return (
-        <PermissionContext.Provider value={{ checkSubscription }}>
+        <SubscriptionContext.Provider value={{ checkSubscription }}>
             {children}
-        </PermissionContext.Provider>
+        </SubscriptionContext.Provider>
     );
 };
 
 export const useSubscription = () => {
-  return useContext(PermissionContext);
+  return useContext(SubscriptionContext);
 };
 

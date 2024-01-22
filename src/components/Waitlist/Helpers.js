@@ -214,10 +214,10 @@ export const moveClientDown = (clientId, currentClients) => {
 
 
 
-export const removeClient = (id) => {
+export const removeClient = (id, type) => {
   const { user, business } = getStateData();
   const accessToken = getAccessToken();
-  const payload = { clientId: id, bId: business._id };
+  const payload = { clientId: id, bId: business._id, type };
   const headers = { headers: { 'x-access-token': accessToken } };
   return new Promise((resolve, reject) => {
     axios.put('/api/internal/remove_client', payload, headers)

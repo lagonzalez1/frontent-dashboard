@@ -63,7 +63,7 @@ const NotificationForm = ({setLoading, loading}) => {
                   label="Message"
                   variant="outlined"
                   as={TextField}
-                  multiline={true}
+                  multiline={false}
                   rows={2}
                   fullWidth
                   defaultValue={initialValue.message}

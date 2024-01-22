@@ -229,58 +229,6 @@ export const getAvailableAppointments = (payload) => {
 
 
 
-export const getClientsByResource = (id, resourceTag) => {
-    const { _ , business} = getStateData();
-    if (!business) { return new Error('business data is empty.'); }
-    const timezone = business.timezone;
-    if (!timezone) { return new Error('No timezone available.')}
-    const timestampNow = DateTime.now().setZone(timezone);
-    const clientList = business.currentClients;
-    const list = [];
-
-    for(var client of clientList){
-        const timestamp = DateTime.fromISO(client.timestamp, { zone: 'utc' });
-        const timestampInTimezone = timestamp.setZone(timezone);
-        const sameDay = timestampNow.hasSame(timestampInTimezone, 'day');
-        if ( client._id === id && client.resourceTag === resourceTag && sameDay === true){
-            list.push(client);
-        }
-    }
-    return list;
-}
-
-
-export const getResourceData = () => {
-    const { _ , business} = getStateData();
-    if (!business) { return []}
-    const timezone = business.timezone;
-    if (!timezone) { return []}
-
-    const timestampNow = DateTime.now().setZone(timezone);
-    const clientList = business.currentClients;
-    let resources = business.resources;
-    for (var client of clientList) {
-        const timestamp = DateTime.fromISO(client.timestamp, { zone: 'utc' });
-        const timestampInTimezone = timestamp.setZone(timezone);
-        const sameDay = timestampNow.hasSame(timestampInTimezone, 'day');
-        const hasTag = client.resourceTag ? true : false;
-        if ( sameDay && hasTag ) {
-            for (var resource of resources){
-                if ( resource._id === client.resourceTag) {
-                    if (!resource.attached) {
-                        resource.attached = [client._id];
-                      } else {
-                        resource.attached.push(client._id);
-                      }
-                    break;        
-                }
-            }
-        }
-    }
-
-    return resources
-}
-
 /*
     Handle all error codes and route to correct destination.
                             REJECTS:    
@@ -470,7 +418,6 @@ export const getServingCount = () => {
                     clients.push(client);
                 }
             }
-            console.log(clients);
             const type = business.system.equalDate;
             if (!clients) {
                 return [];
@@ -549,6 +496,13 @@ export const getNoShowTable = () => {
             return new Error(error); // Return an empty array or any other appropriate value
       }
 };
+
+
+export function getUserTableData () {
+    return new Promise((resolve, reject) => {
+        
+    })
+}
 
 
 

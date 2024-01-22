@@ -27,7 +27,6 @@ export default function Settings() {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        console.log("CALLED in settings")
         reloadBusinessData(dispatch);
         return () => {
             setLoading(false);

@@ -16,10 +16,11 @@ import { columns, getHighlightedDays } from "./AppointmentsHelper";
 import { DatePicker, PickersDay } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 import FabAppointment from "../../components/AddAppointment/FabAppointment";
-
+import { usePermission } from "../../auth/Permissions";
 
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
+    const { checkPermission } = usePermission();
 
     const [loading, setLoading] = useState(false);
     const business = useSelector((state) => state.business);
@@ -178,8 +179,8 @@ const Appointments = ({setClient, setEditClient}) => {
                         </Box>
                 </Grid>
             </Grid>
-
-                {!loading ? <div className="servingTable">
+            
+                <div className="servingTable">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
                             <Table stickyHeader aria-label='main_table'>
@@ -196,8 +197,19 @@ const Appointments = ({setClient, setEditClient}) => {
                                 </TableHead>
                                 <TableBody>
                                     
-                                    { data ? data.map((client, index) => {
-                                        const disabled = allowEmployeeEdit(permissionLevel, userEmail, findEmployee(client.employeeTag));
+                                    { loading === true ? (
+                                        <TableRow>
+                                        <TableCell colSpan={3}/>
+                                        
+                                        <TableCell>
+                                        <CircularProgress />
+                                        </TableCell>
+                                        <TableCell colSpan={1}/>
+                                        </TableRow>
+                                    ) :
+                                     data.map((client, index) => {
+                                        const edit = checkPermission('CLIENT_EDIT')
+                                        const serve = checkPermission('SERVE')
                                     return (
                                         <TableRow>
                                             <TableCell>
@@ -234,27 +246,25 @@ const Appointments = ({setClient, setEditClient}) => {
                                             </TableCell>
                                             <TableCell>
                                                 <Stack direction={'row'} spacing={1}>
-                                                <IconButton disabled={disabled} onClick={() => sendClientServing(client._id)}>
+                                                <IconButton disabled={!serve} onClick={() => sendClientServing(client._id)}>
                                                     <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                                 </IconButton>
-                                                <IconButton disabled={disabled}  onClick={() => sendClientNotification(client._id)}>
+                                                <IconButton  onClick={() => sendClientNotification(client._id)}>
                                                     <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                                 </IconButton>
-                                                <IconButton disabled={disabled}  onClick={() => editClientInfo(client) }>
+                                                <IconButton disabled={!edit}  onClick={() => editClientInfo(client) }>
                                                     <EditIcon fontSize="small" />
                                                 </IconButton>
 
                                                 </Stack>
                                             </TableCell>
                                         </TableRow>
-                                    )}): null}
+                                    )})}
                                 </TableBody>
                             </Table>
                         </TableContainer>
                     </Paper>
                 </div>
-                : <CircularProgress />
-                }
 
                 {
                     /**

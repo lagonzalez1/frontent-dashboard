@@ -37,7 +37,12 @@ const BusinessForm = ({loading, setLoading}) => {
     })
   };
 
-  
+  useEffect(() => {
+    if (checkPermission('BUSI_FIELDS') === false) {
+      setPermissionMessage('User does not have permissions to edit.');
+      return;
+    }
+  }, [])
 
   const initialValue = {
     businessName: business ? business.businessName : "",

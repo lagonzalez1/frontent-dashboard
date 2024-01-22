@@ -3,6 +3,7 @@
 export const APPOINTMENT = 'appointment';
 export const WAITLIST = 'waitlist';
 export const SERVING = 'serving';
+export const NOSHOW = 'noshow';
 export const APPOINTMENT_DATE_SELECT = 'appointment-date';
 export const CLIENT = 'client';
 export const APPOINTMENT_REMOVE = {

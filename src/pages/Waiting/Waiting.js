@@ -151,8 +151,8 @@ export default function Waiting() {
         ])
         .then(([userResponse, argsResponse]) => {
             if (userResponse.status === 203){
-                console.log("ENTER?")
                 setReview(userResponse.data.review);
+                setCompleted(userResponse.data.completed);
             }
             if (userResponse.status === 201) {
                 setErrors(userResponse.data.msg);
@@ -175,9 +175,7 @@ export default function Waiting() {
             setServiceList(argsResponse.services);
         })
         .catch(error => {
-            if (error.response.data.msg === "User not found"){
-
-            }
+            
             setErrors('Error: ' + error.response.data.msg);
         })
         .finally(() => {
@@ -200,7 +198,7 @@ export default function Waiting() {
     }
 
     const navigateToWaitlist = () => {
-        if (args.present.waitlist === true) {
+        if (presentArgs.waitlist === true) {
             const url = `https://waitonline.us/welcome/${link}/waitlist`
             window.open(url, '_blank');
         }
@@ -249,13 +247,12 @@ export default function Waiting() {
         const payload = { unid, link, ...clientStatus, type: user.type}
         requestClientStatus(payload)
         .then(response => {
-            setMessage(response);
+            setAlert({title: 'Success', open: true, color: 'success', message: response})
         })
         .catch(error => {
-            setMessage(error)
+            setAlert({title: 'Error', open: true, color: 'error', message: error})
         })
         .finally(() => {
-            setAlert({title: null, message: null, color: null, open: false});
             handleStatusClose();
         })
     }
@@ -342,7 +339,7 @@ export default function Waiting() {
         const currentDate = DateTime.local();
         setErrors(null);
         const payload = { employeeId: employee_id, serviceId: service_id , appointmentDate: selectedDate, currentDate, link}
-        
+        setLoading(true)
         getAvailableAppointments(payload)
         .then(response => {
             setAppointments(response.data)
@@ -351,6 +348,7 @@ export default function Waiting() {
             setErrors(error);
         })
         .finally(() => {
+            setLoading(true)
             setWait(false);
         })
     }
@@ -967,7 +965,7 @@ export default function Waiting() {
                             {errors && <LoadErrorHeader />}
 
                             {review ? <ReviewHeader /> : null }
-                            {(review === false && completed === null) && <CompleteCycle /> }
+                            {(review === false && completed === true) && <CompleteCycle /> }
 
 
                             {user && <LoadHeader presentArgs={presentArgs} /> }

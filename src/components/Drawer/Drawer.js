@@ -11,7 +11,7 @@ import { completeClientAppointment, findEmployee, findService, moveClientServing
 import axios from "axios";
 import { getHeaders } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
-import { WAITLIST, SERVING, APPOINTMENT } from "../../static/static";
+import { WAITLIST, SERVING, APPOINTMENT, NOSHOW } from "../../static/static";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
@@ -27,6 +27,7 @@ import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import { useSubscription } from '../../auth/Subscription';
 import ServingClient from "../Dialog/ServingClient";
+import { removeClient } from "../Waitlist/Helpers";
 
 
 
@@ -136,6 +137,25 @@ const Drawer = ({client, setClient}) => {
         
     }
 
+    const sendRemoveClient = (id, type) => {
+        removeClient(id, type)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+            setLoading(false)
+
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+            setLoading(false)
+        })
+        .finally(() => {
+            dispatch(setReload(true));
+            closeDrawer()
+
+        })
+    }
+
 
     const sendClientNoShow = (payload) => {
         requestNoShow(payload._id, payload.type)
@@ -227,6 +247,27 @@ const Drawer = ({client, setClient}) => {
                             ):
                             null
                         }
+
+                            {
+                            client.fromComponent === SERVING ? 
+                            (   
+                                <>
+                                <Grid container
+                                    direction="row"
+                                    justifyContent="space-between"
+                                    alignItems="center">
+                                    <Grid item>
+                                        <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Served by</Typography>
+                                    </Grid>
+                                    <Grid sx={{ justifyContent: 'right'}} item>
+                                        <Typography variant="body2">{payload && findEmployee(payload.status.served_by).fullname }</Typography>
+                                    </Grid>
+                                </Grid>
+                                <br/>
+                                </>
+                            ):
+                            null
+                        }
                         <Grid container
                         direction="row"
                         justifyContent="space-between"
@@ -280,7 +321,7 @@ const Drawer = ({client, setClient}) => {
                             justifyContent="space-between"
                             alignItems="center">
                             <Grid item>
-                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Staff</Typography>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Staff requested</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
                                 <Typography variant="body2">{payload && findEmployee(payload.employeeTag).fullname}</Typography>
@@ -398,6 +439,17 @@ const Drawer = ({client, setClient}) => {
                             <Stack alignContent={'center'} justifyContent={'center'} spacing={0.5} direction={'row'}>
                                 {payload ? <Button disableElevation startIcon={<DoNotDisturbRoundedIcon fontSize="small"/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
                                 <Button disableElevation startIcon={<NotificationsRoundedIcon fontSize="small"/>} color='warning' variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
+                                {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
+
+                            </Stack>
+                        )
+                    }
+
+{
+                        (client.fromComponent === NOSHOW) &&
+                        (
+                            <Stack alignContent={'center'} justifyContent={'center'} spacing={0.5} direction={'row'}>
+                                {payload ? <Button disableElevation startIcon={<DoNotDisturbRoundedIcon fontSize="small"/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendRemoveClient(payload._id, payload.type)}>Delete</Button>: null}
                                 {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
 
                             </Stack>

@@ -39,6 +39,7 @@ function App() {
   const { theme, getCurrentTheme, updateTheme } = useTheme();
 
   useEffect(() => {
+    console.log("APP>JU")
     // Get the current theme from localStorage and update the state
     const currentTheme = getCurrentTheme();
     updateTheme(currentTheme);

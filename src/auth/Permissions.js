@@ -8,10 +8,10 @@ export const PermissionProvider = ({ children }) => {
     const userPermissions = useSelector((state) => state.user.permissions);
     const signOnEmail = useSelector((state) => state.user.email);
     let permissions = {
-        0: ['SETTINGS', 'EMP_CHANGE', 'SERV_CHANGE', 'RESO_CHANGE', 'CUST_REMOVAL','RESO_DEL', 'SERV_DEL', 'OPEN_LOCK', 'LOC_URL','PERS_IMG',
+        0: ['SETTINGS', 'EMP_CHANGE', 'SERV_CHANGE', 'RESO_CHANGE', 'CUST_REMOVAL','RESO_DEL', 'SERV_DEL', 'OPEN_LOCK', 'LOC_URL','PERS_IMG', 'BUSI_FIELDS',
         'HOUR_TZ', 'HOUR_OPEN_HR', 'HOUR_CLOSE_DEL', 'SYSTEM', 'NOTI_SETTINGS','CLIENT_REMOVAL', 'CLIENT_EDIT', 'EMPL_ATTACH',
         'BUSI_INFO', 'EMPL_REMOVE', 'EMPL_ADD', 'EMPL_EDIT' ,'CLIENT_SIGNU', 'CLIENT_FORM' , 'PAY_CHANGE', 'EMPL_DETACH', 'SERV_ADD', 'RESO_ADD'],
-        1: ['SETTINGS', 'EMP_CHANGE', 'SERV_CHANGE', 'RESO_CHANGE', 'RESO_DEL', 'SERV_DEL', 'CUST_REMOVAL', 'OPEN_LOCK', 'PERS_IMG', 'EMPL_ATTACH',
+        1: ['SETTINGS', 'EMP_CHANGE', 'SERV_CHANGE', 'RESO_CHANGE', 'RESO_DEL', 'SERV_DEL', 'CUST_REMOVAL', 'OPEN_LOCK', 'PERS_IMG', 'EMPL_ATTACH','BUSI_FIELDS',
         'HOUR_OPEN_HR', 'HOUR_CLOSE_DEL', 'SYSTEM', 'NOTI_SETTINGS','EMPL_EDIT' ,'EMPL_REMOVE', 'EMPL_ADD', 'CLIENT_SIGNU', 'CLIENT_FORM', 'EMPL_DETACH',
          'SERV_ADD', 'RESO_ADD'],
         2: ['CLIENT_REMOVAL', 'CLIENT_EDIT', 'SERVE'],

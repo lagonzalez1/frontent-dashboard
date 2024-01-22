@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import '../../css/Customers.css';
 import { Stack, Grid, Menu, MenuItem, IconButton, TextField, Typography,
    Skeleton, Table, TableCell, TableBody, TableHead, TableContainer, TableRow,Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip,
-   Box, Collapse, Tooltip } from '@mui/material';
+   Box, Collapse, Tooltip, CircularProgress } from '@mui/material';
 import DateSelect from '../../components/Select/DateSelect';
 import StateSelect from '../../components/Select/StateSelect';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
@@ -55,12 +55,16 @@ const Customers = () => {
     if (searchTerm.length === 0){
       return;
     }
+    setLoading(true)
     searchAnalyticsKeyword(searchTerm)
     .then(response => {
       setData(response);
     })
     .catch(error => {
       console.log(error)
+    })
+    .finally(() => {
+      setLoading(false);
     })
 
   };
@@ -80,9 +84,12 @@ const Customers = () => {
   };
 
   const handlePrint = () => {
-    console.log('Print action');
+    const printThis = convertToCSV(data);
+    console.log(printThis)
     handleClose();
   };
+
+  
 
   const handleDeleteAll = () => {
     handleClose();
@@ -93,14 +100,17 @@ const Customers = () => {
     if ( !sort || !stateSort) { return; }
     const currentTime = DateTime.local().setZone(business.timezone).toISO();
     const payload = {bid: business._id, sort, stateSort, currentTime}
+    setLoading(true)
     getAnalyticsClients(payload)
     .then(response => {
       setData(response.payload);
-
     })
     .catch(error => {
       console.log(error);
       dispatch(setSnackbar({requestMessage: "Error", requestStatus: true}))
+    })
+    .finally(() => {
+      setLoading(false)
     })
   }
 
@@ -142,7 +152,7 @@ const Customers = () => {
 
   useEffect(() => {
     loadCustomers(sort, stateSort);
-  }, [loading, sort, stateSort])
+  }, [ sort, stateSort])
 
 
 
@@ -375,9 +385,6 @@ const Customers = () => {
     );
   }
 
-
-  
-
   return (
     <>
       <div className='customerContainer'>
@@ -415,24 +422,8 @@ const Customers = () => {
                 <DateSelect set={setSort} />
                 <StateSelect set={setStateSort} />
 
-                <IconButton
-                  aria-controls="dropdown-menu"
-                  aria-haspopup="true"
-                  onClick={handleClick}
-                  color="inherit"
-                >
-                  <MoreVertIcon />
-                </IconButton>
-                <Menu
-                  id="dropdown-menu"
-                  anchorEl={anchorEl}
-                  keepMounted
-                  open={Boolean(anchorEl)}
-                  onClose={handleClose}
-                >
-                  <MenuItem onClick={handlePrint}>Print</MenuItem>
-                  <MenuItem onClick={handleDeleteAll}>Delete All</MenuItem>
-                </Menu>
+                
+                
 
             </Stack>
           </Grid>
@@ -455,11 +446,20 @@ const Customers = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            { 
-                              data ? data.map((client, index) => (
-                                <Row key={index} row={client} />
-                              )): 
-                              null
+                            { (loading === true && data === null) ? 
+                            (
+                              <TableRow>
+                                  <TableCell colSpan={3}/>
+                                  
+                                  <TableCell>
+                                  <CircularProgress />
+                                  </TableCell>
+                                  <TableCell colSpan={1}/>
+                              </TableRow>
+                            ):
+                            data && data.map((client, index) => (
+                              <Row key={index} row={client} />
+                            ))
                             }
                         </TableBody>
                     </Table>

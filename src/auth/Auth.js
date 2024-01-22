@@ -99,6 +99,7 @@ const USER = 'user';
     }
     try {
       const status = await checkAccessToken();
+      console.log(status)
       dispatch(setBusiness(status.business));
       dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription}))
       dispatch(setIndex(status.defaultIndex));
@@ -122,7 +123,7 @@ const USER = 'user';
       const email = user.email;
   
       const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: { 'x-access-token': token } });
-  
+      console.log(response)
       if (response.status === 200) {
         return response.data;
       } else {

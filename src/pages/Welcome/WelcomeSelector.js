@@ -286,6 +286,7 @@ export default function WelcomeSelector() {
         }
         const currentDate = DateTime.now().toISO();
         const payload = { employeeId: appointmentData.employee_id, serviceId: id, appointmentDate: appointmentData.date.toISO(), link, currentDate }
+        setLoading(true)
         getAvailableAppointments(payload)
         .then(response => {
             setSlots(response.data);
@@ -497,6 +498,11 @@ export default function WelcomeSelector() {
                                             </Box>
                                             <Container id="intervalSelect" sx={{pt: 1, display: openAvailabity ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
                                                 <Grow in={openAvailabity}>
+                                                    {loading === true ? (
+                                                        <Box>
+                                                            <CircularProgress size={'small'}/>
+                                                        </Box>
+                                                    ) :
                                                     <Box className="scroll-left" sx={{display: 'block', whiteSpace: 'nowrap'}}>
                                                         <Grid
                                                             maxHeight={1}
@@ -534,6 +540,7 @@ export default function WelcomeSelector() {
                                                             </Grid>
                                                         </Grid>
                                                     </Box>
+                                                    }
                                                 </Grow>
                                             </Container>
                                             

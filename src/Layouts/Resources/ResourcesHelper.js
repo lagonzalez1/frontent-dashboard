@@ -24,6 +24,7 @@ export const getResourcesAvailable = () => {
 
 
 
+// This need to be updated based on the fact that multiple people can be on a resource.
 export const findServingSize = (id) => {
   const { _, business} = getStateData();
   if ( !business ) { return new Error('No business data found.');}

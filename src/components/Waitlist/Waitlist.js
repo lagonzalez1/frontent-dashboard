@@ -21,7 +21,7 @@ import { handleOpenNewTab, requestChangeAccept, options, columns,
     clientOptions, OPTIONS_SELECT, acceptingRejecting,
     removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState, noShowColumns} from "./Helpers";
 import { getUserTable, getNoShowTable, getWaitlistWaittime } from "../../hooks/hooks";
-import { WAITLIST } from "../../static/static";
+import { WAITLIST, NOSHOW } from "../../static/static";
 import FabButton from "../Add/FabButton";
 import { usePermission } from "../../auth/Permissions";
 import { DateTime } from "luxon";
@@ -52,10 +52,12 @@ const Waitlist = ({setClient, setEditClient}) => {
     let accepting = acceptingRejecting();
 
     useEffect(() => {
-        tableData = getUserTable();   
-        noShowData = getNoShowTable();   
-        getWaittime();
+        setLoading(true)
+        tableData = getUserTable(); // This will now be get function to ease the load on front end.
+        noShowData = getNoShowTable(); // This will now be get function to ease the load on front end.  
+        getWaittime(); // ALready get
         return() => {
+            setLoading(false)
             dispatch(setReload(false));
         }
     }, [reload])
@@ -68,6 +70,9 @@ const Waitlist = ({setClient, setEditClient}) => {
         })
         .catch(error => {
             console.log(error);
+        })
+        .finally(() => {
+            setLoading(false);
         })
     }
 
@@ -116,6 +121,7 @@ const Waitlist = ({setClient, setEditClient}) => {
             return;
         })
         .finally(() => {
+            setLoading(false);
             dispatch(setReload(true))
             handleCloseVert();
         })
@@ -138,13 +144,12 @@ const Waitlist = ({setClient, setEditClient}) => {
                 requestNoShow(clientId)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
-                    setLoading(false)
                 })  
                 .catch(error => {
                     dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
-                    setLoading(false)
                 })
                 .finally(() => {
+                    setLoading(false)
                     dispatch(setReload(true))
                     handleCloseVert();
                 })
@@ -155,15 +160,14 @@ const Waitlist = ({setClient, setEditClient}) => {
                 moveClientUp(clientId,tableData)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
-                    setLoading(false)
 
                 })  
                 .catch(error => {
                     dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
-                    setLoading(false)
-
                 })
                 .finally(() => {
+                    setLoading(false)
+
                     dispatch(setReload(true))
                     handleCloseVert();
                 })
@@ -173,13 +177,12 @@ const Waitlist = ({setClient, setEditClient}) => {
                 moveClientDown(clientId,tableData)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
-                    setLoading(false)
                 })  
                 .catch(error => {
                     dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}));
-                    setLoading(false)
                 })
                 .finally(() => {
+                    setLoading(false)
                     dispatch(setReload(true))
                     handleCloseVert();
                 })
@@ -187,19 +190,18 @@ const Waitlist = ({setClient, setEditClient}) => {
                 return;
             case OPTIONS_SELECT.REMOVE:
                 setLoading(true);
-                removeClient(clientId)
+                removeClient(clientId, WAITLIST)
                 .then(response => {
                     console.log(response)
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
-                    setLoading(false)
 
                 })
                 .catch(error => {
                     console.log(error);
                     dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
-                    setLoading(false)
                 })
                 .finally(() => {
+                    setLoading(false)
                     dispatch(setReload(true))
                     handleCloseVert();
 
@@ -210,6 +212,10 @@ const Waitlist = ({setClient, setEditClient}) => {
 
     const openClientDrawer = (item) => {
         setClient({payload: item, open: true, fromComponent: WAITLIST});
+    }
+
+    const openClientDrawerNoShow = (item) => {
+        setClient({payload: item, open: true, fromComponent: NOSHOW});
     }
 
     const editClientInfo = (item) => {
@@ -228,7 +234,6 @@ const Waitlist = ({setClient, setEditClient}) => {
         setClientId(null);
         
         dispatch(setReload(true));
-        closeDrawer();
     }
 
     const sendClientNotification = (clientId) => {
@@ -374,7 +379,15 @@ const Waitlist = ({setClient, setEditClient}) => {
                                 <TableBody>
 
                 {
-                    tableData ? (
+                    (loading === true) ? (
+                        <TableRow>
+                            <TableCell colSpan={3}/>
+                            <TableCell>
+                            <CircularProgress />
+                            </TableCell>
+                            <TableCell colSpan={1}/>
+                        </TableRow>
+                    ) : (
                         tableData.map((item, index) => {
                             return (
                             <TableRow key={item._id}>
@@ -457,8 +470,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                                 </TableCell>            
                             </TableRow>
                         )}) 
-                    ): 
-                    null
+                    )
                 }
                                     
                                 </TableBody>
@@ -497,66 +509,63 @@ const Waitlist = ({setClient, setEditClient}) => {
                                 </TableHead>
                                 <TableBody>
 
-                        {noShowData.map((item, index) => {
-                            return (
-                            <TableRow key={item._id}>
-                                     
-                                <TableCell align="left">
-                                    <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'left'}>
-                                        <IconButton onClick={() => openClientDrawer(item)}>
-                                            <InfoOutlinedIcon fontSize="small" /> 
-                                        </IconButton>
-                                        <Typography>{++index}</Typography>                                   
-                                    </Stack>
-                                </TableCell>
+                                { noShowData.map((item, index) => {
+                                    return (
+                                    <TableRow key={item._id}>
+                                            
+                                        <TableCell align="left">
+                                            <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'left'}>
+                                                <IconButton onClick={() => openClientDrawerNoShow(item)}>
+                                                    <InfoOutlinedIcon fontSize="small" /> 
+                                                </IconButton>
+                                                <Typography>{++index}</Typography>                                   
+                                            </Stack>
+                                        </TableCell>
 
-                                <TableCell align="left">
-                                    <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
-                                    <Typography fontWeight="normal" variant="caption">
-                                        { item.serviceTag ? findService(item.serviceTag).title: null }
-                                    </Typography>
-                            
-                                </TableCell>
+                                        <TableCell align="left">
+                                            <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
+                                            <Typography fontWeight="normal" variant="caption">
+                                                { item.serviceTag ? findService(item.serviceTag).title: null }
+                                            </Typography>
+                                    
+                                        </TableCell>
 
-                                <TableCell align="left">
-                                    <Typography variant="subtitle2" fontWeight="bold">{item.partySize}</Typography>
-                                </TableCell>
+                                        <TableCell align="left">
+                                            <Typography variant="subtitle2" fontWeight="bold">{item.partySize}</Typography>
+                                        </TableCell>
 
-                                <TableCell align="left">
-                                    <Typography fontWeight="bold" variant="body2">
-                                        { item.resourceTag ? findResource(item.resourceTag).title : null }
-                                    </Typography>
-                                </TableCell>
+                                        <TableCell align="left">
+                                            <Typography fontWeight="bold" variant="body2">
+                                                { item.resourceTag ? findResource(item.resourceTag).title : null }
+                                            </Typography>
+                                        </TableCell>
 
-                                <TableCell align="left">
-                                    <Typography variant="subtitle2" fontWeight="bold">
-                                        {DateTime.fromJSDate(new Date(item.timestampOrigin)).toFormat('LLL dd yyyy hh:mm a')}
-                                    </Typography>
-                                </TableCell>   
+                                        <TableCell align="left">
+                                            <Typography variant="subtitle2" fontWeight="bold">
+                                                {DateTime.fromJSDate(new Date(item.timestampOrigin)).toFormat('LLL dd yyyy hh:mm a')}
+                                            </Typography>
+                                        </TableCell>   
 
-                                <TableCell align="right">
-                                    <Stack
-                                        direction="row"
-                                        spacing={1}
-                                    >
-                                        
-                                        <IconButton onClick={() => sendClientServing(item._id)}>
-                                            <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
-                                        </IconButton>
-                                        <IconButton onClick={() => sendClientNotification(item._id)}>
-                                            <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
-                                        </IconButton>
-                                        <IconButton onClick={() => editClientInfo(item)}>
-                                            <EditIcon fontSize="small" />
-                                        </IconButton>
-                                        
-                                                 
-                                    </Stack>
-                                </TableCell> 
+                                        <TableCell align="right">
+                                            <Stack
+                                                direction="row"
+                                                spacing={1}
+                                            >
+                                                <IconButton onClick={() => sendClientServing(item._id)}>
+                                                    <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
+                                                </IconButton>
+                                                <IconButton onClick={() => sendClientNotification(item._id)}>
+                                                    <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
+                                                </IconButton>
+                                                <IconButton onClick={() => editClientInfo(item)}>
+                                                    <EditIcon fontSize="small" />
+                                                </IconButton>      
+                                            </Stack>
+                                        </TableCell> 
 
-                            </TableRow>
-                        )}) }
-                        </TableBody>
+                                    </TableRow>
+                                )}) }
+                                </TableBody>
                             </Table>
                         </TableContainer>
                     </Paper>
