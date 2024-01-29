@@ -99,12 +99,12 @@ const USER = 'user';
     }
     try {
       const status = await checkAccessToken();
-      console.log(status)
       dispatch(setBusiness(status.business));
-      dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription}))
+      dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription, trial: status.trial, trialStatus: status.trialStatus}))
       dispatch(setIndex(status.defaultIndex));
       dispatch(setLocation(0));
       dispatch(setOptions(status.businessOptions));
+
       return true;
     } catch (error) {
       return false;

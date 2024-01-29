@@ -24,6 +24,7 @@ import Appointments from "../Appointments/Appointments";
 import { PermissionProvider } from "../../auth/Permissions";
 import { SubscriptionProvider } from "../../auth/Subscription";
 import Analytics from "../Analytics/Analytics";
+import Trial from "../../components/Snackbar/Trial";
 
 
 /**
@@ -146,7 +147,8 @@ export default function Dashboard () {
                             : <MemoizedRenderLocation />}
                             <Success/>
                       </PermissionProvider>
-                 </Box>      
+                 </Box>
+                 <Trial />
                  { client.open ? <Drawer setClient={setClient} client={client} />  : null}
                  { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }
                  </SubscriptionProvider>

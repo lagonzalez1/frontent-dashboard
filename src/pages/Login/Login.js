@@ -105,7 +105,7 @@ export default function Login() {
                     });
                     
                     setAccessToken(response.data.accessToken);
-                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions}));
+                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions, trial: response.data.trial, trialStatus: response.data.trialStatus }));
                     // Set business ref ?
                     navigate('/Dashboard');
                     setLoading(false);
