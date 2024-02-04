@@ -18,3 +18,21 @@ export const WAITLIST_REMOVE = {
 export const WAITLIST_PLAN = "price_1Odn7GFBv6mpTbIZlmB4v8vZ";
 export const WAITLIST_APP_PLAN = "price_1Odn7yFBv6mpTbIZdEVpjuym";
 export const WAITLIST_APP_ANALYTICS_PLAN = "price_1Odn8NFBv6mpTbIZYxSQHjns";
+
+export const CURRENT_PLANS = {
+    'price_1Odn7GFBv6mpTbIZlmB4v8vZ': {
+        title: 'Waitlist',
+        description: 'This plan allows you to manage an online waitlist with clients. Utilize employees, resources and services.',
+        price: '$6.99/mo'
+    },
+    'price_1Odn7yFBv6mpTbIZdEVpjuym': {
+        title: 'Waitlist + Appointments',
+        description: 'This plan allows you to manage an online waitlist and appointments with your clients. Utilize employees, resources and services.',
+        price: '$9.99/mo'
+    },
+    'price_1Odn8NFBv6mpTbIZYxSQHjns': {
+        title: 'Waitlist + Appointments + Analytics',
+        description: 'This plan allows you to manage and online waitlist and appointments with clients. Utlilze employees, resources and services. Utilize and manage you business analytics and metrics to improve!',
+        price: '$15.99/mo'
+    }
+}

@@ -15,11 +15,11 @@ const SubscriptionForm = () => {
 
 
   // Plan will end up being a stripe unid and or the price_id of current plan.
-  const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
+  //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
   const trial = useSelector((state) => state.user.trialStatus);
   const [register, setRegister] = useState(false);
   const [cancelPlan, setCancelPlan] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(plan);
+  const [selectedPlan, setSelectedPlan] = useState(null);
   const [subscription, setSubcription] = useState(false);
 
   const [success, setSuccess] = useState(false);
@@ -28,17 +28,10 @@ const SubscriptionForm = () => {
 
   const [cardError, setCardError] = useState(null);
 
-  const plans = {
-    0: 'ID_BASIC_PLAN',
-    1: 'ID_FULL_PLAN',
-    2: 'ID_MED_PLAN'
-  }
-
-
   useEffect(() => {
     // I will need to retrive the status of the subscriptions.
     // 
-    setSelectedPlan(plan);
+    //setSelectedPlan(plan);
   }, [])
 
   const handleSubmit = async (event, elements, stripe) => {
@@ -96,12 +89,10 @@ const SubscriptionForm = () => {
     if (query.get('successs')) {
       setSuccess(true);
       setSessionId(query.get('session_id'));
-
     }
     if (query.get('cancelled')) {
       setSuccess(false);
       setSessionId('');
-
     }
   }, [sessionId])
 

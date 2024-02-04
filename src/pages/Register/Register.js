@@ -27,6 +27,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { DateTime } from "luxon";
 import { RegisterTheme } from "../../theme/theme.js";
+import { WAITLIST, WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN } from "../../static/static.js";
 
 
 
@@ -57,7 +58,7 @@ export default function Register(props){
 
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(10);
-    const [mode, setMode] = useState(0);
+    const [mode, setMode] = useState(null);
     const [error, setErrors] = useState({title: '', message: '', severity: ''});
     const [passwordError, setPasswordError] = useState(false);
 
@@ -75,7 +76,7 @@ export default function Register(props){
         role: 'Admin',
         businessAddress: '',
         country: '',
-        mode: 0,
+        mode: '',
         services: [{title: 'default', duration: 10}],
         schedule: {},
         timezone: timezone,
@@ -427,7 +428,7 @@ export default function Register(props){
                                     spacing={2}
                                 >
                                     <Grid item xs={12} sm={6} md={4}>
-                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 0 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(0) }>
+                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === WAITLIST_PLAN ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_PLAN) }>
                                             <CardActionArea>
                                                 <CardContent>
                                                     <Typography sx={{ textAlign: 'left', pl: 1}} variant="h5"><strong>Set up waitlist</strong></Typography>
@@ -444,7 +445,7 @@ export default function Register(props){
                                         </Card>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={4}>
-                                    <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 1 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(1) } >
+                                    <Card sx={{ height: '100%', p: 1, backgroundColor: mode === WAITLIST_APP_PLAN ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_APP_PLAN) } >
                                         <CardActionArea>
 
                                             <CardContent>
@@ -461,10 +462,10 @@ export default function Register(props){
                                         </Card>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={4}>
-                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 2 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(2) }>
+                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === WAITLIST_APP_ANALYTICS_PLAN ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_APP_ANALYTICS_PLAN) }>
                                             <CardActionArea>
                                             <CardContent>
-                                                <Typography sx={{ textAlign: 'left',pl: 1}} variant="h5" color="dark"><strong>Both</strong></Typography>
+                                                <Typography sx={{ textAlign: 'left',pl: 1}} variant="h5" color="dark"><strong>Both + Analytics</strong></Typography>
                                                 <Typography sx={{ textAlign: 'left',  pt: 2,pl: 1, fontWeight: 600}} variant="subtitle2" color="dark">Let my clients do both.</Typography>
                                                 <CardMedia
                                                 component="img"

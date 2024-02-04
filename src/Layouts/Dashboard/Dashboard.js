@@ -26,6 +26,7 @@ import { SubscriptionProvider } from "../../auth/Subscription";
 import Analytics from "../Analytics/Analytics";
 import Trial from "../../components/Snackbar/Trial";
 import { setLocation } from "../../reducers/user";
+import StripeCompletion from "../../components/Dialog/StripeCompletion";
 
 
 /**
@@ -47,6 +48,9 @@ export default function Dashboard () {
     const signOut = useSignOut();
     const reload = useSelector((state) => state.user.reload);
     const [loading, setLoading] = useState(false);
+    const [openCompletion, openStripeCompletion] = useState(false);
+    const [stripeSession, setStripeSession] = useState({sessionId: '', status: '', title: ''})
+
 
     const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
     const [openNav, setOpenNav] = useState(false);
@@ -100,7 +104,34 @@ export default function Dashboard () {
           // Clear the interval to avoid memory leaks
             clearInterval(intervalId);
         };
-      }, []); 
+    }, []);
+
+    //** User completes the subscrtiption cycle. */
+    const closeStripeCompletion = () => {
+        openStripeCompletion(false);
+        const currentUrl = new URL(window.location.href);
+        const query = new URLSearchParams(window.location.search);
+        query.delete('success');
+        query.delete('cancelled');
+        query.delete('session_id');
+        currentUrl.search = query.toString();
+        window.history.replaceState({}, document.title, currentUrl.href);
+    }
+
+    useEffect(() => {
+        // Check to see if this is a redirect back from Checkout
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('success')) {
+        openStripeCompletion(true);
+        setStripeSession({sessionId: query.get('session_id'), status: 'Subscription has been proccess and completed!', title: 'Success', icon: 'okay'})
+        }
+
+        if (query.get('cancelled')) {
+        openStripeCompletion(true);
+        setStripeSession({sessionId: query.get('session_id'), status: 'Order canceled -- continue to shop around and checkout when you are ready.', title: 'Incomplete', icon:'cancelled'})
+
+    }
+  }, [stripeSession.sessionId]);
 
 
     const RenderLocation = () => {
@@ -153,6 +184,7 @@ export default function Dashboard () {
                  <Trial />
                  { client.open ? <Drawer setClient={setClient} client={client} />  : null}
                  { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }
+                 <StripeCompletion payload={stripeSession} open={openCompletion} onClose={closeStripeCompletion}/>
                  </SubscriptionProvider>
             </Box>
 
