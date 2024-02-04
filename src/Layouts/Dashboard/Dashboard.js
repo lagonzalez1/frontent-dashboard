@@ -25,6 +25,7 @@ import { PermissionProvider } from "../../auth/Permissions";
 import { SubscriptionProvider } from "../../auth/Subscription";
 import Analytics from "../Analytics/Analytics";
 import Trial from "../../components/Snackbar/Trial";
+import { setLocation } from "../../reducers/user";
 
 
 /**
@@ -100,6 +101,7 @@ export default function Dashboard () {
             clearInterval(intervalId);
         };
       }, []); 
+
 
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
