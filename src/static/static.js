@@ -19,6 +19,13 @@ export const WAITLIST_PLAN = "price_1Odn7GFBv6mpTbIZlmB4v8vZ";
 export const WAITLIST_APP_PLAN = "price_1Odn7yFBv6mpTbIZdEVpjuym";
 export const WAITLIST_APP_ANALYTICS_PLAN = "price_1Odn8NFBv6mpTbIZYxSQHjns";
 
+
+export const CURRENT_PLANS_NUMERAL = {
+    0: 'price_1Odn7GFBv6mpTbIZlmB4v8vZ',
+    1: 'price_1Odn7yFBv6mpTbIZdEVpjuym',
+    2: 'price_1Odn8NFBv6mpTbIZYxSQHjns'
+}
+
 export const CURRENT_PLANS = {
     'price_1Odn7GFBv6mpTbIZlmB4v8vZ': {
         title: 'Waitlist',

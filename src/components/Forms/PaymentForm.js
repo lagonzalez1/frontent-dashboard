@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog, Stack } from '@mui/material';
+import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog, Stack, Divider } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import NewRegister from '../Dialog/NewRegister';
 import RemovePlan from '../Dialog/RemovePlan';
@@ -10,6 +10,7 @@ import StartSubscription from '../Dialog/StartSubscription';
 import axios from 'axios';
 import { getHeaders } from '../../auth/Auth';
 import { WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN } from '../../static/static';
+import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 
 const SubscriptionForm = () => {
 
@@ -17,6 +18,10 @@ const SubscriptionForm = () => {
   // Plan will end up being a stripe unid and or the price_id of current plan.
   //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
   const trial = useSelector((state) => state.user.trialStatus);
+
+  const customer_id = useSelector((state) => state.business.stripe.cus_id);
+  const session_id = useSelector((state) => state.business.stripe.session_id);
+  
   const [register, setRegister] = useState(false);
   const [cancelPlan, setCancelPlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -57,11 +62,13 @@ const SubscriptionForm = () => {
     setSubcription(false);
   }
 
-  const manageSubscription = (sessionId) => {
+  const manageSubscription = () => {
+    
     const header = getHeaders();
-    axios.post('/create-portal-session', {sessionId}, header)
+    axios.post('/api/internal/create-portal-session', {session_id}, header)
     .then(res => {
-      console.log(res);
+      window.location.href = res.data.link;
+
     })
     .catch(error => {
       console.log(error);
@@ -82,32 +89,14 @@ const SubscriptionForm = () => {
   }
 
 
-  // This will check if a redirect back to this page exist.
-  // This should only trigger once a new user subscribes or new user. 
-  useEffect(() => {
-    const query = new URLSearchParams(window.location.search);
-    if (query.get('successs')) {
-      setSuccess(true);
-      setSessionId(query.get('session_id'));
-    }
-    if (query.get('cancelled')) {
-      setSuccess(false);
-      setSessionId('');
-    }
-  }, [sessionId])
-
-
-
-
-
   return (
     <>
       <Container id="plans">
         <Container sx={{ width: '100%', display: 'flex', justifyContent: 'center', pb: 2}}>
-          <Stack direction={'row'} spacing={1}>
-          <Button sx={{borderRadius: 10}} variant='contained' color='warning' onClick={() => setSubcription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Start subscription</Button>
-          <Button sx={{borderRadius: 10}} disabled={trial} variant='contained' color='success' onClick={() => setRegister(true)} startIcon={<AddIcon />}> add business</Button>
-          <Button sx={{borderRadius: 10}} disabled={trial}  variant='contained' color='info' onClick={() => setBillCycle(true)} startIcon={<ReceiptLongRoundedIcon/>}> View bill cycle</Button>
+          <Stack direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}>
+          <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setSubcription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Start subscription</Button>
+          <Button sx={{borderRadius: 10}} disabled={trial} size='small' variant='contained' color='success' onClick={() => setRegister(true)} startIcon={<AddIcon />}> add business</Button>
+          <Button sx={{borderRadius: 10}} disabled={trial} size='small'  variant='contained' color='info' onClick={() => manageSubscription()} startIcon={<OpenInNewOutlinedIcon/>}>Manage Subscription</Button>
           </Stack>
         </Container>
         <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_PLAN ? "lightgray": ""}} variant="outlined" id="waitlist">

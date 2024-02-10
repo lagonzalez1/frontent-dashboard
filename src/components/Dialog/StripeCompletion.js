@@ -21,8 +21,8 @@ const StripeCompletion = ({open, onClose, payload}) => {
         <DialogContent>
             
             <Container sx={{ display: 'flex', justifyContent: 'center'}}>
-                {payload && payload.icon === "cancelled" && <XCircle weight="fill" size={40} /> }
-                {payload && payload.icon === "okay" && <CheckCircle color="#00e025" weight="fill" size={40} /> }
+                {payload && payload.icon === "cancelled" && <XCircle weight="fill" size={60} /> }
+                {payload && payload.icon === "okay" && <CheckCircle color="#00e025" weight="fill" size={60} /> }
             </Container>
             <br />
             <Typography variant="subtitle2" fontWeight={'bold'} gutterBottom>-{payload ? payload.status: ''}</Typography>

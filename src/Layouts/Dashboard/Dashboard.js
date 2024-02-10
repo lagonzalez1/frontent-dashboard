@@ -27,6 +27,7 @@ import Analytics from "../Analytics/Analytics";
 import Trial from "../../components/Snackbar/Trial";
 import { setLocation } from "../../reducers/user";
 import StripeCompletion from "../../components/Dialog/StripeCompletion";
+import axios from "axios";
 
 
 /**
@@ -91,10 +92,13 @@ export default function Dashboard () {
     useEffect(() => { 
         console.log("Dashboard-render.");
         checkAuthStatus();
+
     },[reload]);
 
 
     useEffect(() => {
+        
+        webhookCall();
         const myFunction = () => {
             reloadBusinessData(dispatch);
         };
@@ -105,6 +109,17 @@ export default function Dashboard () {
             clearInterval(intervalId);
         };
     }, []);
+
+
+    const webhookCall = () => {
+        axios.post('/api/internal/webhook')
+        .then(response => {
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 
     //** User completes the subscrtiption cycle. */
     const closeStripeCompletion = () => {

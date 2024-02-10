@@ -27,7 +27,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { DateTime } from "luxon";
 import { RegisterTheme } from "../../theme/theme.js";
-import { WAITLIST, WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN } from "../../static/static.js";
+import { WAITLIST, WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN, CURRENT_PLANS_NUMERAL } from "../../static/static.js";
 
 
 
@@ -81,7 +81,8 @@ export default function Register(props){
         schedule: {},
         timezone: timezone,
         timestamp: timestamp,
-        settings: {}
+        settings: {},
+        product_id: '',
     })
 
     const [userErrors, setUserErrors] = useState({
@@ -196,8 +197,9 @@ export default function Register(props){
      * 
      * @param {*} digit     0..2 corresponding to level of service.  
      */
-    const handleCardClick = (digit) => {
-        setMode(digit);
+    const handleCardClick = (productId, mode) => {
+        setMode(mode);
+        setUser((prev) => ({...prev, product_id: productId})); // Update on Feb 6 2024
     }
 
 
