@@ -98,7 +98,6 @@ export default function Dashboard () {
 
     useEffect(() => {
         
-        webhookCall();
         const myFunction = () => {
             reloadBusinessData(dispatch);
         };
@@ -110,16 +109,9 @@ export default function Dashboard () {
         };
     }, []);
 
-
-    const webhookCall = () => {
-        axios.post('/api/internal/webhook')
-        .then(response => {
-            console.log(response);
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
+    
+ 
+    
 
     //** User completes the subscrtiption cycle. */
     const closeStripeCompletion = () => {

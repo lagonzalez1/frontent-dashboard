@@ -23,7 +23,6 @@ export default function Trial() {
         const term = DateTime.fromISO(termDate)
         const current = DateTime.now();
         const difference = term.diff(current, 'day').toObject();
-        console.log(difference)
         setDaysLeft(Math.floor(difference.days) * 10);
       }
     }
