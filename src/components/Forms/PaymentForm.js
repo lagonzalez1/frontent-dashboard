@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog, Stack, Divider } from '@mui/material';
+import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog, Stack, Divider, Alert, CircularProgress, AlertTitle } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import NewRegister from '../Dialog/NewRegister';
 import RemovePlan from '../Dialog/RemovePlan';
@@ -18,30 +18,57 @@ const SubscriptionForm = () => {
   // Plan will end up being a stripe unid and or the price_id of current plan.
   //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
   const trial = useSelector((state) => state.user.trialStatus);
+  const ref = useSelector((state) => state.business.stripe.ref);
 
-  const customer_id = useSelector((state) => state.business.stripe.cus_id);
-  const session_id = useSelector((state) => state.business.stripe.session_id);
+
+  /**
+   * const stripeIssues = useSelector((state) => state.business.stripe.issue);
+  const stripeTitle = useSelector((state) => state.business.stripe.message.title);
+  const stripeBody = useSelector((state) => state.business.stripe.message.body);
+  const stripeSeverity = useSelector((state)=> state.business.stripe.message.severity);
+  const stripeActive = useSelector((state) => state.business.stripe.active);
+   * 
+   * 
+   */
+  
+
   
   const [register, setRegister] = useState(false);
   const [cancelPlan, setCancelPlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [subscription, setSubcription] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [success, setSuccess] = useState(false);
-  const [sessionId, setSessionId] = useState('');
-  const [billCycle, setBillCycle] = useState(false);
-
-  const [cardError, setCardError] = useState(null);
+  const [stripe, setStripe] = useState({
+    session_id: '',
+    customer_id: '',
+    product_id: '',
+    subscription_id: ''
+  })
+  
 
   useEffect(() => {
-    // I will need to retrive the status of the subscriptions.
-    // 
-    //setSelectedPlan(plan);
-  }, [])
+    retriveStripeInformation();
+  }, []);
 
-  const handleSubmit = async (event, elements, stripe) => {
 
-  };
+  const retriveStripeInformation = () => {
+    // Get Stripe info if exist in Stripe collections.
+    setLoading(true);
+    const stripeRef = ref;
+    const headers = getHeaders();
+    axios.post('/api/internal/stripe_info_user', {ref: stripeRef}, headers)
+    .then(response => {
+      setStripe(response.data.payload);
+    })
+    .catch(error => {
+      console.log(error)
+    })
+    .finally(() => {
+      setLoading(false);
+    })
+
+  }
 
   const handlePlanChange = (plan) => {
     setSelectedPlan(plan)
@@ -63,12 +90,11 @@ const SubscriptionForm = () => {
   }
 
   const manageSubscription = () => {
-    
-    const header = getHeaders();
-    axios.post('/api/internal/create-portal-session', {session_id}, header)
+    if (!stripe.customer_id) { return; }
+    const customer_id = stripe.customer_id;
+    axios.post('/api/internal/create-portal-session', {customer_id}, header)
     .then(res => {
       window.location.href = res.data.link;
-
     })
     .catch(error => {
       console.log(error);
@@ -77,21 +103,11 @@ const SubscriptionForm = () => {
 
 
 
-  // Once a sessionId exist and or customerId this will be available for the user to change/ update
-  // That is the user has already managed or subscribed.
-  const SuccessDisplay = ({sessionId}) => {
-    return (
-      <Container>
-        <Typography variant='subtitle1' fontWeight={'bold'}>Subscription plan details.</Typography>
-        <Button variant='contained' onChange={() => manageSubscription(sessionId)}></Button>
-      </Container>
-    )
-  }
-
-
   return (
     <>
       <Container id="plans">
+      
+
         <Container sx={{ width: '100%', display: 'flex', justifyContent: 'center', pb: 2}}>
           <Stack direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}>
           <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setSubcription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Start subscription</Button>
@@ -99,6 +115,30 @@ const SubscriptionForm = () => {
           <Button sx={{borderRadius: 10}} disabled={trial} size='small'  variant='contained' color='info' onClick={() => manageSubscription()} startIcon={<OpenInNewOutlinedIcon/>}>Manage Subscription</Button>
           </Stack>
         </Container>
+
+        {
+
+          /**
+           *  <Box sx={{ display: 'flex', pb: 2, width: '100%'}}>
+          {loading ? (<CircularProgress />) : 
+            <>
+              <Alert severity={stripeSeverity}>
+                <AlertTitle><strong>{stripeTitle}</strong></AlertTitle>
+                <Stack>
+                  <Typography> <strong>Active:</strong> {stripeActive ? 'True': 'False'} </Typography>                  
+                  <Typography> <strong>Issues:</strong> {stripeIssues ? 'True': 'False'}</Typography>
+                  <Typography>{stripeBody}</Typography>
+                </Stack>
+              </Alert>
+            </>
+          }
+        </Box>
+           * 
+           * 
+           */
+        }
+
+
         <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_PLAN ? "lightgray": ""}} variant="outlined" id="waitlist">
         <CardActionArea onClick={() => handlePlanChange(WAITLIST_PLAN)} >
           <CardContent>
