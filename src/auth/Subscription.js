@@ -11,9 +11,21 @@ export const SubscriptionProvider = ({ children }) => {
     if (currentSubscription === null || currentSubscription === undefined) {
         // Return null or a loading indicator while waiting for the subscription data
         return null;
-      }
+    }
+
+/**
+ * 
+ * 
+ * NEEDS UPDATE: Feb 22 24
+ * 
+ * 
+ * Issue: 99 subsciption status 99 needs to prevent user from making any types of changes. Only allow user to view data (Customers, Analytics);
+ * Sol: Each editable page and component needs to be provisioned.
+ * 
+ */
 
     let subscriptions = {
+        99: ['CANCELLED'],
         0: ['WAITLIST'],
         1: ['WAITLIST', 'APPOINTMENTS', 'CUSTOMERS'],
         2: ['WAITLIST', 'APPOINTMENTS', 'CUSTOMERS', 'ANALYTICS'],

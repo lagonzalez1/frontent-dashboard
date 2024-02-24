@@ -11,9 +11,9 @@ import axios from 'axios';
 import { getHeaders } from '../../auth/Auth';
 import { WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN } from '../../static/static';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
+import { DateTime } from 'luxon';
 
 const SubscriptionForm = () => {
-
 
   // Plan will end up being a stripe unid and or the price_id of current plan.
   //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
@@ -21,18 +21,14 @@ const SubscriptionForm = () => {
   const ref = useSelector((state) => state.business.stripe.ref);
 
 
-  /**
-   * const stripeIssues = useSelector((state) => state.business.stripe.issue);
+  const stripeIssues = useSelector((state) => state.business.stripe.issue);
   const stripeTitle = useSelector((state) => state.business.stripe.message.title);
   const stripeBody = useSelector((state) => state.business.stripe.message.body);
   const stripeSeverity = useSelector((state)=> state.business.stripe.message.severity);
   const stripeActive = useSelector((state) => state.business.stripe.active);
-   * 
-   * 
-   */
-  
+  const term_date = useSelector((state) => state.business.terminating);
 
-  
+    
   const [register, setRegister] = useState(false);
   const [cancelPlan, setCancelPlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -59,7 +55,11 @@ const SubscriptionForm = () => {
     const headers = getHeaders();
     axios.post('/api/internal/stripe_info_user', {ref: stripeRef}, headers)
     .then(response => {
-      setStripe(response.data.payload);
+      if (response.data.payload) {
+        setStripe(response.data.payload);
+        handlePlanChange(response.data.payload.product_id);
+      }
+      
     })
     .catch(error => {
       console.log(error)
@@ -67,7 +67,6 @@ const SubscriptionForm = () => {
     .finally(() => {
       setLoading(false);
     })
-
   }
 
   const handlePlanChange = (plan) => {
@@ -92,6 +91,7 @@ const SubscriptionForm = () => {
   const manageSubscription = () => {
     if (!stripe.customer_id) { return; }
     const customer_id = stripe.customer_id;
+    const header = getHeaders();
     axios.post('/api/internal/create-portal-session', {customer_id}, header)
     .then(res => {
       window.location.href = res.data.link;
@@ -99,6 +99,38 @@ const SubscriptionForm = () => {
     .catch(error => {
       console.log(error);
     })
+  }
+
+
+  const DisplayAccountStatus = ({active}) => {
+    if (active) {
+      return (
+        <>
+        <Alert severity={stripeSeverity}>
+          <AlertTitle><strong>{stripeTitle}</strong></AlertTitle>
+          <Stack>
+            <Typography> <strong>Active:</strong> {stripeActive ? 'True': 'False'} </Typography>                  
+            <Typography>{stripeBody}</Typography>
+          </Stack>
+        </Alert>
+        
+        </>
+      )
+    }
+    else {
+      return (
+        <>
+        <Alert severity={'error'}>
+          <AlertTitle><strong>{stripeTitle}</strong></AlertTitle>
+          <Stack>
+            <Typography>{stripeBody}</Typography>
+            <Typography>{`Your account is set to be terminated on ${DateTime.fromISO(term_date).toLocaleString()}.`}</Typography>
+          </Stack>
+        </Alert>
+
+        </>
+      )
+    }
   }
 
 
@@ -118,24 +150,10 @@ const SubscriptionForm = () => {
 
         {
 
-          /**
-           *  <Box sx={{ display: 'flex', pb: 2, width: '100%'}}>
-          {loading ? (<CircularProgress />) : 
-            <>
-              <Alert severity={stripeSeverity}>
-                <AlertTitle><strong>{stripeTitle}</strong></AlertTitle>
-                <Stack>
-                  <Typography> <strong>Active:</strong> {stripeActive ? 'True': 'False'} </Typography>                  
-                  <Typography> <strong>Issues:</strong> {stripeIssues ? 'True': 'False'}</Typography>
-                  <Typography>{stripeBody}</Typography>
-                </Stack>
-              </Alert>
-            </>
-          }
+          <Box sx={{ display: 'flex', pb: 2, width: '100%'}}>
+          <DisplayAccountStatus active={stripeActive}/>
         </Box>
-           * 
-           * 
-           */
+          
         }
 
 
