@@ -19,14 +19,8 @@ const SubscriptionForm = () => {
   //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
   const trial = useSelector((state) => state.user.trialStatus);
   const ref = useSelector((state) => state.business.stripe.ref);
+  const termDate = useSelector((state) => state.business.terminating);
 
-
-  const stripeIssues = useSelector((state) => state.business.stripe.issue);
-  const stripeTitle = useSelector((state) => state.business.stripe.message.title);
-  const stripeBody = useSelector((state) => state.business.stripe.message.body);
-  const stripeSeverity = useSelector((state)=> state.business.stripe.message.severity);
-  const stripeActive = useSelector((state) => state.business.stripe.active);
-  const term_date = useSelector((state) => state.business.terminating);
 
     
   const [register, setRegister] = useState(false);
@@ -39,8 +33,14 @@ const SubscriptionForm = () => {
     session_id: '',
     customer_id: '',
     product_id: '',
-    subscription_id: ''
+    subscription_id: '',
+    active: false,
   })
+  const [stripeMessage, setStripeMessage] = useState({
+    title: null,
+    body: null,
+    severity: null
+  });
   
 
   useEffect(() => {
@@ -58,8 +58,9 @@ const SubscriptionForm = () => {
       if (response.data.payload) {
         setStripe(response.data.payload);
         handlePlanChange(response.data.payload.product_id);
+        setStripeMessage(response.data.payload.message);
       }
-      
+
     })
     .catch(error => {
       console.log(error)
@@ -102,35 +103,17 @@ const SubscriptionForm = () => {
   }
 
 
-  const DisplayAccountStatus = ({active}) => {
-    if (active) {
-      return (
-        <>
-        <Alert severity={stripeSeverity}>
-          <AlertTitle><strong>{stripeTitle}</strong></AlertTitle>
-          <Stack>
-            <Typography> <strong>Active:</strong> {stripeActive ? 'True': 'False'} </Typography>                  
-            <Typography>{stripeBody}</Typography>
-          </Stack>
-        </Alert>
-        
-        </>
-      )
-    }
-    else {
-      return (
-        <>
-        <Alert severity={'error'}>
-          <AlertTitle><strong>{stripeTitle}</strong></AlertTitle>
-          <Stack>
-            <Typography>{stripeBody}</Typography>
-            <Typography>{`Your account is set to be terminated on ${DateTime.fromISO(term_date).toLocaleString()}.`}</Typography>
-          </Stack>
-        </Alert>
-
-        </>
-      )
-    }
+  const DisplayAccountStatus = ({title, body, severity}) => {
+    return (
+      <>
+      <Alert severity={'error'}>
+        <AlertTitle><strong>{title}</strong></AlertTitle>
+        <Stack>
+          <Typography>{body}</Typography>
+        </Stack>
+      </Alert>
+      </>
+    )
   }
 
 
@@ -151,7 +134,7 @@ const SubscriptionForm = () => {
         {
 
           <Box sx={{ display: 'flex', pb: 2, width: '100%'}}>
-          <DisplayAccountStatus active={stripeActive}/>
+            {stripeMessage ? <DisplayAccountStatus title={stripeMessage.title} severity={stripeMessage.severity} body={stripeMessage.body} /> : null}
         </Box>
           
         }
