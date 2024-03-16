@@ -25,14 +25,14 @@ const SubscriptionForm = () => {
     
   const [register, setRegister] = useState(false);
   const [cancelPlan, setCancelPlan] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState('');
   const [subscription, setSubcription] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [stripe, setStripe] = useState({
     session_id: '',
     customer_id: '',
-    product_id: '',
+    price_id: '',
     subscription_id: '',
     active: false,
   })
@@ -57,7 +57,7 @@ const SubscriptionForm = () => {
     .then(response => {
       if (response.data.payload) {
         setStripe(response.data.payload);
-        handlePlanChange(response.data.payload.product_id);
+        setSelectedPlan(response.data.payload.price_id);
         setStripeMessage(response.data.payload.message);
       }
 
@@ -91,6 +91,7 @@ const SubscriptionForm = () => {
 
   const manageSubscription = () => {
     if (!stripe.customer_id) { return; }
+
     const customer_id = stripe.customer_id;
     const header = getHeaders();
     axios.post('/api/internal/create-portal-session', {customer_id}, header)
@@ -103,10 +104,31 @@ const SubscriptionForm = () => {
   }
 
 
+  const updateSubscription = () => {
+    console.log(selectedPlan);
+    console.log(stripe.price_id);
+    // Handle wrongfull updates.
+    if (!stripe.customer_id) { return; }
+    if (selectedPlan === null) {return; }
+    if (selectedPlan === stripe.price_id) { return; }
+    
+    const price_id = selectedPlan;
+    const customer_id = stripe.customer_id;
+    const header = getHeaders();
+    axios.post('/api/internal/update-checkout-session', {customer_id, price_id}, header)
+    .then(res => {
+      window.location.href = res.data.link;
+    })
+    .catch(error => {
+      console.log(error);
+    })
+  }
+
+
   const DisplayAccountStatus = ({title, body, severity}) => {
     return (
       <>
-      <Alert severity={'error'}>
+      <Alert severity={severity === "error" ? 'error': 'success'}>
         <AlertTitle><strong>{title}</strong></AlertTitle>
         <Stack>
           <Typography>{body}</Typography>
@@ -125,7 +147,16 @@ const SubscriptionForm = () => {
 
         <Container sx={{ width: '100%', display: 'flex', justifyContent: 'center', pb: 2}}>
           <Stack direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}>
-          <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setSubcription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Start subscription</Button>
+          {
+            stripe && stripe.customer_id !== '' ? (
+              <>
+                <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => updateSubscription()} startIcon={<KeyboardArrowRightRoundedIcon/>}> Update subscription </Button>
+
+              </>
+            )
+            : 
+            <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setSubcription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Start subscription</Button>
+          }
           <Button sx={{borderRadius: 10}} disabled={trial} size='small' variant='contained' color='success' onClick={() => setRegister(true)} startIcon={<AddIcon />}> add business</Button>
           <Button sx={{borderRadius: 10}} disabled={trial} size='small'  variant='contained' color='info' onClick={() => manageSubscription()} startIcon={<OpenInNewOutlinedIcon/>}>Manage Subscription</Button>
           </Stack>
@@ -144,7 +175,7 @@ const SubscriptionForm = () => {
         <CardActionArea onClick={() => handlePlanChange(WAITLIST_PLAN)} >
           <CardContent>
           <Typography variant='caption' color="text.secondary" gutterBottom>
-              Basic
+              Basic 
             </Typography>
             <Typography color="primary" variant="subtitle1" fontWeight={'bold'} component="div">
               Waitlist
@@ -164,7 +195,7 @@ const SubscriptionForm = () => {
         <CardActionArea onClick={() => handlePlanChange(WAITLIST_APP_ANALYTICS_PLAN)}>
           <CardContent>
           <Typography variant='caption' color="text.secondary" gutterBottom>
-              Best value
+              Best value 
             </Typography>
             <Typography color="primary" variant="subtitle1" fontWeight={'bold'} component="div">
               Waitlist & Appointments & Customers

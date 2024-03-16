@@ -11,8 +11,11 @@ import { DateTime } from 'luxon';
 
 
 export default function Trial() {
+
     const termDate = useSelector((state) => state.user.trial)
     const requestStatus = useSelector((state) => state.user.trialStatus);
+
+
     const [daysLeft, setDaysLeft] = useState(null);
     useEffect(() => {
       calculateDaysLeft();
@@ -20,7 +23,7 @@ export default function Trial() {
 
     const calculateDaysLeft = () => {
       if (requestStatus){
-        const term = DateTime.fromISO(termDate)
+        const term = DateTime.fromISO(termDate);
         const current = DateTime.now();
         const difference = term.diff(current, 'day').toObject();
         setDaysLeft(Math.floor(difference.days) * 10);
@@ -29,7 +32,6 @@ export default function Trial() {
 
     const action = (
         <React.Fragment>
-
         </React.Fragment>
     );
 
@@ -43,7 +45,7 @@ export default function Trial() {
             <Alert
             severity="error"
             variant="filled">
-                {'7 day trial will be available until ' + DateTime.fromISO(termDate).toLocaleString() + "." }
+                {'You account is active until ' + DateTime.fromISO(termDate).toLocaleString() + "." }
                 <LinearProgress variant="determinate" value={daysLeft} />
           </Alert>    
         </Snackbar>

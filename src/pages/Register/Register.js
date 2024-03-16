@@ -29,8 +29,6 @@ import { DateTime } from "luxon";
 import { RegisterTheme } from "../../theme/theme.js";
 import { WAITLIST, WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN, CURRENT_PLANS_NUMERAL } from "../../static/static.js";
 
-
-
 /** 
  * Option 2: 
  * COMPLETED: Here have the user choose between basic or medium with analytics, Promotions
@@ -39,8 +37,6 @@ import { WAITLIST, WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN
  * 
  * 
 */
-
-
 
 export default function Register(props){
 
@@ -286,15 +282,11 @@ export default function Register(props){
                     setLoading(false);
                     navigate('/Dashboard');
                     return;
-                }else {
-                    setLoading(false);
-                    setErrors({title: `Register error ${response.status}`, message: response.data.msg, severity: 'error'});
-                    return;
                 }
             })
             .catch(error => {
                 console.log(error);
-                setErrors({title: 'Server responded:', message: error.data.msg, severity: 'error'});
+                setErrors({title: 'Server responded:', message: error.response.data.msg, severity: 'error'});
                 setLoading(false);
                 return;
             })
@@ -430,7 +422,7 @@ export default function Register(props){
                                     spacing={2}
                                 >
                                     <Grid item xs={12} sm={6} md={4}>
-                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === WAITLIST_PLAN ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_PLAN) }>
+                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 0 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_PLAN, 0) }>
                                             <CardActionArea>
                                                 <CardContent>
                                                     <Typography sx={{ textAlign: 'left', pl: 1}} variant="h5"><strong>Set up waitlist</strong></Typography>
@@ -447,7 +439,7 @@ export default function Register(props){
                                         </Card>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={4}>
-                                    <Card sx={{ height: '100%', p: 1, backgroundColor: mode === WAITLIST_APP_PLAN ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_APP_PLAN) } >
+                                    <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 1 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_APP_PLAN, 1) } >
                                         <CardActionArea>
 
                                             <CardContent>
@@ -464,7 +456,7 @@ export default function Register(props){
                                         </Card>
                                     </Grid>
                                     <Grid item xs={12} sm={6} md={4}>
-                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === WAITLIST_APP_ANALYTICS_PLAN ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_APP_ANALYTICS_PLAN) }>
+                                        <Card sx={{ height: '100%', p: 1, backgroundColor: mode === 2 ? '#c2b0e2': '', borderRadius: 7}} variant="outlined" onClick={() => handleCardClick(WAITLIST_APP_ANALYTICS_PLAN, 2) }>
                                             <CardActionArea>
                                             <CardContent>
                                                 <Typography sx={{ textAlign: 'left',pl: 1}} variant="h5" color="dark"><strong>Both + Analytics</strong></Typography>
