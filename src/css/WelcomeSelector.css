@@ -24,6 +24,9 @@
     box-shadow: 0;
   }
 
+  #intervalSelect {
+    width: 100%;
+  }
 
   .card-style {
     border-radius: 5;

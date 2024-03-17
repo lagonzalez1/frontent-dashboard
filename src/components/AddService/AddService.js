@@ -135,6 +135,7 @@ const AddService = () => {
                 as={TextField}
                 name="title"
                 label="Title"
+                size="small"
                 fullWidth={true}
                 margin="normal"
                 variant="outlined"
@@ -146,6 +147,7 @@ const AddService = () => {
                 as={TextField}
                 name="description"
                 label="Description"
+                size="small"
                 fullWidth={true}
                 onChange={handleChange}
                 margin="normal"
@@ -156,6 +158,7 @@ const AddService = () => {
               <Field
                 as={TextField}
                 name="duration"
+                size="small"
                 label="Duration"
                 fullWidth={true}
                 margin="normal"
@@ -168,6 +171,7 @@ const AddService = () => {
                 as={TextField}
                 name="cost"
                 label="Cost $"
+                size="small"
                 fullWidth={true}
                 error={touched.cost && !!errors.cost}
                 onChange={handleChange}
@@ -181,6 +185,7 @@ const AddService = () => {
                 as={Select} 
                 id="employeeTag"
                 name="employeeTag"
+                size="small"
                 handleChange={handleChange}
                 fullWidth={true}
               >

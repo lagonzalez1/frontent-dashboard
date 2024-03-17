@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog, Stack, Divider, Alert, CircularProgress, AlertTitle } from '@mui/material';
+import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog, Stack, Divider, Alert, CircularProgress, AlertTitle, Zoom, Grow } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import NewRegister from '../Dialog/NewRegister';
 import RemovePlan from '../Dialog/RemovePlan';
@@ -9,7 +9,7 @@ import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
 import StartSubscription from '../Dialog/StartSubscription';
 import axios from 'axios';
 import { getHeaders } from '../../auth/Auth';
-import { WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN } from '../../static/static';
+import { CURRENT_PLANS, WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN } from '../../static/static';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { DateTime } from 'luxon';
 
@@ -22,12 +22,12 @@ const SubscriptionForm = () => {
   const termDate = useSelector((state) => state.business.terminating);
 
 
-    
   const [register, setRegister] = useState(false);
-  const [cancelPlan, setCancelPlan] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('');
   const [subscription, setSubcription] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [updateSub, setUpdateSubscription] = useState(false);
+
 
   const [stripe, setStripe] = useState({
     session_id: '',
@@ -35,14 +35,14 @@ const SubscriptionForm = () => {
     price_id: '',
     subscription_id: '',
     active: false,
-  })
+  });
+
   const [stripeMessage, setStripeMessage] = useState({
     title: null,
     body: null,
     severity: null
   });
   
-
   useEffect(() => {
     retriveStripeInformation();
   }, []);
@@ -77,14 +77,6 @@ const SubscriptionForm = () => {
   const onCloseRegister = () => {
     setRegister(false);
   }
-
-  const handleCancelPlan = () => {
-    setCancelPlan(true);
-  }
-  const onCloseCancel = () => {
-    setCancelPlan(false);
-  }
-
   const onCloseSubscription = () => {
     setSubcription(false);
   }
@@ -113,11 +105,11 @@ const SubscriptionForm = () => {
     if (selectedPlan === stripe.price_id) { return; }
     
     const price_id = selectedPlan;
-    const customer_id = stripe.customer_id;
+    const subscription_id = stripe.subscription_id;
     const header = getHeaders();
-    axios.post('/api/internal/update-checkout-session', {customer_id, price_id}, header)
+    axios.post('/api/internal/update-subscription', {subscription_id, price_id}, header)
     .then(res => {
-      window.location.href = res.data.link;
+      console.log(res);
     })
     .catch(error => {
       console.log(error);
@@ -138,6 +130,25 @@ const SubscriptionForm = () => {
     )
   }
 
+  const DisplayUpdateWarning = () => {
+    
+    return (
+        <Alert severity="info" onClose={() => setUpdateSubscription(false)}>
+        <AlertTitle><strong>{'Updating subscription '}</strong></AlertTitle>
+        <Stack>
+          <Typography variant='body2'>{`Your current subscription `} <strong>{ CURRENT_PLANS[stripe.price_id].title }</strong>{ ` will be updated to `} <strong>{ CURRENT_PLANS[selectedPlan].title }</strong> </Typography>
+          *
+          <Typography variant='caption'>
+            By default, we prorate subscription changes. For example, if a customer signs up on May 1 for a 100 USD price, they’ll be billed 100 USD immediately. 
+            If on May 15 they switch to a 200 USD price, then on June 1 they’ll be billed 250 USD (200 USD for a renewal of her subscription, plus a 50 USD prorating adjustment for half of the previous month’s 100 USD difference). 
+            Similarly, a downgrade generates a credit that is applied to the next invoice.
+          </Typography>
+          <Button color='primary' variant='contained' onClick={() => updateSubscription()}>Accept</Button>
+        </Stack>
+      </Alert>
+    )
+  }
+
 
 
   return (
@@ -150,8 +161,7 @@ const SubscriptionForm = () => {
           {
             stripe && stripe.customer_id !== '' ? (
               <>
-                <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => updateSubscription()} startIcon={<KeyboardArrowRightRoundedIcon/>}> Update subscription </Button>
-
+                <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setUpdateSubscription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Update subscription </Button>
               </>
             )
             : 
@@ -165,8 +175,11 @@ const SubscriptionForm = () => {
         {
 
           <Box sx={{ display: 'flex', pb: 2, width: '100%'}}>
+            <Stack spacing={1}>
             {stripeMessage ? <DisplayAccountStatus title={stripeMessage.title} severity={stripeMessage.severity} body={stripeMessage.body} /> : null}
-        </Box>
+            {updateSub ? ( <DisplayUpdateWarning /> ): null}
+            </Stack>
+          </Box>
           
         }
 
@@ -233,11 +246,7 @@ const SubscriptionForm = () => {
           </CardActionArea>
         </Card>
       </Container>
-      <Box sx={{ display: 'flex', justifyContent: 'center', pt: 1}}>
-        <Button variant="text" onClick={() => handleCancelPlan()}>Cancel</Button>
-      </Box>
 
-      <RemovePlan open={cancelPlan} onClose={onCloseCancel} />
       <NewRegister open={register} onClose={onCloseRegister} />
       <StartSubscription plan={selectedPlan} open={subscription} onClose={onCloseSubscription}/>
     </>

@@ -49,6 +49,9 @@ export default function WelcomeSelector() {
     const [services, setServices] = useState(null);
     const [resources, setResouces] = useState(null);
     const [slots, setSlots] = useState(false);
+
+
+    const [appSlotLoader, setAppSlotLoader] = useState(false);
     
 
     const [appointmentEmployees, setAppEmployees] = useState(null);
@@ -286,22 +289,23 @@ export default function WelcomeSelector() {
         }
         const currentDate = DateTime.now().toISO();
         const payload = { employeeId: appointmentData.employee_id, serviceId: id, appointmentDate: appointmentData.date.toISO(), link, currentDate }
-        setLoading(true)
+        setAppSlotLoader(true)
         getAvailableAppointments(payload)
         .then(response => {
-            setSlots(response.data);
+            
             if(response.data.length === 0){
                 setAlertAppointment(true);
                 setErrorMessage({title: 'No available appointments.'})
                 return;
             }
+            setSlots(response.data);
         })
         .catch(error => {
             setError(error);
             console.log(error)
         })
         .finally(() => {
-            setLoading(false);
+            setAppSlotLoader(false);
         })
     }
 
@@ -325,7 +329,7 @@ export default function WelcomeSelector() {
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
                 <Box className="center-box" >
-                    <Card className="custom-card" sx={{ p: 1, borderRadius: 5, boxShadow: 0, marginTop: 2 }}>
+                    <Card className="custom-card" sx={{ p: .5, borderRadius: 5, boxShadow: 0, marginTop: 2 }}>
                         {loading ? (<CircularProgress />): 
                         <CardContent>
                             <Container sx={{ textAlign: 'left'}}>
@@ -452,7 +456,6 @@ export default function WelcomeSelector() {
                                                         rowSpacing={2}
                                                         spacing={.5}
                                                         alignItems="stretch"
-
                                                     >
 
                                                         {
@@ -475,6 +478,7 @@ export default function WelcomeSelector() {
                                                                             <Typography gutterBottom color="text.secondary" variant="caption">
                                                                                 { service.description }
                                                                             </Typography>
+                                                             
                                                                             <Divider variant="middle" />                                                                    
                                                                             <Stack sx={{m: 1}} spacing={0.5}>
                                                                                 <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
@@ -498,7 +502,7 @@ export default function WelcomeSelector() {
                                             </Box>
                                             <Container id="intervalSelect" sx={{pt: 1, display: openAvailabity ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
                                                 <Grow in={openAvailabity}>
-                                                    {loading === true ? (
+                                                    {appSlotLoader === true ? (
                                                         <Box>
                                                             <CircularProgress size={'small'}/>
                                                         </Box>

@@ -106,6 +106,7 @@ export default function AddResource() {
                       name="title"
                       as={TextField}
                       label="Title"
+                      size="small"
                       variant="outlined"
                       onChange={handleChange}
                       fullWidth={true}
@@ -118,6 +119,7 @@ export default function AddResource() {
                           as={Select}
                           id="services"
                           name="service_id"
+                          size="small"
                           fullWidth={true}
                           error={touched.service_id && !!errors.service_id}
                           onChange={handleChange}
@@ -135,13 +137,15 @@ export default function AddResource() {
                     <Field
                       name="description"
                       as={TextFieldEdit}
-                      fullWidth={true}  
+                      fullWidth={true}
+                      size="small"  
                       onChange={handleChange}
                       variant="outlined"
                       error={touched.description && !!errors.description}
                     />
                     <Field
                       name="serveSize"
+                      size="small"
                       as={TextField}
                       fullWidth={true}
                       label="Serve size"
@@ -156,6 +160,7 @@ export default function AddResource() {
                     <Field
                       id="active"
                       name="active"
+                      
                       type="checkbox"
                       as={Checkbox}
                       fullWidth={true}
