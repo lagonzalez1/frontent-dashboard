@@ -14,7 +14,7 @@ export default function SystemForm({setLoading, loading}) {
 
 
     const { checkPermission } = usePermission();
-    const { checkSubscription } = useSubscription();
+    const { checkSubscription, cancelledSubscription } = useSubscription();
 
     const settings = useSelector((state) => state.business.system);
     const business = useSelector((state) => state.business);
@@ -153,7 +153,7 @@ export default function SystemForm({setLoading, loading}) {
                 </Grid>
             </Grid>
             <br/>
-                <Button variant='contained' type="submit" sx={{borderRadius: 10}} disabled={!checkPermission('SYSTEM')}>Save</Button>
+                <Button variant='contained' type="submit" sx={{borderRadius: 10}} disabled={!checkPermission('SYSTEM') || cancelledSubscription()}>Save</Button>
             </Form>
         )}
         </Formik>

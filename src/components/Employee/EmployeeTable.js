@@ -22,7 +22,7 @@ export default function EmployeeTable({setLoading, loading}) {
 
 
     const { canEmployeeEdit, checkPermission } = usePermission();
-    const { checkSubscription } = useSubscription();
+    const { checkSubscription, cancelledSubscription } = useSubscription();
     const employees = useSelector((state) => state.business.employees);
     const userEmail = useSelector((state) => state.user.email);
     const today = DateTime.local();
@@ -198,7 +198,7 @@ export default function EmployeeTable({setLoading, loading}) {
                 </Table>
             </Stack>
             <br/>
-            <Button disabled={!checkPermission('EMPL_ADD') || !checkSubscription('APPOINTMENTS')} onClick={() => showEmployeeModal()} sx={{borderRadius: 10}} variant="contained">
+            <Button disabled={!checkPermission('EMPL_ADD') || !cancelledSubscription()} onClick={() => showEmployeeModal()} sx={{borderRadius: 10}} variant="contained">
                 Add
             </Button>
 
@@ -338,7 +338,7 @@ export default function EmployeeTable({setLoading, loading}) {
                     </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button sx={{borderRadius: 10}} variant="contained" onClick={() => changeVisability(employee)}>Save</Button>
+                <Button disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" onClick={() => changeVisability(employee)}>Save</Button>
             </DialogActions>
             </Dialog>
 

@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -8,6 +9,7 @@ const SubscriptionContext = createContext();
 // currentSubscription is null and throwing an Error.
 export const SubscriptionProvider = ({ children }) => {
     const currentSubscription = useSelector((state) => state.user.subscription);
+    const termDate = useSelector((state) => state.business.terminating);
     if (currentSubscription === null || currentSubscription === undefined) {
         // Return null or a loading indicator while waiting for the subscription data
         return null;
@@ -34,8 +36,13 @@ export const SubscriptionProvider = ({ children }) => {
     const checkSubscription = (required) => {
         return subscriptions[currentSubscription].includes(required);
     };
+
+
+    const cancelledSubscription = () => { return currentSubscription === 99 ? true: false }
+
+
     return (
-        <SubscriptionContext.Provider value={{ checkSubscription }}>
+        <SubscriptionContext.Provider value={{ checkSubscription, cancelledSubscription }}>
             {children}
         </SubscriptionContext.Provider>
     );

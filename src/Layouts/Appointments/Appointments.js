@@ -209,7 +209,6 @@ const Appointments = ({setClient, setEditClient}) => {
                                     ) :
                                      data.map((client, index) => {
                                         const edit = checkPermission('CLIENT_EDIT')
-                                        const serve = checkPermission('SERVE')
                                     return (
                                         <TableRow>
                                             <TableCell>
@@ -246,7 +245,7 @@ const Appointments = ({setClient, setEditClient}) => {
                                             </TableCell>
                                             <TableCell>
                                                 <Stack direction={'row'} spacing={1}>
-                                                <IconButton disabled={!serve} onClick={() => sendClientServing(client._id)}>
+                                                <IconButton onClick={() => sendClientServing(client._id)}>
                                                     <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                                 </IconButton>
                                                 <IconButton  onClick={() => sendClientNotification(client._id)}>

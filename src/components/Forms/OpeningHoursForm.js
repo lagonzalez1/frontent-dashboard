@@ -14,12 +14,14 @@ import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
 import { allowEmployeeEdit, findEmployee, getEmployeeList } from '../../hooks/hooks';
 import { usePermission } from '../../auth/Permissions';
+import { useSubscription } from '../../auth/Subscription';
 
 
 
 const OpeningHoursForm = ({setLoading, loading}) => {
 
   const { checkPermission, canEmployeeEdit } = usePermission();
+  const { cancelledSubscription } = useSubscription();
   const business = useSelector((state) => state.business);
   const schedule = useSelector((state) => state.business.schedule);
   const closedDays = useSelector((state) => state.business.closedDates);
@@ -346,7 +348,7 @@ const initialValuesSchedule = {
                 </Box>
                 <DialogActions>
                   
-                  <Button disabled={!checkPermission('HOUR_OPEN_HR')} sx={{ borderRadius: 10}} type="submit" variant='contained' color="primary">
+                  <Button disabled={!checkPermission('HOUR_OPEN_HR') || cancelledSubscription() } sx={{ borderRadius: 10}} type="submit" variant='contained' color="primary">
                     Save
                   </Button>
                 </DialogActions>

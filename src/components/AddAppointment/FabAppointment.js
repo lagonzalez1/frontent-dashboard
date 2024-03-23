@@ -20,7 +20,7 @@ import { usePermission } from "../../auth/Permissions";
 export default function FabAppointment () {
 
     const dispatch = useDispatch();
-    const { checkSubscription} = useSubscription();
+    const { cancelledSubscription } = useSubscription();
     const { checkPermission } = usePermission();
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
@@ -379,10 +379,10 @@ export default function FabAppointment () {
                             (
                             <>
                             <Button variant="outlined" sx={{ borderRadius: 10}} onClick={() => setNextStep(false)}> back</Button>
-                            <Button variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</Button>
+                            <Button disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</Button>
                             </>
                             ): 
-                            <Button variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>
+                            <Button disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>
                             }
                         </Stack>
                     </form>

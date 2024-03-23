@@ -5,11 +5,13 @@ import { Grid, FormControlLabel, Switch, Button, FormLabel, Stack, Box, Typograp
 import { validationSchema, LABELS, requestExtraChanges, TITLE } from "../FormHelpers/ExtraFormsHelper";
 import { setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
+import { useSubscription } from "../../auth/Subscription";
 
 
 export default function ClientSignForm({setLoading, loading}) {
 
     const { checkPermission } = usePermission();
+    const { cancelledSubscription } = useSubscription();
     const business = useSelector((state) => state.business);
     const settings = useSelector((state) => state.business.settings.present);
     const dispatch = useDispatch();
@@ -56,7 +58,7 @@ export default function ClientSignForm({setLoading, loading}) {
                         
                     </Stack>
                     <br/>
-                    <Button disabled={!checkPermission('CLIENT_SIGNU')} sx={{borderRadius: 10}} variant="contained" type="submit">Save</Button>
+                    <Button disabled={!checkPermission('CLIENT_SIGNU') || cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" type="submit">Save</Button>
                     </Form>
                 )}
             </Formik>

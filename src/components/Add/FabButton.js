@@ -13,12 +13,18 @@ import * as Yup from 'yup';
 import { setBusiness } from "../../reducers/business";
 
 import { setReload, setSnackbar } from "../../reducers/user";
+import { usePermission } from "../../auth/Permissions";
+import { useSubscription } from "../../auth/Subscription";
 
 
 
 
 export default function FabButton () {
+
+
     const dispatch = useDispatch();
+    const { cancelledSubscription } = useSubscription();
+
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
 
@@ -28,7 +34,6 @@ export default function FabButton () {
     const [phoneNumber, setPhoneNumber] = useState(null);
     const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
-    const permissionLevel = useSelector((state) => state.user.permissions);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -43,7 +48,6 @@ export default function FabButton () {
     }, [])
 
     const handleSubmit = (payload) => {
-        console.log("Called")
         addCustomerWaitlist(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
@@ -276,7 +280,8 @@ export default function FabButton () {
                             error={formik.touched.notes && !!formik.errors.notes}
                             onChange={formik.handleChange}
                             />
-                            <Button disabled={(permissionLevel === 3) ? true: false} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</Button>
+                            {console.log(cancelledSubscription())}
+                            <Button disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</Button>
                         </Stack>
                     
                     </form>

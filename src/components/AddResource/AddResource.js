@@ -10,6 +10,7 @@ import Success from '../Snackbar/Success';
 import { setReload, setSnackbar } from '../../reducers/user';
 import CloseIcon from "@mui/icons-material/Close"
 import { usePermission } from '../../auth/Permissions';
+import { useSubscription } from '../../auth/Subscription';
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -31,6 +32,7 @@ const initialValues = {
 
 export default function AddResource() {
   const { checkPermission } = usePermission();
+  const { cancelledSubscription } = useSubscription();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
@@ -183,7 +185,7 @@ export default function AddResource() {
                     /> 
                     </Grid>
                     </Grid>
-                    <Button disabled={!checkPermission('RESO_ADD')} sx={{ borderRadius: 10}}  variant="contained" type="submit">submit</Button>
+                    <Button disabled={!checkPermission('RESO_ADD') || cancelledSubscription() } sx={{ borderRadius: 10}}  variant="contained" type="submit">submit</Button>
 
                   </Stack>
                 <DialogActions>

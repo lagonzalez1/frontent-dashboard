@@ -8,6 +8,7 @@ import { setSnackbar } from '../../reducers/user';
 import { getAccessToken } from '../../auth/Auth';
 import { useNavigate, useParams } from "react-router-dom";
 import { usePermission } from '../../auth/Permissions';
+import { useSubscription } from '../../auth/Subscription';
 
 
 const validationSchema = Yup.object().shape({
@@ -18,6 +19,7 @@ const validationSchema = Yup.object().shape({
 const LocationForm = ({setLoading, loading}) => {
 
   const { checkPermission } = usePermission();
+  const { cancelledSubscription } = useSubscription();
   const business = useSelector((state) => state.business);
   const settings = useSelector((state) => state.business.settings);
   const options = useSelector((state) => state.user.options);
@@ -153,7 +155,7 @@ const LocationForm = ({setLoading, loading}) => {
             </Grid>
 
             <Grid item xs={12}>              
-            <Button disabled={ !checkPermission('LOC_URL')} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 10}}>
+            <Button disabled={ !checkPermission('LOC_URL') || cancelledSubscription()} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 10}}>
                 {loading ? <CircularProgress /> : 'Save'}
             </Button>
             </Grid>

@@ -6,11 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setSnackbar } from '../../reducers/user';
 import { requestNotificationChange } from "../FormHelpers/NotificationFormHelper";
 import { usePermission } from '../../auth/Permissions';
+import { useSubscription } from '../../auth/Subscription';
 
 
 const NotificationForm = ({setLoading, loading}) => {
   
   const { checkPermission } = usePermission();
+  const { cancelledSubscription } = useSubscription();
   const business = useSelector((state) => state.business);
   const dispatch = useDispatch();
   
@@ -74,7 +76,7 @@ const NotificationForm = ({setLoading, loading}) => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button disabled={!checkPermission('NOTI_SETTINGS')} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <Button disabled={!checkPermission('NOTI_SETTINGS') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </Grid>

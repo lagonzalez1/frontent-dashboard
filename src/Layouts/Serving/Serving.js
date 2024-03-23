@@ -295,7 +295,7 @@ export default function Serving({setClient}) {
                             </FormGroup>
                         </DialogContent>
                         <DialogActions>
-                            <Button variant="contained" onClick={() => checkoutClient()}>Save</Button>
+                            <Button sx={{ borderRadius: 7}} variant="contained" onClick={() => checkoutClient()}>Save</Button>
                         </DialogActions>
 
                     </Dialog>

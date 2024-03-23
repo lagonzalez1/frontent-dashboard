@@ -7,12 +7,14 @@ import UploadIcon from '@mui/icons-material/Upload';
 import { getAccessToken, getStateData } from "../../auth/Auth";
 import { useTheme } from "../../theme/ThemeContext";
 import { usePermission } from "../../auth/Permissions";
+import { useSubscription } from "../../auth/Subscription";
 
 export default function Personalization ({setLoading, loading}) {
 
     const { theme, updateTheme } = useTheme();
     const { checkPermission } = usePermission();
 
+    const {cancelledSubscription } = useSubscription();
     const link = useSelector((state) => state.business.publicLink);
     const imageRef = useSelector((state) => state.business.settings.profileImage);
     const permissionLevel = useSelector((state) => state.user.permissions);
@@ -213,7 +215,7 @@ export default function Personalization ({setLoading, loading}) {
                 (
                 <>
                 <br/>
-                <Button disabled={!checkPermission('PERS_IMG')} size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</Button>
+                <Button disabled={!checkPermission('PERS_IMG') || cancelledSubscription()} size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</Button>
                 </>)
                 : null}             
         

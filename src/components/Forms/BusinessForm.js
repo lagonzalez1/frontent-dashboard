@@ -7,6 +7,7 @@ import axios from 'axios';
 import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { usePermission } from '../../auth/Permissions';
+import { useSubscription } from '../../auth/Subscription';
 
 const validationSchema = Yup.object().shape({
   businessName: Yup.string().required(),
@@ -18,6 +19,9 @@ const validationSchema = Yup.object().shape({
 const BusinessForm = ({loading, setLoading}) => {
   
   const { checkPermission } = usePermission();
+  const { cancelledSubscription } = useSubscription();
+
+  
   const business = useSelector((state) => state.business);
   const dispatch = useDispatch();
   
@@ -105,7 +109,7 @@ const BusinessForm = ({loading, setLoading}) => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button disabled={!checkPermission('BUSI_INFO')} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <Button disabled={!checkPermission('BUSI_INFO') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
               </Button>
             </Grid>

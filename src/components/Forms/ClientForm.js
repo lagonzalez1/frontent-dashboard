@@ -5,12 +5,14 @@ import { Grid, FormControlLabel, Switch, Button, FormLabel, Typography} from "@m
 import { requestInputFieldChange, validationSchema, LABELS, TITLE } from "../FormHelpers/ClientFormHelpers";
 import { setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
+import { useSubscription } from "../../auth/Subscription";
 
 
 export default function ClientForm({setLoading, loading}) {
     
 
     const { checkPermission } = usePermission();
+    const { cancelledSubscription } = useSubscription();
     const settings = useSelector((state) => state.business.settings.inputFields);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
@@ -53,7 +55,7 @@ export default function ClientForm({setLoading, loading}) {
                             ))}
                         </Grid>
                         <br/>
-                        <Button sx={{borderRadius: 10}} disabled={!checkPermission('CLIENT_FORM')} variant="contained" type="submit">Save</Button>
+                        <Button sx={{borderRadius: 10}} disabled={!checkPermission('CLIENT_FORM') || cancelledSubscription()} variant="contained" type="submit">Save</Button>
                     </Form>
                     )}
             </Formik>

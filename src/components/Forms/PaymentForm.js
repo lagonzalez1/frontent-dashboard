@@ -102,7 +102,7 @@ const SubscriptionForm = () => {
     // Handle wrongfull updates.
     if (!stripe.customer_id) { return; }
     if (selectedPlan === null) {return; }
-    if (selectedPlan === stripe.price_id) { return; }
+    if (selectedPlan === stripe.price_id && stripe.active === true) { return; }
     
     const price_id = selectedPlan;
     const subscription_id = stripe.subscription_id;

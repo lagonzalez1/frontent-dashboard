@@ -185,7 +185,7 @@ export default function Dashboard () {
                                 <CircularProgress color="inherit" />
                             </Backdrop>)
                             : <MemoizedRenderLocation />}
-                            <Success/>
+                            <Success />
                       </PermissionProvider>
                  </Box>
                  <Trial />
