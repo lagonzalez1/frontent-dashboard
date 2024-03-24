@@ -38,7 +38,6 @@ export default function Trial() {
   return (
         <Snackbar
             open={requestStatus}
-
             action={action}
             anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
           >

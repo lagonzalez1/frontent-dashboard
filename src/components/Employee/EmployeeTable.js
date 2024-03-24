@@ -198,7 +198,7 @@ export default function EmployeeTable({setLoading, loading}) {
                 </Table>
             </Stack>
             <br/>
-            <Button disabled={!checkPermission('EMPL_ADD') || !cancelledSubscription()} onClick={() => showEmployeeModal()} sx={{borderRadius: 10}} variant="contained">
+            <Button disabled={!checkPermission('EMPL_ADD') || cancelledSubscription()} onClick={() => showEmployeeModal()} sx={{borderRadius: 7}} variant="contained">
                 Add
             </Button>
 
