@@ -282,7 +282,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                         <FiberManualRecordIcon fontSize="small" htmlColor="#00FF00"/>:
                         <FiberManualRecordIcon fontSize="small" htmlColor="#FF0000"/>} 
                         <ListItemText
-                            primary={ accepting ? 'Open' : 'Close'}
+                            primary={ accepting ? 'Open' : 'Closed'}
                         />
                         <KeyboardArrowDownIcon/>
                         </ListItemButton>

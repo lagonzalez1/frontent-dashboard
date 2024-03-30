@@ -14,17 +14,24 @@ function createAppointmentRequest(payload) {
     const { user, business } = getStateData();
     const header = getHeaders();
     const data = { ...payload, b_id: business._id };
-  
-    return axios.post('/api/internal/create_appointment', data, header);
-  }
+    return axios({timeout: 4000, signal: AbortSignal.timeout(4000)}).post('/api/internal/create_appointment', data, header);
+}
 
+
+
+/**
+ *  
+ * @param {*} payload 
+ * @returns Resolve: Appointment succesfull
+ *          Reject: Appointment failed
+ */
 export const createAppointmentPretense = (payload) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
         const data = { ...payload, b_id: business._id };
 
-        axios
+        axios({timeout: 4000, signal: AbortSignal.timeout(4000)})
         .post('/api/internal/validate_appointment', data, header)
         .then((response) => {
             if (response.data.isValid) {

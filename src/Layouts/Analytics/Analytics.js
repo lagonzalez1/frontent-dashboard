@@ -14,7 +14,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import BarGraphWait from "../../components/Vizual/BarGraphWait";
 import BarGraphApp from "../../components/Vizual/BarGraphApp";
-import { CalendarBlank, HourglassHigh, UserSwitch , UsersThree, XCircle  } from "phosphor-react"; 
+import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle  } from "phosphor-react"; 
 
 
 
@@ -165,7 +165,7 @@ const Analytics = () => {
             <Grid container sx={{ pt: 1}} 
                 direction="row"
                 >
-                <Grid item lg={6} md={6} xs={12} sm={12}>
+                <Grid item lg={5} md={5} xs={12} sm={12}>
                     { /** Employee list */}
                     <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
                         <Typography variant="subtitlel" fontWeight={'bold'}>Current employees</Typography>
@@ -205,7 +205,7 @@ const Analytics = () => {
                                     return (
                                         <Card elevation={0} sx={{ maxWidth: 100}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22}  />
+                                                <Package alignmentBaseline="center" size={22}  />
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     { findResource(item.id).title }
                                                 </Typography>
@@ -228,9 +228,9 @@ const Analytics = () => {
                             { employeeData &&
                                 employeeData.services.map((item) => {
                                     return (
-                                        <Card elevation={0} sx={{ maxWidth: 100}}>
+                                        <Card elevation={0} sx={{ maxWidth: 150}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22}  />
+                                                <Package alignmentBaseline="center" size={22}  />
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     {findService(item.id).title}
                                                 </Typography>
@@ -364,6 +364,20 @@ const Analytics = () => {
                                             </Typography>
                                         </CardContent>
                                     </Card>
+
+                                    <Card elevation={0} sx={{ maxWidth: 200}}>
+                                        <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                            <UserSwitch alignmentBaseline="center" size={22}  />
+                                            <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                                {'Party size average'}
+                                            </Typography>
+
+                                            <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                            { Math.ceil(businessData.serve_time) + " min" }
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+
                             </Stack>) : null }
 
                             <Typography gutterBottom variant="subtitle1">Service and resource popularity</Typography>
@@ -377,7 +391,7 @@ const Analytics = () => {
                                         return (
                                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22}/>
+                                                <Package alignmentBaseline="center" size={22}/>
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     {findService(item.id).title}
                                                 </Typography>
@@ -403,7 +417,7 @@ const Analytics = () => {
                                         return (
                                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <CalendarBlank alignmentBaseline="center" size={22}  />
+                                                <Package alignmentBaseline="center" size={22}  />
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     {findResource(item.id).title}
                                                 </Typography>

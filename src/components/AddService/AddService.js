@@ -223,7 +223,7 @@ const AddService = () => {
                 </Grid>
               </Grid>
             
-              <Button disabled={!checkPermission('SERV_ADD') || !cancelledSubscription()} sx={{borderRadius: 10}}  fullWidth={true} variant="contained" type="submit">Submit</Button>
+              <Button disabled={!checkPermission('SERV_ADD') || cancelledSubscription()} sx={{borderRadius: 10}}  fullWidth={true} variant="contained" type="submit">Submit</Button>
               </Stack>
             </Form>
             )}

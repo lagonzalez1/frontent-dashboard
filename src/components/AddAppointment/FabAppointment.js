@@ -15,6 +15,8 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 import { useSubscription } from "../../auth/Subscription";
 import { usePermission } from "../../auth/Permissions";
+import LoadingButton from '@mui/lab/LoadingButton';
+
 
 
 export default function FabAppointment () {
@@ -30,6 +32,7 @@ export default function FabAppointment () {
 
 
     const [loading, setLoading] = useState(false);
+    const [app_loader, setApp_loader] = useState(false);
     const business = useSelector((state) => state.business);
     const [appointments, setAppointments] = useState(null);
     const [selectedDate, setSelectedDate] = useState(null);
@@ -80,10 +83,10 @@ export default function FabAppointment () {
 
     const handleSubmit = (payload) => {
         if (!payload && !selectedAppointment && !selectedDate) {
-            console.log(payload);
-            console.log(selectedDate);
-            console.log(selectedAppointment); 
+            dispatch(setSnackbar({requestMessage: 'Missing values found', requestStatus: true}));
+            return;
         }
+        setApp_loader(true);
         const timestamp = DateTime.local().setZone(business.timezone).toISO();
         const data = { ...payload, appointmentDate: selectedDate.toISO(), appointment: selectedAppointment, timestamp};
         createAppointmentPretense(data)
@@ -94,10 +97,10 @@ export default function FabAppointment () {
             dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}));
         })
         .finally(() => {
+            setApp_loader(false);
             dispatch(setReload(true));
             handleClose();
         })
-        
     }
 
     const handleAppointmentClick = (app) => {
@@ -107,7 +110,6 @@ export default function FabAppointment () {
     const handleDateChange = (date) => {
         setSelectedDate(date);
     };
-
 
     const formatPhoneNumber = (input) => {
         const digits = input.replace(/\D/g, '');
@@ -379,7 +381,7 @@ export default function FabAppointment () {
                             (
                             <>
                             <Button variant="outlined" sx={{ borderRadius: 10}} onClick={() => setNextStep(false)}> back</Button>
-                            <Button disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</Button>
+                            <LoadingButton loading={app_loader} disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</LoadingButton>
                             </>
                             ): 
                             <Button disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>

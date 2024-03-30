@@ -5,28 +5,32 @@ import NewRegister from '../Dialog/NewRegister';
 import RemovePlan from '../Dialog/RemovePlan';
 import { useSelector } from 'react-redux';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
-import ReceiptLongRoundedIcon from '@mui/icons-material/ReceiptLongRounded';
 import StartSubscription from '../Dialog/StartSubscription';
 import axios from 'axios';
+import { LoadingButton } from "@mui/lab";
 import { getHeaders } from '../../auth/Auth';
 import { CURRENT_PLANS, WAITLIST_APP_ANALYTICS_PLAN, WAITLIST_APP_PLAN, WAITLIST_PLAN } from '../../static/static';
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
+import { SUPPORT } from '../../static/static';
+import TemplateDialog from '../Dialog/TemplateDialog';
+import { CloudCheck  } from "phosphor-react"; 
 import { DateTime } from 'luxon';
 
-const SubscriptionForm = () => {
 
+
+const SubscriptionForm = () => {
   // Plan will end up being a stripe unid and or the price_id of current plan.
   //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
-  const trial = useSelector((state) => state.user.trialStatus);
   const ref = useSelector((state) => state.business.stripe.ref);
-  const termDate = useSelector((state) => state.business.terminating);
-
+  
 
   const [register, setRegister] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('');
   const [subscription, setSubcription] = useState(false);
   const [loading, setLoading] = useState(false);
   const [updateSub, setUpdateSubscription] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState(false);
+  const [update, setUpdate] = useState({title: '', body: '', support: ''});
 
 
   const [stripe, setStripe] = useState({
@@ -50,7 +54,6 @@ const SubscriptionForm = () => {
 
   const retriveStripeInformation = () => {
     // Get Stripe info if exist in Stripe collections.
-    setLoading(true);
     const stripeRef = ref;
     const headers = getHeaders();
     axios.post('/api/internal/stripe_info_user', {ref: stripeRef}, headers)
@@ -68,6 +71,10 @@ const SubscriptionForm = () => {
     .finally(() => {
       setLoading(false);
     })
+  }
+
+  const closeUpdateDialog = () => {
+    setUpdateStatus(false);
   }
 
   const handlePlanChange = (plan) => {
@@ -103,16 +110,22 @@ const SubscriptionForm = () => {
     if (!stripe.customer_id) { return; }
     if (selectedPlan === null) {return; }
     if (selectedPlan === stripe.price_id && stripe.active === true) { return; }
-    
+    setLoading(true);
     const price_id = selectedPlan;
     const subscription_id = stripe.subscription_id;
     const header = getHeaders();
-    axios.post('/api/internal/update-subscription', {subscription_id, price_id}, header)
+    const timestamp = DateTime.now().plus({days: 1}).toISO();
+    axios.post('/api/internal/update-subscription', {subscription_id, price_id, timestamp}, header)
     .then(res => {
       console.log(res);
     })
     .catch(error => {
-      console.log(error);
+      setUpdate({title: 'Error', body: error.msg, support: SUPPORT});
+      setUpdateStatus(true);
+    })
+    .finally(() => {
+      setLoading(false);
+      setUpdateSubscription(false);
     })
   }
 
@@ -143,13 +156,11 @@ const SubscriptionForm = () => {
             If on May 15 they switch to a 200 USD price, then on June 1 they’ll be billed 250 USD (200 USD for a renewal of her subscription, plus a 50 USD prorating adjustment for half of the previous month’s 100 USD difference). 
             Similarly, a downgrade generates a credit that is applied to the next invoice.
           </Typography>
-          <Button color='primary' variant='contained' onClick={() => updateSubscription()}>Accept</Button>
+          <LoadingButton loading={loading} color='primary' variant='contained' onClick={() => updateSubscription()}>Accept</LoadingButton>
         </Stack>
       </Alert>
     )
   }
-
-
 
   return (
     <>
@@ -161,7 +172,7 @@ const SubscriptionForm = () => {
           {
             stripe && stripe.customer_id !== '' ? (
               <>
-                <Button sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setUpdateSubscription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Update subscription </Button>
+                <Button loading={loading} sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setUpdateSubscription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Update subscription </Button>
               </>
             )
             : 
@@ -248,7 +259,9 @@ const SubscriptionForm = () => {
       </Container>
 
       <NewRegister open={register} onClose={onCloseRegister} />
-      <StartSubscription plan={selectedPlan} open={subscription} onClose={onCloseSubscription}/>
+      <StartSubscription plan={selectedPlan} open={subscription} onClose={onCloseSubscription} />
+      <TemplateDialog open={updateStatus} Icon={<CloudCheck size={32} />} title={update.title} body={update.body} support={update} onClose={closeUpdateDialog} />
+
     </>
   );
 };

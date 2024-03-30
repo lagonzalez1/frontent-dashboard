@@ -280,7 +280,6 @@ export default function FabButton () {
                             error={formik.touched.notes && !!formik.errors.notes}
                             onChange={formik.handleChange}
                             />
-                            {console.log(cancelledSubscription())}
                             <Button disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</Button>
                         </Stack>
                     

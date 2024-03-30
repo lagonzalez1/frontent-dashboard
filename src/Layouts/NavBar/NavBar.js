@@ -39,7 +39,7 @@ export default function NavBar({ navState, openNav }) {
 
     function logout() {
       removeUserState();
-      signOut();
+      //signOut();
     }
 
     return (

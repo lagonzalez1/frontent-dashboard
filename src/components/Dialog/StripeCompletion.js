@@ -19,14 +19,15 @@ const StripeCompletion = ({open, onClose, payload}) => {
             <Divider />
         </DialogTitle>
         <DialogContent>
-            
             <Container sx={{ display: 'flex', justifyContent: 'center'}}>
-                {payload && payload.icon === "cancelled" && <XCircle weight="fill" size={60} /> }
-                {payload && payload.icon === "okay" && <CheckCircle color="#00e025" weight="fill" size={60} /> }
+                {payload && payload.icon === "cancelled" && <XCircle weight="fill" size={100} /> }
+                {payload && payload.icon === "okay" && <CheckCircle color="#00e025" weight="fill" size={100} /> }
             </Container>
             <br />
-            <Typography variant="subtitle2" fontWeight={'bold'} gutterBottom>-{payload ? payload.status: ''}</Typography>
-            <Typography variant="subtitle2">-To manage subscriptions please visit the settings page under Payments</Typography>
+            <Typography variant="subtitle2" fontWeight={'bold'} gutterBottom>- {payload ? payload.status: ''}</Typography>
+            <Typography variant="subtitle2">- To manage subscriptions please visit the <u>settings</u> page under <u>Payments</u></Typography>
+
+
         </DialogContent>
         <DialogActions>
             <Button sx={{ borderRadius: 10}} variant="contained" onClick={onClose}>Close</Button>
