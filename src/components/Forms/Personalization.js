@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Button, Link, Typography, Avatar, Grow, Stack, CircularProgress, Alert, Switch, FormControl, FormControlLabel} from "@mui/material"
+import { Box, Container, Button, Link, Typography, Avatar, Grow, Stack, CircularProgress, Alert, Switch, FormControl, FormControlLabel, IconButton} from "@mui/material"
 import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -7,6 +7,7 @@ import UploadIcon from '@mui/icons-material/Upload';
 import { getAccessToken, getStateData } from "../../auth/Auth";
 import { useTheme } from "../../theme/ThemeContext";
 import { usePermission } from "../../auth/Permissions";
+import { setSnackbar } from '../../reducers/user';
 import { useSubscription } from "../../auth/Subscription";
 
 export default function Personalization ({setLoading, loading}) {

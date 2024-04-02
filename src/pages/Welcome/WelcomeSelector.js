@@ -75,7 +75,8 @@ export default function WelcomeSelector() {
         end: null,
         date: null,
         start: null,
-        end: null
+        end: null,
+        notes: null,
     });
 
     
@@ -328,23 +329,28 @@ export default function WelcomeSelector() {
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
-                <Box className="center-box" >
-                    <Card className="custom-card" sx={{ p: .5, borderRadius: 5, boxShadow: 0, marginTop: 2 }}>
+                <Box className="center-box">
+                    <Card className="custom-card" sx={{ borderRadius: 5, boxShadow: 0 }}>
                         {loading ? (<CircularProgress />): 
-                        <CardContent>
+                        <CardContent sx={{overflowY: 'auto', maxHeight: "80vh", mt: 2}}>
                             <Container sx={{ textAlign: 'left'}}>
                                 <IconButton onClick={ () => redirectBack() }>
                                     <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                                 </IconButton>
                             </Container>
-                            <Container>
+
+
+
+                            <Container id="header_selector">
                             <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                 {link}
                             </Typography>
-                                {loading ? <CircularProgress /> : null}
                             <Typography variant="h5" fontWeight="bold">
                                 Type
                             </Typography>
+                            </Container>
+                            
+                            <Container>
                             { error ? (
                             <Alert
                                 severity="error"
@@ -367,7 +373,7 @@ export default function WelcomeSelector() {
                             ): null}
 
                             <br/>
-                            <ButtonGroup fullWidth={true} variant="outlined">
+                            <ButtonGroup size="small" fullWidth={true} variant="outlined">
                                 <Tooltip title="Waitlist: Wait in a general line.">
                                     {
                                         acceptingStatus.waitlist === false ? (
@@ -383,10 +389,7 @@ export default function WelcomeSelector() {
                                 </Tooltip>
                                 
                             </ButtonGroup>
-
                             {
-                                loading ? (<CircularProgress /> ):
-
                                 systemTypeSelected === APPOINTMENT 
                                 &&
                                 <Box id="appointmentSection" sx={{ justifyContent: 'center', alignItems: 'center'}}>
@@ -547,6 +550,26 @@ export default function WelcomeSelector() {
                                                     }
                                                 </Grow>
                                             </Container>
+
+                                            <Box sx={{pt: 1}}>
+                                                {present && present.notes === true ? (
+                                                    <>
+                                                <TextField
+                                                id="notes"
+                                                name="notes"
+                                                label="Anything we need to know?"
+                                                fullWidth
+                                                size="small"
+                                                placeholder="Additional notes"
+                                                value={appointmentData.notes}
+                                                onChange={(e) => setAppointmentData((prev) => ({...prev, notes: e.target.value})) }
+                                                />
+                                                </>
+                                                    
+                                                ): null}
+                                            </Box>
+                                            
+                                            
                                             
 
                                             {
@@ -645,15 +668,22 @@ export default function WelcomeSelector() {
                                             </Select>
                                         </>
                                         ) : null}
-                                        <InputLabel id="notes" textAlign="left"><strong>Anything we need to know before hand?</strong></InputLabel>
-                                        <TextField
-                                        id="notes"
-                                        name="notes"
-                                        label="Notes"
-                                        placeholder="Additional notes"
-                                        value={waitlistData.notes}
-                                        onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }
-                                        />
+                                        {
+                                            present && present.notes === true ? (
+                                                <>
+                                                <InputLabel id="notes" textAlign="left"><strong>Anything we need to know before hand?</strong></InputLabel>
+                                                <TextField
+                                                id="notes"
+                                                name="notes"
+                                                label="Notes"
+                                                placeholder="Additional notes"
+                                                value={waitlistData.notes}
+                                                onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }
+                                                />
+                                                </>
+                                            ):null
+                                        }
+                                        
                                     </Stack>
 
                                     {
@@ -693,15 +723,14 @@ export default function WelcomeSelector() {
                                     
                                 </Box>
                             }
+                            </Container>
                             <Container sx={{ pt: 3}}>
                                 <Button disabled={systemTypeSelected === null} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
                                     <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
                                         Next
                                     </Typography>
                                 </Button> 
-                            </Container>
-                                        
-                            </Container>
+                            </Container>       
                         </CardContent>
                         }
 

@@ -17,11 +17,11 @@ export default function BusinessWaitlist () {
     const [isOpen, setIsOpen] = useState(null);
 
 
+
     useEffect(() => {
-       
-        // Reload after 1.5 min
-        const intervalId = setInterval(getWaitlist, 30000);
-        console.log("Auto refresh")
+        // Load initially
+        getWaitlist();
+        const intervalId = setInterval(getWaitlist, 20000);
         return () => {
           // Clear the interval to avoid memory leaks
             clearInterval(intervalId);

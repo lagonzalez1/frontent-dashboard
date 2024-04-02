@@ -2,7 +2,7 @@ import React, {useEffect, useState } from "react";
 import { Dialog, Container, Box, Typography, DialogContent, DialogTitle, Button, DialogActions} from "@mui/material";
 
 
-export default function TemplateDialog({title, body, support ,Icon, onClose, open}){
+export default function TemplateDialog({title, body, support, onClose, open}){
 
 
     useEffect(() => {
@@ -21,9 +21,7 @@ export default function TemplateDialog({title, body, support ,Icon, onClose, ope
                 <Typography variant="substitle1">{title}</Typography>
             </DialogTitle>
             <DialogContent>
-                <Container sx={{ display: 'flex', justifyContent: 'center'}}>
-                    <Icon />
-                </Container>
+                
                 <Typography variant="body2">
                     {body}
                 </Typography>

@@ -24,7 +24,7 @@ export default function Footer () {
               About Us
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Small web company working on creating a simple appointment and waitlist tracker.
+              Small web company working on creating a simple appointment and waitlist trackers.
             </Typography>
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -35,7 +35,7 @@ export default function Footer () {
               P.O box Comming soon
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Email: lag.webservice@example.com
+              Email: sales@waitonline.us
             </Typography>
             <Typography variant="body2" color="text.secondary">
               
@@ -45,17 +45,17 @@ export default function Footer () {
             <Typography variant="h6" color="text.primary" gutterBottom>
               Follow Us
             </Typography>
-            <Link href="https://www.facebook.com/" color="inherit">
+            <Link href="" color="inherit">
               <Facebook />
             </Link>
             <Link
-              href="https://www.instagram.com/"
+              href=""
               color="inherit"
               sx={{ pl: 1, pr: 1 }}
             >
               <Instagram />
             </Link>
-            <Link href="https://www.twitter.com/" color="inherit">
+            <Link href="" color="inherit">
               <Twitter />
             </Link>
           </Grid>
@@ -63,7 +63,7 @@ export default function Footer () {
         <Box mt={5}>
           <Typography variant="body2" color="text.secondary" align="center">
             {"Copyright © "}
-            <Link color="inherit" href="https://your-website.com/">
+            <Link color="inherit" href="https://waitonline.us">
               Your Website
             </Link>{" "}
             {new Date().getFullYear()}

@@ -205,6 +205,7 @@ const initialValuesSchedule = {
         <Form>
           <Grid container spacing={2}>
             <Grid item xs={12}>
+              
               <FormControl variant="outlined" fullWidth error={touched.timezone && !!errors.timezone}>
                 <InputLabel id="timezone-label">Timezone</InputLabel>
                 <Select

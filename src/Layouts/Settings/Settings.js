@@ -54,7 +54,7 @@ export default function Settings() {
                                         Location
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        Your location name <strong>{business && business.publicLink }</strong> is displayed across many areas including on your online pages and messages to client
+                                        Your location name <strong>{business && business.publicLink }</strong> is displayed across many areas including on your online pages and messages to clients
                                     </Typography>
                                 </Stack>
                             </Grid>
@@ -88,8 +88,13 @@ export default function Settings() {
                                         Hours
                                     </Typography>
                                     <Typography variant="subtitle2">
+                                        Opening hours - 
                                         Your business timezone is crutial information to allow clients within the correct region to join your waitlist.
                                         Your business hours are crutial for your waitlist to work properly. Please take the time to fill this out correctly.
+                                    </Typography>
+
+                                    <Typography variant="subtitle2">
+                                        Closed on days - You can elect to be closed on future dates or only certain employees to be off.
                                     </Typography>
                                 </Stack>
                             </Grid>
@@ -106,7 +111,10 @@ export default function Settings() {
                                         System
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        Appointment system settings, choose how your will manage your waitlist.
+                                        Waitlist and appointment system settings, choose how your will manage your clients.
+                                </Typography>
+                                <Typography variant="subtitle2">
+                                    Also enable restrictions for waitlist.
                                 </Typography>
                                 </Stack>
                             </Grid>
@@ -124,7 +132,7 @@ export default function Settings() {
                                         Notification settings
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                        Control what your client sees in their notification and when they receive it. 
+                                        Control what your client sees in their notifications and emails. 
                                     </Typography>
                                     <Typography variant="subtitle2">
 
@@ -144,7 +152,7 @@ export default function Settings() {
                                         Business info
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                    Your business info is displayed on your online pages and messages to client
+                                    Your business info is displayed on your online pages, email notifications, and more.
                                 </Typography>
                                 </Stack>
                             </Grid>
@@ -167,6 +175,11 @@ export default function Settings() {
                                     <Typography variant="subtitle2">
                                         Only root user will be able to add new employees.
                                     </Typography>
+                                    <Typography variant="subtitle2">
+                                        Breaks - Assign various time block off periods for employees.
+                                    </Typography>
+                                    
+                                    
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
@@ -180,10 +193,10 @@ export default function Settings() {
                             <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
-                                        Client signup page
+                                        Client welcome page
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                    Allows you to control what your client can see when joining your waitlist
+                                    Allows you to control what your client can see when joining your <strong>waitlist</strong>
                                 </Typography>
                                 </Stack>
                             </Grid>
@@ -200,8 +213,8 @@ export default function Settings() {
                                         Client form 
                                     </Typography>
                                     <Typography variant="subtitle2">
-                                    Allows you to control what information your clients give you
-                                </Typography>
+                                        Allows you to control what information you want from your client.
+                                    </Typography>
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
@@ -241,6 +254,10 @@ export default function Settings() {
                                     <Typography variant="subtitle2">
                                         Thank you for the continuous support by paying for this service.
                                     </Typography>
+                                    <Typography variant="substitle2">
+                                        For any issues, questions regarding your account please feel free to email us at: <strong>support@waitonline.us</strong>
+                                    </Typography>
+                                    <Typography variant="substitle2">Please provide your business name and email associated with your account.</Typography>
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>

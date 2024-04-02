@@ -200,13 +200,13 @@ export default function WelcomeDetails() {
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
             <Box className="center-box" >
-                <Card className="custom-card" sx={{ maxWidth: '100vh', minWidth: '30%',  minHeight: '70vh', textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
+                <Card className="custom-card" sx={{ maxWidth: '100vh', minWidth: '30%', textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
                     <Container sx={{ textAlign: 'left'}}>
                         <IconButton onClick={ () => redirectBack() }>
                             <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                         </IconButton>
                     </Container>
-                    <CardContent>
+                    <CardContent sx={{overflowY: 'auto', maxHeight: "70vh", mt: 1}}>
                         { errors ? <Alert color="warning">{errors}</Alert>: null} 
                     
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
@@ -272,7 +272,7 @@ export default function WelcomeDetails() {
                              <Divider/>
                              <LoadingButton loading={loading} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                              <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
-                                Join waitlist
+                                submit 
                             </Typography> 
                             </LoadingButton> 
 

@@ -20,10 +20,10 @@ export const LABELS = {
     position: 'Let clients know what place they are in line.',
     waitlist: 'Let clients see the current waitlist.',
     servicePrice: 'Let clients see the cost of a services.',
-    employees: 'Let clients pick a employee preferences.',
-    resources: 'Let clients pick a resource.',
-    services: 'Let clients pick a service.',
-    waittime: 'Let clients view a estimated wait time.',
+    employees: 'Let clients choose their preferred an employee.',
+    resources: 'Let clients choose thier preferred resource.',
+    services: 'Let clients choose their preferred service.',
+    waittime: 'Based on your serving list, employee count and service duration calculate an estimated wait time.',
 }
 
 export const TITLE = {

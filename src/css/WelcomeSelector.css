@@ -7,7 +7,6 @@
     justify-content: center;
     align-items: center;
     align-content: baseline;
-    height: 100vh; /* Center vertically and take the full height on smaller screens */
     flex-direction: column;
   }
   
@@ -15,11 +14,8 @@
     width: 100%; /* Full width on smaller screens */
     max-width: 65vh; /* Adjust the maximum width for larger screens */
     min-width: 40%; /* Adjust the minimum width for larger screens */
-    min-height: 40vh; /* Adjust the minimum height for larger screens */
     align-content: center;
     text-align: center;
-    padding: 2;
-    overflow: auto !important;
     border-radius: 5;
     box-shadow: 0;
   }
@@ -49,7 +45,7 @@
 
   @media (min-width: 300px) {
     .custom-card {
-      margin-top: 10px;
+      margin-top: 20px;
       width: 100%; /* Adjust the width for larger screens */
 
     }

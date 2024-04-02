@@ -678,30 +678,7 @@ export default function Waiting() {
             <ThemeProvider theme={ClientWaitingTheme}>
             <Box className="center-box" sx={{ pt: 3 }}>
                     <Card className="custom-card" sx={{ textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
-                    <Box sx={{ width: '100%' }}>
-                    <Collapse in={alert.open}>
-                        <Alert
-                        severity='warning'
-                        action={
-                            <IconButton
-                            aria-label="close"
-                            color="inherit"
-                            size="small"
-                            onClick={() => {
-                                setAlert({title: null, message: null, open: false, color: null});
-                                setMessage(null);
-                            }}
-                            >
-                            <CloseIcon fontSize="inherit" />
-                            </IconButton>
-                        }
-                        sx={{ mb: 2 }}
-                        >
-                        <AlertTitle textAlign="left"><strong>{alert.title}</strong></AlertTitle>
-                            <Typography textAlign={'left'}>{alert.message}</Typography>
-                        </Alert>
-                    </Collapse>
-                    </Box>
+                    
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                             <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                         </Typography>
@@ -712,8 +689,31 @@ export default function Waiting() {
                             </Container>
                         </Box>)
                         : 
-                        <CardContent>
-                            
+                        <CardContent sx={{overflowY: 'auto', maxHeight: "70vh", mt: 1}}>
+                        <Box sx={{ width: '100%' }}>
+                            <Collapse in={alert.open}>
+                                <Alert
+                                severity='warning'
+                                action={
+                                    <IconButton
+                                    aria-label="close"
+                                    color="inherit"
+                                    size="small"
+                                    onClick={() => {
+                                        setAlert({title: null, message: null, open: false, color: null});
+                                        setMessage(null);
+                                    }}
+                                    >
+                                    <CloseIcon fontSize="inherit" />
+                                    </IconButton>
+                                }
+                                sx={{ mb: 2 }}
+                                >
+                                <AlertTitle textAlign="left"><strong>{alert.title}</strong></AlertTitle>
+                                    <Typography textAlign={'left'}>{alert.message}</Typography>
+                                </Alert>
+                            </Collapse>
+                            </Box>
                             
                         { editClient ? 
                         (<Box>

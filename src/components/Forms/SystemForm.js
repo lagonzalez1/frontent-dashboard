@@ -60,10 +60,10 @@ export default function SystemForm({setLoading, loading}) {
         autoDelete: 'Auto delete',
     }
     const LABELS = {
-        appointments: 'Use appointments based on your services and duration let your clients schedule future appointments ',
-        waitlist: 'User a queue based appointment system, allow clients to join a virtual',
-        equalDate: 'Waitlist will only show current day appointments.',
-        autoDelete: 'Automatically delete missed once a new day is present. Otherwise, all missed clients will be marked as no show.',
+        appointments: 'Use a appointment system to schedule future appointments using your business services and employees.',
+        waitlist: 'Use a queue based waitlist system, allow clients to join a virtual.',
+        equalDate: 'Waitlist will only accept same day request.',
+        autoDelete: 'Automatically delete clients left unattended, otherwise will be marked as no-shows.',
     }
 
     return (
@@ -105,7 +105,7 @@ export default function SystemForm({setLoading, loading}) {
                 }
 
                 <Grid item xs={12}>
-                    <Typography variant='subtitle2' fontWeight={'bold'}>Blocks any external waitlist request from clients after {business && business.serveMax}. </Typography>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>Blocks any external waitlist request from clients after {business && business.serveMax}+ clients. </Typography>
                     <br/>
                     <Field
                         as={TextField}
@@ -119,8 +119,9 @@ export default function SystemForm({setLoading, loading}) {
                 </Grid>
 
                 <Grid item xs={12}>
-                    <Typography variant='subtitle2' fontWeight={'bold'}>Maximum Open Dates Control </Typography>
-                    <Typography variant='body2'>Configure the number of open dates in your Date Calendar with precision. For example, limit the availability to a maximum of {initialValues.maxAppointmentDate} days ~ untill {DateTime.local().plus({days: initialValues.maxAppointmentDate}).toFormat('LLL dd yyyy')}</Typography>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>Maximum Open Dates Control - Appointments </Typography>
+                    <Typography variant='body2'>Configure the number of open dates in your Date Calendar with precision. 
+                    For example, limit the availability to a maximum of {initialValues.maxAppointmentDate} days ~ untill {DateTime.local().plus({days: initialValues.maxAppointmentDate}).toFormat('LLL dd yyyy')}</Typography>
                     <br/>
                     {
                         checkSubscription('APPOINTMENTS') ? (

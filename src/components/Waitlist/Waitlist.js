@@ -243,7 +243,8 @@ const Waitlist = ({setClient, setEditClient}) => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+            console.log(error);
+            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
         })
     }
 

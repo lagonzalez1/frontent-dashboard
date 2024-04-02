@@ -260,7 +260,7 @@ const SubscriptionForm = () => {
 
       <NewRegister open={register} onClose={onCloseRegister} />
       <StartSubscription plan={selectedPlan} open={subscription} onClose={onCloseSubscription} />
-      <TemplateDialog open={updateStatus} Icon={<CloudCheck size={32} />} title={update.title} body={update.body} support={update} onClose={closeUpdateDialog} />
+      <TemplateDialog open={updateStatus} title={update.title} body={update.body} support={update} onClose={closeUpdateDialog} />
 
     </>
   );

@@ -171,10 +171,7 @@ export default function Welcome() {
             </Button>
             </>
         )
-
-
     }
-    
     
 
 
