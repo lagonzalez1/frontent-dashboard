@@ -66,7 +66,7 @@ const Waitlist = ({setClient, setEditClient}) => {
     const getWaittime = () => {
         getWaitlistWaittime()
         .then(response => {
-            setWaittime(response);
+            setWaittime(response.waittime);
         })
         .catch(error => {
             console.log(error);

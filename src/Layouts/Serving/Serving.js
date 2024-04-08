@@ -5,7 +5,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useSelector, useDispatch } from "react-redux";
 import  { columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable, reloadBusinessData } from "../../hooks/hooks";
+import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable, reloadBusinessData, findEmployee } from "../../hooks/hooks";
 import "../../css/Serving.css";
 import { setSnackbar } from "../../reducers/user";
 import CloseIcon from "@mui/icons-material/Close"
@@ -135,10 +135,11 @@ export default function Serving({setClient}) {
                                     {item.fullname}
                                 </Typography>
                                 </TableCell>
-
                                 <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.partySize}</Typography>
-                                
+                                </TableCell>
+                                <TableCell align="left"> 
+                                    <Typography variant="subtitle2" fontWeight="bolder">{findEmployee(item.status.served_by).fullname}</Typography>
                                 </TableCell>
                                 <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">
@@ -295,7 +296,7 @@ export default function Serving({setClient}) {
                             </FormGroup>
                         </DialogContent>
                         <DialogActions>
-                            <Button sx={{ borderRadius: 7}} variant="contained" onClick={() => checkoutClient()}>Save</Button>
+                            <Button sx={{ borderRadius: 7}} variant="contained" onClick={() => checkoutClient()}>Complete</Button>
                         </DialogActions>
 
                     </Dialog>

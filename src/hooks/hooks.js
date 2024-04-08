@@ -148,7 +148,7 @@ export const requestNoShow = (clientId, type) => {
         const date = DateTime.local().setZone(business.timezone).toISO();
         axios.get(`/api/internal/waittime/${date}/${business._id}`, headers)
         .then(response => {
-          resolve(response.data.waittime);
+          resolve(response.data);
         })
         .catch(error => {
           reject(error.response.data);

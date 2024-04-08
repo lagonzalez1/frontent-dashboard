@@ -1,13 +1,13 @@
 import React, { useState, useEffect} from "react";
 import {Fab, Dialog, DialogTitle, Button, IconButton, DialogContent, TextField, Box, Typography, Stack, Select, MenuItem, InputLabel, Alert, 
-    ListItemAvatar, ListItemButton, ListItemIcon} from "@mui/material";
-
+    ListItemAvatar, ListItemButton, ListItemIcon, ListItemText} from "@mui/material";
+import { LoadingButton } from '@mui/lab';
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from '@mui/icons-material/Close';
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { Transition, addCustomerWaitlist  } from "./Helper";
 import { useSelector, useDispatch } from "react-redux";
-import { getEmployeeList, getResourcesAvailable, getServicesAvailable, handleErrorCodes } from "../../hooks/hooks";
+import { getEmployeeList, getResourcesAvailable, getServicesAvailable, getWaitlistWaittime, handleErrorCodes } from "../../hooks/hooks";
 import { Field, ErrorMessage, useFormik } from 'formik';
 import * as Yup from 'yup';
 import { setBusiness } from "../../reducers/business";
@@ -15,7 +15,7 @@ import { setBusiness } from "../../reducers/business";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
 import { useSubscription } from "../../auth/Subscription";
-
+import PersonIcon from '@mui/icons-material/Person';
 
 
 
@@ -24,16 +24,15 @@ export default function FabButton () {
 
     const dispatch = useDispatch();
     const { cancelledSubscription } = useSubscription();
-
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
-
-    
     const business = useSelector((state) => state.business);
     const serviceList = getServicesAvailable();
     const [phoneNumber, setPhoneNumber] = useState(null);
     const resourceList = getResourcesAvailable();
     const employeeList = getEmployeeList();
+    const [employeeWaittime, setWaittime] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -44,12 +43,27 @@ export default function FabButton () {
     };
 
     useEffect(() => {
-
+        getWaittime();
     }, [])
 
+    const getWaittime = () => {
+        getWaitlistWaittime()
+        .then(response => {
+            setWaittime(response.waittimeObject);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+        .finally(() => {
+            setLoading(false);
+        })
+    }
+
     const handleSubmit = (payload) => {
+        setLoading(true);
         addCustomerWaitlist(payload)
         .then(response => {
+            setLoading(false);
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
         })
         .catch(error => {
@@ -263,7 +277,18 @@ export default function FabButton () {
                                 <MenuItem key={'NONE'} value={''}>none</MenuItem>
                                 {Array.isArray(employeeList) ? employeeList.map((employee) => (
                                     <MenuItem key={employee._id} value={employee._id}>
-                                        <Typography variant="body2">{employee.fullname} </Typography>
+                                        <ListItemIcon>
+                                            <PersonIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText>{employee.fullname} </ListItemText>
+                                        <Stack>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Waiting: {employeeWaittime !== null ? (employee._id in employeeWaittime) ? employeeWaittime[employee._id].waiting.length : employeeWaittime['NONE'].waiting.length : null} 
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            Serving: {employeeWaittime !== null ?  (employee._id in employeeWaittime) ? employeeWaittime[employee._id].serving.length : employeeWaittime['NONE'].serving.length : null}
+                                        </Typography>
+                                        </Stack>
                                     </MenuItem>
                                 )) : null}
                                 </Select>
@@ -280,7 +305,7 @@ export default function FabButton () {
                             error={formik.touched.notes && !!formik.errors.notes}
                             onChange={formik.handleChange}
                             />
-                            <Button disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</Button>
+                            <LoadingButton loading={loading} disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</LoadingButton>
                         </Stack>
                     
                     </form>

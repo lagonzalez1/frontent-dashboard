@@ -33,8 +33,9 @@ export const columns = [
     { id: 'position', label: '#', minWidth: 10 },
     { id: 'name', label: 'Name', minWidth: 150 },
     { id: 'size', label: 'Party size', minWidth: 50 },
+    { id: 'employee', label: 'Served by', minWidth: 50 },
     { id: 'resource', label: 'Using', minWidth: 50 },
-    { id: 'time', label: 'Duration', minWidth: 40 },
+    { id: 'time', label: '(current) Duration', minWidth: 40 },
     { id: 'actions', label: 'Actions', minWidth: 160 },
 ];
 

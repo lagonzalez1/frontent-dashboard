@@ -345,7 +345,13 @@ const Drawer = ({client, setClient}) => {
 
                     </TabPanel>
                     <TabPanel value="2">
-                        <Typography variant="body2">{payload && payload.notes ? payload.notes: 'No notes.'}</Typography>
+                        <List dense={true}>
+                            <ListItem>
+                                <ListItemText>
+                                <Typography variant="body2">{payload && payload.notes ? payload.notes: 'No notes.'}</Typography>
+                                </ListItemText>
+                            </ListItem>
+                        </List>
                     </TabPanel>
                     <TabPanel value="3">
                         <List dense={true}>
@@ -360,7 +366,7 @@ const Drawer = ({client, setClient}) => {
                                             <PlaylistAddRoundedIcon fontSize="small" />
                                         </ListItemAvatar>
                                         <ListItemText>
-                                            <Typography variant="body2"> { "Date: " + DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
+                                            <Typography variant="body2"> { "Last visit: " + DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
                                             <Typography variant="body2"> { "Employee: " + findEmployee(object.employee).fullname }</Typography>
                                             <Typography variant="caption"> {"Notes: "} { object.notes ? object.notes: 'No notes.' }</Typography>
                                         </ListItemText>
@@ -383,7 +389,7 @@ const Drawer = ({client, setClient}) => {
                                                 <CalendarMonthIcon fontSize="small" />
                                             </ListItemAvatar>
                                             <ListItemText>
-                                                <Typography variant="body2"> <strong>{'Date: '}</strong>{DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
+                                                <Typography variant="body2"> <strong>{'Last visit: '}</strong>{DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
                                                 <Typography variant="body2"> <strong>{"Employee: "}</strong>{ findEmployee(object.employee).fullname }</Typography>
                                                 <Typography variant="body2"> <strong>{'Service: '}</strong> { findService(object.serviceTag).title }</Typography>
                                                 <Typography variant="caption"> <strong>{"Notes: "}</strong> { object.notes ? object.notes: 'No notes.' }</Typography>
