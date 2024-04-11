@@ -151,6 +151,7 @@ export default function FabButton () {
                 <IconButton
                     aria-label="close"
                     onClick={handleClose}
+                    disabled={loading}
                     sx={{
                         position: 'absolute',
                         right: 8,

@@ -90,7 +90,7 @@ export default function WelcomeSelector() {
     const setDataAndContinue = () => {
         if (systemTypeSelected === APPOINTMENT){
             if (appointmentData.date === null || appointmentData.start === null || appointmentData.end === null || appointmentData.employee_id === null){
-                setError('You are missing values for yoour appointment.');
+                setError('Please select a date, employee and service.');
                 return;
             }
             const payload = sessionStorage.getItem(CLIENT);
@@ -338,9 +338,6 @@ export default function WelcomeSelector() {
                                     <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                                 </IconButton>
                             </Container>
-
-
-
                             <Container id="header_selector">
                             <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                 {link}

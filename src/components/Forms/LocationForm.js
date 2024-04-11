@@ -9,6 +9,8 @@ import { getAccessToken } from '../../auth/Auth';
 import { useNavigate, useParams } from "react-router-dom";
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import { LoadingButton } from '@mui/lab';
+
 
 
 const validationSchema = Yup.object().shape({
@@ -16,7 +18,7 @@ const validationSchema = Yup.object().shape({
   companyLogo: Yup.mixed(),
 });
 
-const LocationForm = ({setLoading, loading}) => {
+const LocationForm = () => {
 
   const { checkPermission } = usePermission();
   const { cancelledSubscription } = useSubscription();
@@ -27,11 +29,14 @@ const LocationForm = ({setLoading, loading}) => {
   const [businessSelect, setBusiness] = useState(business._id);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
 
 
   const [errors, setErrors] = useState(null);
   
   const handleSubmit = (values) => {
+    setLoading(true);
     if (!checkValidString(values.locationUrl)){
       setErrors('Public link cannot include special or spaces.');
       return;
@@ -56,7 +61,7 @@ const LocationForm = ({setLoading, loading}) => {
           setErrors(error);
       })
       .finally(() => {
-        setLoading(true);
+        setLoading(false);
       })
   };
 
@@ -155,9 +160,9 @@ const LocationForm = ({setLoading, loading}) => {
             </Grid>
 
             <Grid item xs={12}>              
-            <Button disabled={ !checkPermission('LOC_URL') || cancelledSubscription()} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 10}}>
-                {loading ? <CircularProgress /> : 'Save'}
-            </Button>
+            <LoadingButton loading={loading} disabled={ !checkPermission('LOC_URL') || cancelledSubscription()} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 7}}>
+                save
+            </LoadingButton>
             </Grid>
           </Grid>
         </Form>

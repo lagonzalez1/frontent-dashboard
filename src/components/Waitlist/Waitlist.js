@@ -349,7 +349,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                             </Tooltip>
                             <Tooltip title="The estimated time for the next person that joins your line." placement="right">
                                 <Button sx={{ backgroundColor: 'white'}}  variant="outlined" startIcon={<AccessAlarmsIcon />}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>{waittime}</strong> min wait.</Typography>
+                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>{waittime ? waittime: (<CircularProgress size={10} />)}</strong> min wait.</Typography>
                                 </Button>
                             </Tooltip>
                         </Stack>
