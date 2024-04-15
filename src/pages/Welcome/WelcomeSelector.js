@@ -548,18 +548,18 @@ export default function WelcomeSelector() {
                                                 </Grow>
                                             </Container>
 
-                                            <Box sx={{pt: 1}}>
+                                            <Box sx={{pt: 1.5}}>
                                                 {present && present.notes === true ? (
                                                     <>
                                                 <TextField
-                                                id="notes"
-                                                name="notes"
-                                                label="Anything we need to know?"
-                                                fullWidth
-                                                size="small"
-                                                placeholder="Additional notes"
-                                                value={appointmentData.notes}
-                                                onChange={(e) => setAppointmentData((prev) => ({...prev, notes: e.target.value})) }
+                                                    id="notes"
+                                                    name="notes"
+                                                    label="Anything we need to know?"
+                                                    fullWidth
+                                                    size="small"
+                                                    placeholder="Additional notes"
+                                                    value={appointmentData.notes}
+                                                    onChange={(e) => setAppointmentData((prev) => ({...prev, notes: e.target.value})) }
                                                 />
                                                 </>
                                                     
@@ -596,7 +596,7 @@ export default function WelcomeSelector() {
                                     <Stack sx={{ pt: 1 }} direction="column" spacing={1.5} textAlign="left">
                                     {employees && present.employees === true ? (
                                         <>
-                                            <InputLabel id="employee">Employee preference</InputLabel>
+                                            <Typography  fontWeight={'bold'} id="employee" variant="subtitle2">Employee preference</Typography>
                                             <Select
                                                 id="employee"
                                                 name="employee_id"
@@ -624,7 +624,7 @@ export default function WelcomeSelector() {
 
                                         {services && present.services === true ? (
                                         <>
-                                            <InputLabel id="services">Services</InputLabel>
+                                            <Typography fontWeight={'bold'} variant="subtitle2" id="services">Services</Typography>
                                             <Select
                                             id="services"
                                             name="service_id"
@@ -648,7 +648,7 @@ export default function WelcomeSelector() {
 
                                         {resources && present.resources === true ? (
                                         <>
-                                            <InputLabel id="resources" textAlign="left">Resources</InputLabel>
+                                            <Typography fontWeight={'bold'} variant="subtitle2" id="resources" textAlign="left">Resources</Typography>
                                             <Select
                                             as={Select}
                                             id="resources"
@@ -668,13 +668,13 @@ export default function WelcomeSelector() {
                                         {
                                             present && present.notes === true ? (
                                                 <>
-                                                <InputLabel id="notes" textAlign="left"><strong>Anything we need to know before hand?</strong></InputLabel>
+                                                <Typography variant="subtitle2" fontWeight={'bold'} id="notes">Anything we need to know before hand?</Typography>
                                                 <TextField
-                                                id="notes"
-                                                name="notes"
-                                                label="Notes"
-                                                placeholder="Additional notes"
-                                                value={waitlistData.notes}
+                                                    id="notes"
+                                                    name="notes"
+                                                    label="Notes"
+                                                    placeholder="Additional notes"
+                                                    value={waitlistData.notes}
                                                 onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }
                                                 />
                                                 </>

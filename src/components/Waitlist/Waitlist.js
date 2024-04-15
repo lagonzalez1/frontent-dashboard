@@ -14,14 +14,14 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-import { findResource, findService, moveClientServing, sendNotification } from "../../hooks/hooks";
+import { findResource, findService, moveClientServing, sendNotification, getNoShowClients } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT, acceptingRejecting,
     removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState, noShowColumns} from "./Helpers";
 import { getUserTable, getNoShowTable, getWaitlistWaittime } from "../../hooks/hooks";
-import { WAITLIST, NOSHOW } from "../../static/static";
+import { WAITLIST, NOSHOW, APPOINTMENT } from "../../static/static";
 import FabButton from "../Add/FabButton";
 import { usePermission } from "../../auth/Permissions";
 import { DateTime } from "luxon";
@@ -38,6 +38,7 @@ const Waitlist = ({setClient, setEditClient}) => {
     const reload = useSelector((state) => state.reload);
 
     const [anchorElVert, setAnchorElVert] = useState(null);
+    const [noShowData, setNoShowData] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
     const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -48,19 +49,30 @@ const Waitlist = ({setClient, setEditClient}) => {
     const openVert = Boolean(anchorElVert);
 
     let tableData = getUserTable();
-    let noShowData = getNoShowTable();
     let accepting = acceptingRejecting();
 
     useEffect(() => {
         setLoading(true)
         tableData = getUserTable(); // This will now be get function to ease the load on front end.
-        noShowData = getNoShowTable(); // This will now be get function to ease the load on front end.  
+        loadNoShowTable()
         getWaittime(); // ALready get
         return() => {
             setLoading(false)
             dispatch(setReload(false));
         }
     }, [reload])
+
+
+    const loadNoShowTable = () => {
+        getNoShowClients()
+        .then(response => {
+            console.log(response)
+            setNoShowData(response.data.result)
+        })
+        .catch(error => {
+            console.log(error);
+        })
+    }
 
 
     const getWaittime = () => {
@@ -85,6 +97,7 @@ const Waitlist = ({setClient, setEditClient}) => {
     const handleCloseVert = () => {
         setClientId(null)
         setAnchorElVert(null);
+        setServeType(null);
     }
     const handleOpenVert = (event, id) => {
         setClientId(id);
@@ -218,13 +231,20 @@ const Waitlist = ({setClient, setEditClient}) => {
         setClient({payload: item, open: true, fromComponent: NOSHOW});
     }
 
+
+    // This is also an issue when dealing with noShow from appointments.
     const editClientInfo = (item) => {
-        setEditClient({payload: item, open: true, fromComponent: WAITLIST})
+        const TYPE = item.type;
+        setEditClient({payload: item, open: true, fromComponent: TYPE})
     }
 
     const [serveDialog, setServeDialog] = useState(false);
+    const [serveType, setServeType] = useState(null);
 
-    const sendClientServing = (clientId) => {
+    const sendClientServing = (client) => {
+        const clientId = client._id;
+        const TYPE = client.type;
+        setServeType(TYPE);
         setServeDialog(true);
         setClientId(clientId);
     }
@@ -232,12 +252,14 @@ const Waitlist = ({setClient, setEditClient}) => {
     const closeClientServing = () => {
         setServeDialog(false);
         setClientId(null);
-        
         dispatch(setReload(true));
     }
 
-    const sendClientNotification = (clientId) => {
-        const payload = {clientId: clientId, type: WAITLIST}
+    const sendClientNotification = (client) => {
+        const clientId = client._id;
+        const TYPE = client.type;
+        // This is an issue when it comes to appointments.
+        var payload = {clientId: clientId, type: TYPE}
         sendNotification(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
@@ -428,10 +450,10 @@ const Waitlist = ({setClient, setEditClient}) => {
                                         spacing={1}
                                     >
                                         
-                                        <IconButton onClick={() => sendClientServing(item._id)}>
+                                        <IconButton onClick={() => sendClientServing(item)}>
                                             <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                         </IconButton>
-                                        <IconButton onClick={() => sendClientNotification(item._id)}>
+                                        <IconButton onClick={() => sendClientNotification(item)}>
                                             <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                         </IconButton>
                                         <IconButton onClick={() => editClientInfo(item)}>
@@ -487,7 +509,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                 
 
                 {
-                    noShowData.length > 0 ? (
+                    noShowData ? (
                         <div className="table_content">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
@@ -552,10 +574,10 @@ const Waitlist = ({setClient, setEditClient}) => {
                                                 direction="row"
                                                 spacing={1}
                                             >
-                                                <IconButton onClick={() => sendClientServing(item._id)}>
+                                                <IconButton onClick={() => sendClientServing(item)}>
                                                     <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                                 </IconButton>
-                                                <IconButton onClick={() => sendClientNotification(item._id)}>
+                                                <IconButton onClick={() => sendClientNotification(item)}>
                                                     <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                                 </IconButton>
                                                 <IconButton onClick={() => editClientInfo(item)}>
@@ -581,7 +603,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
             </div>
 
-            {serveDialog && <ServingClient onClose={closeClientServing} open={serveDialog} type={WAITLIST} clientId={clientId} />}
+            {serveDialog && <ServingClient onClose={closeClientServing} open={serveDialog} type={serveType} clientId={clientId} />}
 
         
         </>

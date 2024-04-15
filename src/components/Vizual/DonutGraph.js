@@ -121,10 +121,6 @@ export default function DonutGraph({data}) {
         
     }, [data])
 
-
-
-
-
     return (
         <Container sx={{ pt: 2, width: width, height: height}}>
             <svg ref={svgRef} width={width} height={height}>

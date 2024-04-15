@@ -27,6 +27,7 @@ export default function Welcome() {
     const [present, setPresent] = useState(null);
     const [waittime, setWaittime] = useState(null);
     const [position, setPosition] = useState(null);
+    const [waittimeRange, setWaittimeRange] = useState(null);
 
     const navigate = useNavigate();
 
@@ -37,6 +38,7 @@ export default function Welcome() {
             setMaxSize(data.serveMax);
         })
         .catch(error => {
+            setErrors(error);
             console.log(error);
         })
     }
@@ -90,6 +92,7 @@ export default function Welcome() {
                 setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
                 setPosition(response.data.waitlistLength);
                 setWaittime(response.data.waittime);
+                setWaittimeRange(response.data.waittimeRange);
                 if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
@@ -125,10 +128,10 @@ export default function Welcome() {
 
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
-            <Box>
-                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Currently <strong>{position}</strong> in line.</Typography>}     
-                { (present.waitime === true && acceptingStatus.waitlist === true) && <Typography variant="subtitle1" gutterBottom>Est {waittime} min.</Typography>}                
-            </Box>
+            <Stack>
+                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>currently <strong>{position}</strong> in line</Typography>}     
+                { (present.waittime === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>est wait <strong>{waittimeRange}</strong></Typography>}                
+            </Stack>
         )
     }
 
@@ -180,7 +183,7 @@ export default function Welcome() {
                             </Fade>
                         </Box>
 
-                        {present && <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/>}
+                        {present ? <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/>: <CircularProgress  size={20}/>}
                         
                         <Container sx={{ pt: 2}}>
                             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>

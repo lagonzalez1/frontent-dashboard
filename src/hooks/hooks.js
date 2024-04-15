@@ -497,6 +497,20 @@ export const getNoShowTable = () => {
       }
 };
 
+export const getNoShowClients = () => {
+    const { user, business } = getStateData();
+    const headers = getHeaders();
+    return new Promise((resolve, reject) => {
+        axios.get(`/api/internal/no_show/${business._id}`, headers)
+        .then(response => {
+            resolve(response);
+        })
+        .catch(error => {
+            reject(error);
+        })
+    })
+}
+
 
 export function getUserTableData () {
     return new Promise((resolve, reject) => {

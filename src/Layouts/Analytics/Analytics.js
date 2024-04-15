@@ -15,6 +15,7 @@ import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGener
 import BarGraphWait from "../../components/Vizual/BarGraphWait";
 import BarGraphApp from "../../components/Vizual/BarGraphApp";
 import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle  } from "phosphor-react"; 
+import Collapse from '@mui/material/Collapse';
 
 
 
@@ -37,6 +38,7 @@ const Analytics = () => {
     const [loading, setLoading] = useState({employee: false, business: false});
 
     const [error, setError] = useState(false);
+    const [openError, setOpenError] = useState(false);
     const [alert, setAlert] = useState({title: null, body: null})
 
 
@@ -61,7 +63,8 @@ const Analytics = () => {
             setBusinessData(response)
         })
         .catch(error => {
-            setError(true)
+            setOpenError(true)
+            setError(true);
             setAlert({title: error.response.data.msg})
         })
         .finally(() => {
@@ -82,6 +85,7 @@ const Analytics = () => {
             setEmployeeData(response);
         })
         .catch(error => {
+            setOpenError(true)
             setError(true)
             setAlert({title: error.response.data.msg})
         })
@@ -94,11 +98,13 @@ const Analytics = () => {
     const reloadAnalyticsData = () => {
         console.log(range)
         if (employeeId === ""){
+            setOpenError(true)
             setError(true);
             setAlert({title: 'Error', body:'No employee has been selected', open: true});
             return;
         }
         if (!checkValidRange(range.start, range.end)) {
+            setOpenError(true)
             setError(true);
             setAlert({title: 'Error', body:'Range is not valid, {from} must be before than {to}.', open: true});
             return;
@@ -111,6 +117,7 @@ const Analytics = () => {
             setEmployeeData(response)
         })
         .catch(error => {
+            setOpenError(true)
             setError(true)
             setAlert({title: error.response.data.msg})
         })
@@ -122,6 +129,7 @@ const Analytics = () => {
     }
 
     const closeAlert = () => {
+        setOpenError(false);
         setError(false);
         setAlert({title: null, body: null})
     }
@@ -133,14 +141,16 @@ const Analytics = () => {
 
     return (
     <div className="mainContainer">
-        { error === true ? (
+        <Collapse in={openError}>
             <Box sx={{pt:1}}>
+
                 <AlertMessageGeneral open={error} onClose={closeAlert} title={alert.title} body={alert.body} />
             </Box>
-        ): null}
+        </Collapse>
+        
 
         <Grid container direction="row">
-            <Grid  item xs={12} md={6} sm={12} lg={6}>
+            <Grid item xs={12} md={6} sm={12} lg={6}>
                 <Stack>
                     <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
                     <Typography variant="h5"><strong>Analytics</strong></Typography>
@@ -162,8 +172,9 @@ const Analytics = () => {
 
         
         
-            <Grid container sx={{ pt: 1}} 
+            <Grid container sx={{ pt: 1, width: '100%'}} 
                 direction="row"
+                
                 >
                 <Grid item lg={5} md={5} xs={12} sm={12}>
                     { /** Employee list */}
@@ -199,43 +210,41 @@ const Analytics = () => {
                     <Stack direction={'row'}>
                         <DonutGraph data={employeeData}/>
                         { /**  */}                
-                        <Stack spacing={1} alignContent={'flex-start'}>
-                            { employeeData &&
+                        
+                    </Stack>
+                    { /** Serve_time, Wait_time, No_show, Party_size */}
+                        { /**  */}                
+                        <Stack sx={{pt:2, overflowX: 'auto'}} direction={'row'} spacing={1} justifyContent={'center'}>
+
+                        { employeeData &&
                                 employeeData.resources.map((item) => {
                                     return (
                                         <Card elevation={0} sx={{ maxWidth: 100}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <Package alignmentBaseline="center" size={22}  />
-                                                <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                                <Package alignmentBaseline="center" size={20}  />
+                                                <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
                                                     { findResource(item.id).title }
                                                 </Typography>
 
-                                                <Typography gutterBottom fontWeight={'normal'} variant="body2">
-                                                { Math.floor(item.avg) * 100 }
+                                                <Typography gutterBottom  variant="subtitle2">
+                                                { Math.floor(item.avg * 100) + "%" }
                                                 </Typography>
                                             </CardContent>
                                         </Card>
                                     )
                                 })
                             }
-                                
-
-                            
-                        </Stack>
-
-                        { /**  */}                
-                        <Stack spacing={1} alignContent={'flex-start'}>
                             { employeeData &&
                                 employeeData.services.map((item) => {
                                     return (
-                                        <Card elevation={0} sx={{ maxWidth: 150}}>
+                                        <Card elevation={0} sx={{ maxWidth: 100}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <Package alignmentBaseline="center" size={22}  />
-                                                <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
-                                                    {findService(item.id).title}
+                                                <Package alignmentBaseline="center" size={20}  />
+                                                <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
+                                                    {findService(item.id).title }
                                                 </Typography>
 
-                                                <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                                <Typography gutterBottom variant="subtitle2">
                                                 { Math.floor(item.avg * 100) + "%" }
                                                 </Typography>
                                             </CardContent>
@@ -247,12 +256,10 @@ const Analytics = () => {
 
                             
                         </Stack>
-                    </Stack>
-                    { /** Serve_time, Wait_time, No_show, Party_size */}
 
                     {
                         employeeData ? (
-                        <Stack sx={{pt:2}} direction={'row'} spacing={1} justifyContent={'center'}>
+                        <Stack sx={{pt:0}} direction={'row'} spacing={1} justifyContent={'center'}>
                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                     <HourglassHigh alignmentBaseline="center" size={22} />
@@ -260,7 +267,7 @@ const Analytics = () => {
                                         Wait-time avg
                                     </Typography>
 
-                                    <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                    <Typography gutterBottom variant="subtitle2">
                                     { employeeData && Math.floor(employeeData.wait_time) + " min." }
                                     </Typography>
                                 </CardContent>
@@ -270,11 +277,11 @@ const Analytics = () => {
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                     <UserSwitch size={22}  />
 
-                                    <Typography gutterBottom fontWeight={'bold'} variant="body1">
+                                    <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                         Serve-time avg
                                     </Typography>
 
-                                    <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                    <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
                                         { employeeData && Math.floor(employeeData.serve_time) + " min" }
                                     </Typography>
                                 </CardContent>
@@ -283,11 +290,11 @@ const Analytics = () => {
                         <Card elevation={0} sx={{ maxWidth: 200}}>
                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                     <UsersThree size={22}  />
-                                    <Typography gutterBottom fontWeight={'bold'} variant="body1">
+                                    <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                         Party size avg
                                     </Typography>
 
-                                    <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                    <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
                                         { employeeData && Math.floor(employeeData.party_size)}
 
                                     </Typography>
@@ -297,11 +304,11 @@ const Analytics = () => {
                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                     <XCircle  size={22}  />
 
-                                    <Typography gutterBottom fontWeight={'bold'} variant="body1">
+                                    <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                         No shows
                                     </Typography>
 
-                                    <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                    <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
                                         { employeeData && Math.floor(employeeData.no_show)}
 
                                     </Typography>
@@ -383,7 +390,7 @@ const Analytics = () => {
                             <Typography gutterBottom variant="subtitle1">Service and resource popularity</Typography>
                             {businessData ? (
                                 <>
-                                <Stack sx={{ flexWrap: 'wrap'}} direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
+                                <Stack sx={{ flexWrap: 'wrap', overflowX: 'auto'}} direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
                                     justifyContent={'center'}>
                                 {
                                     businessData.services.map((item, count) => {
@@ -409,7 +416,7 @@ const Analytics = () => {
                                     })
                                 }
                                 </Stack>
-                                <Stack direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
+                                <Stack sx={{ overflowX: 'auto', flexWrap: 'wrap'}} direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
                                     justifyContent={'center'}>
                                 {
                                     businessData.resources.map((item, count) => {

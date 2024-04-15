@@ -140,6 +140,7 @@ export default function Serving({setClient}) {
                                 </TableCell>
                                 <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">{findEmployee(item.status.served_by).fullname}</Typography>
+                                    
                                 </TableCell>
                                 <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">
@@ -203,6 +204,10 @@ export default function Serving({setClient}) {
                                 
                                 </TableCell>
                                 <TableCell align="left"> 
+                                    <Typography variant="subtitle2" fontWeight="bolder">{findEmployee(item.employeeTag).fullname}</Typography>
+                                    
+                                </TableCell>
+                                <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">
                                         {'Service: '+ findService(item.serviceTag).title }
                                     </Typography>
@@ -250,12 +255,11 @@ export default function Serving({setClient}) {
                         </TableContainer>
                     </Paper>
                     </div>
-
-
                     <Dialog
                         id="updateClientNotes"
                         open={notesDialog}
                         onClose={closeNotesDialog}
+                        fullWidth
                     >
                         <DialogTitle>
                             <IconButton

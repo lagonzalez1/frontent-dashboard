@@ -5,6 +5,7 @@ import { Stack, Grid, Menu, MenuItem, IconButton, TextField, Typography,
    Box, Collapse, Tooltip, CircularProgress } from '@mui/material';
 import DateSelect from '../../components/Select/DateSelect';
 import StateSelect from '../../components/Select/StateSelect';
+import EmployeeSelect from '../../components/Select/EmployeeSelect';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,6 +38,7 @@ const Customers = () => {
   const [data, setData] = useState(null);
   const [sort, setSort] = useState();
   const [stateSort, setStateSort] = useState();
+  const [employeeSort, setEmployeeSort] = useState();
   const [client, setClient] = useState(null);
   const [clientNotes, setClientNotes] = useState(false);
   const [notes, setNotes] = useState({timestamp: null, notes: null});
@@ -230,21 +232,21 @@ const Customers = () => {
                         // Construct the result string
                         let serve_result = '';
                         if (serve_hours > 0) {
-                          serve_result += `${serve_hours} ${serve_hours === 1 ? 'hour' : 'hours'}`;
+                          serve_result += `${serve_hours} ${serve_hours === 1 ? 'hr' : 'hours'}`;
                         }
 
                         if (serve_minutes > 0) {
-                          serve_result += ` ${serve_minutes} ${serve_minutes === 1 ? 'minute' : 'minutes'}`;
+                          serve_result += ` ${serve_minutes} ${serve_minutes === 1 ? 'min' : 'minutes'}`;
                         }
 
                         // Construct the result string
                         let result = '';
                         if (wait_hours > 0) {
-                          result += `${wait_hours} ${wait_hours === 1 ? 'hour' : 'hours'}`;
+                          result += `${wait_hours} ${wait_hours === 1 ? 'hr' : 'hours'}`;
                         }
 
                         if (wait_minutes > 0) {
-                          result += ` ${wait_minutes} ${wait_minutes === 1 ? 'minute' : 'minutes'}`;
+                          result += ` ${wait_minutes} ${wait_minutes === 1 ? 'min' : 'minutes'}`;
                         }
                         return (
                           <TableRow>
@@ -317,21 +319,21 @@ const Customers = () => {
                         // Construct the result string
                         let serve_result = '';
                         if (serve_hours > 0) {
-                          serve_result += `${serve_hours} ${serve_hours === 1 ? 'hour' : 'hours'}`;
+                          serve_result += `${serve_hours} ${serve_hours === 1 ? 'hr' : 'hours'}`;
                         }
 
                         if (serve_minutes > 0) {
-                          serve_result += ` ${serve_minutes} ${serve_minutes === 1 ? 'minute' : 'minutes'}`;
+                          serve_result += ` ${serve_minutes} ${serve_minutes === 1 ? 'min' : 'minutes'}`;
                         }
 
                         // Construct the result string
                         let result = '';
                         if (wait_hours > 0) {
-                          result += `${wait_hours} ${wait_hours === 1 ? 'hour' : 'hours'}`;
+                          result += `${wait_hours} ${wait_hours === 1 ? 'hr' : 'hours'}`;
                         }
 
                         if (wait_minutes > 0) {
-                          result += ` ${wait_minutes} ${wait_minutes === 1 ? 'minute' : 'minutes'}`;
+                          result += ` ${wait_minutes} ${wait_minutes === 1 ? 'min' : 'minutes'}`;
                         }
 
                         return (
@@ -420,11 +422,9 @@ const Customers = () => {
           <Grid sx={{ display: 'flex', justifyContent: 'right'}} item xs={12} sm={12} md={6} lg={6}>
             <Stack direction="row" spacing={1}>
                 <DateSelect set={setSort} />
+                  { // Not yet ready to implement. <EmployeeSelect set={setEmployeeSort} /> 
+                  }
                 <StateSelect set={setStateSort} />
-
-                
-                
-
             </Stack>
           </Grid>
         </Grid>
