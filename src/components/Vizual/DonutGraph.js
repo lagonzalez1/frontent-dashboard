@@ -19,7 +19,6 @@ export default function DonutGraph({data}) {
         const appointments = data.appointments;
         const waitlist = data.waitlist;
 
-
         if (appointments.length === 0) { return; }
         if (waitlist.length === 0) { return; }
         const height = Math.min(width, 500);

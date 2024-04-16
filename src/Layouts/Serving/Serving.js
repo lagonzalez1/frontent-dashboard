@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Skeleton ,Typography, Stack, Tooltip, Button, Table, 
-    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, IconButton, Dialog, DialogContent, DialogTitle, TextField, Divider, Checkbox, DialogActions, FormControl, FormControlLabel, FormGroup } from "@mui/material";
+    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, IconButton, Dialog, DialogContent, DialogTitle, TextField, Divider, Checkbox, DialogActions, FormControl, FormControlLabel, FormGroup, Alert, Box } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useSelector, useDispatch } from "react-redux";
 import  { columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingTable, getServingCount, getAppointmentServingTable, reloadBusinessData, findEmployee } from "../../hooks/hooks";
+import {  findResource, findService, getServingTable, getServingCount, 
+    getAppointmentServingTable, reloadBusinessData, findEmployee, getServingClients } from "../../hooks/hooks";
 import "../../css/Serving.css";
 import { setSnackbar } from "../../reducers/user";
 import CloseIcon from "@mui/icons-material/Close"
 import { useSubscription } from "../../auth/Subscription";
+import Collapse from '@mui/material/Collapse';
+import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
+
 
 export default function Serving({setClient}) {
     const { checkSubscription } = useSubscription();
@@ -17,8 +21,9 @@ export default function Serving({setClient}) {
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(false);
-    const [appointmentServing, setAppointmentServing] = useState(null);
-    const [servingList, setServingList] = useState(null);
+    const [servingList, setServingList] = useState();
+    const [errors, setErrors] = useState({title: null, body: null});
+    const [openErrors, setOpenErrors] = useState(false);
 
 
     const [client, setCurrentClient] = useState(null);
@@ -33,12 +38,27 @@ export default function Serving({setClient}) {
         setCurrentClient(null)
     }
     useEffect(() => {
-        reloadBusinessData(dispatch);
-        let appointmentServing = getAppointmentServingTable();
-        let servingList = getServingTable();
-        setServingList(servingList);
-        setAppointmentServing(appointmentServing)
+        getServingList();
+        return () => {
+            setLoading(false);
+        }
     }, [loading])
+
+
+    const getServingList = () => {
+        getServingClients()
+        .then(response => {
+            setServingList(response);
+        })
+        .catch(error => {
+            console.log(error);
+            setOpenErrors(true);
+            setErrors({title: 'error', body: 'Error found on fetching serving clients'});
+        })
+        .finally(() => {
+            setLoading(false);
+        })
+    }
 
 
     const openCheckoutNotes = (client) => {
@@ -77,8 +97,20 @@ export default function Serving({setClient}) {
         setClient({payload: client, open: true, fromComponent: 'serving'})
     }
 
+    const closeAlert = () => {
+        setErrors({title: null, body: null});
+        setOpenErrors(false);
+    }
+
     return(
         <div className="servingContainer">
+            <Box sx={{ width: '100%'}}>
+                <Collapse in={openErrors}>
+                    <AlertMessageGeneral open={openErrors} onClose={closeAlert} title={errors.title} body={errors.body} />
+
+                </Collapse>
+            </Box>
+            
             <Grid container>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack>
@@ -183,67 +215,7 @@ export default function Serving({setClient}) {
                         ))
                     : null
                 }
-                {
-                    Array.isArray(appointmentServing) ? 
-                        appointmentServing.map((item, index) => (
-                            <TableRow key={index}>                                       
-                                <TableCell align="left">
-                                    <Typography variant="subtitle2" fontWeight="bolder">
-                                    {++index}
-                                    </Typography> 
-                                    </TableCell>
-                                <TableCell align="left">
-                                <Typography variant="subtitle2" fontWeight="bolder">
-                                    {item.fullname}
-                                </Typography>
-                                </TableCell>
-
-                                <TableCell align="left"> 
-                                    <Typography variant="subtitle2" fontWeight="bolder">{item.partySize}</Typography>
-                                
-                                </TableCell>
-                                <TableCell align="left"> 
-                                    <Typography variant="subtitle2" fontWeight="bolder">
-                                        {'Service: '+ findService(item.serviceTag).title }
-                                    </Typography>
-
-                                    <Typography variant="subtitle2" fontWeight="bolder">
-                                        {'Resource: ' + findResource(item.resourceTag).title }
-                                    </Typography>
-                                </TableCell>
-                                <TableCell align="left">
-                                <Typography variant="subtitle2" fontWeight="bolder">
-                                    {item.waittime ? ( item.waittime.hours >= 1 ? (`${item.waittime.hours} Hr ${item.waittime.minutes} Min.`): (`${item.waittime.minutes} Min.`)): (null) } 
-
-                                </Typography>
-
-                                </TableCell>
-                                <TableCell align="left">
-                                <Stack
-                                        direction="row"
-                                        spacing={1}
-                                    >
-                                        <IconButton onClick={() => openCheckoutNotes(item)}>
-                                            <Tooltip title="Checkout" placement="left">
-                                                <CheckCircleIcon htmlColor="#4CBB17"/>
-                                            </Tooltip>                                            
-                                        </IconButton>
-
-                                        <IconButton onClick={() => displayClientInformation(item)}>
-                                            <Tooltip title="Edit" placement="right">
-                                                <EditNoteIcon />
-                                            </Tooltip>  
-                                        </IconButton>
-                                       
-                                    </Stack>
-                                </TableCell>
-
-
-
-                            </TableRow>
-                        ))
-                    : null
-                }
+                
                                     
                                 </TableBody>
                             </Table>

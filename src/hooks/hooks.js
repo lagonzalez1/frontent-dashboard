@@ -347,6 +347,22 @@ export const getWaitlistServingTable = () => {
   }
 }
 
+
+export const getServingClients = () => {
+    const { user, business } = getStateData();
+    const bid = business._id;
+    const headers = getHeaders();
+    return new Promise((reject, resolve) => {
+        axios.get(`/api/internal/serving_table/${bid}`, headers)
+        .then(response => {
+            resolve(response.data.result);
+        })
+        .catch(error => {
+            reject(error)
+        })  
+    }) 
+}
+
 export const getAppointmentServingTable = () => {
     const { user, business } = getStateData();
     const currentTime = DateTime.local();
