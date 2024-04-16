@@ -33,6 +33,7 @@ const NotesDialog = ({open, onClose, payload}) => {
             </DialogTitle>
 
             <DialogContent>
+
               <Typography variant='body2'>
                 Notes : { payload ? payload.notes : ''}
               </Typography>

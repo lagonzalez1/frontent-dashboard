@@ -95,11 +95,11 @@ const Drawer = ({client, setClient}) => {
 
     const [serveDialog, setServeDialog] = useState(false);
     const [clientId, setClientId] = useState(null);
+    const [serveType, setServeType] = useState(null);
 
     const sendClientServing = (clientId) => {
         setServeDialog(true);
         setClientId(clientId);
-        console.log(clientId);
     }
 
     const closeClientServing = () => {
@@ -269,15 +269,15 @@ const Drawer = ({client, setClient}) => {
                             null
                         }
                         <Grid container
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center">
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center">
                             <Grid item>
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Status</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
                                 <Stack spacing={0.5}>
-                                {payload && (payload.status.late) ? (<Chip variant="outlined" icon={<WatchLaterIcon />} label="Here" />) : null }
+                                {payload && payload.status.late === true ? (<Chip variant="outlined" icon={<WatchLaterIcon />} label="Running Late" />) : null }
                                 {payload && (payload.status.parking) ? (<Chip variant="outlined" icon={<DirectionsCarFilledIcon />} label="Parking" />) : null }
                                 {payload && (payload.status.here) ? (<Chip variant="outlined" icon={<EmojiPeopleIcon />} label="Here" />) : null }
                                 {payload && (payload.status.cancelled) ? (<Chip variant="outlined" icon={<DoNotDisturbAltRoundedIcon />} label="Cancelled" />) : null }
@@ -299,6 +299,19 @@ const Drawer = ({client, setClient}) => {
                             <Grid sx={{ justifyContent: 'right'}} item>
                                 <Typography  variant="body2">{payload && payload.phone}</Typography>
 
+                            </Grid>
+                        </Grid>
+                        <br/>
+                        <Grid 
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center">
+                            <Grid item>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Email</Typography>
+                            </Grid>
+                            <Grid sx={{ justifyContent: 'right'}} item>
+                                <Typography variant="body2">{payload && payload.email}</Typography>
                             </Grid>
                         </Grid>
                         <br/>
@@ -325,6 +338,20 @@ const Drawer = ({client, setClient}) => {
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
                                 <Typography variant="body2">{payload && findEmployee(payload.employeeTag).fullname}</Typography>
+                            </Grid>
+                        </Grid>
+                        <br/>
+
+                        <Grid 
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center">
+                            <Grid item>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Type</Typography>
+                            </Grid>
+                            <Grid sx={{ justifyContent: 'right'}} item>
+                                <Typography variant="body2">{payload && payload.type === "appointment" ? 'Appointment': 'Waitlist' }</Typography>
                             </Grid>
                         </Grid>
                         <br/>
@@ -445,7 +472,7 @@ const Drawer = ({client, setClient}) => {
                             <Stack alignContent={'center'} justifyContent={'center'} spacing={0.5} direction={'row'}>
                                 {payload ? <Button disableElevation startIcon={<DoNotDisturbRoundedIcon fontSize="small"/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNoShow(payload)}>No show</Button>: null}
                                 <Button disableElevation startIcon={<NotificationsRoundedIcon fontSize="small"/>} color='warning' variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientNotification(payload._id, client.fromComponent)}>Notify</Button>
-                                {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
+                                {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id, client.fromComponent)}>Serve</Button> : null}
 
                             </Stack>
                         )
@@ -456,7 +483,6 @@ const Drawer = ({client, setClient}) => {
                         (
                             <Stack alignContent={'center'} justifyContent={'center'} spacing={0.5} direction={'row'}>
                                 {payload ? <Button disableElevation startIcon={<DoNotDisturbRoundedIcon fontSize="small"/>} color="error" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendRemoveClient(payload._id, payload.type)}>Delete</Button>: null}
-                                {payload ? <Button disableElevation startIcon={<NavigateNextRoundedIcon fontSize="small" />} color="success" variant="contained" sx={{borderRadius: 10, margin: 0}} onClick={() => sendClientServing(payload._id)}>Serve</Button> : null}
 
                             </Stack>
                         )

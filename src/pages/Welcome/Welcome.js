@@ -25,6 +25,7 @@ export default function Welcome() {
     const [system, setSystem] = useState(null);
     const [present, setPresent] = useState(null);
     const [waittime, setWaittime] = useState(null);
+    const [waittimeRange, setWaittimeRange] = useState(null);
     const [position, setPosition] = useState(null);
 
     const [schedule, setSchedule] = useState({});
@@ -76,6 +77,7 @@ export default function Welcome() {
                     return;
                 }
                 setWaittime(stateResponse.data.waittime); 
+                setWaittimeRange(stateResponse.data.waittimeRange)
                 setOpen(stateResponse.data.isAccepting);
                 setPosition(stateResponse.data.waitlistLength);
                 setBusiness(argsResponse.businessDetails);
@@ -98,12 +100,11 @@ export default function Welcome() {
     }
 
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
-        console.log(present);
         return (
-            <Box>
-                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="subtitle1" gutterBottom>Currently <strong>{position}</strong> in line.</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="subtitle1" gutterBottom>Est {waittime} min.</Typography>}                
-            </Box>
+            <Stack>
+                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="body2">currently <strong>{position}</strong> in line</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2" gutterBottom>est wait <strong>{waittimeRange}</strong></Typography>}                
+            </Stack>
         )
     }
 
@@ -162,8 +163,7 @@ export default function Welcome() {
             { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
 
-            { console.log(acceptingStatus)}
-            {present && <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/> }
+            {present ? <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/> : <CircularProgress  size={20}/> }
             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
                 <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
                     { acceptingStatus.waitlist && acceptingStatus.appointments ? 'Join waitlist' : 'create appointment'}
