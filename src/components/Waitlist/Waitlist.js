@@ -14,7 +14,7 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-import { findResource, findService, moveClientServing, sendNotification, getNoShowClients } from "../../hooks/hooks";
+import { findResource, findService, moveClientServing, sendNotification, getNoShowClients, getWaitlistTable } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
@@ -44,33 +44,48 @@ const Waitlist = ({setClient, setEditClient}) => {
     const [loading, setLoading] = useState(false);
     const [clientId, setClientId] = useState();
     const [waittime, setWaittime] = useState(null);
+    const [tableData, setTableData] = useState([]);
+    
 
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
 
-    let tableData = getUserTable();
+    //let tableData = getUserTable();
     let accepting = acceptingRejecting();
 
     useEffect(() => {
         setLoading(true)
-        tableData = getUserTable(); // This will now be get function to ease the load on front end.
-        loadNoShowTable()
-        getWaittime(); // ALready get
-        return() => {
+        //tableData = getUserTable(); // This will now be get function to ease the load on front end.
+        getWaitlistData();
+        loadNoShowData() // No show table
+        getWaittime(); // Waittime
+        return () => {
             setLoading(false)
             dispatch(setReload(false));
         }
     }, [reload])
 
+    const getWaitlistData = () => {
+        getWaitlistTable()
+        .then(response => {
+            setTableData(response);
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
+        })
+        .finally(() => {
+            setLoading(false)
+        })
+    }
 
-    const loadNoShowTable = () => {
+
+    const loadNoShowData = () => {
         getNoShowClients()
         .then(response => {
-            console.log(response)
             setNoShowData(response.data.result)
         })
         .catch(error => {
-            console.log(error);
+            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
         })
     }
 
@@ -151,8 +166,6 @@ const Waitlist = ({setClient, setEditClient}) => {
         switch (optionId){
             case OPTIONS_SELECT.NO_SHOW:
                 setLoading(true);
-
-
                 // This is the wrong noshow.
                 requestNoShow(clientId)
                 .then(response => {
@@ -406,7 +419,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                         <TableRow>
                             <TableCell colSpan={3}/>
                             <TableCell>
-                            <CircularProgress />
+                            <CircularProgress size={15} />
                             </TableCell>
                             <TableCell colSpan={1}/>
                         </TableRow>

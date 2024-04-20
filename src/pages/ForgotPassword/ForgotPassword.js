@@ -21,12 +21,13 @@ export default function ForgotPassword () {
         }
         setLoading(true);
         requestResetToken(email)
-        .then(response => {
-            setAlert(true);
-            setAlertMessage({title: 'success', body: response})
+        .then(response => {   
+            console.log(response);       
+            //setAlert(true);
+            //setAlertMessage({title: 'success', body: response})
         })
         .catch(error => {
-            console.log(error)
+            console.log(error);
             setAlert(true);
             setAlertMessage({title: 'error', body: error})
         })
@@ -36,10 +37,6 @@ export default function ForgotPassword () {
 
     }
 
-
-    useEffect(() => {
-
-    },[])
 
     return (
         <Container>
@@ -54,11 +51,10 @@ export default function ForgotPassword () {
                 alignItems: 'center',
                 }}
             >
-                <Paper elevation sx={{p: 2}}>
                 <Stack spacing={1.5}>
-
                 <Collapse in={alert}>
                         <Alert
+                        severity={alertMessage.title === "error" ? "error": 'success'}
                         action={
                             <IconButton
                             aria-label="close"
@@ -89,17 +85,23 @@ export default function ForgotPassword () {
                 </Typography>
 
                 <Typography textAlign={'left'} variant="body2">
-                    Attention: This section is only for ROOT users. For employees please refer to your root user to update any password.
+                    <u>Attention:</u> This section is only for ROOT users. For employees please refer to your root user to update any password.
+                </Typography>
+                <Typography textAlign={'left'} variant="body2">
+                    <u>Follow</u>: Please enter your email associated with your account. You will recive a confirmation email.
+                </Typography>
+                <Typography textAlign={'left'} variant="body2">
+                        <u>Security</u>: Note you will have a total of 3 minutes to complete this task.
                 </Typography>
 
+
                 <TextField id="outlined-basic" label="Root email" variant="outlined" value={email} placeholder="Email" onChange={(e) => setEmail(e.target.value)}  />
-                    <LoadingButton sx={{ borderRadius: 10}} loading={loading} onClick={() => requestToken()} variant="contained">Send</LoadingButton>
+                <LoadingButton sx={{ borderRadius: 10}} loading={loading} onClick={() => requestToken()} variant="contained">Send</LoadingButton>
 
                 <Divider />
                 <Link href="/Login">Back to login</Link>
                 </Stack>
                 
-                </Paper>
 
             </Box>
             

@@ -9,15 +9,12 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-
 function createAppointmentRequest(payload) {
     const { user, business } = getStateData();
     const header = getHeaders();
     const data = { ...payload, b_id: business._id };
-    return axios({timeout: 4000, signal: AbortSignal.timeout(4000)}).post('/api/internal/create_appointment', data, header);
+    return axios.post('/api/internal/create_appointment', data, header);
 }
-
-
 
 /**
  *  
@@ -31,7 +28,7 @@ export const createAppointmentPretense = (payload) => {
         const header = getHeaders();
         const data = { ...payload, b_id: business._id };
 
-        axios({timeout: 4000, signal: AbortSignal.timeout(4000)})
+        axios
         .post('/api/internal/validate_appointment', data, header)
         .then((response) => {
             if (response.data.isValid) {

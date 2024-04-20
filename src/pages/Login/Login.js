@@ -36,11 +36,6 @@ export default function Login() {
         password: '',
     })
 
-    useEffect(() => {
-        console.log("LOGIN")
-    }, [])
-
-
     const handleEmployeeLogin = () => {
         setLoading(true);
         if (employeeCred.employeeUsername && employeeCred.employeeUsername) {
@@ -117,16 +112,15 @@ export default function Login() {
             })
             .catch(error => {
                 setLoading(false);
+                console.log(error);
                 setErrors(error.response.data.msg);
                 setAlert(true);
-
             })
         }
         else {
             setLoading(false);
             setErrors('Error: Empty fields found.');
             setAlert(true);
-
             return;
         }
 	}

@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Skeleton ,Typography, Stack, Tooltip, Button, Table, 
-    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, IconButton, Dialog, DialogContent, DialogTitle, TextField, Divider, Checkbox, DialogActions, FormControl, FormControlLabel, FormGroup, Alert, Box } from "@mui/material";
+    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, IconButton, Dialog, DialogContent, DialogTitle, TextField, Divider, Checkbox, DialogActions, FormControl, FormControlLabel, FormGroup, Alert, Box, CircularProgress } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useSelector, useDispatch } from "react-redux";
 import  { columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingTable, getServingCount, 
-    getAppointmentServingTable, reloadBusinessData, findEmployee, getServingClients } from "../../hooks/hooks";
+import {  findResource, findService, getServingCount, findEmployee, getServingClients } from "../../hooks/hooks";
 import "../../css/Serving.css";
-import { setSnackbar } from "../../reducers/user";
+import { setReload, setSnackbar } from "../../reducers/user";
 import CloseIcon from "@mui/icons-material/Close"
 import { useSubscription } from "../../auth/Subscription";
 import Collapse from '@mui/material/Collapse';
@@ -24,7 +23,7 @@ export default function Serving({setClient}) {
     const [servingList, setServingList] = useState();
     const [errors, setErrors] = useState({title: null, body: null});
     const [openErrors, setOpenErrors] = useState(false);
-
+    const reload = useSelector((state) => state.reload);
 
     const [client, setCurrentClient] = useState(null);
     const [clientNotes, setClientNotes] = useState(null);
@@ -39,19 +38,16 @@ export default function Serving({setClient}) {
     }
     useEffect(() => {
         getServingList();
-        return () => {
-            setLoading(false);
-        }
-    }, [loading])
+    }, [reload])
 
 
     const getServingList = () => {
+        setLoading(true);
         getServingClients()
         .then(response => {
             setServingList(response);
         })
         .catch(error => {
-            console.log(error);
             setOpenErrors(true);
             setErrors({title: 'error', body: 'Error found on fetching serving clients'});
         })
@@ -59,7 +55,6 @@ export default function Serving({setClient}) {
             setLoading(false);
         })
     }
-
 
     const openCheckoutNotes = (client) => {
         // Check if they can save to analytics.
@@ -78,6 +73,7 @@ export default function Serving({setClient}) {
     const checkoutClient = () => {
         // This will now call a notes dialog to update the notes and pass into 
         if (!client) {
+            setErrors({title: 'No User', body: 'No user selected'});
             return;
         }
         setLoading(true)
@@ -90,6 +86,8 @@ export default function Serving({setClient}) {
         .finally(() => {
             closeNotesDialog();
             setLoading(false);
+            dispatch(setReload(true));
+            // setReload Dispatch
         })
     }
 
@@ -107,7 +105,6 @@ export default function Serving({setClient}) {
             <Box sx={{ width: '100%'}}>
                 <Collapse in={openErrors}>
                     <AlertMessageGeneral open={openErrors} onClose={closeAlert} title={errors.title} body={errors.body} />
-
                 </Collapse>
             </Box>
             
@@ -154,9 +151,20 @@ export default function Serving({setClient}) {
                                 <TableBody>
 
                 {
-                    Array.isArray(servingList) ? 
-                        servingList.map((item, index) => (
-                            <TableRow key={index}>                                       
+                    loading === true ? (
+                        <TableRow>
+                            <TableCell colSpan={3}/>
+                            <TableCell>
+                            <CircularProgress size={15} />
+                            </TableCell>
+                            <TableCell colSpan={1}/>
+                        </TableRow>
+                    ): 
+                    servingList && 
+                    (
+                        servingList.map((item, index) => {
+                            return (
+                                <TableRow key={index}>                                       
                                 <TableCell align="left">
                                     <Typography variant="subtitle2" fontWeight="bolder">
                                     {++index}
@@ -178,7 +186,7 @@ export default function Serving({setClient}) {
                                     <Typography variant="subtitle2" fontWeight="bolder">
                                         {'Service: '+ findService(item.serviceTag).title }
                                     </Typography>
-
+    
                                     <Typography variant="subtitle2" fontWeight="bolder">
                                         {'Resource: ' + findResource(item.resourceTag).title }
                                     </Typography>
@@ -186,9 +194,9 @@ export default function Serving({setClient}) {
                                 <TableCell align="left">
                                 <Typography variant="subtitle2" fontWeight="bolder">
                                     {item.waittime ? ( item.waittime.hours >= 1 ? (`${item.waittime.hours} Hr ${item.waittime.minutes} Min.`): (`${item.waittime.minutes} Min.`)): (null) } 
-
+    
                                 </Typography>
-
+    
                                 </TableCell>
                                 <TableCell align="left">
                                     <Stack
@@ -200,7 +208,7 @@ export default function Serving({setClient}) {
                                                 <CheckCircleIcon htmlColor="#4CBB17"/>
                                             </Tooltip>                                            
                                         </IconButton>
-
+    
                                         <IconButton onClick={() => displayClientInformation(item)}>
                                             <Tooltip title="Edit" placement="right">
                                                 <EditNoteIcon />
@@ -209,13 +217,13 @@ export default function Serving({setClient}) {
                                        
                                     </Stack>
                                 </TableCell>
-
-
-
                             </TableRow>
-                        ))
-                    : null
+                            )
+                        }))
+                    
                 }
+
+                
                 
                                     
                                 </TableBody>

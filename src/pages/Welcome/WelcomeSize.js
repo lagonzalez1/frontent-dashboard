@@ -129,8 +129,8 @@ export default function Welcome() {
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
             <Stack>
-                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>currently <strong>{position}</strong> in line</Typography>}     
-                { (present.waittime === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>est wait <strong>{waittimeRange}</strong></Typography>}                
+                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>Currently <strong>{position}</strong> in line</Typography>}     
+                { (present.waittime === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>Est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }

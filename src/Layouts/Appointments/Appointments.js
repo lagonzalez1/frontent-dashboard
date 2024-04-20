@@ -1,6 +1,6 @@
 import React, { useState, useEffect, memo} from "react";
 import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, Table, 
-    TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton, Badge } from "@mui/material";
+    TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton, Badge, Collapse } from "@mui/material";
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -17,15 +17,19 @@ import { DatePicker, PickersDay } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 import FabAppointment from "../../components/AddAppointment/FabAppointment";
 import { usePermission } from "../../auth/Permissions";
+import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
     const { checkPermission } = usePermission();
 
+    const reload = useSelector((state) => state.reload);
     const [loading, setLoading] = useState(false);
+    const [reloadPage, setReloadPage] = useState(false);
     const business = useSelector((state) => state.business);
-    const permissionLevel = useSelector((state) => state.user.permissions);
-    const userEmail = useSelector((state) => state.user.email);
+    const [error, setError] = useState(false);
+    const [alert, setAlert] = useState({title: null, body: null});
+
     const currentDate = DateTime.local().setZone(business.timezone);
     const [selectedDate, setSelectedDate] = useState();
     const [highlightedDays, setHighlightedDays] = useState([]);
@@ -34,28 +38,48 @@ const Appointments = ({setClient, setEditClient}) => {
 
     useEffect(() => {
         getLastSearchedDate();
-        // Cleanup
         return () => {
-            setLoading(false);
+            setReloadPage(false);
         }
-    }, [loading]);
+    }, [reloadPage]);
 
     function getLastSearchedDate () {
         const date = sessionStorage.getItem(APPOINTMENT_DATE_SELECT);
         if (date) {
+            setLoading(true);
             let lastDate = DateTime.fromISO(date);
             setSelectedDate(lastDate)
-            let reload = getAppointmentTable(lastDate);
-            setHighlightedDays(getHighlightedDays(lastDate))
-            setData(reload);
+            getAppointmentTable(lastDate)
+            .then(response => {
+                setHighlightedDays(getHighlightedDays(lastDate))
+                setData(response);
+            })
+            .catch(error => {
+                console.log(error);
+                setError(true);
+                setAlert({title: 'Error found', body: error.msg});
+            })
+            .finally(() => {
+                setLoading(false);
+            })
         }
         else {
-            let reload = getAppointmentTable(currentDate);
+            setLoading(true);
             setSelectedDate(currentDate)
-            setHighlightedDays(getHighlightedDays(currentDate))
-            setData(reload);
+            getAppointmentTable(currentDate)
+            .then(response => {
+                setHighlightedDays(getHighlightedDays(currentDate))
+                setData(response);
+            })
+            .catch(error => {
+                setError(true);
+                setAlert({title: 'Error found', body: error.msg});
+                console.log(error);
+            })
+            .finally(() => {
+                setLoading(false);
+            })
         }
-
     }
 
     const sendClientServing = (clientId) => {
@@ -68,14 +92,14 @@ const Appointments = ({setClient, setEditClient}) => {
         })
         .finally(() => {
             setLoading(false);
-            dispatch(setReload(true));
+            setReloadPage(true);
         })
     }
 
     function handleDateChange(date) {
         const dateObj = date.toISO();
         sessionStorage.setItem(APPOINTMENT_DATE_SELECT, dateObj); 
-        setLoading(true);
+        setReloadPage(true);
     };
 
     function openClientDrawer(item) {
@@ -100,10 +124,7 @@ const Appointments = ({setClient, setEditClient}) => {
         const dates = getHighlightedDays(date)
         setHighlightedDays(dates);
     
-    }   
-
-
-
+    }
     //**
      /* 
      /* @param {Array} props array of dates that will be highlighted.
@@ -127,11 +148,21 @@ const Appointments = ({setClient, setEditClient}) => {
         );
       }
 
+    const closeAlert = () => {
+        setError(false);
+        setAlert({title: null, body: null});
+    }
+
     
 
     return (
         <>
         <div className="appointments">
+        <Collapse in={error}>
+            <Box sx={{pt:1}}>
+                <AlertMessageGeneral open={error} onClose={closeAlert} title={alert.title} body={alert.body} />
+            </Box>
+        </Collapse>
             <Grid container>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack>
@@ -202,7 +233,7 @@ const Appointments = ({setClient, setEditClient}) => {
                                         <TableCell colSpan={3}/>
                                         
                                         <TableCell>
-                                        <CircularProgress />
+                                        <CircularProgress size={15} />
                                         </TableCell>
                                         <TableCell colSpan={1}/>
                                         </TableRow>

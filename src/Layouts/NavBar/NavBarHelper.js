@@ -2,9 +2,7 @@ import {styled} from "@mui/material";
 import { DateTime } from "luxon";
 import { getStateData } from "../../auth/Auth";
 import MuiAppBar from '@mui/material/AppBar';
-import BedtimeIcon from '@mui/icons-material/Bedtime';
-import WbTwilightIcon from '@mui/icons-material/WbTwilight';
-import WbSunnyIcon from '@mui/icons-material/WbSunny';
+import { MoonStars, Sun, SunHorizon } from "phosphor-react";
 export const drawerWidth = 240;
 
 
@@ -42,10 +40,10 @@ export const DetermineDaytimeOrEvening = () => {
     const eveningThreshold = DateTime.local().set({ hour: 18, minute: 0, second: 0, millisecond: 0 });
   
     if (currentTime < morningThreshold) {
-      return <WbTwilightIcon />;
+      return <SunHorizon size={30} weight="duotone" />;
     } else if (currentTime >= eveningThreshold) {
-      return <BedtimeIcon />
+      return <MoonStars size={30} weight="duotone" />
     } else {
-      return <WbSunnyIcon/>;
+      return <Sun size={30} weight="duotone" />;
     }
   };

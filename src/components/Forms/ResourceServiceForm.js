@@ -10,7 +10,7 @@ import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
 
 
-export default function ResourceServiceForm ({setLoading, loading}) {
+export default function ResourceServiceForm () {
 
 
     const { checkPermission } = usePermission();
@@ -68,7 +68,6 @@ export default function ResourceServiceForm ({setLoading, loading}) {
                 dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
             })
             .finally(() => {
-                setLoading(true);
                 closeServiceDialog();
             })
             return;
@@ -82,7 +81,6 @@ export default function ResourceServiceForm ({setLoading, loading}) {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            setLoading(true);
             closeServiceDialog();
         })
 
@@ -98,7 +96,6 @@ export default function ResourceServiceForm ({setLoading, loading}) {
                 dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
             })
             .finally(() => {
-                setLoading(true);
                 closeResourceDialog()
             })
             return;
@@ -112,7 +109,6 @@ export default function ResourceServiceForm ({setLoading, loading}) {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            setLoading(true);
             closeResourceDialog()
         })
     }
@@ -191,11 +187,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
                             </strong>
 
                         </DialogTitle>
-                         {loading ? (
-                            <Container sx={{p: 2}}>
-                                <CircularProgress />
-                            </Container>
-                         ) : 
+                        
                         <DialogContent>
                             <Box>
                         <Typography variant="caption"></Typography>
@@ -287,7 +279,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
                     </Formik>
                     </Box>
                         </DialogContent>
-                        }
+                        
                 <DialogActions>
                     
                 </DialogActions>
@@ -320,11 +312,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
 
                     </DialogTitle>
                     
-                    { loading ? (
-                    <Container sx={{p: 2}}>
-                        <CircularProgress />
-                    </Container>
-                    ) : 
+                    
                     <DialogContent>
                     <Typography variant="caption"></Typography>
                     <Divider/>
@@ -398,7 +386,7 @@ export default function ResourceServiceForm ({setLoading, loading}) {
                 </Formik>
                     
                     </DialogContent>
-                    }
+                    
 
             </Dialog>
         

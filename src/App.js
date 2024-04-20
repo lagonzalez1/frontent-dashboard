@@ -78,7 +78,6 @@ function App() {
                   <ThemeProvider theme={theme && theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
                     <Dashboard/>                
                   </ThemeProvider>
-            
               </RequireAuth>
           }></Route>
 

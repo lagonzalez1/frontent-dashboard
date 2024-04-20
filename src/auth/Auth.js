@@ -65,13 +65,6 @@ const USER = 'user';
     removeBusinessState();
   }
 
-
-  /**
-   * 
-   * 
-   */
-
-
   export const updateBusinessIndex = async (businessId) => {
     const header = getHeaders();
     const { user, _ } = getStateData();

@@ -102,8 +102,8 @@ export default function Welcome() {
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
             <Stack>
-                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="body2">currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2" gutterBottom>est wait <strong>{waittimeRange}</strong></Typography>}                
+                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2" gutterBottom>Est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }
@@ -180,7 +180,8 @@ export default function Welcome() {
             <ThemeProvider theme={ClientWelcomeTheme}>
             <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
                 <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
-                    { loading ? <Box>
+                    { loading ? 
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
                         <CircularProgress/>
                         </Box> : 
                     (<>

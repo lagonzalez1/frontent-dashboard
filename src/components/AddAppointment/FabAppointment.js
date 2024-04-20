@@ -94,7 +94,7 @@ export default function FabAppointment () {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}));
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
         })
         .finally(() => {
             setApp_loader(false);
@@ -332,7 +332,7 @@ export default function FabAppointment () {
                                 value={formik.values.notes}
                             />
 
-                            { loading ? <CircularProgress/> : null} 
+                            { loading ? <CircularProgress size={15}/> : null} 
                             
                             
                             {nextStep ? 

@@ -60,7 +60,7 @@ export default function SystemForm({setLoading, loading}) {
         autoDelete: 'Auto delete',
     }
     const LABELS = {
-        appointments: 'Use a appointment system to schedule future appointments using your business services and employees.',
+        appointments: 'Use a appointment system to schedule future appointments using your business employees.',
         waitlist: 'Use a queue based waitlist system, allow clients to join a virtual.',
         equalDate: 'Waitlist will only accept same day request.',
         autoDelete: 'Automatically delete clients left unattended, otherwise will be marked as no-shows.',

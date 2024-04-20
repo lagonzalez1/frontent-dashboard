@@ -3,10 +3,12 @@ import { IconButton,Typography, Toolbar, Button, Box } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AppBar, DetermineDaytimeOrEvening } from "./NavBarHelper";
+import { MoonStars } from "phosphor-react";
 import { useSignOut } from "react-auth-kit";
 import { removeUserState } from "../../auth/Auth";
 import { DateTime } from 'luxon';
 import { useSelector } from "react-redux";
+import Login from "../../pages/Login/Login";
 
 
 
@@ -37,7 +39,7 @@ export default function NavBar({ navState, openNav }) {
       );
     };
 
-    function logout() {
+    const logout = () => {
       removeUserState();
       signOut();
     }

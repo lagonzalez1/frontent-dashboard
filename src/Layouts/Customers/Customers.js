@@ -452,7 +452,7 @@ const Customers = () => {
                                   <TableCell colSpan={3}/>
                                   
                                   <TableCell>
-                                  <CircularProgress />
+                                  <CircularProgress size={15} />
                                   </TableCell>
                                   <TableCell colSpan={1}/>
                               </TableRow>

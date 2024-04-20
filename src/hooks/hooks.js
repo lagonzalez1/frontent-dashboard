@@ -113,7 +113,7 @@ export const requestNoShow = (clientId, type) => {
         const { user, business } = getStateData();
         const header = getHeaders();
         const data = { ...payload, bid: business._id}
-        axios.post('/api/internal/appointment_data', data, header)
+        axios.get('/api/internal/appointment_data', data, header)
         .then(response => {
             resolve(response.data.data);
         })
@@ -352,7 +352,7 @@ export const getServingClients = () => {
     const { user, business } = getStateData();
     const bid = business._id;
     const headers = getHeaders();
-    return new Promise((reject, resolve) => {
+    return new Promise((resolve, reject) => {
         axios.get(`/api/internal/serving_table/${bid}`, headers)
         .then(response => {
             resolve(response.data.result);
@@ -471,29 +471,23 @@ export const getServingCount = () => {
 };
 
 
+// This might not be in use.
 export const getAppointmentTable = (date) => {
-    const { user,  business} = getStateData();
-    try {
-        
-        let appointments = business.appointments;
-        let filtered = []
-        for (var client of appointments){
-            const appDate = DateTime.fromISO(client.appointmentDate);
-            
-            if (appDate.hasSame(date, 'day') && client.status.serving !== true){
-                filtered.push(client);
-            }
-        }
-        return filtered;
-
-    }
-    catch (error) {
-        // Handle the error here
-        console.error(error);
-        return new Error(error); // Return an empty array or any other appropriate value
-    }
+    return new Promise((resolve, reject) => {
+        const { user,  business} = getStateData();
+        const bid = business._id;
+        const headers = getHeaders();
+        axios.get(`/api/internal/appointment_data/${bid}/${date}`, headers)
+        .then(response => {
+            resolve(response.data.data);
+        })
+        .catch(error => {
+            reject(error);
+        })
+    })
 }
 
+// This is no longet used.
 export const getNoShowTable = () => {
     const { user, business } = getStateData();
     try {
@@ -528,9 +522,19 @@ export const getNoShowClients = () => {
 }
 
 
-export function getUserTableData () {
-    return new Promise((resolve, reject) => {
-        
+// Need to complete, this is the waitlist on Dashboard
+export function getWaitlistTable () {
+    const { user, business } = getStateData();
+    const headers = getHeaders();
+    const bid = business._id;
+    return new Promise((resolve, reject) => {   
+        axios.get(`/api/internal/get_waitlist/${bid}`, headers)
+        .then(response => {
+            resolve(response.data.result);
+        })
+        .catch(error => {
+            reject(error)
+        })
     })
 }
 

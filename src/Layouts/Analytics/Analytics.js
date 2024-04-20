@@ -14,7 +14,7 @@ import CachedIcon from '@mui/icons-material/Cached';
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import BarGraphWait from "../../components/Vizual/BarGraphWait";
 import BarGraphApp from "../../components/Vizual/BarGraphApp";
-import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle  } from "phosphor-react"; 
+import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle, Database} from "phosphor-react"; 
 import Collapse from '@mui/material/Collapse';
 
 
@@ -35,7 +35,12 @@ const Analytics = () => {
     const [employeeData, setEmployeeData] = useState(null);
     const [businessData, setBusinessData] = useState(null);
 
-    const [loading, setLoading] = useState({employee: false, business: false});
+    const [loading, setLoading] = useState(false);
+
+    const [loadBusiness, setLoadBusiness] = useState(false);
+    const [businessLoader, setBusinessLoader] = useState(false);
+
+
 
     const [error, setError] = useState(false);
     const [openError, setOpenError] = useState(false);
@@ -54,8 +59,12 @@ const Analytics = () => {
     }, [employeeId])
 
     useEffect(() => {
+        setBusinessLoader(true);
         getBusinessData();
-    }, [])
+        return () => {
+            setLoadBusiness(false)
+        }
+    }, [loadBusiness])
 
     const getBusinessData = () => {
         getBusinessAnalytics()
@@ -69,6 +78,7 @@ const Analytics = () => {
         })
         .finally(() => {
             setLoading((prev) => ({...prev, business: false}))
+            setBusinessLoader(false);
         })
     }
 
@@ -78,7 +88,7 @@ const Analytics = () => {
         if (employeeId === "") {
             return;
         }
-        setLoading((prev) => ({...prev, employee: true}))
+        setLoading(true)
         getEmployeeAnalytics(employeeId)
         .then(response => {
             console.log(response)
@@ -90,7 +100,7 @@ const Analytics = () => {
             setAlert({title: error.response.data.msg})
         })
         .finally(() => {
-            setLoading((prev) => ({...prev, employee: false}))
+            setLoading(false)
         })
         
     }
@@ -109,7 +119,7 @@ const Analytics = () => {
             setAlert({title: 'Error', body:'Range is not valid, {from} must be before than {to}.', open: true});
             return;
         }
-        setLoading((prev) => ({...prev, employee: true}))
+        setLoading(true)
 
         const payload = { eid: employeeId, type: type, start: range.start.toISO(), end: range.end.toISO()}
         getEmployeeAnalyticsRange(payload)
@@ -122,7 +132,7 @@ const Analytics = () => {
             setAlert({title: error.response.data.msg})
         })
         .finally(() => {
-            setLoading((prev) => ({...prev, employee: false}))
+            setLoading(false)
         })
 
         
@@ -143,7 +153,6 @@ const Analytics = () => {
     <div className="mainContainer">
         <Collapse in={openError}>
             <Box sx={{pt:1}}>
-
                 <AlertMessageGeneral open={error} onClose={closeAlert} title={alert.title} body={alert.body} />
             </Box>
         </Collapse>
@@ -200,18 +209,21 @@ const Analytics = () => {
                     
                 </Grid>
                 
-                {loading.employee === true ?(
-                    <Grid sx={{display:'flex', justifyContent: 'center', alignItems: 'center'}} item lg={6} md={6} xs={12} sm={12}>
-                        <CircularProgress />
+                {loading === true ?(
+                    <Grid item sx={{display:'flex', justifyContent: 'center', alignItems: 'center'}} lg={6} md={6} xs={12} sm={12}>
+                        <CircularProgress size={15} />
                     </Grid>
                 ):
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     { /** Data FOR EMPLOYEES in various graph list, total, Waittime, servve_time, noshow, resorce/service average */}
-                    <Stack direction={'row'}>
+                    {employeeData === null ? (
+                            <Box sx={{ display: 'flex', pt: 4, justifyContent: 'center', alignItems: 'center'}}>
+                                <Typography  variant="substitle2" fontWeight={'light'}>No data</Typography>
+                                <Database size={27} />
+                            </Box>
+                        ): 
                         <DonutGraph data={employeeData}/>
-                        { /**  */}                
-                        
-                    </Stack>
+                        }
                     { /** Serve_time, Wait_time, No_show, Party_size */}
                         { /**  */}                
                         <Stack sx={{pt:2, overflowX: 'auto'}} direction={'row'} spacing={1} justifyContent={'center'}>
@@ -323,19 +335,24 @@ const Analytics = () => {
                 }
 
             </Grid>
-            {loading.business === true && businessData === null ? (
+            <Divider />
+
+            {businessLoader === true ? (
             <Grid container sx={{ display: 'flex', justifyContent: 'center'}}>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
-                    <CircularProgress />
+                    <Box>
+                        <CircularProgress size={15} />
+                    </Box>
                 </Grid>
 
                 <Grid item lg={6} md={6} xs={12} sm={12}>
-                    <CircularProgress />
+                    <Box>
+                        <CircularProgress size={15} />
+                    </Box>
                 </Grid>
             </Grid>
             ):(
             <>
-            <Divider />
             <Grid container sx={{ pt: 1}}
                 direction="row"
             >
@@ -470,28 +487,21 @@ const Analytics = () => {
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     { /** Ratings */}
                     <Typography variant="h6" fontWeight={'bold'}>Employee Ratings</Typography>
-                    <List component="nav" aria-label="employeeSelect" sx={{maxHeight: 300}}>
+                    <List sx={{overflow: 'auto', maxHeight: 300}} component="nav" aria-label="employeeSelect">
 
                             {businessData && businessData.employeeRatings.map((item, index) => {
                                 const id = item.id;
+                                const popularity = Math.ceil(item.popularity);
                                 const employee = findEmployee(id);
-                                const rating = Math.ceil(item.data.ratingSum / item.data.ratingCount);
-                                const count = item.data.ratingCount;
+                                const rating = Math.ceil(item.data);
+                                const count = item.count;
                                 return (
                                     <ListItem alignItems="flex-start">
                                         
                                         <ListItemText primary={employee.fullname}
                                             secondary={
-                                            <React.Fragment>
-                                            <Typography
-                                                sx={{ display: 'inline' }}
-                                                component="span"
-                                                variant="body2"
-                                                color="text.primary"
-                                            >
-                                                {`Ratings (${count})`} 
-                                            </Typography>
-                                            <Box>
+                                            <React.Fragment>                                            
+                                            <Stack>
                                             <Rating
                                                 name="text-feedback"
                                                 value={rating}
@@ -499,6 +509,26 @@ const Analytics = () => {
                                                 precision={0.5}
                                                 emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                                                 />
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                            {`Completed (${popularity})`}
+                                            </Typography>                                                
+                                            <Typography
+                                                sx={{ display: 'inline' }}
+                                                component="span"
+                                                variant="body2"
+                                                color="text.primary"
+                                            >
+                                                {`Ratings (${count})`} 
+                                                
+                                            </Typography>
+                                            </Stack>
+                                            <Box>
+                                            
                                             </Box>
                                             </React.Fragment>
                                         }
@@ -514,14 +544,14 @@ const Analytics = () => {
             </Grid>
             
 
-            { loading.business === true && businessData === null ? (
+            { businessLoader === true  ? (
                 <Grid container sx={{pt: 2}} id="visual_bars">
                 <Grid item lg={6} md={6} xs={12} sm={12}>
-                    <CircularProgress />
+                    <CircularProgress size={15} />
                 </Grid>
 
                 <Grid item lg={6} md={6} xs={12} sm={12}>
-                    <CircularProgress />
+                    <CircularProgress size={15} />
                 </Grid>
             </Grid>
             ):
