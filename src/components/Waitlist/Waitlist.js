@@ -423,8 +423,9 @@ const Waitlist = ({setClient, setEditClient}) => {
                             </TableCell>
                             <TableCell colSpan={1}/>
                         </TableRow>
-                    ) : (
-                        tableData.map((item, index) => {
+                    ) : 
+                        ( tableData && tableData.length > 0 ? 
+                            (tableData.map((item, index) => {
                             return (
                             <TableRow key={item._id}>
                                      
@@ -506,7 +507,14 @@ const Waitlist = ({setClient, setEditClient}) => {
                                 </TableCell>            
                             </TableRow>
                         )}) 
-                    )
+                    ): 
+                    <TableRow>
+                        <TableCell colSpan={6} align="center">
+                            No data available
+                        </TableCell>
+                    </TableRow>    
+                ) 
+
                 }
                                     
                                 </TableBody>
@@ -559,11 +567,12 @@ const Waitlist = ({setClient, setEditClient}) => {
                                         </TableCell>
 
                                         <TableCell align="left">
+                                            <Stack>
                                             <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
                                             <Typography fontWeight="normal" variant="caption">
                                                 { item.serviceTag ? findService(item.serviceTag).title: null }
                                             </Typography>
-                                    
+                                            </Stack>
                                         </TableCell>
 
                                         <TableCell align="left">
@@ -577,25 +586,36 @@ const Waitlist = ({setClient, setEditClient}) => {
                                         </TableCell>
 
                                         <TableCell align="left">
+                                            <Stack>
                                             <Typography variant="subtitle2" fontWeight="bold">
                                                 {DateTime.fromJSDate(new Date(item.timestampOrigin)).toFormat('LLL dd yyyy hh:mm a')}
                                             </Typography>
+                                            <Typography fontWeight="normal" variant="caption">
+                                                { item.type ? item.type: null }
+                                                </Typography>
+                                            </Stack>
                                         </TableCell>   
 
                                         <TableCell align="right">
                                             <Stack
                                                 direction="row"
                                                 spacing={1}
-                                            >
+                                            >   
+                                                <Tooltip title="Serve client" placement="left">
                                                 <IconButton onClick={() => sendClientServing(item)}>
                                                     <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                                 </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Send notification" placement="top">
                                                 <IconButton onClick={() => sendClientNotification(item)}>
                                                     <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                                 </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Edit client information" placement="right">
                                                 <IconButton onClick={() => editClientInfo(item)}>
                                                     <EditIcon fontSize="small" />
                                                 </IconButton>      
+                                                </Tooltip>
                                             </Stack>
                                         </TableCell> 
 

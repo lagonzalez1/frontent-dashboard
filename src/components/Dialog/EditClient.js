@@ -157,9 +157,6 @@ export default function EditClient({setEditClient, editClient}) {
         .catch(error => {
             setErrors(error);
         })
-        .finally(() => {
-            //setLoading(false);
-        })
     }
 
     return(

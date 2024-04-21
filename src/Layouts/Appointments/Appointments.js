@@ -8,7 +8,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 
-import { findEmployee, getAppointmentClients, moveClientServing, findService, getAppointmentTable, allowEmployeeEdit, sendNotification } from "../../hooks/hooks";
+import { findEmployee, moveClientServing, findService, getAppointmentTable, sendNotification } from "../../hooks/hooks";
 import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -51,8 +51,8 @@ const Appointments = ({setClient, setEditClient}) => {
             setSelectedDate(lastDate)
             getAppointmentTable(lastDate)
             .then(response => {
-                setHighlightedDays(getHighlightedDays(lastDate))
-                setData(response);
+                setHighlightedDays(response.highlightDays)
+                setData(response.data);
             })
             .catch(error => {
                 console.log(error);
@@ -68,8 +68,8 @@ const Appointments = ({setClient, setEditClient}) => {
             setSelectedDate(currentDate)
             getAppointmentTable(currentDate)
             .then(response => {
-                setHighlightedDays(getHighlightedDays(currentDate))
-                setData(response);
+                setHighlightedDays(response.highlightDays)
+                setData(response.data);
             })
             .catch(error => {
                 setError(true);
@@ -228,68 +228,72 @@ const Appointments = ({setClient, setEditClient}) => {
                                 </TableHead>
                                 <TableBody>
                                     
-                                    { loading === true ? (
-                                        <TableRow>
-                                        <TableCell colSpan={3}/>
-                                        
-                                        <TableCell>
-                                        <CircularProgress size={15} />
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center">
+                                            <CircularProgress size={15} />
                                         </TableCell>
-                                        <TableCell colSpan={1}/>
-                                        </TableRow>
-                                    ) :
-                                     data.map((client, index) => {
-                                        const edit = checkPermission('CLIENT_EDIT')
-                                    return (
-                                        <TableRow>
-                                            <TableCell>
-                                                <Typography fontWeight={'bold'} variant="body2">
-                                                <IconButton onClick={() => openClientDrawer(client)}>
-                                                    <InfoOutlinedIcon fontSize="small" /> 
-                                                </IconButton>
-                                                    {++index}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={'bold'} variant="body2">
-                                                    { client.fullname}
-                                                </Typography>
-                                                <Typography fontWeight="normal" variant="caption">
-                                                    { client.serviceTag ? findService(client.serviceTag).title: null }
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={'bold'} variant="body2">
-                                                    {DateTime.fromISO(client.appointmentDate).toFormat('LLL dd yyyy')}
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={'bold'} variant="body2">
-                                                { DateTime.fromFormat(client.start, "HH:mm").toFormat('hh:mm a') + " - " + DateTime.fromFormat(client.end, "HH:mm").toFormat('hh:mm a') }
+                                    </TableRow>
+                                ) : data && data.length > 0 ? (
+                                    data.map((client, index) => {
+                                        const edit = checkPermission('CLIENT_EDIT');
+                                        return (
+                                            <TableRow key={client._id}>
+                                                <TableCell>
+                                                    <Typography fontWeight={'bold'} variant="body2">
+                                                        <IconButton onClick={() => openClientDrawer(client)}>
+                                                            <InfoOutlinedIcon fontSize="small" />
+                                                        </IconButton>
+                                                        {++index}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography fontWeight={'bold'} variant="body2">
+                                                        {client.fullname}
+                                                    </Typography>
+                                                    <Typography fontWeight="normal" variant="caption">
+                                                        {client.serviceTag ? findService(client.serviceTag).title : null}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography fontWeight={'bold'} variant="body2">
+                                                        {DateTime.fromISO(client.appointmentDate).toFormat('LLL dd yyyy')}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography fontWeight={'bold'} variant="body2">
+                                                        {DateTime.fromFormat(client.start, "HH:mm").toFormat('hh:mm a') + " - " + DateTime.fromFormat(client.end, "HH:mm").toFormat('hh:mm a')}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography fontWeight={'bold'} variant="body2">
+                                                        {findEmployee(client.employeeTag).fullname}
+                                                    </Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Stack direction={'row'} spacing={1}>
+                                                        <IconButton onClick={() => sendClientServing(client._id)}>
+                                                            <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
+                                                        </IconButton>
+                                                        <IconButton onClick={() => sendClientNotification(client._id)}>
+                                                            <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
+                                                        </IconButton>
+                                                        <IconButton disabled={!edit} onClick={() => editClientInfo(client)}>
+                                                            <EditIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </Stack>
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center">
+                                            No data available
+                                        </TableCell>
+                                    </TableRow>
+)}
 
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Typography fontWeight={'bold'} variant="body2">
-                                                { findEmployee(client.employeeTag).fullname }
-                                                </Typography>
-                                            </TableCell>
-                                            <TableCell>
-                                                <Stack direction={'row'} spacing={1}>
-                                                <IconButton onClick={() => sendClientServing(client._id)}>
-                                                    <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
-                                                </IconButton>
-                                                <IconButton  onClick={() => sendClientNotification(client._id)}>
-                                                    <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
-                                                </IconButton>
-                                                <IconButton disabled={!edit}  onClick={() => editClientInfo(client) }>
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>
-
-                                                </Stack>
-                                            </TableCell>
-                                        </TableRow>
-                                    )})}
                                 </TableBody>
                             </Table>
                         </TableContainer>

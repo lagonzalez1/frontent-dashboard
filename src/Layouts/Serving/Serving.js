@@ -20,7 +20,7 @@ export default function Serving({setClient}) {
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(false);
-    const [servingList, setServingList] = useState();
+    const [servingList, setServingList] = useState([]);
     const [errors, setErrors] = useState({title: null, body: null});
     const [openErrors, setOpenErrors] = useState(false);
     const reload = useSelector((state) => state.reload);
@@ -160,7 +160,7 @@ export default function Serving({setClient}) {
                             <TableCell colSpan={1}/>
                         </TableRow>
                     ): 
-                    servingList && 
+                    servingList && servingList.length > 0 ?
                     (
                         servingList.map((item, index) => {
                             return (
@@ -219,7 +219,14 @@ export default function Serving({setClient}) {
                                 </TableCell>
                             </TableRow>
                             )
-                        }))
+                        })): 
+                        (
+                        <TableRow>
+                            <TableCell colSpan={6} align="center">
+                                No data available
+                            </TableCell>
+                        </TableRow>
+                        )
                     
                 }
 

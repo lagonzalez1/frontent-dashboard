@@ -115,7 +115,7 @@ export const requestNoShow = (clientId, type) => {
         const data = { ...payload, bid: business._id}
         axios.get('/api/internal/appointment_data', data, header)
         .then(response => {
-            resolve(response.data.data);
+            resolve(response.data);
         })
         .catch(error => {
             console.log(error);
@@ -479,7 +479,7 @@ export const getAppointmentTable = (date) => {
         const headers = getHeaders();
         axios.get(`/api/internal/appointment_data/${bid}/${date}`, headers)
         .then(response => {
-            resolve(response.data.data);
+            resolve(response.data);
         })
         .catch(error => {
             reject(error);

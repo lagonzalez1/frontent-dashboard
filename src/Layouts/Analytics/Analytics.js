@@ -14,14 +14,16 @@ import CachedIcon from '@mui/icons-material/Cached';
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import BarGraphWait from "../../components/Vizual/BarGraphWait";
 import BarGraphApp from "../../components/Vizual/BarGraphApp";
-import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle, Database} from "phosphor-react"; 
+import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle, Database, FireSimple, Drop,Waves , Campfire , FlowerLotus, Tree, Coffee  } from "phosphor-react"; 
 import Collapse from '@mui/material/Collapse';
 
 
 
 const Analytics = () => {
 
-
+    const iconsList = [<Package alignmentBaseline="center" size={22}/>,<FireSimple alignmentBaseline="center" size={22}/>, <Drop alignmentBaseline="center" size={22}/>,
+     <Waves  alignmentBaseline="center" size={22}/>, <Campfire  alignmentBaseline="center" size={22}/>, <FlowerLotus  alignmentBaseline="center" size={22}/>, <Tree alignmentBaseline="center" size={22}/>,
+     <Coffee alignmentBaseline="center" size={22}/>  ]
     const business = useSelector((state) => state.business);
     const employeeList = getEmployeeList();
     const [range, setRange] = useState({ start: DateTime.local().setZone(business.timezone), end: DateTime.local().setZone(business.timezone)});
@@ -230,10 +232,12 @@ const Analytics = () => {
 
                         { employeeData &&
                                 employeeData.resources.map((item) => {
+                                    const len = employeeData.resources.length;
+                                    const randomIndex = Math.floor(Math.random() * len)
                                     return (
                                         <Card elevation={0} sx={{ maxWidth: 100}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <Package alignmentBaseline="center" size={20}  />
+                                                {iconsList[randomIndex]}
                                                 <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
                                                     { findResource(item.id).title }
                                                 </Typography>
@@ -246,12 +250,15 @@ const Analytics = () => {
                                     )
                                 })
                             }
+                            <Divider orientation="vertical" />
                             { employeeData &&
                                 employeeData.services.map((item) => {
+                                    const len = employeeData.services.length;
+                                    const randomIndex = Math.floor(Math.random() * len)
                                     return (
                                         <Card elevation={0} sx={{ maxWidth: 100}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <Package alignmentBaseline="center" size={20}  />
+                                                { iconsList[randomIndex]}
                                                 <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
                                                     {findService(item.id).title }
                                                 </Typography>
@@ -264,7 +271,7 @@ const Analytics = () => {
                                     )
                                 })
                             }
-                                
+
 
                             
                         </Stack>
@@ -328,15 +335,12 @@ const Analytics = () => {
                             </Card>
                         </Stack>
                         ):null
-                    }
-                    
-                    
+                    }   
                 </Grid>
                 }
-
             </Grid>
+            { /** END OF EMPLOYEES Serve_time, Wait_time, No_show, Party_size */}
             <Divider />
-
             {businessLoader === true ? (
             <Grid container sx={{ display: 'flex', justifyContent: 'center'}}>
                 <Grid item lg={6} md={6} xs={12} sm={12}>
@@ -353,6 +357,7 @@ const Analytics = () => {
             </Grid>
             ):(
             <>
+            {/** BUSINESS metrics below */}
             <Grid container sx={{ pt: 1}}
                 direction="row"
             >
@@ -409,13 +414,14 @@ const Analytics = () => {
                                 <>
                                 <Stack sx={{ flexWrap: 'wrap', overflowX: 'auto'}} direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
                                     justifyContent={'center'}>
-                                {
+                                {   
                                     businessData.services.map((item, count) => {
-
+                                        const len = businessData.services.length;
+                                        const randomIndex = Math.floor(Math.random() * len);
                                         return (
                                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                <Package alignmentBaseline="center" size={22}/>
+                                                {iconsList[randomIndex]}
                                                 <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                     {findService(item.id).title}
                                                 </Typography>
@@ -435,7 +441,7 @@ const Analytics = () => {
                                 </Stack>
                                 <Stack sx={{ overflowX: 'auto', flexWrap: 'wrap'}} direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
                                     justifyContent={'center'}>
-                                {
+                                {   
                                     businessData.resources.map((item, count) => {
 
                                         return (
@@ -543,7 +549,6 @@ const Analytics = () => {
 
             </Grid>
             
-
             { businessLoader === true  ? (
                 <Grid container sx={{pt: 2}} id="visual_bars">
                 <Grid item lg={6} md={6} xs={12} sm={12}>
