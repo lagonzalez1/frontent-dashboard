@@ -11,6 +11,7 @@ import { setReload, setSnackbar } from '../../reducers/user';
 import CloseIcon from "@mui/icons-material/Close"
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
@@ -30,7 +31,7 @@ const initialValues = {
   publicValue: false
 };
 
-export default function AddResource() {
+export default function AddResource({reloadParent}) {
   const { checkPermission } = usePermission();
   const { cancelledSubscription } = useSubscription();
   const [isOpen, setIsOpen] = useState(false);
@@ -56,19 +57,15 @@ export default function AddResource() {
       handleClose();
     })
     .catch(error => {
-      dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
       setLoading(false);
       handleClose();
+      reloadParent(); // Reload parent page
     })
     
   };
-
-  useEffect(() => {
-    reloadBusinessData(dispatch);
-  }, [loading])
-
 
   const TextFieldEdit = () => { return <TextField multiline={true} rows={3} label="Description" />}
 
@@ -116,7 +113,7 @@ export default function AddResource() {
                     />           
                   {business ? (
                       <>
-                          <InputLabel id="services" sx={{fontWeight: 'bold'}}>Attach serivce? </InputLabel>
+                          <InputLabel id="services" sx={{fontWeight: 'bold'}}>Attach service? </InputLabel>
                           <Field
                           as={Select}
                           id="services"
@@ -185,7 +182,7 @@ export default function AddResource() {
                     /> 
                     </Grid>
                     </Grid>
-                    <Button disabled={!checkPermission('RESO_ADD') || cancelledSubscription() } sx={{ borderRadius: 10}}  variant="contained" type="submit">submit</Button>
+                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_ADD') || cancelledSubscription() } sx={{ borderRadius: 10}}  variant="contained" type="submit">submit</LoadingButton>
 
                   </Stack>
                 <DialogActions>

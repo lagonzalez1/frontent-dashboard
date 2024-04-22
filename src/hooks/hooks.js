@@ -102,7 +102,18 @@ export const requestNoShow = (clientId, type) => {
         })
         .catch(error => {
             console.log(error);
-            reject("Error cannot hit analytics.");
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
         })
         
     })
@@ -151,8 +162,20 @@ export const requestNoShow = (clientId, type) => {
           resolve(response.data);
         })
         .catch(error => {
-          reject(error.response.data);
-        }) 
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
+        })
         
       })
   }
@@ -168,8 +191,18 @@ export const requestNoShow = (clientId, type) => {
           resolve(response.data);
         })
         .catch(error => {
-          reject(error.response.data);
-        }) 
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }        }) 
         
       })
   }
@@ -187,8 +220,18 @@ export const requestNoShow = (clientId, type) => {
         resolve(response.data);
       })
       .catch(error => {
-        reject(error.response.data);
-      }) 
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }      }) 
       
     })
   }
@@ -358,8 +401,18 @@ export const getServingClients = () => {
             resolve(response.data.result);
         })
         .catch(error => {
-            reject(error)
-        })  
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }        })  
     }) 
 }
 
@@ -418,8 +471,18 @@ export const sendNotification = (payload) => {
             resolve(response.data);
         })
         .catch(error => {
-            reject(error);
-
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
         })
     })
 }
@@ -482,30 +545,23 @@ export const getAppointmentTable = (date) => {
             resolve(response.data);
         })
         .catch(error => {
-            reject(error);
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
         })
     })
 }
 
-// This is no longet used.
-export const getNoShowTable = () => {
-    const { user, business } = getStateData();
-    try {
-            let currentClients = business.currentClients;
-            let clients = [];
-            for (var client of currentClients){
-                if (client.status.noShow === true) {
-                    clients.push(client);
-                }
-            }
-            const sortNoShow = clients.sort(sortBaseTime);
-            return sortNoShow;
-      } catch (error) {
-            // Handle the error here
-            console.error(error);
-            return new Error(error); // Return an empty array or any other appropriate value
-      }
-};
 
 export const getNoShowClients = () => {
     const { user, business } = getStateData();
@@ -516,7 +572,19 @@ export const getNoShowClients = () => {
             resolve(response);
         })
         .catch(error => {
-            reject(error);
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
         })
     })
 }
@@ -524,7 +592,7 @@ export const getNoShowClients = () => {
 
 // Need to complete, this is the waitlist on Dashboard
 export function getWaitlistTable () {
-    const { user, business } = getStateData();
+    const { _ , business } = getStateData();
     const headers = getHeaders();
     const bid = business._id;
     return new Promise((resolve, reject) => {   
@@ -533,7 +601,19 @@ export function getWaitlistTable () {
             resolve(response.data.result);
         })
         .catch(error => {
-            reject(error)
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
         })
     })
 }

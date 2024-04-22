@@ -14,13 +14,12 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-import { findResource, findService, moveClientServing, sendNotification, getNoShowClients, getWaitlistTable } from "../../hooks/hooks";
+import { findResource, findService, moveClientServing, sendNotification, getNoShowClients, getWaitlistTable, getWaitlistWaittime } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT, acceptingRejecting,
     removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState, noShowColumns} from "./Helpers";
-import { getUserTable, getNoShowTable, getWaitlistWaittime } from "../../hooks/hooks";
 import { WAITLIST, NOSHOW, APPOINTMENT } from "../../static/static";
 import FabButton from "../Add/FabButton";
 import { usePermission } from "../../auth/Permissions";
@@ -40,7 +39,6 @@ const Waitlist = ({setClient, setEditClient}) => {
     const [anchorElVert, setAnchorElVert] = useState(null);
     const [noShowData, setNoShowData] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [errors, setErrors] = useState(null);
     const [loading, setLoading] = useState(false);
     const [clientId, setClientId] = useState();
     const [waittime, setWaittime] = useState(null);
@@ -50,12 +48,10 @@ const Waitlist = ({setClient, setEditClient}) => {
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
 
-    //let tableData = getUserTable();
     let accepting = acceptingRejecting();
 
     useEffect(() => {
         setLoading(true)
-        //tableData = getUserTable(); // This will now be get function to ease the load on front end.
         getWaitlistData();
         loadNoShowData() // No show table
         getWaittime(); // Waittime
@@ -71,32 +67,28 @@ const Waitlist = ({setClient, setEditClient}) => {
             setTableData(response);
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
             setLoading(false)
         })
     }
-
-
     const loadNoShowData = () => {
         getNoShowClients()
         .then(response => {
             setNoShowData(response.data.result)
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
     }
-
-
     const getWaittime = () => {
         getWaitlistWaittime()
         .then(response => {
             setWaittime(response.waittime);
         })
         .catch(error => {
-            console.log(error);
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
             setLoading(false);
@@ -172,7 +164,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
                 })  
                 .catch(error => {
-                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+                    dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
                 })
                 .finally(() => {
                     setLoading(false)
@@ -186,14 +178,12 @@ const Waitlist = ({setClient, setEditClient}) => {
                 moveClientUp(clientId,tableData)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
-
                 })  
                 .catch(error => {
-                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+                    dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
                 })
                 .finally(() => {
                     setLoading(false)
-
                     dispatch(setReload(true))
                     handleCloseVert();
                 })
@@ -205,7 +195,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
                 })  
                 .catch(error => {
-                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}));
+                    dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
                 })
                 .finally(() => {
                     setLoading(false)
@@ -223,8 +213,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
                 })
                 .catch(error => {
-                    console.log(error);
-                    dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+                    dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
                 })
                 .finally(() => {
                     setLoading(false)
@@ -278,8 +267,7 @@ const Waitlist = ({setClient, setEditClient}) => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
         .catch(error => {
-            console.log(error);
-            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
     }
 

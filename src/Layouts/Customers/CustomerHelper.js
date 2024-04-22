@@ -40,8 +40,20 @@ export function searchAnalyticsKeyword (word) {
         resolve(response.data.payload)
        }) 
        .catch(error => {
-        reject(error);
-       })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
     })
 }
 
@@ -55,8 +67,20 @@ export function removeFromAnalytics (id) {
         resolve(response.data.msg);
        }) 
        .catch(error => {
-        reject(error);
-       })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
     })
 }
 

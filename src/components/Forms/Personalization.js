@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Container, Button, Link, Typography, Avatar, Grow, Stack, CircularProgress, Alert, Switch, FormControl, FormControlLabel, IconButton} from "@mui/material"
+import { Box, Container, Button, Link, Typography, Avatar, Grow, Stack, CircularProgress, Alert, Switch, FormControl, FormControlLabel, IconButton, Divider} from "@mui/material"
 import QRCode from "react-qr-code";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -9,6 +9,7 @@ import { useTheme } from "../../theme/ThemeContext";
 import { usePermission } from "../../auth/Permissions";
 import { setSnackbar } from '../../reducers/user';
 import { useSubscription } from "../../auth/Subscription";
+import { LoadingButton } from "@mui/lab";
 
 export default function Personalization ({setLoading, loading}) {
 
@@ -57,7 +58,16 @@ export default function Personalization ({setLoading, loading}) {
             }
         })
         .catch(error => {
-            setError(error.response.data.msg);
+            console.log(error);
+            if (error.response) {
+                dispatch(setSnackbar({requestMessage:'Response error', requestStatus: true}) );
+            }
+            else if (error.request){
+                dispatch(setSnackbar({requestMessage:'No response from server', requestStatus: true}) );
+            }
+            else {
+                dispatch(setSnackbar({requestMessage:'Request setup error', requestStatus: true}) );
+            }
         })
         .finally(() => {
             setLoading(true);
@@ -109,10 +119,19 @@ export default function Personalization ({setLoading, loading}) {
         formData.append('profileImage', imageRef ? imageRef: null);
         axios.post('/api/internal/upload_profile_image', formData, config)
         .then(response => {
-            dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}))
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}))
+            console.log(error);
+            if (error.response) {
+                dispatch(setSnackbar({requestMessage:'Response error', requestStatus: true}) );
+            }
+            else if (error.request){
+                dispatch(setSnackbar({requestMessage:'No response from server', requestStatus: true}) );
+            }
+            else {
+                dispatch(setSnackbar({requestMessage:'Request setup error', requestStatus: true}) );
+            }
         })
         .finally(() => {
             setLoading(true);
@@ -176,7 +195,7 @@ export default function Personalization ({setLoading, loading}) {
                         <>
                             <Stack spacing={1} direction={'row'} sx={{ alignItems: 'center'}}>
                             <Avatar alt="Remy Sharp" src={profileImage} sx={{ width: 72, height: 72 }}/>
-                            <Typography variant="body2">Current</Typography>
+                            <Typography variant="body2" fontWeight={'bold'}>Current</Typography>
                             </Stack>
                             
                         </>
@@ -191,8 +210,7 @@ export default function Personalization ({setLoading, loading}) {
                     )}
                 </Stack>
                 
-                <br/>
-                <input
+                    <input
                     accept="image/*"
                     style={{ display: 'none' }}
                     id="image-input"
@@ -206,19 +224,18 @@ export default function Personalization ({setLoading, loading}) {
                     component="span"
                     sx={{ borderRadius: 15}}
                     startIcon={<UploadIcon />}
-                    disabled={(permissionLevel === 2 || permissionLevel === 3) ? true: false}
+                    disabled={!checkPermission('PERS_IMG') ? true: false}
                     >
                     Upload Image
                     </Button>
                 </label>
-                
+                <br/>
                 {image ? 
                 (
                 <>
-                <br/>
-                <Button disabled={!checkPermission('PERS_IMG') || cancelledSubscription()} size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</Button>
+                <LoadingButton fullWidth={false} loading={loading} disabled={!checkPermission('PERS_IMG') || cancelledSubscription()} size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</LoadingButton>
                 </>)
-                : null}             
+                : null}
         
             </Box>
             

@@ -51,17 +51,14 @@ const Analytics = () => {
 
     const handleEmployeeClick = (event, index) => {
         setEmployeeSelect(index);
-
         setMock({waittime: Math.random(100), serve_time: Math.random(100)})
     };
-
 
     useEffect(() => {
         getEmployeeData();
     }, [employeeId])
 
     useEffect(() => {
-        setBusinessLoader(true);
         getBusinessData();
         return () => {
             setLoadBusiness(false)
@@ -71,20 +68,18 @@ const Analytics = () => {
     const getBusinessData = () => {
         getBusinessAnalytics()
         .then(response => {
-            setBusinessData(response)
+            setBusinessData(response);
         })
         .catch(error => {
             setOpenError(true)
             setError(true);
-            setAlert({title: error.response.data.msg})
+            setAlert({title: error.msg});
         })
         .finally(() => {
             setLoading((prev) => ({...prev, business: false}))
             setBusinessLoader(false);
         })
     }
-
-
 
     const getEmployeeData = () => {
         if (employeeId === "") {
@@ -93,13 +88,12 @@ const Analytics = () => {
         setLoading(true)
         getEmployeeAnalytics(employeeId)
         .then(response => {
-            console.log(response)
             setEmployeeData(response);
         })
         .catch(error => {
             setOpenError(true)
             setError(true)
-            setAlert({title: error.response.data.msg})
+            setAlert({title: 'Error', body: error.msg, open: true});        
         })
         .finally(() => {
             setLoading(false)
@@ -130,8 +124,8 @@ const Analytics = () => {
         })
         .catch(error => {
             setOpenError(true)
-            setError(true)
-            setAlert({title: error.response.data.msg})
+            setError(true);
+            setAlert({title: 'Error', body: error.msg, open: true});
         })
         .finally(() => {
             setLoading(false)
@@ -183,14 +177,11 @@ const Analytics = () => {
 
         
         
-            <Grid container sx={{ pt: 1, width: '100%'}} 
-                direction="row"
-                
-                >
+            <Grid container sx={{ pt: 1, width: '100%'}} direction="row">
                 <Grid item lg={5} md={5} xs={12} sm={12}>
                     { /** Employee list */}
                     <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                        <Typography variant="subtitlel" fontWeight={'bold'}>Current employees</Typography>
+                        <Typography variant="h6" fontWeight={'bold'}>Current employees</Typography>
                         <List component="nav" aria-label="employeeSelect" sx={{maxHeight: 250}}>
 
                             {employeeList && employeeList.map((item, index) => {
@@ -226,60 +217,61 @@ const Analytics = () => {
                         ): 
                         <DonutGraph data={employeeData}/>
                         }
-                    { /** Serve_time, Wait_time, No_show, Party_size */}
-                        { /**  */}                
-                        <Stack sx={{pt:2, overflowX: 'auto'}} direction={'row'} spacing={1} justifyContent={'center'}>
-
-                        { employeeData &&
-                                employeeData.resources.map((item) => {
-                                    const len = employeeData.resources.length;
-                                    const randomIndex = Math.floor(Math.random() * len)
-                                    return (
-                                        <Card elevation={0} sx={{ maxWidth: 100}}>
-                                            <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                {iconsList[randomIndex]}
-                                                <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
-                                                    { findResource(item.id).title }
-                                                </Typography>
-
-                                                <Typography gutterBottom  variant="subtitle2">
-                                                { Math.floor(item.avg * 100) + "%" }
-                                                </Typography>
-                                            </CardContent>
-                                        </Card>
-                                    )
-                                })
-                            }
-                            <Divider orientation="vertical" />
+                        { /** Serve_time, Wait_time, No_show, Party_size */}
+                      
+                </Grid>                        
+                }
+                <Grid item xs={12} md={12} lg={12}>
+                    <Stack sx={{pt:2, overflowX: 'auto'}} direction={'row'} spacing={1} justifyContent={'center'}>
+                        <Divider orientation="vertical" flexItem></Divider>
                             { employeeData &&
-                                employeeData.services.map((item) => {
-                                    const len = employeeData.services.length;
-                                    const randomIndex = Math.floor(Math.random() * len)
-                                    return (
-                                        <Card elevation={0} sx={{ maxWidth: 100}}>
-                                            <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                                { iconsList[randomIndex]}
-                                                <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
-                                                    {findService(item.id).title }
-                                                </Typography>
+                                    employeeData.resources.map((item) => {
+                                        const len = employeeData.resources.length;
+                                        const randomIndex = Math.floor(Math.random() * len)
+                                        return (
+                                            <Card elevation={0} sx={{ maxWidth: 100}}>
+                                                <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                                    {iconsList[randomIndex]}
+                                                    <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
+                                                        { findResource(item.id).title }
+                                                    </Typography>
 
-                                                <Typography gutterBottom variant="subtitle2">
-                                                { Math.floor(item.avg * 100) + "%" }
-                                                </Typography>
-                                            </CardContent>
-                                        </Card>
-                                    )
-                                })
-                            }
+                                                    <Typography gutterBottom  variant="subtitle2">
+                                                    { Math.floor(item.avg * 100) + "%" }
+                                                    </Typography>
+                                                </CardContent>
+                                            </Card>
+                                        )
+                                    })
+                                }
+                                <Divider orientation="vertical" flexItem></Divider>
+                                { employeeData &&
+                                    employeeData.services.map((item) => {
+                                        const len = employeeData.services.length;
+                                        const randomIndex = Math.floor(Math.random() * len)
+                                        return (
+                                            <Card elevation={0} sx={{ maxWidth: 100}}>
+                                                <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                                    { iconsList[randomIndex]}
+                                                    <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
+                                                        {findService(item.id).title }
+                                                    </Typography>
 
+                                                    <Typography gutterBottom variant="subtitle2">
+                                                    { Math.floor(item.avg * 100) + "%" }
+                                                    </Typography>
+                                                </CardContent>
+                                            </Card>
+                                        )
+                                    })
+                                }
+                                <Divider orientation="vertical" flexItem></Divider>
 
-                            
-                        </Stack>
-
-                    {
-                        employeeData ? (
-                        <Stack sx={{pt:0}} direction={'row'} spacing={1} justifyContent={'center'}>
-                            <Card elevation={0} sx={{ maxWidth: 200}}>
+                                {
+                                    employeeData && 
+                                    (
+                                        <>
+                                        <Card elevation={0} sx={{ maxWidth: 200}}>
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                     <HourglassHigh alignmentBaseline="center" size={22} />
                                     <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
@@ -290,54 +282,55 @@ const Analytics = () => {
                                     { employeeData && Math.floor(employeeData.wait_time) + " min." }
                                     </Typography>
                                 </CardContent>
-                            </Card>
+                                </Card>
 
-                        <Card elevation={0} sx={{ maxWidth: 200}}>
+                                <Card elevation={0} sx={{ maxWidth: 200}}>
+                                        <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                            <UserSwitch size={22}  />
+
+                                            <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                                Serve-time avg
+                                            </Typography>
+
+                                            <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
+                                                { employeeData && Math.floor(employeeData.serve_time) + " min" }
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+
+                                <Card elevation={0} sx={{ maxWidth: 200}}>
+                                    <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                            <UsersThree size={22}  />
+                                            <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                            {'Party size average'}
+                                            </Typography>
+
+                                            <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
+                                                { employeeData && Math.floor(employeeData.party_size)}
+
+                                            </Typography>
+                                        </CardContent>
+                                    </Card>
+                                <Card elevation={0} sx={{ maxWidth: 200}}>
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                    <UserSwitch size={22}  />
+                                        <XCircle  size={22}  />
 
-                                    <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
-                                        Serve-time avg
-                                    </Typography>
+                                        <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                            No shows
+                                        </Typography>
 
-                                    <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
-                                        { employeeData && Math.floor(employeeData.serve_time) + " min" }
-                                    </Typography>
-                                </CardContent>
-                            </Card>
+                                        <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
+                                            { employeeData && Math.floor(employeeData.no_show)}
 
-                        <Card elevation={0} sx={{ maxWidth: 200}}>
-                            <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                    <UsersThree size={22}  />
-                                    <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
-                                        Party size avg
-                                    </Typography>
-
-                                    <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
-                                        { employeeData && Math.floor(employeeData.party_size)}
-
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                            <Card elevation={0} sx={{ maxWidth: 200}}>
-                            <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                    <XCircle  size={22}  />
-
-                                    <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
-                                        No shows
-                                    </Typography>
-
-                                    <Typography gutterBottom fontWeight={'normal'} variant="subtitle2">
-                                        { employeeData && Math.floor(employeeData.no_show)}
-
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Stack>
-                        ):null
-                    }   
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                                        </>
+                                    )
+                                }
+                        <Divider orientation="vertical" flexItem></Divider>                            
+                    </Stack>
                 </Grid>
-                }
             </Grid>
             { /** END OF EMPLOYEES Serve_time, Wait_time, No_show, Party_size */}
             <Divider />
@@ -396,19 +389,19 @@ const Analytics = () => {
 
                                     <Card elevation={0} sx={{ maxWidth: 200}}>
                                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                            <UserSwitch alignmentBaseline="center" size={22}  />
+                                            <UsersThree alignmentBaseline="center" size={22}  />
                                             <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                 {'Party size average'}
                                             </Typography>
 
                                             <Typography gutterBottom fontWeight={'normal'} variant="body2">
-                                            { Math.ceil(businessData.serve_time) + " min" }
+                                            { Math.ceil(businessData.party_size)}
                                             </Typography>
                                         </CardContent>
                                     </Card>
 
                             </Stack>) : null }
-
+                            <Divider />
                             <Typography gutterBottom variant="subtitle1">Service and resource popularity</Typography>
                             {businessData ? (
                                 <>
@@ -439,6 +432,8 @@ const Analytics = () => {
                                     })
                                 }
                                 </Stack>
+                                <Divider />
+
                                 <Stack sx={{ overflowX: 'auto', flexWrap: 'wrap'}} direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}
                                     justifyContent={'center'}>
                                 {   
@@ -467,6 +462,7 @@ const Analytics = () => {
                                 </Stack>
                                 </>
                             ): null}
+                            <Divider />
 
                             <Typography variant="subtitle1">No shows</Typography>
                             {businessData ? (
@@ -489,6 +485,7 @@ const Analytics = () => {
                             ): null}
                     </Box>
                 </Grid>
+                <Divider />
 
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     { /** Ratings */}
@@ -548,7 +545,8 @@ const Analytics = () => {
                 </Grid>
 
             </Grid>
-            
+            <Divider />
+
             { businessLoader === true  ? (
                 <Grid container sx={{pt: 2}} id="visual_bars">
                 <Grid item lg={6} md={6} xs={12} sm={12}>

@@ -5,6 +5,7 @@ import {
   Button, Checkbox, 
   Dialog, Box, IconButton, DialogTitle, DialogContent, DialogActions, Select, InputLabel, MenuItem, Stack, FormLabel, Grid, Typography, Divider
 } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
 
 import makeStyles from "@emotion/styled"
 import AddIcon from '@mui/icons-material/Add';
@@ -41,14 +42,14 @@ const useStyles = makeStyles((theme) => ({
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Title is required'),
   description: Yup.string().required('Description is required'),
-  duration: Yup.number().required('Duration is required'),
+  duration: Yup.number().required('Duration is required in minutes'),
   cost: Yup.number(),
   public: Yup.boolean(),
   active: Yup.boolean(),
   employeeTag: Yup.string()
 });
 
-const AddService = () => {
+const AddService = ({reloadParent}) => {
   const { checkPermission } = usePermission();
   const { cancelledSubscription } = useSubscription();
   const classes = useStyles();
@@ -78,12 +79,9 @@ const AddService = () => {
     .finally(() => {
       handleClose();
       setLoading(false);
+      reloadParent()
     })
   };
-
-  useEffect(() => {
-    reloadBusinessData(dispatch);
-  }, [loading])
 
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
@@ -161,7 +159,7 @@ const AddService = () => {
                 as={TextField}
                 name="duration"
                 size="small"
-                label="Duration"
+                label="Duration in (min)"
                 fullWidth={true}
                 margin="normal"
                 type="number"
@@ -223,7 +221,7 @@ const AddService = () => {
                 </Grid>
               </Grid>
             
-              <Button disabled={!checkPermission('SERV_ADD') || cancelledSubscription()} sx={{borderRadius: 10}}  fullWidth={true} variant="contained" type="submit">Submit</Button>
+              <LoadingButton loading={loading} disabled={!checkPermission('SERV_ADD') || cancelledSubscription()} sx={{borderRadius: 10}}  fullWidth={true} variant="contained" type="submit">Submit</LoadingButton>
               </Stack>
             </Form>
             )}

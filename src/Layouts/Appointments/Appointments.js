@@ -55,9 +55,8 @@ const Appointments = ({setClient, setEditClient}) => {
                 setData(response.data);
             })
             .catch(error => {
-                console.log(error);
                 setError(true);
-                setAlert({title: 'Error found', body: error.msg});
+                setAlert({title: 'Error', body: error.msg});
             })
             .finally(() => {
                 setLoading(false);
@@ -73,8 +72,7 @@ const Appointments = ({setClient, setEditClient}) => {
             })
             .catch(error => {
                 setError(true);
-                setAlert({title: 'Error found', body: error.msg});
-                console.log(error);
+                setAlert({title: 'Error', body: error.msg});
             })
             .finally(() => {
                 setLoading(false);

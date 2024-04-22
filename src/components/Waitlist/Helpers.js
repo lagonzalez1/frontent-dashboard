@@ -51,11 +51,22 @@ export const requestNoShow = (clientId) => {
       if(response.status === 200){
         resolve(response.data)
       }
-      resolve(response.data.msg);
     })
-    .error(error => {
-      reject(error.status);
-    })
+    .catch(error => {
+      console.log(error);
+      if (error.response) {
+          console.log(error.response);
+          reject({msg: 'Response error', error: error.response});
+      }
+      else if (error.request){
+          console.log(error.request);
+          reject({msg: 'No response from server', error: error.request})
+      }
+      else {
+          reject({msg: 'Request setup error', error: error.message})
+      }
+      
+      })
 
   })
 }
@@ -86,12 +97,23 @@ export const requestChangeAccept = (accepting) => {
 
     axios.put(ENDPOINT_ACCEPTING, requestBody, headers)
       .then(response => {
-        
         resolve(response.data); // Resolve the promise with the response data
       })
       .catch(error => {
-        reject(error); // Reject the promise with the error
-      });
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
   });
 };
 
@@ -148,8 +170,20 @@ export const moveClientUp = (clientId, currentClients) => {
         
       })
       .catch(error => {
-        reject(error);
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
       
     }
   });
@@ -205,8 +239,20 @@ export const moveClientDown = (clientId, currentClients) => {
         }
       })
       .catch(error => {
-        reject(error);
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
     }
 
   })
@@ -226,12 +272,22 @@ export const removeClient = (id, type) => {
         if ( response.status === 200) {
           resolve(response.data.msg);
         }
-        reject(response.data.msg)
       })
-      .catch((error) => {
-        // If there's an error, reject the promise with the error object
-        reject(error);
-      });
+      .catch(error => {
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
   });
 };
 

@@ -4,9 +4,6 @@ import { Card } from '@mui/material';
 import { getAccessToken, getStateData } from '../../auth/Auth';
 import { findEmployee, getEmployeeList } from '../../hooks/hooks';
 
-
-
-
 export const getServicesTotal  = () => {
     const { _, business} = getStateData();
     if ( !business ) { return new Error('No business data found.');}
@@ -66,8 +63,20 @@ export const updateService = (data) => {
         }
       })
       .catch(error => {
-        reject(error)
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
   })
 }
 
@@ -86,8 +95,20 @@ export const removeEmployeeTag = (data) => {
         }
       })
       .catch(error => {
-        reject(error)
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
   })
 }
 

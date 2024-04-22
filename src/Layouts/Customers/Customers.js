@@ -63,7 +63,7 @@ const Customers = () => {
       setData(response);
     })
     .catch(error => {
-      console.log(error)
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
     })
     .finally(() => {
       setLoading(false);
@@ -108,8 +108,7 @@ const Customers = () => {
       setData(response.payload);
     })
     .catch(error => {
-      console.log(error);
-      dispatch(setSnackbar({requestMessage: "Error", requestStatus: true}))
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
     })
     .finally(() => {
       setLoading(false)
@@ -144,7 +143,7 @@ const Customers = () => {
       dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
     })
     .catch(error => {
-      dispatch(setSnackbar({requestMessage: error, requestStatus: true}));
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
       setLoading(false);

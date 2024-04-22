@@ -11,6 +11,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions.js";
+import LoadingButton from '@mui/lab/LoadingButton';
 
 
 export default function Services() {
@@ -21,7 +22,7 @@ export default function Services() {
     const {active, unactive} = getServicesTotal();
     const [service, setService] = useState({});
     const [loading, setLoading] = useState(false);
-
+    const [reloadPage, setReloadPage] = useState(false);
     const serviceList = useSelector((state) => state.business.services);
     const dispatch = useDispatch();
     
@@ -31,8 +32,7 @@ export default function Services() {
         employeeId: null,
         active: null,
         public: null
-    })
-    
+    })    
     const styles = {
         container: {
           display: 'flex', // Set the container's display to flex
@@ -41,7 +41,6 @@ export default function Services() {
           justifyContent: 'flex-start', // Start the items from the left (you can adjust this to center or space-between if needed)
         }
     };
-
 
     const handleClick = (service) => {
         setDialog(true);
@@ -68,11 +67,11 @@ export default function Services() {
             handleClose();
         })
         .catch(error => {
-            dispatch(setSnackbar(error))
-            setLoading(false);
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
         })
         .finally(() =>{
-            setLoading(false)
+            setLoading(false);
+            reloadCurrentPage()
         })
 
     }
@@ -83,19 +82,30 @@ export default function Services() {
         removeEmployeeTag(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
-            handleClose();
         })
         .catch(error => {
-            dispatch(setSnackbar(error))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));        
         })
         .finally(() =>{
             setLoading(false)
+            handleClose();
+            reloadCurrentPage()
         })
     }
 
+
+    const reloadCurrentPage = () => {
+        setReloadPage(true);
+    }
+
+    
+
     useEffect(() => {  
-        reloadBusinessData(dispatch);      
-    },[loading])
+        reloadBusinessData(dispatch);     
+        return () => {
+            setReloadPage(false);
+        } 
+    },[reloadPage])
 
     return(
         <>
@@ -273,12 +283,12 @@ export default function Services() {
             )}
 
                 <DialogActions>
-                    <Button sx={{ borderRadius: 10}} disabled={!checkPermission('SERV_CHANGE')} variant="contained" onClick={() => handleUpdateService()} > Save</Button>
+                    <LoadingButton loading={loading} sx={{ borderRadius: 10}} disabled={!checkPermission('SERV_CHANGE')} variant="contained" onClick={() => handleUpdateService()} > Submit</LoadingButton>
                 </DialogActions> 
         </Dialog>
 
       
-        <AddService/>
+        <AddService reloadParent={reloadCurrentPage}/>
         </>
     )
 }

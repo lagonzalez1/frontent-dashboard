@@ -10,6 +10,8 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions.js";
+import LoadingButton from '@mui/lab/LoadingButton';
+
 
 export default function Resources() {
 
@@ -18,12 +20,12 @@ export default function Resources() {
 
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
-    const permissionLevel = useSelector((state) => state.user.permissions);
 
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const [dialog, setDialog] = useState(false);
     const [resource, setResource] = useState({});
+    const [reloadPage, setReloadPage] = useState(false);
     
     const [form, setForm] = useState({
         resourceId: null,
@@ -58,14 +60,21 @@ export default function Resources() {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            console.log("Called")
-            setLoading(false);
+            setLoading(false)
+            setReloadPage(true);
         })
       };
 
+      const reloadCurrentPage = () => {
+        setReloadPage(true);
+      }
+
       useEffect(() => {
         reloadBusinessData(dispatch);
-      }, [loading])
+        return () => {
+            setReloadPage(false);
+        }
+      }, [reloadPage])
 
     return(
         <>
@@ -223,14 +232,8 @@ export default function Resources() {
                     <Divider />
                     </>
                 )
-
                 :null}
-                    
-
-                    <Divider />
-                    
-
-                    
+                    <Divider />                    
                     <Grid container>
                             <Grid item xs={6}>
                                 <Typography variant="subtitle2" fontWeight={'bold'}>Active</Typography>
@@ -274,11 +277,11 @@ export default function Resources() {
 
 
                 <DialogActions>
-                    <Button disabled={!checkPermission('RESO_CHANGE','EMPL_ATTACH')} sx={{ borderRadius: 10}} variant="contained" onClick={() => handleUpdateResource()} > Save</Button>
+                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_CHANGE','EMPL_ATTACH')} sx={{ borderRadius: 10}} variant="contained" onClick={() => handleUpdateResource()} > Submit</LoadingButton>
                 </DialogActions> 
         </Dialog>
 
-        <AddResource />
+        <AddResource reloadParent={reloadCurrentPage} />
 
         </>
     )

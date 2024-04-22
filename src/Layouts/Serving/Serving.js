@@ -23,7 +23,7 @@ export default function Serving({setClient}) {
     const [servingList, setServingList] = useState([]);
     const [errors, setErrors] = useState({title: null, body: null});
     const [openErrors, setOpenErrors] = useState(false);
-    const reload = useSelector((state) => state.reload);
+    const [reloadPage, setReloadPage] = useState(false);
 
     const [client, setCurrentClient] = useState(null);
     const [clientNotes, setClientNotes] = useState(null);
@@ -38,7 +38,10 @@ export default function Serving({setClient}) {
     }
     useEffect(() => {
         getServingList();
-    }, [reload])
+        return () => {
+            setReloadPage(false)
+        }
+    }, [reloadPage])
 
 
     const getServingList = () => {
@@ -49,7 +52,7 @@ export default function Serving({setClient}) {
         })
         .catch(error => {
             setOpenErrors(true);
-            setErrors({title: 'error', body: 'Error found on fetching serving clients'});
+            setErrors({title: 'error', body: error.msg});
         })
         .finally(() => {
             setLoading(false);
@@ -60,6 +63,7 @@ export default function Serving({setClient}) {
         // Check if they can save to analytics.
         if (!checkSubscription('ANALYTICS')){
             checkoutClient();
+            return;
         }
         setCurrentClient(client);
         setUpdateNotesDialog(true);
@@ -86,8 +90,7 @@ export default function Serving({setClient}) {
         .finally(() => {
             closeNotesDialog();
             setLoading(false);
-            dispatch(setReload(true));
-            // setReload Dispatch
+            setReloadPage(true);
         })
     }
 

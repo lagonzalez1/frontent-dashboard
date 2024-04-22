@@ -67,8 +67,20 @@ export const updateResources = async (form) => {
       rejects(response.data.msg)
     })
     .catch(error => {
-        rejects(error.response.data);
-    })
+      console.log(error);
+      if (error.response) {
+          console.log(error.response);
+          reject({msg: 'Response error', error: error.response});
+      }
+      else if (error.request){
+          console.log(error.request);
+          reject({msg: 'No response from server', error: error.request})
+      }
+      else {
+          reject({msg: 'Request setup error', error: error.message})
+      }
+      
+  })
   })  
 }
 

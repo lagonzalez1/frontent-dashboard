@@ -39,6 +39,7 @@ const LocationForm = () => {
     setLoading(true);
     if (!checkValidString(values.locationUrl)){
       setErrors('Public link cannot include special or spaces.');
+      setLoading(false)
       return;
     }
     axios.get('/api/internal/unique_link/'+ values.locationUrl )
@@ -50,15 +51,16 @@ const LocationForm = () => {
           .then(response => {
             dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}))
           })
-          .then(error => {
-            setErrors(error);
+          .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
           })
-        }else {
-          setErrors(response.data.msg);
+        }
+        else {
+          dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}))
         }
       })
       .catch((error) => {
-          setErrors(error);
+        dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
       })
       .finally(() => {
         setLoading(false);
@@ -73,7 +75,10 @@ const LocationForm = () => {
   }
 
   const openWaitList = () => {
-    const url = `https://waitonline.us/welcome/${business.publicLink}/waitlist`
+    let url = `https://waitonline.us/welcome/${business.publicLink}/waitlist`;
+    if (process.env.NODE_ENV === "development") {
+      url = `localhost:3000/welcome/${business.publicLink}/waitlist`;
+    }
     window.open(url, '_blank');
     return;
   };
