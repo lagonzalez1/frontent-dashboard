@@ -8,9 +8,10 @@ import { validationSchemaService, validationSchemaResource, updateResource, upda
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
+import { LoadingButton } from "@mui/lab";
 
 
-export default function ResourceServiceForm () {
+export default function ResourceServiceForm ({reloadPage}) {
 
 
     const { checkPermission } = usePermission();
@@ -20,6 +21,7 @@ export default function ResourceServiceForm () {
     const [resourceId, setResourceId] = useState(null)
     const [serviceId, setServiceId] = useState(null)
     const [disable, disableDelete] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const dispatch = useDispatch();
     
@@ -57,6 +59,7 @@ export default function ResourceServiceForm () {
 
     const serviceSubmit = (value) => {
         if (value.delete === true) {
+            setLoading(true)
             console.log(serviceId);
             const payload = { ...value, serviceId }
 
@@ -65,51 +68,62 @@ export default function ResourceServiceForm () {
                 dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
             })
             .catch(error => {
-                dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+                dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
             })
             .finally(() => {
                 closeServiceDialog();
+                setLoading(false);
+                reloadPage();
             })
             return;
         }
+        setLoading(true)
         const payload = { ...value, serviceId }
         updateService(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
             closeServiceDialog();
+            setLoading(false);
+                reloadPage();
         })
 
     }
     const resourceSubmit = (value) => {
         if (value.delete === true) {
             const payload = { ...value, resourceId }
+            setLoading(true);
             requestRemoveResource(payload)
             .then(response => {
                 dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
             })
             .catch(error => {
-                dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+                dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
             })
             .finally(() => {
-                closeResourceDialog()
+                closeResourceDialog();
+                setLoading(false);
+                reloadPage();
             })
             return;
         }
         const payload = { ...value, resourceId }
+        setLoading(true);
         updateResource(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
-            closeResourceDialog()
+            closeResourceDialog();
+            setLoading(false);
+            reloadPage();
         })
     }
 
@@ -375,9 +389,9 @@ export default function ResourceServiceForm () {
                             </Stack>
                         </Box>
                         
-                    <Button disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit"  sx={{borderRadius: 10}}>
+                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit" sx={{borderRadius: 10}}>
                         confirm
-                    </Button>
+                    </LoadingButton>
                     </Stack>
                     
 

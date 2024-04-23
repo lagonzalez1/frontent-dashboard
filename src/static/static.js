@@ -19,7 +19,7 @@ export const WAITLIST_PLAN = "price_1Odn7GFBv6mpTbIZlmB4v8vZ";
 export const WAITLIST_APP_PLAN = "price_1Odn7yFBv6mpTbIZdEVpjuym";
 export const WAITLIST_APP_ANALYTICS_PLAN = "price_1Odn8NFBv6mpTbIZYxSQHjns";
 
-export const SUPPORT = "For any quiestions or concerns feel free to email/text: lag.webservices@gmail.com/909-943-8266";
+export const SUPPORT = "For any quiestions or concerns feel free to email: support@waitonline.us";
 
 
 export const CURRENT_PLANS_NUMERAL = {

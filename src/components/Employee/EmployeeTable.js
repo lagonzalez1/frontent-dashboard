@@ -16,9 +16,10 @@ import { DateTime } from "luxon";
 import { allowEmployeeEdit, findEmployee } from "../../hooks/hooks";
 import { usePermission } from "../../auth/Permissions";
 import { useSubscription } from "../../auth/Subscription";
+import { LoadingButton } from "@mui/lab";
 // Show table of employees
 // Allow to delete and add employees
-export default function EmployeeTable({setLoading, loading}) {
+export default function EmployeeTable({reloadPage}) {
 
 
     const { canEmployeeEdit, checkPermission } = usePermission();
@@ -34,6 +35,7 @@ export default function EmployeeTable({setLoading, loading}) {
     const [quickActions, setQuickActions] = useState(false);
     const [invisable, setInvisable] = useState(null);
     const [message, setMessage] = useState(null);
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
 
 
@@ -54,6 +56,7 @@ export default function EmployeeTable({setLoading, loading}) {
     }
 
     const removeEmployee = (id) => {
+        setLoading(true);
         requestRemoveEmployee(id)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
@@ -63,7 +66,8 @@ export default function EmployeeTable({setLoading, loading}) {
         })
         .finally(() => {
             cancelEmployeeDelete();
-            setLoading(true);
+            setLoading(false);
+            reloadPage();
         })
     }
     const editEmployee = (employee) => {
@@ -103,9 +107,9 @@ export default function EmployeeTable({setLoading, loading}) {
             setMessage("Please select a employee")
             return;
         }
+        setLoading(true);
         const currentDate = DateTime.local().toISO();
         const data = { status: invisable, eid: employee._id, lastUpdate: currentDate}
-
         requestBlockEmployee(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
@@ -115,7 +119,7 @@ export default function EmployeeTable({setLoading, loading}) {
         })
         .finally(() => {
             handleActionClose();
-            setLoading(true);
+            setLoading(false);
             
         })
 
@@ -338,7 +342,7 @@ export default function EmployeeTable({setLoading, loading}) {
                     </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" onClick={() => changeVisability(employee)}>Save</Button>
+                <LoadingButton loading={loading} disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" onClick={() => changeVisability(employee)}>Save</LoadingButton>
             </DialogActions>
             </Dialog>
 

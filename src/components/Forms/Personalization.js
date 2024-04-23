@@ -10,8 +10,9 @@ import { usePermission } from "../../auth/Permissions";
 import { setSnackbar } from '../../reducers/user';
 import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";
+import { Lock } from "phosphor-react";
 
-export default function Personalization ({setLoading, loading}) {
+export default function Personalization ({reloadPage}) {
 
     const { theme, updateTheme } = useTheme();
     const { checkPermission } = usePermission();
@@ -19,7 +20,6 @@ export default function Personalization ({setLoading, loading}) {
     const {cancelledSubscription } = useSubscription();
     const link = useSelector((state) => state.business.publicLink);
     const imageRef = useSelector((state) => state.business.settings.profileImage);
-    const permissionLevel = useSelector((state) => state.user.permissions);
     const dispatch = useDispatch();
 
     const [error, setError] = useState(null);
@@ -30,6 +30,7 @@ export default function Personalization ({setLoading, loading}) {
 
     const [checked, setChecked] = useState(false);
     const [publicLink, setPublicLink] = useState(null);
+    const [loading, setLoading] = useState(false)
 
 
     useEffect(() => {
@@ -117,6 +118,7 @@ export default function Personalization ({setLoading, loading}) {
         formData.append('profile_image', file, image.name);
         formData.append('b_id', business._id)
         formData.append('profileImage', imageRef ? imageRef: null);
+        setLoading(true);
         axios.post('/api/internal/upload_profile_image', formData, config)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}))
@@ -134,7 +136,8 @@ export default function Personalization ({setLoading, loading}) {
             }
         })
         .finally(() => {
-            setLoading(true);
+            setLoading(false);
+            reloadPage();
         })
         
     }
@@ -236,6 +239,17 @@ export default function Personalization ({setLoading, loading}) {
                 <LoadingButton fullWidth={false} loading={loading} disabled={!checkPermission('PERS_IMG') || cancelledSubscription()} size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</LoadingButton>
                 </>)
                 : null}
+
+                <Box sx={{pt: 2}}>
+                    <Typography variant="subtitle2" fontWeight={'bold'}>Welcome screen theme</Typography>
+                    <Stack direction={'row'}>
+                        <Typography variant="body2">
+                            coming soon 
+                        </Typography>
+                        <Lock size={20}/>
+
+                    </Stack>
+                </Box>
         
             </Box>
             

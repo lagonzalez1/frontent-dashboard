@@ -18,7 +18,7 @@ const validationSchema = Yup.object().shape({
   companyLogo: Yup.mixed(),
 });
 
-const LocationForm = () => {
+const LocationForm = ({reloadPage}) => {
 
   const { checkPermission } = usePermission();
   const { cancelledSubscription } = useSubscription();
@@ -64,6 +64,7 @@ const LocationForm = () => {
       })
       .finally(() => {
         setLoading(false);
+        reloadPage();
       })
   };
 

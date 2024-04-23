@@ -13,14 +13,23 @@ export const requestTimezoneChange = (timezone) => {
       const headers = { headers: { 'x-access-token': accessToken } };
       axios.put('/api/internal/update_timezone', {timezone, b_id: business._id}, headers)
       .then(response => {
-        if (response.status === 200){
-          resolve(response.data);
-        }
-        reject(response.data.msg);
+        resolve(response.data);
       })
       .catch(error => {
-        reject(error);
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
 
   })
 }
@@ -32,14 +41,23 @@ export const requestRemoveCloseDate = (dateId) => {
       const headers = { headers: { 'x-access-token': accessToken } };
       axios.put('/api/internal/remove_close_date', {dateId, b_id: business._id}, headers)
       .then(response => {
-        if (response.status === 200){
-          resolve(response.data);
-        }
-        reject(response.data.msg);
+        resolve(response.data);
       })
       .catch(error => {
-        reject(error);
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
 
   })
 }
@@ -53,14 +71,23 @@ export const requestScheduleChange = (payload) => {
       const schedule = {...payload}
       axios.put('/api/internal/update_schedule', {schedule, b_id: business._id}, headers)
       .then(response => {
-        if (response.status === 200){
-          resolve(response.data);
-        }
-        reject(response.data.msg);
+        resolve(response.data);
       })
       .catch(error => {
-        reject(error);
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
 
   })
 }
@@ -74,14 +101,23 @@ export const requestClosedDate = (date, employeeId, start, end) => {
       
       axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId, start, end}, headers)
       .then(response => {
-        if (response.status === 200){
-          resolve(response.data);
-        }
-        reject(response.data.msg);
+        resolve(response.data);
       })
       .catch(error => {
-        reject(error);
-      })
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
 
   })
 }
@@ -95,14 +131,10 @@ export const validateTimerange = (selectedDate, start, end, schedule) => {
   const KEY = DAYOFWEEK[selectedDayOfWeek];
   const scheduledStart = schedule[KEY].start;
   const scheduledEnd = schedule[KEY].end;
-  
   const isStartTimeConsistent = start >= scheduledStart && start <= scheduledEnd;
   const isEndTimeConsistent = end <= scheduledEnd && end >= scheduledStart;
-
   return isStartTimeConsistent && isEndTimeConsistent;
 }
-
-
 
 const initialValuesSchedule = {
   Monday: {

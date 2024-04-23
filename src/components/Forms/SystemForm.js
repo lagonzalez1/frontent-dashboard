@@ -9,8 +9,9 @@ import { setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import { LoadingButton } from '@mui/lab';
 
-export default function SystemForm({setLoading, loading}) {
+export default function SystemForm({reloadPage}) {
 
 
     const { checkPermission } = usePermission();
@@ -18,6 +19,7 @@ export default function SystemForm({setLoading, loading}) {
 
     const settings = useSelector((state) => state.business.system);
     const business = useSelector((state) => state.business);
+    const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
 
     const initialValues = {
@@ -41,15 +43,27 @@ export default function SystemForm({setLoading, loading}) {
         const accessToken = getAccessToken();
         const payload = { ...values, b_id: business._id}
         const headers = { headers: { 'x-access-token': accessToken } };
+        setLoading(true);
         axios.put('/api/internal/update_system', payload, headers)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
+            console.log(error);
+            if (error.response) {
+                dispatch(setSnackbar({msg: 'Response error', error: error.response}));
+            }
+            else if (error.request){
+                dispatch(setSnackbar({msg: 'No response from server', error: error.request}));
+            }
+            else {
+                dispatch(setSnackbar({msg: 'Request setup error', error: error.message}));
+            }
+            
         })
         .finally(() => {
-            setLoading(true);
+            setLoading(false);
+            reloadPage();
         })
 
     };
@@ -154,7 +168,7 @@ export default function SystemForm({setLoading, loading}) {
                 </Grid>
             </Grid>
             <br/>
-                <Button variant='contained' type="submit" sx={{borderRadius: 10}} disabled={!checkPermission('SYSTEM') || cancelledSubscription()}>Save</Button>
+                <LoadingButton loading={loading} variant='contained' type="submit" sx={{borderRadius: 10}} disabled={!checkPermission('SYSTEM') || cancelledSubscription()}>Save</LoadingButton>
             </Form>
         )}
         </Formik>

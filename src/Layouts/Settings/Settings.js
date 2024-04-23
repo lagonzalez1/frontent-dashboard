@@ -24,18 +24,18 @@ export default function Settings() {
     const dispatch = useDispatch();
 
 
-    const [loading, setLoading] = useState(false);
+    const [reload, setLoading] = useState(false);
+
+    const reloadPage = () => {
+        setLoading(true);
+    }
 
     useEffect(() => {
         reloadBusinessData(dispatch);
         return () => {
             setLoading(false);
         }
-    }, [loading])
-
-
-    
-
+    }, [reload])
 
     return(
         <>
@@ -62,7 +62,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <LocationForm setLoading={setLoading} loading={loading} />
+                                <LocationForm reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
@@ -80,7 +80,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <Personalization setLoading={setLoading} loading={loading} />
+                                <Personalization reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
@@ -102,7 +102,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <OpeningHoursForm setLoading={setLoading} loading={loading}/>
+                                <OpeningHoursForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
 
@@ -122,7 +122,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <SystemForm setLoading={setLoading} loading={loading} />
+                                <SystemForm reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
 
@@ -143,7 +143,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <NotificationForm setLoading={setLoading} loading={loading} />
+                                <NotificationForm reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
 
@@ -160,7 +160,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <BusinessForm setLoading={setLoading} loading={loading}/>
+                                <BusinessForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
 
@@ -186,7 +186,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <EmployeeTable setLoading={setLoading} loading={loading}/>
+                                <EmployeeTable reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
 
@@ -204,7 +204,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <ClientSignForm setLoading={setLoading} loading={loading}/>
+                                <ClientSignForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
 
@@ -221,7 +221,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <ClientForm setLoading={setLoading} loading={loading}/>
+                                <ClientForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
 
@@ -243,7 +243,7 @@ export default function Settings() {
                                 </Stack>
                             </Grid>
                             <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
-                                <ResourceServiceForm setLoading={setLoading} loading={loading}/>
+                                <ResourceServiceForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardActions, CardContent, Typography, CardActionArea, Box, Dialog, Stack, Divider, Alert, CircularProgress, AlertTitle, Zoom, Grow } from '@mui/material';
+import { Card,Button, Container, InputLabel, MenuItem, Select, TextField, CardContent, Typography, CardActionArea, Box, Dialog, Stack, Divider, Alert, CircularProgress, AlertTitle, Zoom, Grow } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import Close from '@mui/icons-material/Close';
 import NewRegister from '../Dialog/NewRegister';
 import RemovePlan from '../Dialog/RemovePlan';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
 import StartSubscription from '../Dialog/StartSubscription';
 import axios from 'axios';
@@ -15,6 +16,9 @@ import { SUPPORT } from '../../static/static';
 import TemplateDialog from '../Dialog/TemplateDialog';
 import { CloudCheck  } from "phosphor-react"; 
 import { DateTime } from 'luxon';
+import { getUserStripeInformation, manageUserSubscription, updateUserSubscription } from '../FormHelpers/PaymentFormHelper';
+import { setSnackbar } from '../../reducers/user';
+
 
 
 
@@ -22,7 +26,7 @@ const SubscriptionForm = () => {
   // Plan will end up being a stripe unid and or the price_id of current plan.
   //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
   const ref = useSelector((state) => state.business.stripe.ref);
-  
+  const dispatch = useDispatch();
 
   const [register, setRegister] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('');
@@ -53,20 +57,15 @@ const SubscriptionForm = () => {
 
 
   const retriveStripeInformation = () => {
-    // Get Stripe info if exist in Stripe collections.
-    const stripeRef = ref;
-    const headers = getHeaders();
-    axios.post('/api/internal/stripe_info_user', {ref: stripeRef}, headers)
+    let stripeRef = ref;
+    getUserStripeInformation(stripeRef)
     .then(response => {
-      if (response.data.payload) {
-        setStripe(response.data.payload);
-        setSelectedPlan(response.data.payload.price_id);
-        setStripeMessage(response.data.payload.message);
-      }
-
+      setStripe(response.payload);
+      setSelectedPlan(response.price_id);
+      setStripeMessage(response.message);
     })
     .catch(error => {
-      console.log(error)
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
     })
     .finally(() => {
       setLoading(false);
@@ -90,22 +89,23 @@ const SubscriptionForm = () => {
 
   const manageSubscription = () => {
     if (!stripe.customer_id) { return; }
-
+    setLoading(true);
     const customer_id = stripe.customer_id;
-    const header = getHeaders();
-    axios.post('/api/internal/create-portal-session', {customer_id}, header)
-    .then(res => {
-      window.location.href = res.data.link;
+    manageUserSubscription(customer_id)
+    .then(response => {
+      window.location.href = response;
     })
     .catch(error => {
-      console.log(error);
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+    })
+    .finally(() => {
+      setLoading(false);
+
     })
   }
 
 
   const updateSubscription = () => {
-    console.log(selectedPlan);
-    console.log(stripe.price_id);
     // Handle wrongfull updates.
     if (!stripe.customer_id) { return; }
     if (selectedPlan === null) {return; }
@@ -113,15 +113,12 @@ const SubscriptionForm = () => {
     setLoading(true);
     const price_id = selectedPlan;
     const subscription_id = stripe.subscription_id;
-    const header = getHeaders();
-    const timestamp = DateTime.now().plus({days: 1}).toISO();
-    axios.post('/api/internal/update-subscription', {subscription_id, price_id, timestamp}, header)
-    .then(res => {
-      console.log(res);
+    updateUserSubscription(subscription_id, price_id)
+    .then(response => {
+      dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
     })
     .catch(error => {
-      setUpdate({title: 'Error', body: error.msg, support: SUPPORT});
-      setUpdateStatus(true);
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
       setLoading(false);

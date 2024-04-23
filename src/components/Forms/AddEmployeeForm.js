@@ -10,6 +10,7 @@ import LockIcon from '@mui/icons-material/Lock';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { reloadBusinessData } from '../../hooks/hooks';
+import { LoadingButton } from '@mui/lab';
 
 
 
@@ -121,15 +122,7 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
         { permissionMessage && permissionMessage }
       </Alert>) : null }
 
-    {loading ? (
-        <Container sx={{p: 3}}>
-          <Stack direction={'column'} alignContent={'center'}>
-            <CircularProgress />
-            <Typography variant='caption' textAlign={'center'}>Saving your information...</Typography>
-            </Stack>
-        </Container>
-    ) :  
-    <Formik
+      <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
@@ -247,15 +240,14 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
             </Grid>
             <Grid item xs={12}>
               
-              <Button disabled={!checkPermission('EMPL_ADD')} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
-                Save
-              </Button>
+              <LoadingButton loading={loading} disabled={!checkPermission('EMPL_ADD')} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+                Submit
+              </LoadingButton>
             </Grid>
           </Grid>
         </Form>
       )}
     </Formik>
-    }
     </Box>
     
     )

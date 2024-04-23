@@ -7,25 +7,29 @@ import { setSnackbar } from '../../reducers/user';
 import { requestNotificationChange } from "../FormHelpers/NotificationFormHelper";
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import { LoadingButton } from '@mui/lab';
 
 
-const NotificationForm = ({setLoading, loading}) => {
+const NotificationForm = ({reloadPage}) => {
   
   const { checkPermission } = usePermission();
   const { cancelledSubscription } = useSubscription();
   const business = useSelector((state) => state.business);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   
   const handleSubmit = (values) => {    
+    setLoading(true)
     requestNotificationChange(values)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
     })
     .catch(error => {
-      dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(true);
+      setLoading(false);
+      reloadPage();
     })
   };
 
@@ -76,9 +80,9 @@ const NotificationForm = ({setLoading, loading}) => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button disabled={!checkPermission('NOTI_SETTINGS') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <LoadingButton loading={loading} disabled={!checkPermission('NOTI_SETTINGS') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
-              </Button>
+              </LoadingButton>
             </Grid>
           </Grid>
         </Form>

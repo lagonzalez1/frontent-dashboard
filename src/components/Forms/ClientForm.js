@@ -6,9 +6,10 @@ import { requestInputFieldChange, validationSchema, LABELS, TITLE } from "../For
 import { setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
 import { useSubscription } from "../../auth/Subscription";
+import { LoadingButton } from "@mui/lab";
 
 
-export default function ClientForm({setLoading, loading}) {
+export default function ClientForm({reloadPage}) {
     
 
     const { checkPermission } = usePermission();
@@ -16,6 +17,7 @@ export default function ClientForm({setLoading, loading}) {
     const settings = useSelector((state) => state.business.settings.inputFields);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
+    const [loading, setLoading ] = useState(false);
 
 
     const initialValues = {
@@ -25,6 +27,7 @@ export default function ClientForm({setLoading, loading}) {
     };
 
     const handleSubmit = (values) => {
+        setLoading(true);
         const payload = { b_id: business._id, values}
         requestInputFieldChange(payload)
         .then(response => {
@@ -34,7 +37,8 @@ export default function ClientForm({setLoading, loading}) {
             dispatch(setSnackbar({requestMessage: error, requestStatus: true}))
         })
         .finally(() => {
-            setLoading(true);
+            setLoading(false);
+            reloadPage();
         })
     };
     return(
@@ -55,7 +59,7 @@ export default function ClientForm({setLoading, loading}) {
                             ))}
                         </Grid>
                         <br/>
-                        <Button sx={{borderRadius: 10}} disabled={!checkPermission('CLIENT_FORM') || cancelledSubscription()} variant="contained" type="submit">Save</Button>
+                        <LoadingButton loading={loading} sx={{borderRadius: 10}} disabled={!checkPermission('CLIENT_FORM') || cancelledSubscription()} variant="contained" type="submit">Save</LoadingButton>
                     </Form>
                     )}
             </Formik>

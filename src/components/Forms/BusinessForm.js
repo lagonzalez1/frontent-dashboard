@@ -8,6 +8,7 @@ import { getAccessToken } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import { LoadingButton } from '@mui/lab';
 
 const validationSchema = Yup.object().shape({
   businessName: Yup.string().required(),
@@ -16,16 +17,18 @@ const validationSchema = Yup.object().shape({
   businessPhone: Yup.string()
 });
 
-const BusinessForm = ({loading, setLoading}) => {
+const BusinessForm = ({reloadPage}) => {
   
   const { checkPermission } = usePermission();
   const { cancelledSubscription } = useSubscription();
 
   
+  const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
   const dispatch = useDispatch();
   
   const handleSubmit = (values) => {
+    setLoading(true);
     const accessToken = getAccessToken();
     const headers = { headers: {'x-access-token': accessToken}}
     const payload = { ...values, b_id: business._id}
@@ -37,7 +40,8 @@ const BusinessForm = ({loading, setLoading}) => {
       dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(true);
+      setLoading(false);
+      reloadPage();
     })
   };
 
@@ -109,9 +113,9 @@ const BusinessForm = ({loading, setLoading}) => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <Button disabled={!checkPermission('BUSI_INFO') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <LoadingButton loading={loading} disabled={!checkPermission('BUSI_INFO') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                 Save
-              </Button>
+              </LoadingButton>
             </Grid>
           </Grid>
         </Form>

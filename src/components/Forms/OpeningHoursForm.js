@@ -15,18 +15,18 @@ import { setSnackbar } from '../../reducers/user';
 import { allowEmployeeEdit, findEmployee, getEmployeeList } from '../../hooks/hooks';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import { LoadingButton } from '@mui/lab';
 
 
 
-const OpeningHoursForm = ({setLoading, loading}) => {
+const OpeningHoursForm = ({reloadPage}) => {
 
   const { checkPermission, canEmployeeEdit } = usePermission();
   const { cancelledSubscription } = useSubscription();
   const business = useSelector((state) => state.business);
   const schedule = useSelector((state) => state.business.schedule);
   const closedDays = useSelector((state) => state.business.closedDates);
-  const permissionLevel = useSelector((state) => state.user.permissions);
-  const userEmail = useSelector((state) => state.user.email);
+  const [loading, setLoading] = useState(false);
 
   const [message, setMessage] = useState(null);
   const [timerange, setTimerange] = React.useState(() => [
@@ -40,10 +40,12 @@ const OpeningHoursForm = ({setLoading, loading}) => {
   const [scheduleDialog, setScheduleDialog] = useState(false);
   const [closedDialog, setClosedDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+
   const dispatch = useDispatch();
 
 
   const timzoneSubmit = (timezone) => {
+    setLoading(true);
     if(business.timezone === timezone.timezone){
       dispatch(setSnackbar({requestMessage: 'No changes made.', requestStatus: true}));
       return;
@@ -53,25 +55,28 @@ const OpeningHoursForm = ({setLoading, loading}) => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
     .catch(error => {
-      dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(true);
+      setLoading(false);
+      reloadPage()
     })
   
   };
 
   const scheduleSubmit = (schedule) => {
+    setLoading(true);
     requestScheduleChange(schedule)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
     .catch(error => {
-      dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(true);
+      setLoading(false);
       closeScheduleDialog();
+      reloadPage()
     })
 
   }
@@ -100,30 +105,34 @@ const OpeningHoursForm = ({setLoading, loading}) => {
         return;
       }
     }
+    setLoading(true);
     requestClosedDate(selectedDate.toISO(), employeeTag, start, end)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
     .catch(error => {
-      dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(true);
+      setLoading(false);
+      reloadPage()
     })
 
   }
 
   const removeClosedDate = (dateId) => {
+    setLoading(true);
     requestRemoveCloseDate(dateId)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
     .catch(error => {
       console.log("Error", error);
-      dispatch(setSnackbar({requestMessage: error.response.data.msg, requestStatus: true}));
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(true);
+      setLoading(false);
+      reloadPage()
     })
   }
 
@@ -143,10 +152,8 @@ const OpeningHoursForm = ({setLoading, loading}) => {
     setClosedDialog(false);
     setSelectedDate(null);
     setPartialDay(false);
-    setMessage(null);
-    
+    setMessage(null); 
   }
-  
 
   const TimeInput = ({ label, name }) => {
     return (
@@ -164,16 +171,13 @@ const OpeningHoursForm = ({setLoading, loading}) => {
             />
           )}
         />
-
       </>
     );
   };
 
-  
 
   const FutureDatePicker = ({ label, value, onChange }) => {
     const currentDate = DateTime.local().setZone(business.timezone);
-
     return (
       <Box>
       <DatePicker
@@ -189,10 +193,9 @@ const OpeningHoursForm = ({setLoading, loading}) => {
   };
 
 
-const initialValuesSchedule = {
-  ...schedule
-};
-
+  const initialValuesSchedule = {
+    ...schedule
+  };
 
   return (
     <>
@@ -251,16 +254,16 @@ const initialValuesSchedule = {
             </Grid>
             <Grid item xs={12}>
                 <Stack spacing={1}>
-                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} sx={{ borderRadius: 15}} onClick={() => setScheduleDialog(true)} fullWidth={false} variant="outlined" color="primary">
+                    <Button dis sx={{ borderRadius: 15}} onClick={() => setScheduleDialog(true)} fullWidth={false} variant="outlined" color="primary">
                       Set Opening Hours
                     </Button>
                     <Button sx={{ borderRadius: 15}} variant="outlined" onClick={() => setClosedDialog(true)} fullWidth={false}  color="primary">
                       Closed on Days
                     </Button>
                   
-                    <Button disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} type="submit" variant='contained' sx={{borderRadius: 10}}>
+                    <LoadingButton disabled={!checkPermission('HOUR_TZ')} loading={loading} type="submit" variant='contained' sx={{borderRadius: 10}}>
                       {'save timezone'}
-                    </Button>
+                    </LoadingButton>
 
                 </Stack>
               
@@ -275,6 +278,7 @@ const initialValuesSchedule = {
         id="scheduelDialog"
         open={scheduleDialog}
         onClose={closeScheduleDialog}
+        keepMounted={true}
       >
         <DialogTitle>
             <IconButton
@@ -297,8 +301,8 @@ const initialValuesSchedule = {
             <DialogContent>
             <Divider />
             <Box sx={{textAlign: 'left'}}>
-            <Typography variant='body2'>Any changes will reflect immediately.</Typography>
-            <Typography variant='body2'>Submit your 
+            <Typography variant='body2' gutterBottom>This timerange will be used to open and close your external waitlist request.</Typography>
+            <Typography variant='body2'><u>important</u> Submit your 
               time based on 24 hour time <strong> (Ex. 08:00~8AM, 18:00~6PM.)</strong></Typography>
             <br/>
             <Divider />
@@ -349,9 +353,9 @@ const initialValuesSchedule = {
                 </Box>
                 <DialogActions>
                   
-                  <Button disabled={!checkPermission('HOUR_OPEN_HR') || cancelledSubscription() } sx={{ borderRadius: 10}} type="submit" variant='contained' color="primary">
-                    Save
-                  </Button>
+                  <LoadingButton disabled={!checkPermission('HOUR_OPEN_HR') || cancelledSubscription() } sx={{ borderRadius: 10}} type="submit" variant='contained' color="primary">
+                    Submit
+                  </LoadingButton>
                 </DialogActions>
                 </Stack>
               </Form>
