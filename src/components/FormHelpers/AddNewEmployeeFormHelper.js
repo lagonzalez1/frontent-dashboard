@@ -20,8 +20,6 @@ export const requestEmployeeAdd = (payload) => {
         .catch(error => {
             reject(error.response.data);
         })
-
-
     })
 } 
 
@@ -38,8 +36,6 @@ export const requestEmployeeEdit = (payload) => {
         .catch(error => {
             reject(error.response.data);
         })
-
-
     })
 } 
 
@@ -62,8 +58,6 @@ export const requestRemoveEmployee = (employeeId) => {
         .catch(error => {
             reject(error.response.data);
         })
-
-
     })
 } 
 
@@ -87,8 +81,6 @@ export const requestBlockEmployee = (payload) => {
         .catch(error => {
             reject(error.response.data);
         })
-
-
     })
 } 
 

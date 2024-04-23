@@ -14,10 +14,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon'
 import { ThemeProvider } from './theme/ThemeContext';
 
-
-
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+
 root.render(
   <React.StrictMode>
     <ThemeProvider>

@@ -468,9 +468,6 @@ export default function Waiting() {
     }
 
     const LoadFooter = () => {
-
-        
-
         if (type === WAITLIST) {
             return(
                 <>

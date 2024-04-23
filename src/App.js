@@ -17,11 +17,9 @@ import WelcomeSelector from './pages/Welcome/WelcomeSelector';
 import LandingPage from './pages/Landing/LandingPage';
 import PasswordReset from './pages/PasswordReset/PasswordReset';
 
-
 import Resources from './pages/Resources/Resources';
 import Features from './pages/Features/Features';
 import Pricing from './pages/Pricing/Pricing';
-
 
 import { ThemeProvider } from '@emotion/react';
 import { DashboardThemeLight, DashboardThemeDark } from './theme/theme';
@@ -34,8 +32,6 @@ import { RequireAuth } from "react-auth-kit";
 
 // Handle dark and light theme changes.
 function App() {
-
-
   const { theme, getCurrentTheme, updateTheme } = useTheme();
 
   useEffect(() => {
@@ -74,7 +70,7 @@ function App() {
           
 
           <Route path={'/Dashboard'} element={
-              <RequireAuth loginPath={'/Login'}>
+              <RequireAuth loginPath='/Login'>
                   <ThemeProvider theme={theme && theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
                     <Dashboard/>                
                   </ThemeProvider>

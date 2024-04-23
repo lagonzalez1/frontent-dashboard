@@ -9,6 +9,7 @@ import { removeUserState } from "../../auth/Auth";
 import { DateTime } from 'luxon';
 import { useSelector } from "react-redux";
 import Login from "../../pages/Login/Login";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -16,6 +17,7 @@ export default function NavBar({ navState, openNav }) {
 
     
     const signOut = useSignOut();
+    const navigate = useNavigate();
     const business = useSelector((state) => state.business);
     
     const LiveClock = () => {
@@ -34,7 +36,6 @@ export default function NavBar({ navState, openNav }) {
         <Typography variant="h5">
           {"Welcome " + currentTime.toFormat('hh:mm a') + " "}
           <DetermineDaytimeOrEvening />
-
         </Typography>
       );
     };
@@ -42,6 +43,7 @@ export default function NavBar({ navState, openNav }) {
     const logout = () => {
       removeUserState();
       signOut();
+      navigate("/login");
     }
 
     return (

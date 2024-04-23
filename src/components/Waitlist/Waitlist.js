@@ -451,16 +451,22 @@ const Waitlist = ({setClient, setEditClient}) => {
                                         direction="row"
                                         spacing={1}
                                     >
-                                        
+                                        <Tooltip title={'serve client'} placement="left">
                                         <IconButton onClick={() => sendClientServing(item)}>
                                             <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                         </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title={'send notification'} placement="top">
                                         <IconButton onClick={() => sendClientNotification(item)}>
                                             <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                         </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title={'edit client'} placement="top">
                                         <IconButton onClick={() => editClientInfo(item)}>
                                             <EditIcon fontSize="small" />
                                         </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title={'actions'} placement="top">
                                         <IconButton
                                                 aria-label="more"
                                                 id="long-button"
@@ -470,6 +476,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                                                 >
                                             <MoreVertIcon fontSize="small"  />
                                         </IconButton>
+                                        </Tooltip>
 
                                             <Menu
                                                 id="long-menu"

@@ -26,6 +26,8 @@ const BusinessForm = ({reloadPage}) => {
   const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
   const dispatch = useDispatch();
+  const [permissionMessage, setPermissionMessage] = useState(null);
+
   
   const handleSubmit = (values) => {
     setLoading(true);

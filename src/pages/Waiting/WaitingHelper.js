@@ -3,11 +3,6 @@ export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;
 
 import { NumberOne, NumberTwo, NumberThree, NumberFour, NumberFive, NumberSix, NumberSeven, NumberEight, NumberNine } from "phosphor-react";
 
-
-
-
-
-
 export const iconsList = (position) => {
     let iconLi = [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10]
     return iconLi[position - 1];

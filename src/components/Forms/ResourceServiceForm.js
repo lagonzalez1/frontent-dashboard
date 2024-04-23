@@ -255,7 +255,6 @@ export default function ResourceServiceForm ({reloadPage}) {
                                 {
                                     disable ? (
                                     <>
-
                                     </>
                                     ):
                                         <>
@@ -282,8 +281,8 @@ export default function ResourceServiceForm ({reloadPage}) {
                             
                             </Box>
                                 
-                        <Button variant='contained' type="submit"  sx={{borderRadius: 15}}>
-                            Save
+                        <Button disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit" sx={{borderRadius: 10}}>
+                            submit
                         </Button>
                         </Stack>
                         
@@ -390,7 +389,7 @@ export default function ResourceServiceForm ({reloadPage}) {
                         </Box>
                         
                     <LoadingButton loading={loading} disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit" sx={{borderRadius: 10}}>
-                        confirm
+                        submit
                     </LoadingButton>
                     </Stack>
                     
