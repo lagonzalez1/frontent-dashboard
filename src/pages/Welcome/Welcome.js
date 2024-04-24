@@ -101,9 +101,9 @@ export default function Welcome() {
 
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
-            <Stack>
+            <Stack spacing={0.5} mb={1}>
                 { present.position === true && acceptingStatus.waitlist === true && <Typography variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2" gutterBottom>Est wait <strong>{waittimeRange}</strong></Typography>}                
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }
@@ -128,10 +128,11 @@ export default function Welcome() {
     }
 
     const CheckBusinessArguments = () => {
-        if (Object.keys(nextDate).length === 0) { 
+
+        if ( nextDate === 'No upcoming available dates in the schedule.') { 
             return <ErrorNotFound />
-        
         }
+        
         const start = DateTime.fromFormat( nextDate.start, "HH:mm").toFormat('h:mm a')
         const end = DateTime.fromFormat( nextDate.end, "HH:mm").toFormat('h:mm a');
         // Closed for both options
@@ -178,11 +179,11 @@ export default function Welcome() {
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
-            <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
+            <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 1 }}>
                 <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
                     { loading ? 
                         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
-                        <CircularProgress/>
+                        <CircularProgress size={20}/>
                         </Box> : 
                     (<>
                     {errors ? <Alert color="error">{errors}</Alert>: null}
@@ -228,7 +229,7 @@ export default function Welcome() {
                 : null}
             </DialogContent>
             <DialogActions>
-                <Button variant='contained' onClick={closeBusinessInfo}>Close</Button>
+                <Button sx={{borderRadius: 7}} variant='contained' onClick={closeBusinessInfo}>Close</Button>
             </DialogActions>
             </Dialog>
             

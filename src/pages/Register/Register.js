@@ -180,6 +180,8 @@ export default function Register(props){
                 WEEK_OBJECT[day].start = operationsObject.start;
                 WEEK_OBJECT[day].end = operationsObject.end;
             }
+            delete WEEK_OBJECT[day].status;
+            
         }
         console.log(WEEK_OBJECT);
         setUser((prev) => ({...prev, schedule: WEEK_OBJECT }));

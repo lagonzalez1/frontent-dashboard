@@ -49,6 +49,7 @@ export default function WelcomeSelector() {
     const [services, setServices] = useState(null);
     const [resources, setResouces] = useState(null);
     const [slots, setSlots] = useState(false);
+    const [disable, setDisable] = useState(false);
 
 
     const [appSlotLoader, setAppSlotLoader] = useState(false);
@@ -164,20 +165,19 @@ export default function WelcomeSelector() {
         allowClientJoin(currentTime, link)
         .then(response => {
             if (response.status === 200) {
-                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
                 if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
                     navigate(`/welcome/${link}`);
                     return;
                 }
-            }
-            setError('Error found when trying to reach business.');
-            setAcceptingStatus({waitlist: false, appointments: false});         
+                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
+            }       
         })
         .catch(error => {
             if (error.response.status === 404) {
                 navigate(`/welcome/${link}`);
                 return;
             }
+            setDisable(true);
             setError('Error found when trying to reach business.');
             setAcceptingStatus({waitlist: false, appointments: false});
             return;
@@ -194,7 +194,6 @@ export default function WelcomeSelector() {
                 navigate(`/welcome/${link}`);
                 return;
             }
-            console.log(error)
         })
         .finally(() => {
             setLoading(false);

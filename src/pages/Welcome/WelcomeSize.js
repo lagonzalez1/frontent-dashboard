@@ -124,13 +124,11 @@ export default function Welcome() {
         navigate(`/welcome/${link}`)
     }
 
-    
-
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
-            <Stack>
-                { (present.position === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>Currently <strong>{position}</strong> in line</Typography>}     
-                { (present.waittime === true && acceptingStatus.waitlist === true) && <Typography variant="body2" gutterBottom>Est wait <strong>{waittimeRange}</strong></Typography>}                
+            <Stack spacing={0.5} mb={1}>
+                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }
