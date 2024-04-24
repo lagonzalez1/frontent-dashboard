@@ -43,7 +43,7 @@ const USER = 'user';
   export const getHeaders = () => {
     if (localStorage.getItem(TOKEN_KEY)){
       const token = localStorage.getItem(TOKEN_KEY)
-      return {header: {'x-access-token': token }}
+      return {headers: {'x-access-token': token }}
     }
   }
   

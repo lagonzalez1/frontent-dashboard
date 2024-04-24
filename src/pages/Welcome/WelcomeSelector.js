@@ -169,7 +169,9 @@ export default function WelcomeSelector() {
                     navigate(`/welcome/${link}`);
                     return;
                 }
-            }           
+            }
+            setError('Error found when trying to reach business.');
+            setAcceptingStatus({waitlist: false, appointments: false});         
         })
         .catch(error => {
             if (error.response.status === 404) {
@@ -177,6 +179,8 @@ export default function WelcomeSelector() {
                 return;
             }
             setError('Error found when trying to reach business.');
+            setAcceptingStatus({waitlist: false, appointments: false});
+            return;
         })
     }
 
@@ -207,7 +211,6 @@ export default function WelcomeSelector() {
             setServices(data.services);
         })
         .catch(error => {
-            console.log(error);
             setLoading(false);
         })
         .finally(() => {
@@ -636,7 +639,7 @@ export default function WelcomeSelector() {
                                                 <MenuItem key={service._id} value={service._id} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
                                                     <Stack>
                                                         <Typography variant="body2">{service.title}</Typography>
-                                                        <Typography variant="caption">{'Duration: ' + service.duration }</Typography>
+                                                        <Typography variant="caption">{'Duration: ' + service.duration + " (min) " }</Typography>
                                                         <Typography variant="caption">{present.servicePrice ? ("Cost: " + service.cost) : null}</Typography>
                                                     </Stack>
                                         

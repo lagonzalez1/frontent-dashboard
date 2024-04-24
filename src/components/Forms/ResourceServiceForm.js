@@ -131,6 +131,7 @@ export default function ResourceServiceForm ({reloadPage}) {
         title: userSelected ? userSelected.title : '',
         duration: userSelected ? userSelected.duration: '',
         description: userSelected ? userSelected.description: '',
+        cost: userSelected ? userSelected.cost: '',
         delete: false,
     }
 
@@ -239,6 +240,15 @@ export default function ResourceServiceForm ({reloadPage}) {
                                 fullWidth
                                 error={touched.duration && !!errors.duration}
                                 helperText={touched.duration && errors.duration}
+                            />
+                            <Field
+                                name="cost"
+                                as={TextField}
+                                label="Cost (USD)"
+                                variant="outlined"
+                                fullWidth
+                                error={touched.cost && !!errors.cost}
+                                helperText={touched.cost && errors.cost}
                             />
                             <Field
                                 name="description"
