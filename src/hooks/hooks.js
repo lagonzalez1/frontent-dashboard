@@ -138,11 +138,10 @@ export const requestNoShow = (clientId, type) => {
 
   export const cleanTable = () => {
     return new Promise((resolve, reject) => {
-      const token = getAccessToken();
       const headers = getHeaders();
       const { user, business} = getStateData();
       const currentDate = DateTime.local().setZone(business.timezone).toISO();
-      axios.put(`/api/internal/clean_tables/${currentDate}/${business._id}`, headers)
+      axios.post(`/api/internal/clean_tables/${currentDate}/${business._id}`, headers)
       .then(response => {
         resolve(response)
       })
