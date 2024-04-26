@@ -136,22 +136,6 @@ export const requestNoShow = (clientId, type) => {
     })
   } 
 
-  export const cleanTable = () => {
-    return new Promise((resolve, reject) => {
-      const headers = getHeaders();
-      const { user, business} = getStateData();
-      const currentDate = DateTime.local().setZone(business.timezone).toISO();
-      axios.post(`/api/internal/clean_tables/${currentDate}/${business._id}`, headers)
-      .then(response => {
-        resolve(response)
-      })
-      .catch(error => {
-        reject(error);
-      })
-
-    })
-  }
-
   export const getWaitlistWaittime = () => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();

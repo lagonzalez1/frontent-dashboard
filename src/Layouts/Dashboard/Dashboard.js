@@ -18,7 +18,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Customers from "../Customers/Customers";
 import ErrorPage from "../Error/Error";
 import Success from "../../components/Snackbar/Success";
-import { cleanTable, reloadBusinessData } from "../../hooks/hooks";
+import { reloadBusinessData } from "../../hooks/hooks";
 import EditClient from "../../components/Dialog/EditClient";
 import Appointments from "../Appointments/Appointments";
 import { PermissionProvider } from "../../auth/Permissions";
@@ -70,7 +70,6 @@ export default function Dashboard () {
                 signOut();
                 return;
             }
-            checkPresistentTables();
         }catch(error) {
             removeUserState();
             signOut();
@@ -80,15 +79,7 @@ export default function Dashboard () {
             setAuthCompleted(true)
         }
     }
-    async function checkPresistentTables () {
-        cleanTable()
-        .then(response => {
-            console.log(response);
-        })
-        .catch(error => {
-            console.log(error);
-        })
-    }
+
     useEffect(() => { 
         console.log("Dashboard-render.");
         checkAuthStatus();
