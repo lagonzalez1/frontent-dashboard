@@ -40,17 +40,16 @@ export const requestBusinessState = () => {
 
 
 
-export const requestNoShow = (clientId) => {
+export const requestNoShow = (clientId, type) => {
   return new Promise((resolve, reject) => {
     const { user, business } = getStateData();
     const accessToken = getAccessToken();
     const headers = { headers: { 'x-access-token': accessToken } };
-    const payload = { bId: business._id, clientId}
-    axios.put('/api/internal/noShow', payload, headers)
+    const payload = { bId: business._id, clientId, type}
+    axios.post('/api/internal/noShow', payload, headers)
     .then(response => {
-      if(response.status === 200){
-        resolve(response.data)
-      }
+      resolve(response.data)
+
     })
     .catch(error => {
       console.log(error);

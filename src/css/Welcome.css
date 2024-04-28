@@ -5,55 +5,55 @@
   justify-content: center;
   align-items: center;
   align-content: center;
-  background-color: rgb(236, 236, 236);
-  height: 100vh;
-  padding-top: 0;
   margin-top: 0 !important;
 }
 
-.custom-card {
-  width: 100%;
-  max-width: 65vh;
-  text-align: center;
-  padding: 2px;
-  overflow: auto !important;
-  border-radius: 5px;
-  box-shadow: 0;
-  min-height: 40vh;
+.scroll-left {
+  overflow-x: auto !important;
 }
 
-/* Media queries for adjusting card width and height on larger screens */
-@media (min-width: 600px) {
-  .custom-card {
-    width: 62%;
-    min-height: 35vh;
+
+@media (max-height: 667px) {
+  .grid-item {
+    padding-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
   }
 }
 
-@media (min-width: 800px) {
-  .custom-card {
-    width: 50%;
-    min-height: 35vh;
+@media (min-width: 375px) {
+  .grid-item {
+    max-width: 95vw !important;
   }
 }
 
-@media (min-width: 1000px) {
-  .custom-card {
-    width: 30%;
-    min-height: 35vh;
-  }
-
-}
-
-@media (min-width: 1300px) {
-  .custom-card {
-    width: 15%;
-    min-height: 35vh;
+@media (min-width: 500px) {
+  .grid-item {
+    max-width: 75vw !important;
   }
 }
 
-@media (min-width: 1500px) {
-  .custom-card {
-    width: 300px; /* Adjust the width to 300px */
+@media (min-width: 700px) {
+  .grid-item {
+    max-width: 65vw !important;
+  }
+}
+
+
+@media (min-width: 900px) {
+  .grid-item {
+    max-width: 55vw !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid-item {
+    max-width: 50vw !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .grid-item {
+    max-width: 45vw !important;
   }
 }

@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Title is required'),
-  description: Yup.string().required('Description is required'),
+  description: Yup.string().max(110).required('Description is required'),
   duration: Yup.number().required('Duration is required in minutes'),
   cost: Yup.number(),
   public: Yup.boolean(),
@@ -189,6 +189,7 @@ const AddService = ({reloadParent}) => {
                 handleChange={handleChange}
                 fullWidth={true}
               >
+              <MenuItem key={'NONE'} value={''}>None</MenuItem>
                 {employees.map((employee) => (
                   <MenuItem key={employee._id} value={employee._id}>
                     {employee.fullname}

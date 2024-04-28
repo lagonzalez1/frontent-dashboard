@@ -48,6 +48,7 @@ const OpeningHoursForm = ({reloadPage}) => {
     setLoading(true);
     if(business.timezone === timezone.timezone){
       dispatch(setSnackbar({requestMessage: 'No changes made.', requestStatus: true}));
+      setLoading(false);
       return;
     }
     requestTimezoneChange(timezone.timezone)
@@ -293,16 +294,16 @@ const OpeningHoursForm = ({reloadPage}) => {
                     >
                     <CloseIcon />
                 </IconButton> 
-                <strong>
+                <Typography variant='h6'>
                   Hours of operation
-                </strong>
+                </Typography>
 
             </DialogTitle>
             <DialogContent>
             <Divider />
             <Box sx={{textAlign: 'left'}}>
-            <Typography variant='body2' gutterBottom>This timerange will be used to open and close your external waitlist request.</Typography>
-            <Typography variant='body2'><u>important</u> Submit your 
+            <Typography variant='body2' gutterBottom>- This timerange will be used to open and close your external waitlist request.</Typography>
+            <Typography variant='body2'>- <u>important</u> Submit your 
               time based on 24 hour time <strong> (Ex. 08:00~8AM, 18:00~6PM.)</strong></Typography>
             <br/>
             <Divider />
@@ -313,9 +314,9 @@ const OpeningHoursForm = ({reloadPage}) => {
               <Form>
                 <Stack spacing={1} columnGap={1}>
                 <Box display={'flex'}>
-                  <TimeInput label="Monday Start" name="Monday.start" />
+                  <TimeInput fullWidth label="Monday Start" name="Monday.start" />
                   <Divider orientation='vertical' flexItem>-</Divider>
-                  <TimeInput label="Monday End" name="Monday.end" />
+                  <TimeInput fullWidth label="Monday End" name="Monday.end" />
                 </Box>
                 <Box display={'flex'}>
                   <TimeInput label="Tuesday Start" name="Tuesday.start" />

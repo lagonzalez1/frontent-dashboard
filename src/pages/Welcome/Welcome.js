@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, 
-    Avatar, Divider, IconButton, List, ListItem, ListItemText, Chip, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+    Avatar, Divider, IconButton, List, ListItem, ListItemText, Chip, Dialog, DialogTitle, DialogContent, DialogActions, 
+    Grid} from "@mui/material";
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -83,7 +84,6 @@ export default function Welcome() {
                 setBusiness(argsResponse.businessDetails);
                 setLoading(false);
             }
-            
         })
         .catch(error => {
             console.log(error);
@@ -102,8 +102,8 @@ export default function Welcome() {
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
             <Stack spacing={0.5} mb={1}>
-                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
+                { present.position === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }
@@ -116,39 +116,37 @@ export default function Welcome() {
     const ErrorNotFound = () => {
         return (
             <>
-                <Typography variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
-                <Typography variant="body2" gutterBottom>Unfortunately the link you have used does not exist.</Typography> 
+                <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
+                <Typography textAlign={'center'} variant="body2" gutterBottom>Unfortunately the link you have used does not exist.</Typography> 
                 <br/>
-                <Typography variant="caption" gutterBottom>Possible issues</Typography>
+                <Typography textAlign={'center'} variant="caption" gutterBottom>Possible issues</Typography>
                 <br/>
-                <Typography variant="caption" gutterBottom>incorrect or case sensitive value after www.waitlist.com/welcome/ISSUE</Typography>
+                <Typography textAlign={'center'} variant="caption" gutterBottom>incorrect or case sensitive value after www.waitlist.com/welcome/ISSUE</Typography>
             
             </>
         )
     }
 
     const CheckBusinessArguments = () => {
-
         if ( nextDate === 'No upcoming available dates in the schedule.') { 
             return <ErrorNotFound />
         }
-        
-        const start = DateTime.fromFormat( nextDate.start, "HH:mm").toFormat('h:mm a')
-        const end = DateTime.fromFormat( nextDate.end, "HH:mm").toFormat('h:mm a');
         // Closed for both options
         if (acceptingStatus.waitlist === false && acceptingStatus.appointments === false) {
+            const start = DateTime.fromFormat( nextDate.start, "HH:mm").toFormat('h:mm a');
+            const end = DateTime.fromFormat( nextDate.end, "HH:mm").toFormat('h:mm a');
             return (
                 <>
-                    <Typography sx={{  pt: 2}} variant="h5" fontWeight='bold'>
+                    <Typography textAlign={'center'} sx={{  pt: 2}} variant="h5" fontWeight='bold'>
                             This waitlist is currently closed.
                     </Typography>
 
                     <Container sx={{ justifyContent: 'center', justifyItems: 'center', pt: 2}}>
                     <Stack spacing={0.5}>
-                        <Typography variant="subtitle1">
+                        <Typography textAlign={'center'} variant="subtitle1">
                             {"Waitlist will open again"}
                         </Typography>
-                        <Typography variant="body2" fontWeight={'bold'}>
+                        <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}>
                             <strong>{nextDate.day}</strong>
                             {" from "+  start + " - " + end }
                         </Typography>
@@ -160,13 +158,13 @@ export default function Welcome() {
         // Open for at least on option.
         return (
             <>
-            <Typography variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
-            { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
+            <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
+            { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography textAlign={'center'} variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
 
             {present ? <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/> : <CircularProgress  size={20}/> }
             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
-                <Typography variant="body2" fontWeight="bold" sx={{color: ' white', margin: 1 }}>
+                <Typography variant="body2"  fontWeight="bold" sx={{color: ' white', margin: 1 }}>
                     { acceptingStatus.waitlist && acceptingStatus.appointments ? 'Join waitlist' : 'create appointment'}
                 </Typography>
             </Button>
@@ -179,37 +177,52 @@ export default function Welcome() {
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
-            <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 1 }}>
-                <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
-                    { loading ? 
-                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
-                        <CircularProgress size={20}/>
-                        </Box> : 
-                    (<>
-                    {errors ? <Alert color="error">{errors}</Alert>: null}
-                    <CardContent sx={{ justifyContent: 'center'}}>
-                        <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
-                            {link}
-                        </Typography>
-                        {iconImageLink ? (
-                        <Avatar sx={{ width: 56, height: 56, mx: 'auto' }} src={iconImageLink} />
-                    ) : null}
-                        <CheckBusinessArguments />
-                    </CardContent>
-                    </>
-                    )}
-                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 2, pt: 7}}>
-                        <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
-                        <br/>                        
-                    </CardActions>
-                    {errors ? (null) : 
-                    <IconButton onClick={() => showBusinessInfo(true)}>
-                        <InfoOutlinedIcon fontSize="small"/>
-                    </IconButton>
-                    }
+                <Box className="center-box">
+                <Grid 
+                    container
+                    sx={{pt: 2, height: '100%', width: '100%'}}
+                    spacing={1}
+                    direction="row"
+                    justifyContent="center"
+                    alignItems="center"                      
+                >
+                    <Grid item xs={12} md={3} lg={4} xl={4}>
+                    <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 4}}>
+                            { loading ? 
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
+                                <CircularProgress size={20}/>
+                            </Box> : 
+                            (<>
+                            {errors ? <Alert color="error">{errors}</Alert>: null}
+                            <CardContent>
+                                <Typography textAlign={'center'} variant="body2" fontWeight="bold" color="gray" gutterBottom>
+                                    {link}
+                                </Typography>
+                                {iconImageLink ? (
+                                <Avatar sx={{ width: 56, height: 56, mx: 'auto' }} src={iconImageLink} />
+                            ) : null}
+                                <CheckBusinessArguments />
+                            </CardContent>
+                            </>
+                            )}
+                            <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 1, pt: 7}}>
+                                <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                                <br/>                        
+                            </CardActions>
+                            {errors ? (null) : 
+                            <Box textAlign={'center'}>
+                            <IconButton onClick={() => showBusinessInfo(true)}>
+                                <InfoOutlinedIcon fontSize="small"/>
+                            </IconButton>
+                            </Box>
+                            }
 
-                </Card>
-            </Box>
+                        </Card>
+                    </Grid>
+
+                </Grid>
+
+                </Box>
             <Dialog
                 open={businessInfo}
                 onClose={closeBusinessInfo}

@@ -30,7 +30,8 @@ export const getEmployeeTags = (employeeTags) => {
     let employees = []
     if (employeeTags.length === 0) { return [];}
     for (var id of employeeTags) {
-      const employee = findEmployee(id)
+      const employee = findEmployee(id);
+      if (employee.fullname === "NA") {continue; }
       employees.push(employee);
     }
     return employees
@@ -39,15 +40,18 @@ export const getEmployeeTags = (employeeTags) => {
 export const removeExistingEmployees = (employeeIds) => {
     let currentEmployees = getEmployeeList();
     if (employeeIds.length === 0) { return currentEmployees;}
-    let result = []
-    const filtered = currentEmployees.filter((obj) => {
-      if (Object.keys(obj).includes('_id') ) {
-        return !employeeIds.every((id) => obj['_id'].includes(id) );
-      }
-      result.push(obj);
-      return true
-    })
-    return filtered;
+    let result = [];
+    for (var id of employeeIds) {
+      for (var employee of currentEmployees) {
+        if (id === employee._id) {
+          continue;
+        }
+        result.push(employee);
+        break;
+      }  
+    }
+
+    return result;
 }
 
 export const updateService = (data) => {

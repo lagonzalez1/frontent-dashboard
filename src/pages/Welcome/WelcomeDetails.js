@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
      Stack, IconButton, TextField, InputLabel, Alert, Divider, AlertTitle, Chip, 
-     Dialog, DialogContent, DialogTitle } from "@mui/material";
+     Dialog, DialogContent, DialogTitle, 
+     Grid} from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
 import { allowClientJoin, getBuisnessForm, waitlistRequest,checkDuplicatesRequest } from "./WelcomeHelper";
@@ -199,14 +200,23 @@ export default function WelcomeDetails() {
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
-            <Box className="center-box" >
-                <Card className="custom-card" sx={{ maxWidth: '100vh', minWidth: '30%', textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
+            <Box className="center-box">
+                <Grid 
+                    container
+                    sx={{pt: 2}}
+                    spacing={1}
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"                      
+                >
+                <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
+                    <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 3}}>
                     <Container sx={{ textAlign: 'left'}}>
                         <IconButton onClick={ () => redirectBack() }>
                             <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                         </IconButton>
                     </Container>
-                    <CardContent sx={{overflowY: 'auto', maxHeight: "70vh", mt: 1}}>
+                    <CardContent sx={{textAlign: 'center'}}>
                         { errors ? <Alert color="warning">{errors}</Alert>: null} 
                     
                         <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
@@ -340,21 +350,22 @@ export default function WelcomeDetails() {
                                
                 
                     </CardContent>
-                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 4}}>
+                    <CardActions sx={{ justifyContent: 'center'}}>
 
-                        <Stack spacing={2}>
+                        <Stack alignContent={'center'} spacing={2}>
                             <Chip 
                                 sx={{ maxWidth: '80x'}} variant="outlined" size="small" clickable={true} 
                                 onClick={() => setShowDisclosure(true)} icon={<InfoOutlinedIcon fontSize="small"/>} 
                                 label={'Disclosure'}> 
                             </Chip> 
-                            <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                            <Typography textAlign={'center'} gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
 
                         </Stack>
                     </CardActions>
-                </Card>
+                    </Card>
+                </Grid>
+            </Grid>
             </Box>
-
 
             <Dialog
                 id={'disclosure'}
@@ -390,7 +401,6 @@ export default function WelcomeDetails() {
                 </DialogContent>
             </Dialog>
             </ThemeProvider>
-
         </>
     )
 }

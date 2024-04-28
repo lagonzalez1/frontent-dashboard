@@ -85,7 +85,7 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
               dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
           })
           .catch(error => {
-              dispatch(setSnackbar({requestMessage: error.response, requestStatus: true}))
+              dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
           })
           .finally(() => {
               setLoading(false);
@@ -100,7 +100,7 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
               dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
           })
           .catch(error => {
-              dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
+              dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
           })
           .finally(() => {
               setLoading(false);
@@ -198,7 +198,7 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
                   
               </Field>
 
-                <Typography variant='caption'>Select your availability.</Typography>
+                <Typography variant='body2' fontWeight={'bold'}>Select your availability.</Typography>
                 <Grid container
                     sx={{ pt: 2}}
                     direction="row"

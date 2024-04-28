@@ -3,7 +3,7 @@ import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import { IconButton, Alert, LinearProgress } from '@mui/material';
+import { IconButton, Alert, LinearProgress, Box, Typography } from '@mui/material';
 import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from 'react-redux';
 import { setSnackbar } from '../../reducers/user';
@@ -26,7 +26,7 @@ export default function Trial() {
         const term = DateTime.fromISO(termDate);
         const current = DateTime.now();
         const difference = term.diff(current, 'day').toObject();
-        setDaysLeft(Math.floor(difference.days) * 10);
+        setDaysLeft(Math.floor(difference.days));
       }
     }
 
@@ -45,7 +45,10 @@ export default function Trial() {
             severity="error"
             variant="filled">
                 {'You account is active until ' + DateTime.fromISO(termDate).toLocaleString() + "." }
-                <LinearProgress variant="determinate" value={daysLeft} />
+                <LinearProgress color="secondary" variant="determinate" value={daysLeft} />
+                <Box sx={{ minWidth: 35 }}>
+                  <Typography variant="body2" color="text.secondary">{`Days left ${daysLeft}`}</Typography>
+                </Box>
           </Alert>    
         </Snackbar>
   );

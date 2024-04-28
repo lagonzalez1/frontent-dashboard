@@ -36,6 +36,7 @@ export const addResource = (payload) => {
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       const b_id = business._id;
+      console.log(payload)
       const data = { b_id, ...payload };
       axios
         .post('/api/internal/create_resource', data, headers)

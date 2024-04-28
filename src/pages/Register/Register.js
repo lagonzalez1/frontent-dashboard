@@ -183,8 +183,8 @@ export default function Register(props){
             delete WEEK_OBJECT[day].status;
             
         }
-        console.log(WEEK_OBJECT);
-        setUser((prev) => ({...prev, schedule: WEEK_OBJECT }));
+        const clone = {... WEEK_OBJECT} // Issue solved
+        setUser((prev) => ({...prev, schedule: clone }));
     }
 
     const handleCheckedEvent = (item) => {

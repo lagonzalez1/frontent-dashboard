@@ -251,13 +251,13 @@ export default function Services() {
                                     <TableBody>
                                         {
                                         service && getEmployeeTags(service.employeeTags).map((employee, index) => {
+                                            
                                             return (
                                                 <TableRow>
-                                                    <TableCell >{++index}</TableCell>
-                                                    <TableCell >{employee.fullname}</TableCell>
+                                                    <TableCell><Typography variant="caption">{++index}</Typography></TableCell>
+                                                    <TableCell> <Typography variant="body2">{employee.fullname}</Typography> </TableCell>
                                                     <TableCell>
                                                     <Tooltip title="Remove employee from service.">
-
                                                     <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_DETACH')} onClick={() => removeEmployeeService(employee._id, service._id)} aria-label="delete">
                                                         <DeleteIcon />
                                                     </IconButton> 

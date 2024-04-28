@@ -1,6 +1,7 @@
 import React, { useEffect, useState} from 'react';
 import { TextField, Button, Grid, Stack, Select, Typography, FormControl, Container, Box, CircularProgress,
-     InputLabel, MenuItem, Alert, Collapse, IconButton, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+     InputLabel, MenuItem, Alert, Collapse, IconButton, Accordion, AccordionSummary, AccordionDetails, 
+     Divider} from '@mui/material';
 import { Formik, Form, Field, ErrorMessage, useFormik } from 'formik';
 import { validateBreak, requestScheduleChange } from "../FormHelpers/EmployeeScheduleHelper";
 import * as Yup from 'yup';
@@ -11,6 +12,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { DateTime } from 'luxon';
 import { usePermission } from '../../auth/Permissions';
 import { TimeField } from '@mui/x-date-pickers';
+import { LoadingButton } from '@mui/lab';
 
 
 
@@ -30,7 +32,6 @@ export default function EmployeeScheduleForm({employee}) {
 
     useEffect(() => {
         if (employee && Object.keys(employee).length > 0){
-            console.log(employee);
             return () => {
                 setLoading(false);
             }
@@ -87,13 +88,14 @@ export default function EmployeeScheduleForm({employee}) {
 
     // Two potential submits, EDIT and NEW
     const handleSubmit = (values) => {
-        console.log(values);
+        setLoading(true);
         const businessSchedule = business.schedule;
         const {validated, employeeSchedule} = validateBreak(values, businessSchedule);
         if (!validated) { 
             console.log("Error");
             setAlert(true);
             setErrors('Business might not be open on a break request or a start time is not within start and end time.');
+            setLoading(false);
             return;
         }
         const payload = {breaks: {...employeeSchedule},  originalUsername: employee.employeeUsername , b_id: business._id}
@@ -102,7 +104,7 @@ export default function EmployeeScheduleForm({employee}) {
             dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.response.msg, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
             setLoading(false);
@@ -124,14 +126,7 @@ export default function EmployeeScheduleForm({employee}) {
     
     return (
     <Box sx={{ pt: 2}}>
-    {loading ? (
-        <Container sx={{p: 3}}>
-          <Box>
-            <CircularProgress />
-          </Box>
-        </Container>
-    ) :  
-    <Box>
+        <Box>
         <Accordion>
                 <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -213,14 +208,12 @@ export default function EmployeeScheduleForm({employee}) {
                         </Grid>              
                     </div>
                 ))}
-                <Button sx={{ borderRadius: 10}} variant="contained" color="primary" type="submit">
-                    Save
-                </Button>
-                </form>
-            
-    </Box>
-    
-    }
+                <br />
+                <LoadingButton loading={loading} sx={{ borderRadius: 7}} variant="contained" color="primary" type="submit">
+                    submit
+                </LoadingButton>
+                </form>  
+        </Box>
     </Box>
     
     )

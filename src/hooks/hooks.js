@@ -23,6 +23,12 @@ export const reloadBusinessData = (dispatch) => {
 
 }
 
+export const getTimeZone = () => {
+    const { _, business} = getStateData();
+    if (!business) { return null; }
+    return business.timezone;
+}
+
 export const getEmployeeList = () => {
     const { _ , business} = getStateData();
     if (!business) { return new Error('business data is empty.'); }

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef} from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogActions, DialogTitle, DialogContent, Switch, Button,
 Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel, Divider, Slide, Box, CircularProgress } from '@mui/material';
 import { getResourcesTotal, StyledCardService, stringAvatar,
- findResourceTag, findServingSize, updateResources, removeResourceTag } from "./ResourcesHelper"; 
+ findResourceTag, findResourceServing, updateResources, removeResourceTag } from "./ResourcesHelper"; 
 import { findClient, reloadBusinessData } from "../../hooks/hooks";
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
@@ -76,6 +76,25 @@ export default function Resources() {
         }
       }, [reloadPage])
 
+
+    const RenderResourceInUse = ({id}) => {
+        let inUse = findResourceServing(id);
+        if (inUse.length <= 0) { return null}
+        return (
+            <Box>
+            <Typography variant="caption">In use</Typography>
+            <Divider />
+            {inUse.map((client, index) => 
+                <>
+                <Typography variant="body2" component="p">Name {client.fullname}</Typography>
+                <Typography variant="body2" component="p">Party size: {client.partySize}</Typography>
+                <Divider />
+                </>
+            )}
+            </Box>
+        )
+    }
+
     return(
         <>
         <Grid container spacing={2}>
@@ -98,7 +117,7 @@ export default function Resources() {
                         <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>
                         <CardContent>
-                            <Stack direction="row" spacing={1} sx={{ alignItems: 'center'}}>
+                            <Stack direction="row" spacing={1} sx={{ alignItems: 'center', pt: 1, pb: 1}}>
                             <Avatar {...stringAvatar(resource.title)} />
                             <Box sx={{ paddingLeft: 1, paddingRight: 1}}>    
                             <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
@@ -109,21 +128,15 @@ export default function Resources() {
                             <Typography variant="body2" component="p">
                                     <strong>Assigned: </strong> { findResourceTag(resource.employeeTag) }
                             </Typography>
-                            <Typography  variant="body2" component="p">
-                                    <strong>Serving: </strong> {findServingSize(resource._id).fullname }
-                                </Typography>
-                            <Stack direction="row" spacing={1}>
-                                
-                                <Typography  variant="body2" component="p">
-                                    <strong>Size:</strong> {findServingSize(resource._id).partySize }
-                                </Typography>
-                                <Typography variant="body2" component="p">
-                                    <strong>Max: </strong> {resource.size}
-                                </Typography>   
-                            </Stack>
-                                
+                            <Typography variant="body2" component="p">
+                                    <strong>Serving max: </strong> {resource.size}
+                            </Typography> 
+                            <Typography variant="body2" component="p">
+                                    <strong>Description: </strong> {resource.description}
+                            </Typography>     
                             </Box>
-                            </Stack>    
+                            </Stack>
+                            <RenderResourceInUse id={resource._id} />
                         </CardContent>   
                         </CardActionArea> 
                         </StyledCardService>
@@ -133,7 +146,7 @@ export default function Resources() {
         </Grid>
 
 
-        <Dialog maxWidth={'xs'} fullWidth={true}  open={dialog} onClose={handleCloseDialog}>
+        <Dialog maxWidth={'xs'} fullWidth={true} open={dialog} onClose={handleCloseDialog}>
         <DialogTitle>
             <IconButton
                     aria-label="close"
@@ -150,89 +163,11 @@ export default function Resources() {
                 Resource - <strong>
             { resource ? resource.title: null }</strong></DialogTitle>
 
-            {loading ? (
-                <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <CircularProgress />
-              </DialogContent>
-              
-            ):
             <DialogContent>
                 <Stack spacing={2}>
-                { resource.attached ? (
-                    <>
-                    <Typography variant="subtitle1" textAlign={'left'}>Current clients</Typography>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>
-                                        Name
-                                    </TableCell>
-                                    <TableCell>
-                                        Party size
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {
-                                resource.attached ? resource.attached.map((id) => {
-                                    const client = findClient(id);
-                                    return (
-                                        <TableRow>
-                                            <TableCell >{client.fullname}</TableCell>
-                                            <TableCell>{ client.partySize } </TableCell>
-                                            <TableCell>
-                                               
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                }):
-                                null 
-                                    
-                                }
-                            </TableBody>
-                        </Table>
-                        
-                    </TableContainer>   
-                    <Divider />
-                    <Typography variant="subtitle1" textAlign={'left'}>Current clients</Typography>
-                    <TableContainer component={Paper}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>
-                                        Name
-                                    </TableCell>
-                                    <TableCell>
-                                        Party size
-                                    </TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {
-                                resource.attached ? resource.attached.map((id) => {
-                                    const client = findClient(id);
-                                    return (
-                                        <TableRow>
-                                            <TableCell>{client.fullname}</TableCell>
-                                            <TableCell>{ client.partySize } </TableCell>
-                                            <TableCell>
+                
+                    <RenderResourceInUse id={resource._id} />
 
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                }):
-                                null 
-                                    
-                                }
-                            </TableBody>
-                        </Table>
-                        
-                    </TableContainer>   
-                    <Divider />
-                    </>
-                )
-                :null}
                     <Divider />                    
                     <Grid container>
                             <Grid item xs={6}>
@@ -273,7 +208,6 @@ export default function Resources() {
                 
                     </Stack>  
             </DialogContent>
-            }
 
 
                 <DialogActions>

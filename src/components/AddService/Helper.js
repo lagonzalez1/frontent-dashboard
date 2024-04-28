@@ -14,10 +14,7 @@ export const submitService = (data) => {
     const { user, business } = getStateData();
     const accessToken = getAccessToken();
     const headers = { headers: { 'x-access-token': accessToken } };
-    const payload = {
-        b_id: business._id,
-        service: {...data}
-    }
+    const payload = { b_id: business._id, ...data}
     axios.post('/api/internal/create_service', payload, headers)
     .then(response => {
       if(response.status === 200){

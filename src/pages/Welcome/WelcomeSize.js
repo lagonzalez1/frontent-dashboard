@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, ThemeProvider, paperClasses } from "@mui/material";
+    Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, ThemeProvider, paperClasses, 
+    Grid} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
@@ -12,7 +13,7 @@ import "../../css/Welcome.css";
 import { ClientWelcomeTheme } from "../../theme/theme";
 
 
-export default function Welcome() {
+export default function WelcomeSize() {
 
     const { link } = useParams();
 
@@ -127,8 +128,8 @@ export default function Welcome() {
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
             <Stack spacing={0.5} mb={1}>
-                { present.position === true && acceptingStatus.waitlist === true && <Typography variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
+                { present.position === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }
@@ -137,68 +138,77 @@ export default function Welcome() {
         <>
 
         <ThemeProvider theme={ClientWelcomeTheme}>
-            <Box className="center-box" sx={{ pt: 3 }}>
-                <Card className="custom-card"  sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
-                    <Container sx={{ textAlign: 'left'}}>
-                        <IconButton onClick={ () => redirectBack() }>
-                            <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
-                        </IconButton>
-                    </Container>
-                    <CardContent sx={{ justifyContent: 'center'}}>
-                        <Container>
+            <Box className="center-box">
+                <Grid 
+                    container
+                    sx={{pt: 2}}
+                    spacing={1}
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"                      
+                >
+                    <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
+                        <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 3}}>
+                            <Container sx={{}}>
+                                <IconButton onClick={ () => redirectBack() }>
+                                    <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
+                                </IconButton>
+                            </Container>
+                            <CardContent sx={{}}>
 
-                        <Typography variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
-                            {link}
-                        </Typography>
-                            {loading ? <CircularProgress /> : null}
-                        <Typography variant="h4" fontWeight="bold" textAlign={'center'}>
-                            Party size
-                        </Typography>
-
-                        <Stack direction='row' spacing={2} sx={{ pt: 5, p: 2}}>
-                        <ToggleButtonGroup
-                            value={size}
-                            onChange={handleChange}
-                            fullWidth
-                            exclusive
-                            >
-                            {Array(6).fill().map((_, index) => (
-                                <ToggleButton
-                                value={index+1}
-                                key={index+1}                               
-                                >
-                                    <strong>{index + 1}{index === 5 ? '+' : ''}</strong>
-                                </ToggleButton>
-                            ))}
-                            </ToggleButtonGroup>
-                            
-                        </Stack>
-
-
-                        <Box sx={{ display: 'flex', pt: 2, height: open ? 'auto' : 0  }}>
-                            <Fade in={open}>
-                                <TextField inputProps={{ max: maxSize, min: 6 }} type="number" onChange={e => setSize(e.target.value)} fullWidth={true} id="outlined-basic" label=" Party size" variant="outlined" />
-                            </Fade>
-                        </Box>
-
-                        {present ? <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/>: <CircularProgress  size={20}/>}
-                        
-                        <Container sx={{ pt: 2}}>
-                            <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
-                                <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
-                                    Next
+                                <Typography variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
+                                    {link}
                                 </Typography>
-                            </Button> 
-                        </Container>
-                        </Container>
+                                <Typography variant="h4" fontWeight="bold" textAlign={'center'}>
+                                    Party size
+                                </Typography>
+
+                                <Stack direction='row' spacing={2} sx={{ pt: 5, p: 2}}>
+                                <ToggleButtonGroup
+                                    value={size}
+                                    onChange={handleChange}
+                                    fullWidth={true}
+                                    exclusive
+                                    size="large"
+                                    >
+                                    {Array(6).fill().map((_, index) => (
+                                        <ToggleButton
+                                        value={index+1}
+                                        key={index+1}                               
+                                        >
+                                            <strong>{index + 1}{index === 5 ? '+' : ''}</strong>
+                                        </ToggleButton>
+                                    ))}
+                                    </ToggleButtonGroup>
                                     
-                    </CardContent>
+                                </Stack>
 
 
-                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
-                        <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
-                    </CardActions>
-                </Card>
+                                <Box sx={{ display: 'flex', pt: 2, height: open ? 'auto' : 0  }}>
+                                    <Fade in={open}>
+                                        <TextField inputProps={{ max: maxSize, min: 6 }} type="number" onChange={e => setSize(e.target.value)} fullWidth={true} id="outlined-basic" label=" Party size" variant="outlined" />
+                                    </Fade>
+                                </Box>
+
+                                {present ? <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/>: <Box textAlign={'center'}><CircularProgress size={20}/></Box>}
+                                
+                                <Container sx={{ pt: 2}}>
+                                    <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
+                                        <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
+                                            Next
+                                        </Typography>
+                                    </Button> 
+                                </Container>
+                                            
+                            </CardContent>
+
+
+                            <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
+                                <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                            </CardActions>
+                        </Card>
+                    </Grid>
+                </Grid>
             </Box>
         </ThemeProvider>
 

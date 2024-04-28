@@ -9,6 +9,32 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 
 export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;    
 
+export const rerquestClientContactEdit = (payload) => {
+    return new Promise((resolve, reject) => {
+        const { _ , business} = getStateData();
+        const headers = getHeaders();
+        const data = {...payload, b_id: business._id}
+        axios.post(`/api/internal/update_client_contact`, data, headers)
+        .then(response => {
+            resolve(response.data.msg);
+        })
+        .catch(error => {
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
+        })      
+    })
+}
 
 
 export const requestClientEditApp = (payload) => {
@@ -21,8 +47,20 @@ export const requestClientEditApp = (payload) => {
             resolve(response.data.msg);
         })
         .catch(error => {
-            reject(error)
-        })       
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
+        })     
     })
 }
 
@@ -36,7 +74,19 @@ export const requestClientEditWait = (payload) => {
             resolve(response.data.msg);
         })
         .catch(error => {
-            reject(error)
-        })       
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
+        })      
     })
 }

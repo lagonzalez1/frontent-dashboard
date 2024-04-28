@@ -25,16 +25,23 @@ export const getResourcesAvailable = () => {
 
 
 // This need to be updated based on the fact that multiple people can be on a resource.
-export const findServingSize = (id) => {
+export const findResourceServing = (id) => {
   const { _, business} = getStateData();
   if ( !business ) { return new Error('No business data found.');}
+  let total = []
+  const appointmentClients = business.appointments;
   const clients = business.currentClients;
   for (var client of clients){
     if (client.resourceTag === id && client.status.serving === true) {
-      return client;
+      total.push(client);
     }
   }
-  return {fullname: 'NA', partySize: 0};
+  for (var client of appointmentClients) {
+    if (client.resourceTag === id && client.status.serving === true) {
+      total.push(client);
+    }
+  }
+  return total;
 }
 
 export const findResourceTag = (id) => {

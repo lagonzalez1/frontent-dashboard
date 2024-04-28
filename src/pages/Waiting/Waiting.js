@@ -358,13 +358,13 @@ export default function Waiting() {
         if(clientStatus.noShow === true) {
             return (
                 <Stack spacing={2.5}>
-                <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <Container sx={{display: 'flex', justifyContent: 'center', justifyItems: 'center'}}>
                     <div className="circle_red">
                     <FontAwesomeIcon icon={faCircleExclamation} size="9x" color="#fc0303" />
                     </div>
                 </Container>
-                <Typography variant="h4" fontWeight="bold" > {'Please contact the business'} </Typography>
-                <Typography variant="body2"> {'Your request is dweling under no show'}</Typography>
+                <Typography textAlign={'center'} variant="h4" fontWeight="bold" > {'Please contact the business'} </Typography>
+                <Typography textAlign={'center'} variant="body2"> {'Your request is dweling under no show'}</Typography>
             </Stack>
                 
             )
@@ -374,7 +374,7 @@ export default function Waiting() {
             return (
                 <Stack direction={'column'}>
                     
-                    <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <Container sx={{display: 'flex', justifyContent: 'center',  justifyItems: 'center'}}>
                     <div className="blob_appointment">
                         <Star size={88} color="white" weight="thin" />
                     </div>
@@ -389,7 +389,7 @@ export default function Waiting() {
         if (type === APPOINTMENT) {
             return (
             <Stack spacing={2.5}>
-                <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <Container sx={{display: 'flex', justifyContent: 'center',  justifyItems: 'center'}}>
                     <div className="blob_appointment">
                         <Calendar color="white" size={70} weight="light"/>
                     </div>
@@ -406,7 +406,7 @@ export default function Waiting() {
         if (type === WAITLIST) {
             return (
             <Stack spacing={2}>
-                <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <Container sx={{display: 'flex', justifyContent: 'center',  justifyItems: 'center'}}>
                 
                 <div className="circle_green">
                     { presentArgs.position === true ? (
@@ -424,10 +424,10 @@ export default function Waiting() {
                 {
                     presentArgs.position === true ? (
                         <>
-                        <Typography variant="h4" fontWeight="bold" > {position <= 9 ? placementTitle[position].message : 'Thank you for joining!'} </Typography>
+                        <Typography textAlign={'center'} variant="h4" fontWeight="bold" > {position <= 9 ? placementTitle[position].message : 'Thank you for joining!'} </Typography>
                         <Stack>
-                            <Typography variant="body2" fontWeight={'bold'}> { position <= 9 ? `Currently ${position}` + placementTitle[position].abrv + ' in line': null } </Typography>
-                            <Typography variant="body2" fontWeight={'bold'}> { position <= 9 ? placementTitle[position].message2 : 'Please check back often for any updates'} </Typography>
+                            <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> { position <= 9 ? `Currently ${position}` + placementTitle[position].abrv + ' in line': null } </Typography>
+                            <Typography variant="body2" textAlign={'center'} fontWeight={'bold'}> { position <= 9 ? placementTitle[position].message2 : 'Please check back often for any updates'} </Typography>
                         </Stack>        
                         </>
                     ):
@@ -435,8 +435,8 @@ export default function Waiting() {
                         <>
                         <Typography variant="h4" fontWeight="bold" > {'Thank you for joining!'} </Typography>
                         <Stack>
-                            <Typography variant="body2" fontWeight={'bold'}> {'Keep an eye out for any notifications on this page'} </Typography>
-                            <Typography variant="body2" fontWeight={'bold'}> { 'Please check back often'} </Typography>
+                            <Typography variant="body2" fontWeight={'bold'} textAlign={'center'}> {'Keep an eye out for any notifications on this page'} </Typography>
+                            <Typography variant="body2" fontWeight={'bold'} textAlign={'center'}> { 'Please check back often'} </Typography>
                         </Stack>  
                         </>
                     )
@@ -537,10 +537,10 @@ export default function Waiting() {
                         <FontAwesomeIcon icon={faCircleExclamation} size="9x" color="#fc0303" />
                         </div>
                     </Container>
-                    <Typography variant="h4" fontWeight="bold"> {'Error!'} </Typography>
-                    <Typography variant="h5"> {'Your request is no longer valid for the reason listed below'}</Typography>
-                    <Typography variant="body2"> {errors}</Typography>
-                    <Typography variant="body2"> Unique identifier: {unid}</Typography>
+                    <Typography textAlign={'center'} variant="h4" fontWeight="bold"> {'Error!'} </Typography>
+                    <Typography textAlign={'center'} variant="h5"> {'Your request is no longer valid for the reason listed below'}</Typography>
+                    <Typography textAlign={'center'} variant="body2"> {errors}</Typography>
+                    <Typography textAlign={'center'} variant="body2"> Unique identifier: {unid}</Typography>
 
                 </Stack>
             )
@@ -555,9 +555,9 @@ export default function Waiting() {
                     <Star size={88} color="white" weight="thin" />
                 </div>
             </Container>
-                <Typography variant="h4" fontWeight="bold" > {'Thank you for choosing us'} </Typography>
-                <Typography variant="body2" fontWeight={'bold'}> {'Enjoyed your service ? '} </Typography>
-                <Typography variant="body2" fontWeight={'bold'}> {'Leave us a review'} </Typography>
+                <Typography textAlign={'center'} variant="h4" fontWeight="bold" > {'Thank you for choosing us'} </Typography>
+                <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> {'Enjoyed your service ? '} </Typography>
+                <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> {'Leave us a review'} </Typography>
 
             </Stack>
         )
@@ -653,8 +653,8 @@ export default function Waiting() {
                     <Check size={88} color="#40932a" weight="bold" />
                 </div>
                 </Container>
-                <Typography variant="h5" fontWeight={'bold'}>Thanks for completing our survey</Typography>
-                <Typography variant="body2" fontWeight={'bold'}>Feel free to close this page.</Typography>
+                <Typography textAlign={'center'} variant="h5" fontWeight={'bold'}>Thanks for completing our survey</Typography>
+                <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}>Feel free to close this page.</Typography>
             </Stack>
         )
     }
@@ -673,315 +673,327 @@ export default function Waiting() {
     return(
         <>
             <ThemeProvider theme={ClientWaitingTheme}>
-            <Box className="center-box" sx={{ pt: 3 }}>
-                    <Card className="custom-card" sx={{ textAlign:'center', p: 2, borderRadius: 5, boxShadow: 0 }}>
-                    
-                        <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
-                            <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
-                        </Typography>
-                        {loading ? (
-                        <Box>
-                            <Container>
-                                <CircularProgress sx={{ p: 2}} />
-                            </Container>
-                        </Box>)
-                        : 
-                        <CardContent sx={{overflowY: 'auto', maxHeight: "70vh", mt: 1}}>
-                        <Box sx={{ width: '100%' }}>
-                            <Collapse in={alert.open}>
-                                <Alert
-                                severity='warning'
-                                action={
-                                    <IconButton
-                                    aria-label="close"
-                                    color="inherit"
-                                    size="small"
-                                    onClick={() => {
-                                        setAlert({title: null, message: null, open: false, color: null});
-                                        setMessage(null);
-                                    }}
-                                    >
-                                    <CloseIcon fontSize="inherit" />
-                                    </IconButton>
-                                }
-                                sx={{ mb: 2 }}
-                                >
-                                <AlertTitle textAlign="left"><strong>{alert.title}</strong></AlertTitle>
-                                    <Typography textAlign={'left'}>{alert.message}</Typography>
-                                </Alert>
-                            </Collapse>
-                            </Box>
-                            
-                        { editClient ? 
-                        (<Box>
-                        <Grow in={editClient}>
-                            <Box>
-                            <IconButton onClick={ () => setEditClient(false) }>
-                                <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
-                            </IconButton>
 
-                            <Typography variant="h5" fontWeight="bold">
-                                Edit appointment
-                            </Typography>
-                            <Formik
-                                initialValues={initialValues}
-                                validationSchema={validationSchema}
-                                onSubmit={handleSubmit}
-                            >
-                            {({ errors, touched, handleChange, handleBlur, values, setFieldValue, isSubmitting }) => (
-                                
-                                <Form>
-                                <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
-                                    <Field
-                                    as={TextField}
-                                    id="fullname"
-                                    size="small"
-                                    name="fullname"
-                                    label="Customer name"
-                                    placeholder="Customer name"
-                                    error={touched.fullname && !!errors.fullname}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    />
-                                    <ErrorMessage name="fullname" component="div" />
-
-                                    <Field
-                                    as={TextField}
-                                    id="email"
-                                    size="small"
-                                    name="email"
-                                    disabled={true}
-                                    label="Customer email"
-                                    placeholder="Email"
-                                    error={touched.email && !!errors.email}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    />
-                                    <ErrorMessage name="email" component="div" />
-
-
-                                    <Field
-                                    as={TextField}
-                                    id="phone"
-                                    size="small"
-                                    name="phone"
-                                    disabled={true}
-                                    label="Phone"
-                                    placeholder="xxx-xxx-xxxx"
-                                    error={touched.phone && !!errors.phone}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    />
-                                    <ErrorMessage name="phone" component="div" />
-
-                                
-                                    <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Select your new date </Typography>
-                                    <Box>
-                                        <FutureDatePicker label="Appointment date" value={selectedDate} onChange={handleDateChange}  />
-                                    </Box>
-
-                                        {
-                                            employeeList && 
-                                            (
-                                            <Box>
-                                            <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
-                                                <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
-                                            </Box>
-
-                                                <Grid
-                                                    maxHeight={1}
-                                                    container 
-                                                    wrap='nowrap'
-                                                    flexDirection={'row'}
-                                                    rowSpacing={2}
-                                                    spacing={.5}
-                                                    alignItems="stretch"
-                                                
-                                                >
-                                                    {
-                                                        employeeList.map((employee) => {
-                                                            return (
-                                                                <Grid item key={employee.id}>
-                                                                    <Card className="card-style" sx={{backgroundColor: values.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee, setFieldValue)}>
-                                                                        <CardActionArea>
-                                                                            <CardContent>
-                                                                                <PersonIcon />
-                                                                                <Typography variant="caption">{employee.fullname}</Typography>
-                                                                            </CardContent>
-                                                                        </CardActionArea>
-                                                                    </Card>
-                                                                </Grid>
-                                                            
-                                                            )
-                                                        })
-                                                    }
-                                                </Grid>
-                                                </Box>
-
-                                            )
-
-                                        }
-      
-                                    
-                                    {values.employee_id ? (
+            <Box className="center-box">
+                <Grid container
+                    sx={{pt: 2}}
+                    id={'gridContainer'}
+                    spacing={1}
+                    direction={'column'}
+                    alignItems={'center'}
                                         
-                                            <Box className="scroll-left">
-                                                <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
-                                                    <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
-                                                </Box>
-                                                <Grid
-                                                    maxHeight={1}
-                                                    container 
-                                                    wrap='nowrap'
-                                                    flexDirection={'row'}
-                                                    rowSpacing={2}
-                                                    spacing={.5}
-                                                    alignItems="stretch"
-                                                >
-                                                    {
-                                                        serviceList ? 
-                                                        serviceList
-                                                        .filter((service) => service.employeeTags.includes(values.employee_id))
-                                                        .map((service) => (
-                                                            <Grid item key={service._id}>
-                                                                <Card variant="outlined" className="card-style" sx={{backgroundColor: values.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service, setFieldValue, values)}>
+                >
+                <Grid item xs={12} md={4} lg={4} xl={6}>
+                    <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 1}}>
+                    <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
+                        <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
+                    </Typography>
+                    {loading ? (
+                    <Box>
+                        <Container>
+                            <CircularProgress sx={{ p: 2}} />
+                        </Container>
+                    </Box>)
+                    : 
+                    <CardContent sx={{ mt: 0}}>
+                        <Box>
+                        <Collapse in={alert.open}>
+                            <Alert
+                            severity='warning'
+                            action={
+                                <IconButton
+                                aria-label="close"
+                                color="inherit"
+                                size="small"
+                                onClick={() => {
+                                    setAlert({title: null, message: null, open: false, color: null});
+                                    setMessage(null);
+                                }}
+                                >
+                                <CloseIcon fontSize="inherit" />
+                                </IconButton>
+                            }
+                            sx={{ mb: 2 }}
+                            >
+                                <AlertTitle textAlign="center"><strong>{alert.title}</strong></AlertTitle>
+                                <Typography textAlign={'left'}>{alert.message}</Typography>
+                            </Alert>
+                        </Collapse>
+                        </Box>
+                        
+                    { editClient ? 
+                    (<Box>
+                    <Grow in={editClient}>
+                        <Box>
+                        <IconButton onClick={ () => setEditClient(false) }>
+                            <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
+                        </IconButton>
+
+                        <Typography textAlign={'center'} variant="h5" fontWeight="bold">
+                            Edit appointment
+                        </Typography>
+                        <Formik
+                            initialValues={initialValues}
+                            validationSchema={validationSchema}
+                            onSubmit={handleSubmit}
+                        >
+                        {({ errors, touched, handleChange, handleBlur, values, setFieldValue, isSubmitting }) => (
+                            
+                            <Form>
+                            <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
+                                <Field
+                                as={TextField}
+                                id="fullname"
+                                size="small"
+                                name="fullname"
+                                label="Customer name"
+                                placeholder="Customer name"
+                                error={touched.fullname && !!errors.fullname}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                />
+                                <ErrorMessage name="fullname" component="div" />
+
+                                <Field
+                                as={TextField}
+                                id="email"
+                                size="small"
+                                name="email"
+                                disabled={true}
+                                label="Customer email"
+                                placeholder="Email"
+                                error={touched.email && !!errors.email}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                />
+                                <ErrorMessage name="email" component="div" />
+
+
+                                <Field
+                                as={TextField}
+                                id="phone"
+                                size="small"
+                                name="phone"
+                                disabled={true}
+                                label="Phone"
+                                placeholder="xxx-xxx-xxxx"
+                                error={touched.phone && !!errors.phone}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                />
+                                <ErrorMessage name="phone" component="div" />
+
+                            
+                                <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Select your new date </Typography>
+                                <Box>
+                                    <FutureDatePicker label="Appointment date" value={selectedDate} onChange={handleDateChange}  />
+                                </Box>
+
+                                    {
+                                        employeeList && 
+                                        (
+                                        <Box>
+                                        <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
+                                            <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+                                        </Box>
+
+                                            <Grid
+                                                maxHeight={1}
+                                                container 
+                                                wrap='nowrap'
+                                                flexDirection={'row'}
+                                                rowSpacing={2}
+                                                spacing={.5}
+                                                alignItems="stretch"
+                                            
+                                            >
+                                                {
+                                                    employeeList.map((employee) => {
+                                                        return (
+                                                            <Grid item key={employee.id}>
+                                                                <Card className="card-style" sx={{backgroundColor: values.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee, setFieldValue)}>
                                                                     <CardActionArea>
                                                                         <CardContent>
-
-                                                                        <Grid container alignItems="center">
-                                                                            <Grid item xs>
-                                                                                <Typography component="div" variant="subtitle2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
-                                                                            </Grid>
-                                                                            <Grid item>
-                                                                            </Grid>
-                                                                        </Grid>
-                                                                        <Typography gutterBottom color="text.secondary" variant="body2">
-                                                                            { service.description }
-                                                                        </Typography>
-                                                                        <Divider variant="middle" />                                                                    
-                                                                        <Stack sx={{m: 1}} spacing={0.5}>
-                                                                            <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
-                                                                            <Chip size="small" label={"Cost: " + service.cost} avatar={<PaidRoundedIcon fontSize="small" />} />
-                                                                        </Stack>
+                                                                            <PersonIcon />
+                                                                            <Typography variant="caption">{employee.fullname}</Typography>
                                                                         </CardContent>
                                                                     </CardActionArea>
                                                                 </Card>
                                                             </Grid>
-                                                        )):
-                                                        <Grid item>
-                                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
-                                                        </Grid>
-                                                    }
-                                                </Grid>
-                                            </Box>
-                                    ) : null}
-
-                                    
-                                    {
-                                        (appointments !== null) ? 
-                                        (
-                                            
-                                            <>
-                                            <Box sx={{ pt:0, display: appointments ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
-                                                <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
-                                            </Box>
-                                            { wait ? (<LinearProgress />) : (
-                                            <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
-                                                {
-                                                    wait ? <LinearProgress />: 
-                                                
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap'}}> 
-                                                <Stack direction={'row'} sx={{ backgroundColor: 'lightgray'}}>
-                                                
-                                                { 
-                                                Object.keys(appointments).map((key, index) => {
-                                                    const appointment = appointments[key];
-                                                    return (
-                                                        <Button 
-                                                            sx={{ margin: 1, borderRadius: 10}}
-                                                            variant={values.start === appointment.start ? "contained": "outlined"}
-                                                            onClick={() => handleAppointmentClick(appointment, setFieldValue)} 
-                                                            color={values.start === appointment.start ? 'primary': 'secondary'}
-                                                            id={`appointment${index}`}>
-                                                            <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
-                                                            
-                                                        </Button>
-                                                    )
-                                                })
+                                                        
+                                                        )
+                                                    })
                                                 }
-                                                </Stack>
-                                                </Box>
-}
-                                            </div>
-                                            )} 
+                                            </Grid>
+                                            </Box>
 
-                                            </>
                                         )
-                                        : null
+
                                     }
-                                    <Divider variant="middle" />
-                                    <Field
-                                    as={TextField}          
-                                    id="size"
-                                    name="size"
-                                    size="small"
-                                    label="Party size"
-                                    error={touched.size && !!errors.size}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    />
-                                    <ErrorMessage name="size" component="div" />
+
+                                
+                                {values.employee_id ? (
+                                    
+                                        <Box className="scroll-left">
+                                            <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
+                                                <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+                                            </Box>
+                                            <Grid
+                                                maxHeight={1}
+                                                container 
+                                                wrap='nowrap'
+                                                flexDirection={'row'}
+                                                rowSpacing={2}
+                                                spacing={.5}
+                                                alignItems="stretch"
+                                            >
+                                                {
+                                                    serviceList ? 
+                                                    serviceList
+                                                    .filter((service) => service.employeeTags.includes(values.employee_id))
+                                                    .map((service) => (
+                                                        <Grid item key={service._id}>
+                                                            <Card variant="outlined" className="card-style" sx={{backgroundColor: values.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service, setFieldValue, values)}>
+                                                                <CardActionArea>
+                                                                    <CardContent>
+
+                                                                    <Grid container alignItems="center">
+                                                                        <Grid item xs>
+                                                                            <Typography component="div" variant="subtitle2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                        </Grid>
+                                                                    </Grid>
+                                                                    <Typography gutterBottom color="text.secondary" variant="body2">
+                                                                        { service.description }
+                                                                    </Typography>
+                                                                    <Divider variant="middle" />                                                                    
+                                                                    <Stack sx={{m: 1}} spacing={0.5}>
+                                                                        <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
+                                                                        <Chip size="small" label={"Cost: " + service.cost} avatar={<PaidRoundedIcon fontSize="small" />} />
+                                                                    </Stack>
+                                                                    </CardContent>
+                                                                </CardActionArea>
+                                                            </Card>
+                                                        </Grid>
+                                                    )):
+                                                    <Grid item>
+                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                                                    </Grid>
+                                                }
+                                            </Grid>
+                                        </Box>
+                                ) : null}
+
+                                
+                                {
+                                    (appointments !== null) ? 
+                                    (
+                                        
+                                        <>
+                                        <Box sx={{ pt:0, display: appointments ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
+                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
+                                        </Box>
+                                        { wait ? (<LinearProgress />) : (
+                                        <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
+                                            {
+                                                wait ? <LinearProgress />: 
+                                            
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap'}}> 
+                                            <Stack direction={'row'} sx={{ backgroundColor: 'lightgray'}}>
+                                            
+                                            { 
+                                            Object.keys(appointments).map((key, index) => {
+                                                const appointment = appointments[key];
+                                                return (
+                                                    <Button 
+                                                        sx={{ margin: 1, borderRadius: 10}}
+                                                        variant={values.start === appointment.start ? "contained": "outlined"}
+                                                        onClick={() => handleAppointmentClick(appointment, setFieldValue)} 
+                                                        color={values.start === appointment.start ? 'primary': 'secondary'}
+                                                        id={`appointment${index}`}>
+                                                        <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
+                                                        
+                                                    </Button>
+                                                )
+                                            })
+                                            }
+                                            </Stack>
+                                            </Box>
+    }
+                                        </div>
+                                        )} 
+
+                                        </>
+                                    )
+                                    : null
+                                }
+                                <Divider variant="middle" />
+                                <Field
+                                as={TextField}          
+                                id="size"
+                                name="size"
+                                size="small"
+                                label="Party size"
+                                error={touched.size && !!errors.size}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                />
+                                <ErrorMessage name="size" component="div" />
 
 
-                                    <Field
-                                    as={TextField}
-                                    id="notes"
-                                    name="notes"
-                                    size="small"
-                                    label="Notes"
-                                    placeholder="Additional notes"
-                                    error={touched.notes && !!errors.notes}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    />
-                                    <ErrorMessage name="notes" component="div" />
+                                <Field
+                                as={TextField}
+                                id="notes"
+                                name="notes"
+                                size="small"
+                                label="Notes"
+                                placeholder="Additional notes"
+                                error={touched.notes && !!errors.notes}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                />
+                                <ErrorMessage name="notes" component="div" />
 
-                                    <Button disabled={isSubmitting} type="submit" sx={{ borderRadius: 10}} variant="contained">Submit</Button>
+                                <Button disabled={isSubmitting} type="submit" sx={{ borderRadius: 10}} variant="contained">Submit</Button>
 
-                                </Stack>
-                                </Form>
-                            )}
-                            </Formik>
-                            </Box>
-                        </Grow> 
-                        </Box>)
-                        :(   
-                        <Stack sx={{ pt: 2}} spacing={3}>
-
-
-                            {errors && <LoadErrorHeader />}
-
-                            {review ? <ReviewHeader /> : null }
-                            {(review === false && completed === true) && <CompleteCycle /> }
-
-
-                            {user && <LoadHeader presentArgs={presentArgs} /> }
-
-                            <Divider />
-                            {review ? <ReviewBody  /> : null }
-
-                            {user && <LoadFooter />}
-                            
-                            <Divider />
-                        </Stack>
+                            </Stack>
+                            </Form>
                         )}
+                        </Formik>
+                        </Box>
+                    </Grow> 
+                    </Box>)
+                    :(   
+                    <Stack sx={{ pt: 2}} spacing={3}>
+
+
+                        {errors && <LoadErrorHeader />}
+
+                        {review ? <ReviewHeader /> : null }
+                        {(review === false && completed === true) && <CompleteCycle /> }
+
+
+                        {user && <LoadHeader presentArgs={presentArgs} /> }
+
+                        <Divider />
+                        {review ? <ReviewBody  /> : null }
+
+                        {user && <LoadFooter />}
                         
-                        </CardContent>
-                        }
-                        <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 2}}>
-                            <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
-                        </CardActions>
+                        <Divider />
+                    </Stack>
+                    )}
+                    
+                    </CardContent>
+                    }
+                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 2}}>
+                        <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                    </CardActions>
                     </Card>
+                </Grid>
+
+                </Grid>
             </Box>
 
             <Dialog

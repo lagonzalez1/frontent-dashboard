@@ -270,15 +270,21 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Stack direction={'row'} spacing={1}>
+                                                        <Tooltip title={'Serve client'} placement="left">
                                                         <IconButton onClick={() => sendClientServing(client._id)}>
                                                             <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                                         </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title={'Send notification'} placement="top">
                                                         <IconButton onClick={() => sendClientNotification(client._id)}>
                                                             <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
                                                         </IconButton>
+                                                        </Tooltip>
+                                                        <Tooltip title={'Edit client'} placement="right">
                                                         <IconButton disabled={!edit} onClick={() => editClientInfo(client)}>
                                                             <EditIcon fontSize="small" />
                                                         </IconButton>
+                                                        </Tooltip>
                                                     </Stack>
                                                 </TableCell>
                                             </TableRow>

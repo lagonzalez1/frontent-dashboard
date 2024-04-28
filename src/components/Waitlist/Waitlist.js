@@ -159,9 +159,9 @@ const Waitlist = ({setClient, setEditClient}) => {
             case OPTIONS_SELECT.NO_SHOW:
                 setLoading(true);
                 // This is the wrong noshow.
-                requestNoShow(clientId)
+                requestNoShow(clientId, WAITLIST)
                 .then(response => {
-                    dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+                    dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
                 })  
                 .catch(error => {
                     dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))

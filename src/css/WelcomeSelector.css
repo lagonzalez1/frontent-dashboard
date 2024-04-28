@@ -1,13 +1,13 @@
 
 
 
-/* YourComponent.css */
-.center-box {
+  .center-box {
     display: flex;
     justify-content: center;
     align-items: center;
-    align-content: baseline;
-    flex-direction: column;
+    align-content: center;
+    padding-top: 0;
+    margin-top: 0 !important;
   }
   
   .custom-card {
@@ -19,11 +19,6 @@
     border-radius: 5;
     box-shadow: 0;
   }
-
-  #intervalSelect {
-    width: 100%;
-  }
-
   .card-style {
     border-radius: 5;
     border-color: lightgray;
@@ -35,57 +30,4 @@
   }
 
 
-
-  @media (min-width: 300px) {
-    .center-box {
-      margin-top: 10px;
-      width: 100%; /* Adjust the width for larger screens */
-    }
-  }
-
-  @media (min-width: 300px) {
-    .custom-card {
-      margin-top: 20px;
-      width: 100%; /* Adjust the width for larger screens */
-
-    }
-  }
-  
-  /* Media query for larger screens */
-  @media (min-width: 600px) {
-    .custom-card {
-      width: 62%; /* Adjust the width for larger screens */
-      min-height: 35vh; /* Adjust the height for larger screens */
-    }
-  }
-
-  @media (min-width: 800px) {
-    .custom-card {
-      width: 50%; /* Adjust the width for larger screens */
-      min-height: 35vh; /* Adjust the height for larger screens */
-    }
-  }
-
-
-  @media (min-width: 1000px) {
-    .custom-card {
-      width: 30%; /* Adjust the width for larger screens */
-      min-height: 35vh; /* Adjust the height for larger screens */
-    }
-  }
-
-  @media (min-width: 1300px) {
-    .custom-card {
-      width: 15%; /* Adjust the width for larger screens */
-      min-height: 35vh; /* Adjust the height for larger screens */
-    }
-  }
-
-  @media (min-width: 1500px) {
-    .custom-card {
-      width: 15%; /* Adjust the width for larger screens */
-      max-width: 200px;
-      min-height: 35vh; /* Adjust the height for larger screens */
-    }
-  }
   

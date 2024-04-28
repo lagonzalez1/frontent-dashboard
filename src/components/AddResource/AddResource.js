@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Fab, Dialog, TextField, Button, Grid,FormHelperText,DialogContent, DialogActions, DialogTitle, Box, InputLabel, Select, MenuItem, IconButton, Stack, Divider, Typography, Checkbox, FormLabel   } from '@mui/material';
-import { Formik, Field, Form, ErrorMessage } from 'formik';
-import AddIcon from "@mui/icons-material/Add";
+import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import AddIcon from "@mui/icons-material/Add";
 import { useDispatch, useSelector } from 'react-redux';
 import { addResource, Transition } from "./Helper";
 import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks";
@@ -13,23 +13,15 @@ import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import LoadingButton from '@mui/lab/LoadingButton';
 
-const validationSchema = Yup.object({
-  title: Yup.string().required('Title is required'),
+const validationSchema = Yup.object().shape({
+  title: Yup.string().required('Title is required').max(20),
   service_id: Yup.string(),
-  description: Yup.string(),
-  serveSize: Yup.number().required('Serve size is required'),
+  description: Yup.string().max(110).required(),
+  serveSize: Yup.number().required('Serve size is required').min(0).max(50),
   active: Yup.boolean(),
   publicValue:  Yup.boolean(),
 });
 
-const initialValues = {
-  title: '',
-  service_id: '',
-  description: '',
-  serveSize: 1,
-  active: false,
-  publicValue: false
-};
 
 export default function AddResource({reloadParent}) {
   const { checkPermission } = usePermission();
@@ -50,23 +42,31 @@ export default function AddResource({reloadParent}) {
   };
 
   const handleSubmit = (values) => {
-    setLoading(true);
-    addResource(values)
-    .then(data => {
-      dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
-      handleClose();
-    })
-    .catch(error => {
-      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
-    })
-    .finally(() => {
-      setLoading(false);
-      handleClose();
-      reloadParent(); // Reload parent page
-    })
+    try {
+      console.log(values)
+      setLoading(true);
+      addResource(values)
+      .then(data => {
+        dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
+        handleClose();
+      })
+      .catch(error => {
+        dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
+      })
+      .finally(() => {
+        setLoading(false);
+        handleClose();
+        reloadParent(); // Reload parent page
+      })
+    }
+    catch(error) {
+      console.log(error);
+    }
     
   };
 
+
+  
   const TextFieldEdit = () => { return <TextField multiline={true} rows={3} label="Description" />}
 
   return (
@@ -94,12 +94,19 @@ export default function AddResource({reloadParent}) {
         <Divider />
         <DialogContent>
           <Formik
-            initialValues={initialValues}
+            initialValues={{
+              title: '',
+              service_id: '',
+              description: '',
+              serveSize: 1,
+              active: false,
+              publicValue: false
+            }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ errors, touched, handleBlur, handleChange }) => (
-              <Form>
+            {({errors, touched, handleBlur, handleChange, handleSubmit }) => (
+              <Form onSubmit={handleSubmit}>
                 <Stack spacing={1.5}>
                     <Field
                       name="title"
@@ -118,12 +125,14 @@ export default function AddResource({reloadParent}) {
                           as={Select}
                           id="services"
                           name="service_id"
+                          label="services"
                           size="small"
                           fullWidth={true}
                           error={touched.service_id && !!errors.service_id}
                           onChange={handleChange}
                           onBlur={handleBlur}
                           >
+                          <MenuItem key={'NONE'} value={''}>None</MenuItem>
                           {Array.isArray(serviceList) ? serviceList.map((service) => (
                               <MenuItem key={service._id} value={service._id}>
                               {service.title}
@@ -135,7 +144,10 @@ export default function AddResource({reloadParent}) {
                 
                     <Field
                       name="description"
-                      as={TextFieldEdit}
+                      label="Description"
+                      as={TextField}
+                      multiline={true}
+                      rows={3}
                       fullWidth={true}
                       size="small"  
                       onChange={handleChange}
@@ -159,7 +171,6 @@ export default function AddResource({reloadParent}) {
                     <Field
                       id="active"
                       name="active"
-                      
                       type="checkbox"
                       as={Checkbox}
                       fullWidth={true}
@@ -182,7 +193,7 @@ export default function AddResource({reloadParent}) {
                     /> 
                     </Grid>
                     </Grid>
-                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_ADD') || cancelledSubscription() } sx={{ borderRadius: 10}}  variant="contained" type="submit">submit</LoadingButton>
+                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_ADD') || cancelledSubscription() } sx={{ borderRadius: 10}} variant="contained" type="submit">submit</LoadingButton>
 
                   </Stack>
                 <DialogActions>

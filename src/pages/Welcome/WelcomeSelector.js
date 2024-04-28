@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
-    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert, Chip, Divider, AlertTitle, Tooltip } from "@mui/material";
+    Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert, Chip, Divider, AlertTitle, Tooltip, 
+    useMediaQuery} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { requestBusinessArguments, getExtras, getEmployeeList,getAvailableAppointments, allowClientJoin  } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
-import "../../css/WelcomeSelector.css";
+import "../../css/Welcome.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CloseIcon from '@mui/icons-material/Close';
@@ -15,7 +16,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
 import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
-import { ThemeProvider } from "@emotion/react";
+import { ThemeProvider, useTheme } from "@emotion/react";
 import { ClientWelcomeTheme } from "../../theme/theme";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 
@@ -35,7 +36,11 @@ export default function WelcomeSelector() {
     const [openSummary, setOpenSummary] = useState(false);
     const [openWaitlistSummary, setOpenWaitlistSummary] = useState(false);
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
-    
+
+    const errorRef = useRef();
+    const employeesRef = useRef();
+    const servicesRef = useRef();
+    const availabiltyRef = useRef();
 
     const [alertAppointments, setAlertAppointment] = useState(false);
     const [errorMessage, setErrorMessage] = useState({title: '', body: ''});
@@ -91,11 +96,13 @@ export default function WelcomeSelector() {
     const setDataAndContinue = () => {
         if (systemTypeSelected === APPOINTMENT){
             if (appointmentData.date === null || appointmentData.start === null || appointmentData.end === null || appointmentData.employee_id === null){
+                handleErrorRefChange(); // Trigger ref to show error message.
                 setError('Please select a date, employee and service.');
                 return;
             }
             const payload = sessionStorage.getItem(CLIENT);
             if (payload === null) { 
+                handleErrorRefChange(); // Trigger ref to show error message.
                 setError('Unable to find previous values.');
                 return;
             }
@@ -114,6 +121,7 @@ export default function WelcomeSelector() {
         if (systemTypeSelected === WAITLIST){
             const payload = sessionStorage.getItem(CLIENT);
             if (payload === null) { 
+                handleErrorRefChange(); // Trigger ref to show error message.
                 setError('Unable to find previous values.');
                 return;
             }
@@ -127,6 +135,7 @@ export default function WelcomeSelector() {
             navigate(`/welcome/${link}/details`);
             return;
         }
+        handleErrorRefChange(); // Trigger ref to show error message.
         setError('Please select from the options available.');
         return;
     }
@@ -178,8 +187,8 @@ export default function WelcomeSelector() {
                 return;
             }
             setDisable(true);
+            handleErrorRefChange(); // Trigger ref to show error message.
             setError('Error found when trying to reach business.');
-            setAcceptingStatus({waitlist: false, appointments: false});
             return;
         })
     }
@@ -243,6 +252,22 @@ export default function WelcomeSelector() {
         navigate(`/welcome/${link}/size`)
     }
 
+    const handleEmployeeRefChange = () => { 
+        if (employeesRef.current){ employeesRef.current.scrollIntoView({behavior: 'smooth'}) }
+    }
+
+    const handleServiceRefChange = () => { 
+        if (servicesRef.current){ servicesRef.current.scrollIntoView({behavior: 'smooth'}) }
+    }
+
+    const handleAvailabilityRefChange = () => { 
+        if (availabiltyRef.current){ availabiltyRef.current.scrollIntoView({behavior: 'smooth'}) }
+    }
+
+    const handleErrorRefChange = () => {
+        if (errorRef.current) { errorRef.current.scrollIntoView({behavior: 'smooth'})}
+    }
+
     /**
      * 
      * @param {ISO} date
@@ -257,6 +282,8 @@ export default function WelcomeSelector() {
         setOpenServices(false);
         setAppointmentData((prev) => ({...prev, date: date, start: null, end: null}));
         getAvailableEmployees(date);
+        handleEmployeeRefChange(); // Trigger focus on employee section
+        
     }
         /**
      * 
@@ -268,7 +295,7 @@ export default function WelcomeSelector() {
         setOpenAvailability(true);
         setAppointmentData((prev) => ({...prev, service_id: service._id, serviceName: service.title})); // Assume this will not fail, might be q issue later. 
         searchAppointments(service._id);
-        // Call function with (link, employee_id, service_id) -> Durations.
+        handleAvailabilityRefChange() // Trigger focus on intervals.
     }
     /**
      * 
@@ -281,13 +308,15 @@ export default function WelcomeSelector() {
         setOpenSummary(false);
         setOpenServices(true);
         setAppointmentData((prev) => ({...prev, employee_id: employee.id, fullname: employee.fullname}));
+        handleServiceRefChange(); // Trigger on service section
 
     }
 
     const searchAppointments = (id) => {
         setAlertAppointment(false);
         if (appointmentData.date === null || appointmentData.employee_id === null){ 
-            setError("Missing values");
+            handleErrorRefChange(); // Trigger ref to show error message.
+            setError("Please check if date, employee or resource is cheked.");
             return;
         }
         const currentDate = DateTime.now().toISO();
@@ -304,6 +333,7 @@ export default function WelcomeSelector() {
             setSlots(response.data);
         })
         .catch(error => {
+            handleErrorRefChange(); // Trigger ref to show error message.
             setError(error);
             console.log(error)
         })
@@ -320,6 +350,7 @@ export default function WelcomeSelector() {
             
         })
         .catch(error => {
+            handleErrorRefChange(); // Trigger ref to show error message.
             setError(error);
         })  
         .finally(() => {
@@ -331,27 +362,39 @@ export default function WelcomeSelector() {
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
-                <Box className="center-box">
-                    <Card className="custom-card" sx={{ borderRadius: 5, boxShadow: 0 }}>
+            <Box className="center-box">
+                <Grid 
+                    container
+                    sx={{pt: 2}}
+                    id={'gridContainer'}
+                    spacing={1}
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center" 
+                >
+                    <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
+                        <Card raised={true} sx={{ borderRadius: 5, p: 3}}>
                         {loading ? (<CircularProgress />): 
-                        <CardContent sx={{overflowY: 'auto', maxHeight: "80vh", mt: 2}}>
-                            <Container sx={{ textAlign: 'left'}}>
+                        <CardContent sx={{ pt: 1, justifyItems: 'center', paddingLeft: 0, paddingRight: 0}}>
+                            <Box sx={{ textAlign: 'left'}}>
                                 <IconButton onClick={ () => redirectBack() }>
                                     <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                                 </IconButton>
-                            </Container>
-                            <Container id="header_selector">
-                            <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
+                            </Box>
+
+                            <Box id="header_selector">
+                            <Typography textAlign={'center'} variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                 {link}
                             </Typography>
-                            <Typography variant="h5" fontWeight="bold">
+                            <Typography variant="h4" fontWeight="bold" textAlign={'center'}>
                                 Type
                             </Typography>
-                            </Container>
+                            </Box>
                             
-                            <Container>
+                            <Container sx={{ justifyContent: 'center', alignItems: 'center', paddingRight: '2px', paddingLeft: '2px'}}>
                             { error ? (
                             <Alert
+                                ref={errorRef}
                                 severity="error"
                                 action={
                                     <IconButton
@@ -372,18 +415,12 @@ export default function WelcomeSelector() {
                             ): null}
 
                             <br/>
-                            <ButtonGroup size="small" fullWidth={true} variant="outlined">
-                                <Tooltip title="Waitlist: Wait in a general line.">
-                                    {
-                                        acceptingStatus.waitlist === false ? (
-                                            <span>
-                                                <Button disabled={true} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
-                                            </span>
-                                        ):
-                                        <Button disabled={args && !args.system.waitlist} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
-                                    }
+                            <ButtonGroup size="large" fullWidth={true} variant="outlined">
+                                <Tooltip title="Waitlist - Wait in a general line.">
+                                    <Button disabled={args && !args.system.waitlist || acceptingStatus.waitlist === false} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
+
                                 </Tooltip>
-                                <Tooltip title="Appointment: Schedule an appointment that best suits your schedule.">
+                                <Tooltip title="Appointment - Schedule an appointment that best suits your schedule.">
                                     <Button disabled={args && !args.system.appointments} variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> Appointment</Button>
                                 </Tooltip>
                                 
@@ -391,7 +428,8 @@ export default function WelcomeSelector() {
                             {
                                 systemTypeSelected === APPOINTMENT 
                                 &&
-                                <Box id="appointmentSection" sx={{ justifyContent: 'center', alignItems: 'center'}}>
+                                <Container id="appointmentSection" sx={{paddingLeft: 0, paddingRight: 0}}>
+                                    <Typography align="left" sx={{pt: 1}} variant="body1" fontWeight={'bold'}>Select a date</Typography>
                                         <DateCalendar
                                             sx={{width: 'auto'}}
                                             disablePast={true}
@@ -400,17 +438,18 @@ export default function WelcomeSelector() {
                                             defaultValue={currentDate} 
                                             maxDate={args && DateTime.fromISO(args.maxDateAvailable)}
                                         />
-                                            <Box sx={{pt: 1, display: openEmployees ? 'flex': 'none'}}>
+                                            <Box sx={{pt: 1, display: openEmployees ? 'flex': 'none', paddingLeft: 0, paddingRight: 0}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
                                             </Box>
 
-                                            <Box className="scroll-left" id="employeeSelect" sx={{ display: openEmployees ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
+                                            <Container ref={employeesRef}  sx={{ display: openEmployees ? 'flex': 'none', overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
                                                 <Fade in={openEmployees}
                                                     style={{ transformOrigin: '0 0 0' }}
                                                     {...(openEmployees ? { timeout: 1000 } : {})}
                                                 >
 
                                                     <Grid
+                                                        
                                                         maxHeight={1}
                                                         container 
                                                         wrap='nowrap'
@@ -442,13 +481,13 @@ export default function WelcomeSelector() {
                                                         }                                                    
                                                     </Grid>
                                                 </Fade>
-                                            </Box>
+                                            </Container>
 
                                             <Box sx={{pt: 1, display: openServices ? 'flex': 'none'}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
                                             </Box>
                                             
-                                            <Box id="serviceSelect" className="scroll-left" sx={{pt: 0, display: openServices ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
+                                            <Container sx={{pt: 0, display: openServices ? 'flex': 'none', overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
                                                 <Fade in={openServices}>
                                                     <Grid
                                                         maxHeight={1}
@@ -497,19 +536,19 @@ export default function WelcomeSelector() {
                                                         }
                                                     </Grid>
                                                 </Fade>
-                                            </Box>
+                                            </Container>
                                         
                                             <Box sx={{ pt: 1, display: openAvailabity ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
                                             </Box>
                                             <Container id="intervalSelect" sx={{pt: 1, display: openAvailabity ? 'flex': 'none', paddingRight: 0, paddingLeft: 0}}>
-                                                <Grow in={openAvailabity}>
+                                                <Grow ref={availabiltyRef} in={openAvailabity}>
                                                     {appSlotLoader === true ? (
                                                         <Box>
                                                             <CircularProgress size={'small'}/>
                                                         </Box>
                                                     ) :
-                                                    <Box className="scroll-left" sx={{display: 'block', whiteSpace: 'nowrap'}}>
+                                                    <Box className="scroll-left" sx={{display: 'block', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
                                                         <Grid
                                                             maxHeight={1}
                                                             container 
@@ -576,54 +615,52 @@ export default function WelcomeSelector() {
                                                     <Box sx={{ pt: 2, display: openSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
                                                         <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
                                                             <AlertTitle><Typography variant="body1"><strong>Details saved</strong></Typography></AlertTitle>
-                                                            <Typography variant="caption">Date assigned — <strong>{appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>
+                                                            <Typography variant="caption">Date assigned — <strong>{appointmentData && appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>
                                                             <br/>
-                                                            <Typography variant="caption">Start — <strong>{DateTime.fromFormat(appointmentData.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(appointmentData.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
+                                                            <Typography variant="caption">Start — <strong>{appointmentData && DateTime.fromFormat(appointmentData.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(appointmentData.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
                                                             <br/>
-                                                            <Typography variant="caption">With — <strong>{appointmentData.fullname}</strong></Typography>
+                                                            <Typography variant="caption">With — <strong>{appointmentData && appointmentData.fullname}</strong></Typography>
                                                             <br/>
-                                                            <Typography variant="caption">Service — <strong>{appointmentData.serviceName}  </strong></Typography>
+                                                            <Typography variant="caption">Service — <strong>{appointmentData && appointmentData.serviceName}  </strong></Typography>
                                                         </Alert>
                                                     </Box>
                                                 ) : null
                                             }
                                             
                                             
-                                </Box>
+                                </Container>
                                 ||
                                 systemTypeSelected === WAITLIST 
                                 && 
-                                <Box id="waitlistSection"  sx={{pt: 2}}>
+                                <Container sx={{paddingLeft: 0, paddingRight: 0}}>
                                     
                                     <Stack sx={{ pt: 1 }} direction="column" spacing={1.5} textAlign="left">
-                                    {employees && present.employees === true ? (
-                                        <>
-                                            <Typography  fontWeight={'bold'} id="employee" variant="subtitle2">Employee preference</Typography>
-                                            <Select
-                                                id="employee"
-                                                name="employee_id"
-                                                defaultValue={waitlistData.employee_id}
-                                                onChange={(event) => {
-                                                    const selectedEmployeeId = event.target.value;
-                                                    const selectedEmployee = employees.find(employee => employee.id === selectedEmployeeId);
-                                                    setWaitlistData(prev => ({
-                                                        ...prev,
-                                                        employee_id: selectedEmployeeId,
-                                                        fullname: selectedEmployee ? selectedEmployee.fullname : ''
-                                                    }));
-                                                }}
-                                            >
-                                                {Array.isArray(employees) ? employees.map((employee) => (
-                                                    <MenuItem key={employee.id} value={employee.id}>
-                                                        {employee.fullname}
-                                                    </MenuItem>
-                                                )) : null}
-                                            </Select>
-                                        </>
-                                    ) : null}
-
-
-
+                                        <Typography textAlign={'center'} variant="body1" fontWeight={'bold'}>Choose from the following</Typography>
+                                        {employees && present.employees === true ? (
+                                            <>
+                                                <Typography  fontWeight={'bold'} id="employee" variant="subtitle2">Employee preference</Typography>
+                                                <Select
+                                                    id="employee"
+                                                    name="employee_id"
+                                                    defaultValue={waitlistData.employee_id}
+                                                    onChange={(event) => {
+                                                        const selectedEmployeeId = event.target.value;
+                                                        const selectedEmployee = employees.find(employee => employee.id === selectedEmployeeId);
+                                                        setWaitlistData(prev => ({
+                                                            ...prev,
+                                                            employee_id: selectedEmployeeId,
+                                                            fullname: selectedEmployee ? selectedEmployee.fullname : ''
+                                                        }));
+                                                    }}
+                                                >
+                                                    {Array.isArray(employees) ? employees.map((employee) => (
+                                                        <MenuItem key={employee.id} value={employee.id}>
+                                                            {employee.fullname}
+                                                        </MenuItem>
+                                                    )) : null}
+                                                </Select>
+                                            </>
+                                        ) : null}
                                         {services && present.services === true ? (
                                         <>
                                             <Typography fontWeight={'bold'} variant="subtitle2" id="services">Services</Typography>
@@ -720,11 +757,13 @@ export default function WelcomeSelector() {
                                         ): null
                                     }
                                     
-                                </Box>
+                                </Container>
                             }
                             </Container>
+
+                            
                             <Container sx={{ pt: 3}}>
-                                <Button disabled={systemTypeSelected === null} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
+                                <Button disabled={systemTypeSelected === null || disable === true} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
                                     <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
                                         Next
                                     </Typography>
@@ -738,6 +777,8 @@ export default function WelcomeSelector() {
                             <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                         </CardActions>
                     </Card>
+                    </Grid>
+                    </Grid>
                 </Box>
             </ThemeProvider>
 

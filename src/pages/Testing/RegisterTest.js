@@ -26,7 +26,7 @@ export const WEEK_LIST = () => {
 
 export function WEEK_OBJ() {
     const week_list = WEEK_LIST();
-    const check_state = {}
+    let check_state = {}
     for (let i = 0; i < week_list.length; i ++){
         check_state[week_list[i]] = {
             start: '',

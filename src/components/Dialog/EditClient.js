@@ -11,7 +11,7 @@ import * as Yup from 'yup';
 import { DateTime } from "luxon";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { DatePicker } from "@mui/x-date-pickers";
-import { requestClientEditWait, requestClientEditApp, Transition, PHONE_REGEX } from "./EditClientHelper";
+import { requestClientEditWait, requestClientEditApp, Transition, PHONE_REGEX, rerquestClientContactEdit } from "./EditClientHelper";
 import { APPOINTMENT, WAITLIST } from "../../static/static";
 
 
@@ -68,13 +68,37 @@ export default function EditClient({setEditClient, editClient}) {
 
     const handleSubmit = (data) => {
         if (editClient.fromComponent === APPOINTMENT){
+            if (selectedAppointment === null || appointmentEdit === null) { 
+                const payload = { client_id: data._id, fullname: data.fullname, email: data.email, phone: data.phone, partySize: data.size}
+                updateContactInformation(payload)
+                return;
+            }
             const payload = { ...data, appointment: selectedAppointment, appointmentDate: selectedDate}
             appointmentEdit(payload);
+            return;
         }
         if (editClient.fromComponent === WAITLIST){
             const payload = { ...data}
             waitlistEdit(payload);
+            return;
         }
+    }
+
+
+    const updateContactInformation = (payload) => {
+        rerquestClientContactEdit(payload) 
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(setSnackbar({ requestMessage: error.msg, requestStatus: true} ))
+        })
+        .finally(() => {
+            setLoading(false);
+            dispatch(setReload(true));
+            closeDialog();
+        })
     }
 
     const waitlistEdit = (payload) => {
@@ -84,7 +108,7 @@ export default function EditClient({setEditClient, editClient}) {
         })
         .catch(error => {
             console.log(error);
-            dispatch(setSnackbar({ requestMessage: error.response.msg, requestStatus: true} ))
+            dispatch(setSnackbar({ requestMessage: error.msg, requestStatus: true} ))
         })
         .finally(() => {
             setLoading(false);
@@ -100,7 +124,7 @@ export default function EditClient({setEditClient, editClient}) {
         })
         .catch(error => {
             console.log(error);
-            dispatch(setSnackbar({ requestMessage: error.response.msg, requestStatus: true} ))
+            dispatch(setSnackbar({ requestMessage: error.msg, requestStatus: true} ))
         })
         .finally(() => {
             setLoading(false);

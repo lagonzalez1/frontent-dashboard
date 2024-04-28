@@ -106,7 +106,7 @@ const Analytics = () => {
         if (employeeId === ""){
             setOpenError(true)
             setError(true);
-            setAlert({title: 'Error', body:'No employee has been selected', open: true});
+            setAlert({title: 'Error', body:'Please select an employee to view its available data given its date range.', open: true});
             return;
         }
         if (!checkValidRange(range.start, range.end)) {
@@ -461,7 +461,9 @@ const Analytics = () => {
 
                                 </Stack>
                                 </>
-                            ): null}
+                            ): 
+                            null
+                            }
                             <Divider />
 
                             <Typography variant="subtitle1">No shows</Typography>
