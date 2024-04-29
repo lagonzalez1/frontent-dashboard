@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
     Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert, Chip, Divider, AlertTitle, Tooltip, 
-    useMediaQuery} from "@mui/material";
+    useMediaQuery,
+    Zoom} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
@@ -55,6 +56,7 @@ export default function WelcomeSelector() {
     const [resources, setResouces] = useState(null);
     const [slots, setSlots] = useState(false);
     const [disable, setDisable] = useState(false);
+    const [zoomIntoView, setZoomIntoView] = useState(false);
 
 
     const [appSlotLoader, setAppSlotLoader] = useState(false);
@@ -115,6 +117,7 @@ export default function WelcomeSelector() {
                 date: appointmentData.date.toISO(),
             }
             sessionStorage.setItem(CLIENT, JSON.stringify(object));
+            setZoomIntoView(false);
             navigate(`/welcome/${link}/details`);   
             return;
         }
@@ -132,7 +135,9 @@ export default function WelcomeSelector() {
                 ...waitlistData,
             }
             sessionStorage.setItem(CLIENT, JSON.stringify(object));
+            setZoomIntoView(false);
             navigate(`/welcome/${link}/details`);
+
             return;
         }
         handleErrorRefChange(); // Trigger ref to show error message.
@@ -159,6 +164,7 @@ export default function WelcomeSelector() {
     }
     
     useEffect(() => {
+        setZoomIntoView(true);
         redirectStatus();
         getBuisnessForm();
         getBuisnessExtras();
@@ -175,6 +181,7 @@ export default function WelcomeSelector() {
         .then(response => {
             if (response.status === 200) {
                 if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
+                    setZoomIntoView(false);
                     navigate(`/welcome/${link}`);
                     return;
                 }
@@ -183,6 +190,7 @@ export default function WelcomeSelector() {
         })
         .catch(error => {
             if (error.response.status === 404) {
+                setZoomIntoView(false);
                 navigate(`/welcome/${link}`);
                 return;
             }
@@ -344,10 +352,9 @@ export default function WelcomeSelector() {
 
     const getAvailableEmployees = (date) => {
         const incomingDate = date.toISO();
-        getEmployeeList(incomingDate,link)
+        getEmployeeList(incomingDate, link)
         .then(response => {
             setAppEmployees(response);
-            
         })
         .catch(error => {
             handleErrorRefChange(); // Trigger ref to show error message.
@@ -363,17 +370,18 @@ export default function WelcomeSelector() {
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
             <Box className="center-box">
-                <Grid 
+                    <Grid 
                     container
-                    sx={{pt: 2}}
+                    sx={{pt: 2, pb: 1}}
                     id={'gridContainer'}
                     spacing={1}
                     direction="column"
                     justifyContent="center"
                     alignItems="center" 
-                >
-                    <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
-                        <Card raised={true} sx={{ borderRadius: 5, p: 3}}>
+                >   
+                    <Zoom in={zoomIntoView}>
+                    <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
+                        <Card variant="outlined" sx={{ borderRadius: 5, p: 3, pt: 1}}>
                         {loading ? (<CircularProgress />): 
                         <CardContent sx={{ pt: 1, justifyItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                             <Box sx={{ textAlign: 'left'}}>
@@ -386,7 +394,7 @@ export default function WelcomeSelector() {
                             <Typography textAlign={'center'} variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                 {link}
                             </Typography>
-                            <Typography variant="h4" fontWeight="bold" textAlign={'center'}>
+                            <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
                                 Type
                             </Typography>
                             </Box>
@@ -449,7 +457,6 @@ export default function WelcomeSelector() {
                                                 >
 
                                                     <Grid
-                                                        
                                                         maxHeight={1}
                                                         container 
                                                         wrap='nowrap'
@@ -508,18 +515,13 @@ export default function WelcomeSelector() {
                                                                     <Card variant="outlined" className="card-style" sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service)}>
                                                                         <CardActionArea>
                                                                             <CardContent>
+                                                                            <Stack spacing={0.2}>
+                                                                                <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                                                                <Typography className="large-desc" textAlign="left" gutterBottom color="text.secondary" variant="caption">
+                                                                                    {service.description}
 
-                                                                            <Grid container alignItems="center">
-                                                                                <Grid item xs>
-                                                                                    <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
-                                                                                </Grid>
-                                                                                <Grid item>
-                                                                                </Grid>
-                                                                            </Grid>
-                                                                            <Typography gutterBottom color="text.secondary" variant="caption">
-                                                                                { service.description }
-                                                                            </Typography>
-                                                             
+                                                                                </Typography>
+                                                                            </Stack>
                                                                             <Divider variant="middle" />                                                                    
                                                                             <Stack sx={{m: 1}} spacing={0.5}>
                                                                                 <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
@@ -622,6 +624,7 @@ export default function WelcomeSelector() {
                                                             <Typography variant="caption">With — <strong>{appointmentData && appointmentData.fullname}</strong></Typography>
                                                             <br/>
                                                             <Typography variant="caption">Service — <strong>{appointmentData && appointmentData.serviceName}  </strong></Typography>
+                                                            
                                                         </Alert>
                                                     </Box>
                                                 ) : null
@@ -778,6 +781,7 @@ export default function WelcomeSelector() {
                         </CardActions>
                     </Card>
                     </Grid>
+                    </Zoom>
                     </Grid>
                 </Box>
             </ThemeProvider>

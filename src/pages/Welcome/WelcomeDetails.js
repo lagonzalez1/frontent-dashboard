@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
      Stack, IconButton, TextField, InputLabel, Alert, Divider, AlertTitle, Chip, 
      Dialog, DialogContent, DialogTitle, 
-     Grid} from "@mui/material";
+     Grid,
+     Zoom} from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
 import { allowClientJoin, getBuisnessForm, waitlistRequest,checkDuplicatesRequest } from "./WelcomeHelper";
@@ -53,6 +54,7 @@ export default function WelcomeDetails() {
     const [appointmentsOnly, setAppointmentsOnly] = useState(false);
     const [showDisclosure, setShowDisclosure] = useState(false);
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
+    const [zoomIntoView, setZoomIntoView] = useState(false);
 
 
 
@@ -71,6 +73,7 @@ export default function WelcomeDetails() {
     }
 
     useEffect(() => {
+        setZoomIntoView(true);
         redirectStatus();
         businessForm();
         getPreview();
@@ -102,6 +105,7 @@ export default function WelcomeDetails() {
             if (response.status === 200) {
                 setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
                 if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
+                    setZoomIntoView(false)
                     navigate(`/welcome/${link}`);
                     return;
                 }
@@ -109,6 +113,7 @@ export default function WelcomeDetails() {
         })
         .catch(error => {
             if (error.response.status === 404) {
+                setZoomIntoView(false)
                 navigate(`/welcome/${link}`);
                 return;
             }
@@ -144,6 +149,7 @@ export default function WelcomeDetails() {
     const externalWaitlistRequest = (values) => {
         const clientPayload = sessionStorage.getItem(CLIENT);
         if (clientPayload === null) { 
+            setZoomIntoView(false);
             navigate(`/welcome/${link}`);
             return
         }
@@ -163,14 +169,14 @@ export default function WelcomeDetails() {
             }
         })
         .then(response => {
-            navigate(`/welcome/${link}/visits/${response.unid}`)
+            navigate(`/welcome/${link}/visits/${response.unid}`);
         })
         .catch(error => {
             setLoading(false);
-            console.log(error);
             setErrors(error);
         })
         .finally(() => {
+            setZoomIntoView(false);
             setLoading(false);
         })
     }
@@ -203,167 +209,169 @@ export default function WelcomeDetails() {
             <Box className="center-box">
                 <Grid 
                     container
-                    sx={{pt: 2}}
+                    sx={{pt: 2, pb: 1}}
                     spacing={1}
                     direction="column"
                     justifyContent="center"
                     alignItems="center"                      
                 >
-                <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
-                    <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 3}}>
-                    <Container sx={{ textAlign: 'left'}}>
-                        <IconButton onClick={ () => redirectBack() }>
-                            <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
-                        </IconButton>
-                    </Container>
-                    <CardContent sx={{textAlign: 'center'}}>
-                        { errors ? <Alert color="warning">{errors}</Alert>: null} 
-                    
-                        <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
-                            {link}
-                        </Typography>
-                        <Typography variant="h4" fontWeight="bold" gutterBottom>
-                            Enter your details
-                        </Typography>
-
+                    <Zoom in={zoomIntoView}>
+                        <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
+                        <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 3}}>
+                        <Container sx={{ textAlign: 'left'}}>
+                            <IconButton onClick={ () => redirectBack() }>
+                                <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
+                            </IconButton>
+                        </Container>
+                        <CardContent sx={{textAlign: 'center'}}>
+                            { errors ? <Alert color="warning">{errors}</Alert>: null} 
                         
-                        <form onSubmit={formik.handleSubmit}>
-                        <Stack sx={{pt: 2}} spacing={1}>
+                            <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
+                                {link}
+                            </Typography>
+                            <Typography variant="h4" fontWeight="bold" gutterBottom>
+                                Enter your details
+                            </Typography>
 
-                            { inputs.fullname ? (
-                                <>
-                                <InputLabel htmlFor="fullname" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Name *</InputLabel>
-                                    <TextField
-                                        id="fullname"
-                                        name="fullname"
-                                        label="Name"
-                                        value={formik.values.fullname}
-                                        onChange={formik.handleChange}
-                                        error={formik.touched.fullname && Boolean(formik.errors.fullname)}
-                                        helperText={formik.touched.fullname && formik.errors.fullname}
-                                    /> 
-                            </>
-                            ): null}
                             
-                            { inputs.phone ? (
-                                <>
-                                <InputLabel htmlFor="phoneNumber" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Phone *</InputLabel>
-                                    <TextField
-                                        id="phoneNumber"
-                                        name="phoneNumber"
-                                        label="Phone Number"
-                                        placeholder="xxx-xxx-xxxx"
-                                        value={phoneNumber}
-                                        onChange={(event) => phoneNumberChange(event)}
-                                        error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
-                                        helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
-                                    />
-                                </>
-                            ) : null}
-                            
-                            
-                            { inputs.email ? (
-                                <>
-                                    <InputLabel htmlFor="email" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Email *</InputLabel>
-                                    <TextField
-                                    id="email"
-                                    name="email"
-                                    label="Email"
-                                    value={formik.values.email}
-                                    onChange={formik.handleChange}
-                                    error={formik.touched.email && Boolean(formik.errors.email)}
-                                    helperText={formik.touched.email && formik.errors.email}
-                                />    
-                                
-                                </>
-                            ): null}
-                            
-                            
-                             <Divider/>
-                             <LoadingButton loading={loading} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
-                             <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
-                                submit 
-                            </Typography> 
-                            </LoadingButton> 
+                            <form onSubmit={formik.handleSubmit}>
+                            <Stack sx={{pt: 2}} spacing={1}>
 
-                            </Stack>
-                            </form>
-
-                            {
-                                preview ? (
+                                { inputs.fullname ? (
                                     <>
-                                        <Box sx={{ pt: 2, display: 'block', width: '100%', maxWidth: '100%'}}>
-                                            <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
-                                                <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
+                                    <InputLabel htmlFor="fullname" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Name *</InputLabel>
+                                        <TextField
+                                            id="fullname"
+                                            name="fullname"
+                                            label="Name"
+                                            value={formik.values.fullname}
+                                            onChange={formik.handleChange}
+                                            error={formik.touched.fullname && Boolean(formik.errors.fullname)}
+                                            helperText={formik.touched.fullname && formik.errors.fullname}
+                                        /> 
+                                </>
+                                ): null}
+                                
+                                { inputs.phone ? (
+                                    <>
+                                    <InputLabel htmlFor="phoneNumber" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Phone *</InputLabel>
+                                        <TextField
+                                            id="phoneNumber"
+                                            name="phoneNumber"
+                                            label="Phone Number"
+                                            placeholder="xxx-xxx-xxxx"
+                                            value={phoneNumber}
+                                            onChange={(event) => phoneNumberChange(event)}
+                                            error={formik.touched.phoneNumber && Boolean(formik.errors.phoneNumber)}
+                                            helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                                        />
+                                    </>
+                                ) : null}
+                                
+                                
+                                { inputs.email ? (
+                                    <>
+                                        <InputLabel htmlFor="email" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Email *</InputLabel>
+                                        <TextField
+                                        id="email"
+                                        name="email"
+                                        label="Email"
+                                        value={formik.values.email}
+                                        onChange={formik.handleChange}
+                                        error={formik.touched.email && Boolean(formik.errors.email)}
+                                        helperText={formik.touched.email && formik.errors.email}
+                                    />    
+                                    
+                                    </>
+                                ): null}
+                                
+                                
+                                <Divider/>
+                                <LoadingButton loading={loading} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+                                <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
+                                    submit 
+                                </Typography> 
+                                </LoadingButton> 
 
-                                                {
-                                                    preview && preview.TYPE === APPOINTMENT ? (
-                                                        <>
-                                                        <Typography variant="caption">Employee assigned — <strong>{preview.fullname}</strong></Typography>
-                                                        <br/>
-                                                        <Typography variant="caption">Service — <strong>{preview.serviceName }</strong></Typography>
-                                                        <br/>
-                                                        <Typography variant="caption">Date assigned — <strong>{preview.date.toFormat('LLL dd yyyy') }</strong></Typography>
-                                                        <br/>
-                                                        <Typography variant="caption">Start — <strong>{DateTime.fromFormat(preview.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(preview.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
-                                                        <br/>
-                                                        </>
-                                                    ) : null
-                                                }
+                                </Stack>
+                                </form>
 
-{
-                                                    preview && preview.TYPE === WAITLIST ? (
-                                                        <>
-                                                        <Typography variant="caption">For today — <strong>{DateTime.local().toFormat('LLL dd yyyy')}</strong></Typography>
+                                {
+                                    preview ? (
+                                        <>
+                                            <Box sx={{ pt: 2, display: 'block', width: '100%', maxWidth: '100%'}}>
+                                                <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
+                                                    <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
 
-                                                        <br/>   
-                                                        { preview.fullname && (<>
+                                                    {
+                                                        preview && preview.TYPE === APPOINTMENT ? (
+                                                            <>
                                                             <Typography variant="caption">Employee assigned — <strong>{preview.fullname}</strong></Typography>
                                                             <br/>
-                                                        </>)}
-
-                                                        { preview.serviceTitle && (<>
-                                                            <Typography variant="caption">Service — <strong>{preview.serviceTitle}</strong></Typography>
+                                                            <Typography variant="caption">Service — <strong>{preview.serviceName }</strong></Typography>
                                                             <br/>
-                                                        </>)}
-
-                                                        { preview.resourceTitle && (<>
-                                                            <Typography variant="caption">Resource — <strong>{preview.resourceTitle}</strong></Typography>
+                                                            <Typography variant="caption">Date assigned — <strong>{preview.date.toFormat('LLL dd yyyy') }</strong></Typography>
                                                             <br/>
-                                                        </>)}
-
-                                                        { preview.notes && (<>
-                                                            <Typography variant="caption">Notes  — <strong>{preview.notes}</strong></Typography>
+                                                            <Typography variant="caption">Start — <strong>{DateTime.fromFormat(preview.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(preview.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
                                                             <br/>
-                                                        </>)}
-                                                        </>
-                                                    ) : null
-                                                }
-                                                
-                                                
-                                            </Alert>
-                                        </Box>
-                                    </>
-                                ) : null
-                            } 
+                                                            </>
+                                                        ) : null
+                                                    }
 
-                               
-                
-                    </CardContent>
-                    <CardActions sx={{ justifyContent: 'center'}}>
+    {
+                                                        preview && preview.TYPE === WAITLIST ? (
+                                                            <>
+                                                            <Typography variant="caption">For today — <strong>{DateTime.local().toFormat('LLL dd yyyy')}</strong></Typography>
 
-                        <Stack alignContent={'center'} spacing={2}>
-                            <Chip 
-                                sx={{ maxWidth: '80x'}} variant="outlined" size="small" clickable={true} 
-                                onClick={() => setShowDisclosure(true)} icon={<InfoOutlinedIcon fontSize="small"/>} 
-                                label={'Disclosure'}> 
-                            </Chip> 
-                            <Typography textAlign={'center'} gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                                                            <br/>   
+                                                            { preview.fullname && (<>
+                                                                <Typography variant="caption">Employee assigned — <strong>{preview.fullname}</strong></Typography>
+                                                                <br/>
+                                                            </>)}
 
-                        </Stack>
-                    </CardActions>
-                    </Card>
-                </Grid>
+                                                            { preview.serviceTitle && (<>
+                                                                <Typography variant="caption">Service — <strong>{preview.serviceTitle}</strong></Typography>
+                                                                <br/>
+                                                            </>)}
+
+                                                            { preview.resourceTitle && (<>
+                                                                <Typography variant="caption">Resource — <strong>{preview.resourceTitle}</strong></Typography>
+                                                                <br/>
+                                                            </>)}
+
+                                                            { preview.notes && (<>
+                                                                <Typography variant="caption">Notes  — <strong>{preview.notes}</strong></Typography>
+                                                                <br/>
+                                                            </>)}
+                                                            </>
+                                                        ) : null
+                                                    }
+                                                    
+                                                    
+                                                </Alert>
+                                            </Box>
+                                        </>
+                                    ) : null
+                                } 
+
+                                
+                    
+                        </CardContent>
+                        <CardActions sx={{ justifyContent: 'center'}}>
+
+                            <Stack alignContent={'center'} spacing={2}>
+                                <Chip 
+                                    sx={{ maxWidth: '80x'}} variant="outlined" size="small" clickable={true} 
+                                    onClick={() => setShowDisclosure(true)} icon={<InfoOutlinedIcon fontSize="small"/>} 
+                                    label={'Disclosure'}> 
+                                </Chip> 
+                                <Typography textAlign={'center'} gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+
+                            </Stack>
+                        </CardActions>
+                        </Card>
+                        </Grid>
+                    </Zoom>
             </Grid>
             </Box>
 

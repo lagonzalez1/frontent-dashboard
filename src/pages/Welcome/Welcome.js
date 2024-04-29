@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, 
     Avatar, Divider, IconButton, List, ListItem, ListItemText, Chip, Dialog, DialogTitle, DialogContent, DialogActions, 
-    Grid} from "@mui/material";
+    Grid,
+    Zoom} from "@mui/material";
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -35,11 +36,13 @@ export default function Welcome() {
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
     const [nextDate, setNextAvailableDate] = useState({});
     const [businessInfo, showBusinessInfo] = useState(false);
+    const [zoomIntoView, setZoomIntoView] = useState(false);
 
     const navigate = useNavigate();
 
 
     const startJoinList = () => {
+        setZoomIntoView(false);
         navigate(`/welcome/${link}/size`);
     }
 
@@ -95,6 +98,7 @@ export default function Welcome() {
             }
         })
         .finally(() => {
+            setZoomIntoView(true);
             setLoading(false);
         });
     }
@@ -158,7 +162,7 @@ export default function Welcome() {
         // Open for at least on option.
         return (
             <>
-            <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
+            <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bolder" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
             { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography textAlign={'center'} variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
 
@@ -180,14 +184,15 @@ export default function Welcome() {
                 <Box className="center-box">
                 <Grid 
                     container
-                    sx={{pt: 2, height: '100%', width: '100%'}}
+                    sx={{pt: 2}}
                     spacing={1}
                     direction="row"
                     justifyContent="center"
                     alignItems="center"                      
-                >
-                    <Grid item xs={12} md={3} lg={4} xl={4}>
-                    <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 4}}>
+                >   
+                    <Zoom in={zoomIntoView}>
+                    <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
+                    <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 4}}>
                             { loading ? 
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
                                 <CircularProgress size={20}/>
@@ -199,7 +204,7 @@ export default function Welcome() {
                                     {link}
                                 </Typography>
                                 {iconImageLink ? (
-                                <Avatar sx={{ width: 56, height: 56, mx: 'auto' }} src={iconImageLink} />
+                                <Avatar sx={{ width: 67, height: 67, mx: 'auto' }} src={iconImageLink} />
                             ) : null}
                                 <CheckBusinessArguments />
                             </CardContent>
@@ -219,7 +224,7 @@ export default function Welcome() {
 
                         </Card>
                     </Grid>
-
+                    </Zoom>
                 </Grid>
 
                 </Box>

@@ -130,55 +130,76 @@
 
 
 
-@media (min-width: 300px) {
-  .center-box {
-    margin-top: 10px;
-    width: 100%; /* Adjust the width for larger screens */
+@media (max-width: 480px){
+  .card-style {
+    max-width: 50vw;
   }
 }
 
-@media (min-width: 300px) {
-  .custom-card {
-    margin-top: 10px;
-    width: 100%; /* Adjust the width for larger screens */
+.scroll-left {
+  overflow-x: auto !important;
+}
+
+
+  @media (max-width: 480px) {
+    /* styles for mobile browsers smaller than 480px; (iPhone) */
+    .grid-item {
+      max-width: 95vw !important;
+    }
+  }
+  .large-desc {
+    text-wrap: wrap !important;
+  }
+
+@media (max-height: 667px) {
+  .grid-item {
+    padding-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+@media (min-width: 375px) {
+  .grid-item {
+    max-width: 95vw !important;
+    min-width: 90vw;
+  }
+}
+
+@media (min-width: 500px) {
+  .grid-item {
+    max-width: 85vw !important;
+  }
+}
+
+@media (min-width: 700px) {
+  .grid-item {
+    max-width: 65vw !important;
+    min-width: 55vw;  
+  }
+}
+
+
+@media (min-width: 900px) {
+  .grid-item {
+    max-width: 55vw !important;
+    min-width: 45vw;
 
   }
 }
 
-/* Media query for larger screens */
-@media (min-width: 600px) {
-  .custom-card {
-    width: 62%; /* Adjust the width for larger screens */
-    min-height: 35vh; /* Adjust the height for larger screens */
+@media (min-width: 1200px) {
+  .grid-item {
+    max-width: 50vw !important;
+    min-width: 45vw;
+
   }
 }
 
-@media (min-width: 800px) {
-  .custom-card {
-    width: 50%; /* Adjust the width for larger screens */
-    min-height: 35vh; /* Adjust the height for larger screens */
-  }
-}
-
-
-@media (min-width: 1000px) {
-  .custom-card {
-    width: 30%; /* Adjust the width for larger screens */
-    min-height: 35vh; /* Adjust the height for larger screens */
-  }
-}
-
-@media (min-width: 1300px) {
-  .custom-card {
-    width: 15%; /* Adjust the width for larger screens */
-    min-height: 35vh; /* Adjust the height for larger screens */
-  }
-}
-
-@media (min-width: 1500px) {
-  .custom-card {
-    width: 15%; /* Adjust the width for larger screens */
-    min-height: 35vh; /* Adjust the height for larger screens */
+@media (min-width: 1600px) {
+  .grid-item {
+    max-width: 45vw !important;
+    min-width: 45vw;
   }
 }
 

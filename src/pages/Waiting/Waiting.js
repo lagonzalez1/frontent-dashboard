@@ -29,8 +29,7 @@ import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
 import { Field, Formik,Form, ErrorMessage, useFormik } from "formik";
-import ErrorIcon from '@mui/icons-material/Error';
-import { CheckCircle, Check, Star, Calendar  } from "phosphor-react";
+import { CheckCircle, Check, Star, Calendar, NavigationArrow, Share, Copy  } from "phosphor-react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
@@ -71,6 +70,10 @@ export default function Waiting() {
     const [serving, setServing] = useState(false);
     const [review, setReview] = useState(false);
     const [completed, setCompleted] = useState(false);
+    const [business, setBusinessInfo] = useState(null);
+
+    const [service, setService] = useState(null);
+    const [loader, setLoader] = useState(false);
 
 
 
@@ -113,6 +116,10 @@ export default function Waiting() {
     });
 
     
+    const removeSetEdit = () => {
+        setEditClient(false);
+        setAppointments(null);
+    }
 
 
     function isOnlyOneTrue(obj) {
@@ -160,6 +167,7 @@ export default function Waiting() {
             }  
             if (userResponse.status === 200) {
                 const user = userResponse.data.client;
+                setService(userResponse.data.service);
                 setServing(user.status.serving);
                 setPosition(userResponse.data.clientPosition);
                 setUser(userResponse.data.client);
@@ -171,6 +179,7 @@ export default function Waiting() {
                     setAlert({title: argsResponse.notification.title, message: argsResponse.notification.message, color: 'warning', open: true});
                 }
             }
+            setBusinessInfo(argsResponse.businessDetails);
             setPresent(argsResponse.present);
             setServiceList(argsResponse.services);
         })
@@ -182,6 +191,21 @@ export default function Waiting() {
             setLoading(false);
         });
     };
+
+    
+
+    const handleDirectionsClick = () => {
+        copyAddressToClipboard()
+        .then(() => {
+            setOpenSnack(true);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+        .finally(() => {
+            setLoading(false);
+        })
+    }
     
 
     const copyToClipboardHandler = () => {
@@ -206,6 +230,15 @@ export default function Waiting() {
             setAlert({title: 'Error', message: 'Waitlist is currently disabled for this business.', color: 'error', open: true});
             
         }
+    }
+
+    async function copyAddressToClipboard () {
+        let businessAddress = "";
+        if ('clipboard' in navigator){
+            return await navigator.clipboard.writeText(businessAddress);
+        }else {
+            return document.execCommand('copy', true, businessAddress)
+        }        
     }
 
     async function copyToClipboard () {
@@ -336,10 +369,10 @@ export default function Waiting() {
             setErrors('Missing date and service.');
             return;
         }
+        setLoader(true)
         const currentDate = DateTime.local();
         setErrors(null);
         const payload = { employeeId: employee_id, serviceId: service_id , appointmentDate: selectedDate, currentDate, link}
-        setLoading(true)
         getAvailableAppointments(payload)
         .then(response => {
             setAppointments(response.data)
@@ -348,10 +381,12 @@ export default function Waiting() {
             setErrors(error);
         })
         .finally(() => {
-            setLoading(true)
+            setLoader(false);
             setWait(false);
         })
     }
+
+    
 
     const LoadHeader = ({presentArgs}) => {
         // No show case
@@ -394,7 +429,7 @@ export default function Waiting() {
                         <Calendar color="white" size={70} weight="light"/>
                     </div>
                 </Container>
-                <Typography variant="h5" fontWeight="bold"> Appointment details </Typography>
+                <Typography textAlign={'center'} variant="h5" fontWeight="bold"> Appointment details </Typography>
                 <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
                     <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
                     </Typography>
@@ -472,16 +507,16 @@ export default function Waiting() {
             return(
                 <>
                 <Container sx={{ textAlign: 'left'}}>
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Name </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Name </Typography>
                     <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.fullname : '' }</Typography>
 
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Phone </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Phone </Typography>
                     <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.phone : ''}</Typography>
 
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Email </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Email </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.email : ''}</Typography>
 
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Unique identifier </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Unique identifier </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
                 </Container>
                 {serving !== true &&
@@ -498,20 +533,44 @@ export default function Waiting() {
         if (type === APPOINTMENT) {
             return (
                 <>
+                <Grid sx={{paddingRight: 0, paddingLeft: 0}} container spacing={1}>
+                    <Grid item xs>
+                    <Card variant="outlined">
+                        <CardActionArea onClick={ () => handleDirectionsClick() }>
+                        <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                            <NavigationArrow alignmentBaseline="center" size={24} />
+                            <Typography variant="caption">Directions</Typography>
+                        </CardContent>
+                        </CardActionArea>
+
+                        </Card>
+                    </Grid>
+
+                    <Grid item xs>
+                    <Card variant="outlined">
+                        <CardActionArea onClick={() => copyToClipboardHandler()}>
+                            <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                <Share alignmentBaseline="center" size={24} />
+                                <Typography variant="caption">Share</Typography>
+                            </CardContent>
+                            </CardActionArea>
+                        </Card>
+                    </Grid>
+                </Grid>
                 <Container sx={{ textAlign: 'left'}}>
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Name </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Name </Typography>
                     <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.fullname : '' }</Typography>
 
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Phone </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Phone </Typography>
                     <Typography variant="body1" sx={{ fontWeight: 'bold'}} gutterBottom> {user ? user.phone : ''}</Typography>
 
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Duration </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Duration </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromFormat(user.start, 'HH:mm').toFormat('h:mm a') +  " - " + DateTime.fromFormat(user.end, 'HH:mm').toFormat('h:mm a') : ''}</Typography>
 
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Date </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Date </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromISO(user.appointmentDate).toFormat('LLL dd yyyy') : ''}</Typography>
 
-                    <Typography variant="subtitle2" sx={{ color: "gray"}}> Unique identifier </Typography>
+                    <Typography variant="caption" sx={{ color: "gray"}}> Unique identifier </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
                     
                 </Container>
@@ -676,26 +735,24 @@ export default function Waiting() {
 
             <Box className="center-box">
                 <Grid container
-                    sx={{pt: 2}}
-                    id={'gridContainer'}
+                    sx={{pt: 2, pb: 1}}
                     spacing={1}
                     direction={'column'}
-                    alignItems={'center'}
-                                        
+                    alignItems={'center'}                    
                 >
-                <Grid item xs={12} md={4} lg={4} xl={6}>
-                    <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 1}}>
+                <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
+                    <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 2}}>
                     <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
                         <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                     </Typography>
                     {loading ? (
                     <Box>
-                        <Container>
+                        <Container sx={{ display: 'flex', justifyContent: 'center', justifyItems: 'center'}}>
                             <CircularProgress sx={{ p: 2}} />
                         </Container>
                     </Box>)
                     : 
-                    <CardContent sx={{ mt: 0}}>
+                    <CardContent sx={{ paddingRight: 0, paddingLeft: 0}}>
                         <Box>
                         <Collapse in={alert.open}>
                             <Alert
@@ -724,12 +781,12 @@ export default function Waiting() {
                     { editClient ? 
                     (<Box>
                     <Grow in={editClient}>
-                        <Box>
-                        <IconButton onClick={ () => setEditClient(false) }>
+                        <Box sx={{ mt: 0}}>
+                        <IconButton onClick={ () => removeSetEdit() }>
                             <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                         </IconButton>
 
-                        <Typography textAlign={'center'} variant="h5" fontWeight="bold">
+                        <Typography textAlign={'center'} gutterBottom variant="h5" fontWeight="bold">
                             Edit appointment
                         </Typography>
                         <Formik
@@ -753,7 +810,7 @@ export default function Waiting() {
                                 onBlur={handleBlur}
                                 />
                                 <ErrorMessage name="fullname" component="div" />
-
+ 
                                 <Field
                                 as={TextField}
                                 id="email"
@@ -789,63 +846,61 @@ export default function Waiting() {
                                     <FutureDatePicker label="Appointment date" value={selectedDate} onChange={handleDateChange}  />
                                 </Box>
 
-                                    {
-                                        employeeList && 
-                                        (
-                                        <Box>
-                                        <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
-                                            <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
-                                        </Box>
-
-                                            <Grid
-                                                maxHeight={1}
-                                                container 
-                                                wrap='nowrap'
-                                                flexDirection={'row'}
-                                                rowSpacing={2}
-                                                spacing={.5}
-                                                alignItems="stretch"
-                                            
-                                            >
-                                                {
-                                                    employeeList.map((employee) => {
-                                                        return (
-                                                            <Grid item key={employee.id}>
-                                                                <Card className="card-style" sx={{backgroundColor: values.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee, setFieldValue)}>
-                                                                    <CardActionArea>
-                                                                        <CardContent>
-                                                                            <PersonIcon />
-                                                                            <Typography variant="caption">{employee.fullname}</Typography>
-                                                                        </CardContent>
-                                                                    </CardActionArea>
-                                                                </Card>
-                                                            </Grid>
-                                                        
-                                                        )
-                                                    })
-                                                }
-                                            </Grid>
-                                            </Box>
-
-                                        )
-
-                                    }
-
-                                
+                                {
+                                    employeeList && 
+                                    (
+                                        <>
+                                    <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
+                                        <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+                                    </Box>
+                                    <Container sx={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                                        <Grid
+                                            maxHeight={1}
+                                            container 
+                                            wrap='nowrap'
+                                            flexDirection={'row'}
+                                            rowSpacing={2}
+                                            spacing={.5}
+                                            alignItems="stretch"
+                                        
+                                        >
+                                            {
+                                                employeeList.map((employee) => {
+                                                    return (
+                                                        <Grid item key={employee.id}>
+                                                            <Card className="card-style" sx={{backgroundColor: values.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee, setFieldValue)}>
+                                                                <CardActionArea>
+                                                                    <CardContent>
+                                                                        <PersonIcon />
+                                                                        <Typography variant="caption">{employee.fullname}</Typography>
+                                                                    </CardContent>
+                                                                </CardActionArea>
+                                                            </Card>
+                                                        </Grid>
+                                                    
+                                                    )
+                                                })
+                                            }
+                                        </Grid>
+                                    </Container>
+                                        </>
+                                    )
+                                }
                                 {values.employee_id ? (
-                                    
-                                        <Box className="scroll-left">
-                                            <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none'}}>
-                                                <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
+                                        <>
+                                        <Box sx={{pt: 0, display: employeeList !== 0 ? 'flex': 'none', overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                                                <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Services available</Typography>
                                             </Box>
+                                            <Container sx={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                                            
                                             <Grid
-                                                maxHeight={1}
-                                                container 
-                                                wrap='nowrap'
-                                                flexDirection={'row'}
-                                                rowSpacing={2}
-                                                spacing={.5}
-                                                alignItems="stretch"
+                                                 maxHeight={1}
+                                                 container 
+                                                 wrap='nowrap'
+                                                 flexDirection={'row'}
+                                                 rowSpacing={2}
+                                                 spacing={.5}
+                                                 alignItems="stretch"
                                             >
                                                 {
                                                     serviceList ? 
@@ -864,7 +919,7 @@ export default function Waiting() {
                                                                         <Grid item>
                                                                         </Grid>
                                                                     </Grid>
-                                                                    <Typography gutterBottom color="text.secondary" variant="body2">
+                                                                    <Typography className="large-desc" gutterBottom color="text.secondary" variant="body2">
                                                                         { service.description }
                                                                     </Typography>
                                                                     <Divider variant="middle" />                                                                    
@@ -882,11 +937,15 @@ export default function Waiting() {
                                                     </Grid>
                                                 }
                                             </Grid>
-                                        </Box>
+                                        </Container>
+                                        </>
+                                        
                                 ) : null}
 
                                 
                                 {
+
+                                    
                                     (appointments !== null) ? 
                                     (
                                         
@@ -894,6 +953,7 @@ export default function Waiting() {
                                         <Box sx={{ pt:0, display: appointments ? 'flex' : 'none', paddingRight: 0, paddingLeft: 0}}>
                                             <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Available appointments</Typography>                                                
                                         </Box>
+                                        <Container sx={{ overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
                                         { wait ? (<LinearProgress />) : (
                                         <div style={{ width: '100%', height: '100%',overflowX: 'auto'}}>
                                             {
@@ -924,7 +984,9 @@ export default function Waiting() {
                                         </div>
                                         )} 
 
+                                        </Container>
                                         </>
+                                        
                                     )
                                     : null
                                 }
@@ -990,6 +1052,25 @@ export default function Waiting() {
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 2}}>
                         <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                     </CardActions>
+
+                    {
+                        service ? (
+                            <>
+                                <Divider />
+                                <Typography sx={{pt: 1}} fontWeight={'bolder'} textAlign={'center'} variant="h5">Your service</Typography>
+                                <Typography variant="caption">Title</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].title}</Typography>
+                                <Typography variant="caption">Duration</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].duration + "min"}</Typography>
+                                <Typography variant="caption">Cost</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].cost}</Typography>
+                                <Typography variant="caption">Description</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].description}</Typography>
+
+
+                            </>
+                        ): null
+                    }
                     </Card>
                 </Grid>
 
@@ -1080,6 +1161,14 @@ export default function Waiting() {
                 autoHideDuration={3000}
                 message={'Copied to clipboard.'}
             >
+                <Alert
+                    icon={<Copy size={20} />}
+                    onClose={closeSnack}
+                    severity="success"
+                    variant="standard"
+                >
+                    <Typography variant="body1">Copied! now paste it anywhere</Typography>
+                </Alert>
             </Snackbar>
             
             </ThemeProvider>

@@ -9,7 +9,7 @@ import EmployeeSelect from '../../components/Select/EmployeeSelect';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch, useSelector } from 'react-redux';
-import { columns, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword, sortClientData, Transition} from './CustomerHelper';
+import { columns, convertTo_CSV, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword} from './CustomerHelper';
 import { findEmployee, findService, getAnalyticsClients } from '../../hooks/hooks';
 import { setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
@@ -22,6 +22,8 @@ import NotesIcon from '@mui/icons-material/Notes';
 import CloseIcon from "@mui/icons-material/Close"
 import NotesDialog from '../../components/Dialog/NotesDialog';
 import { usePermission } from '../../auth/Permissions';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import { FileCsv } from "phosphor-react"
 
 const Customers = () => {
 
@@ -91,7 +93,35 @@ const Customers = () => {
     handleClose();
   };
 
-  
+  const convertDataToCsv = () => {
+    if (!data) {
+      setAlert(true);
+      setAlertMessage({title: 'Error', body: 'There is no data on your table.'}) 
+      return;
+    }
+    convertTo_CSV(data)
+    .then(response => {
+      const timestamp = DateTime.local().toUTC();
+      const csvData = response.data;
+      // Create a Blob object from the CSV data
+      const blob = new Blob([csvData], { type: 'text/csv' });
+      
+      // Create a temporary URL for the Blob
+      const url = window.URL.createObjectURL(blob);
+      
+      // Create a link element and trigger the download
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${timestamp}.csv`;
+      a.click();
+    
+    // Revoke the URL to free up memory
+    window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+      dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+    })
+  }
 
   const handleDeleteAll = () => {
     handleClose();
@@ -424,6 +454,11 @@ const Customers = () => {
                   { // Not yet ready to implement. <EmployeeSelect set={setEmployeeSort} /> 
                   }
                 <StateSelect set={setStateSort} />
+                <Tooltip title={'Convert your current data to csv file'} placement='top'>
+                <IconButton onClick={() => convertDataToCsv()}>
+                    <FileCsv size={25}/>
+                </IconButton>
+                </Tooltip>
             </Stack>
           </Grid>
         </Grid>

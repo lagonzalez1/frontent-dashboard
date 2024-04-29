@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
     Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, ThemeProvider, paperClasses, 
-    Grid} from "@mui/material";
+    Grid,
+    Grow,
+    Collapse} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
@@ -11,6 +13,35 @@ import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { CLIENT } from "../../static/static";
 import "../../css/Welcome.css";
 import { ClientWelcomeTheme } from "../../theme/theme";
+import {
+    Unstable_NumberInput as BaseNumberInput,
+    numberInputClasses,
+  } from '@mui/base/Unstable_NumberInput';
+  import { styled } from '@mui/system';
+  
+  const NumberInput = React.forwardRef(function CustomNumberInput(props, ref) {
+    return (
+      <BaseNumberInput
+        slots={{
+          root: StyledInputRoot,
+          input: StyledInputElement,
+          incrementButton: StyledButton,
+          decrementButton: StyledButton,
+        }}
+        slotProps={{
+          incrementButton: {
+            children: '▴',
+          },
+          decrementButton: {
+            children: '▾',
+          },
+        }}
+        {...props}
+        ref={ref}
+      />
+    );
+  });
+
 
 
 export default function WelcomeSize() {
@@ -24,6 +55,7 @@ export default function WelcomeSize() {
     const [maxSize, setMaxSize] = useState(0);
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
     const [errors, setErrors] = useState(null);
+    const [zoomIntoView, setZoomIntoView] = useState(false);
 
     const [present, setPresent] = useState(null);
     const [waittime, setWaittime] = useState(null);
@@ -42,6 +74,9 @@ export default function WelcomeSize() {
             setErrors(error);
             console.log(error);
         })
+        .finally(() => {
+            setZoomIntoView(true)
+        })
     }
 
     const setDataAndContinue = () => {
@@ -49,6 +84,7 @@ export default function WelcomeSize() {
             partySize: size
         }
         sessionStorage.setItem(CLIENT, JSON.stringify(object));
+        setZoomIntoView(false);
         navigate(`/welcome/${link}/selector`);
     }
 
@@ -81,7 +117,7 @@ export default function WelcomeSize() {
         getBuisnessForm();
         getAnySavedFields();
         return() => {
-            setLoading(false)
+            setLoading(false);
         }
     }, [loading])
 
@@ -147,8 +183,9 @@ export default function WelcomeSize() {
                     justifyContent="center"
                     alignItems="center"                      
                 >
-                    <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
-                        <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 3}}>
+                    <Zoom in={zoomIntoView}>
+                        <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
+                        <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
                             <Container sx={{}}>
                                 <IconButton onClick={ () => redirectBack() }>
                                     <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
@@ -159,7 +196,7 @@ export default function WelcomeSize() {
                                 <Typography variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
                                     {link}
                                 </Typography>
-                                <Typography variant="h4" fontWeight="bold" textAlign={'center'}>
+                                <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
                                     Party size
                                 </Typography>
 
@@ -184,9 +221,16 @@ export default function WelcomeSize() {
                                 </Stack>
 
 
-                                <Box sx={{ display: 'flex', pt: 2, height: open ? 'auto' : 0  }}>
+                                <Box sx={{ display: 'flex', pt: 2, height: open ? 'auto' : 0, justifyContent: 'center' }}>
                                     <Fade in={open}>
-                                        <TextField inputProps={{ max: maxSize, min: 6 }} type="number" onChange={e => setSize(e.target.value)} fullWidth={true} id="outlined-basic" label=" Party size" variant="outlined" />
+                                    <NumberInput
+                                        aria-label="party-size"
+                                        placeholder="Party size"
+                                        value={size}
+                                        onChange={(event, val) => setSize(val)}
+                                        max={maxSize}
+                                        min={6}
+                                        />
                                     </Fade>
                                 </Box>
 
@@ -207,7 +251,9 @@ export default function WelcomeSize() {
                                 <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                             </CardActions>
                         </Card>
-                    </Grid>
+                        </Grid>
+                    </Zoom>
+
                 </Grid>
             </Box>
         </ThemeProvider>
@@ -215,3 +261,139 @@ export default function WelcomeSize() {
         </>
     )
 }
+const blue = {
+    100: '#DAECFF',
+    200: '#80BFFF',
+    400: '#3399FF',
+    500: '#007FFF',
+    600: '#0072E5',
+  };
+  
+  const grey = {
+    50: '#F3F6F9',
+    100: '#E5EAF2',
+    200: '#DAE2ED',
+    300: '#C7D0DD',
+    400: '#B0B8C4',
+    500: '#9DA8B7',
+    600: '#6B7A90',
+    700: '#434D5B',
+    800: '#303740',
+    900: '#1C2025',
+  };
+  
+  const StyledInputRoot = styled('div')(
+    ({ theme }) => `
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 400;
+    border-radius: 8px;
+    color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
+    background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
+    border: 1px solid ${theme.palette.mode === 'dark' ? grey[700] : grey[200]};
+    box-shadow: 0px 2px 2px ${theme.palette.mode === 'dark' ? grey[900] : grey[50]};
+    display: grid;
+    grid-template-columns: 1fr 19px;
+    grid-template-rows: 1fr 1fr;
+    overflow: hidden;
+    column-gap: 8px;
+    padding: 4px;
+  
+    &.${numberInputClasses.focused} {
+      border-color: ${blue[400]};
+      box-shadow: 0 0 0 3px ${theme.palette.mode === 'dark' ? blue[600] : blue[200]};
+    }
+  
+    &:hover {
+      border-color: ${blue[400]};
+    }
+  
+    // firefox
+    &:focus-visible {
+      outline: 0;
+    }
+  `,
+  );
+  
+  const StyledInputElement = styled('input')(
+    ({ theme }) => `
+    font-size: 0.875rem;
+    font-family: inherit;
+    font-weight: 400;
+    line-height: 1.5;
+    grid-column: 1/2;
+    grid-row: 1/3;
+    color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
+    background: inherit;
+    border: none;
+    border-radius: inherit;
+    padding: 8px 12px;
+    outline: 0;
+  `,
+  );
+  
+  const StyledButton = styled('button')(
+    ({ theme }) => `
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: center;
+    appearance: none;
+    padding: 0;
+    width: 19px;
+    height: 19px;
+    font-family: system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1;
+    box-sizing: border-box;
+    background: ${theme.palette.mode === 'dark' ? grey[900] : '#fff'};
+    border: 0;
+    color: ${theme.palette.mode === 'dark' ? grey[300] : grey[900]};
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 120ms;
+  
+    &:hover {
+      background: ${theme.palette.mode === 'dark' ? grey[800] : grey[50]};
+      border-color: ${theme.palette.mode === 'dark' ? grey[600] : grey[300]};
+      cursor: pointer;
+    }
+  
+    &.${numberInputClasses.incrementButton} {
+      grid-column: 2/3;
+      grid-row: 1/2;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      border: 1px solid;
+      border-bottom: 0;
+      &:hover {
+        cursor: pointer;
+        background: ${blue[400]};
+        color: ${grey[50]};
+      }
+  
+    border-color: ${theme.palette.mode === 'dark' ? grey[800] : grey[200]};
+    background: ${theme.palette.mode === 'dark' ? grey[900] : grey[50]};
+    color: ${theme.palette.mode === 'dark' ? grey[200] : grey[900]};
+    }
+  
+    &.${numberInputClasses.decrementButton} {
+      grid-column: 2/3;
+      grid-row: 2/3;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      border: 1px solid;
+      &:hover {
+        cursor: pointer;
+        background: ${blue[400]};
+        color: ${grey[50]};
+      }
+  
+    border-color: ${theme.palette.mode === 'dark' ? grey[800] : grey[200]};
+    background: ${theme.palette.mode === 'dark' ? grey[900] : grey[50]};
+    color: ${theme.palette.mode === 'dark' ? grey[200] : grey[900]};
+    }
+    & .arrow {
+      transform: translateY(-1px);
+    }
+  `,
+  );

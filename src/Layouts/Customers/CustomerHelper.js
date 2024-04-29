@@ -9,27 +9,6 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 
-export const sortClientData = (data, sort, stateSort) => {
-    const { user, business} = getStateData();
-    const currentTime = DateTime.local().setZone(business.timezone);
-
-    if (!data) { return []}
-    console.log(sort);
-    const dateSort = data.map((summary) => {
-        switch(sort){
-            case 'Today':
-                const clientTime = DateTime.fromISO(summary.timestamp);
-                if (clientTime.hasSame(currentTime, 'day')){
-                    return summary;
-                }
-            break;
-        }
-    })
-    console.log(dateSort);
-    return dateSort;
-}
-
-
 export function searchAnalyticsKeyword (word) {
     return new Promise((resolve, reject) => {
        const { user, business} = getStateData();
@@ -53,8 +32,34 @@ export function searchAnalyticsKeyword (word) {
             reject({msg: 'Request setup error', error: error.message})
         }
         
+        })
     })
-    })
+}
+
+export function convertTo_CSV (payload) {
+    return new Promise((resolve, reject) => {
+        const headers = getHeaders();
+        const csv_data = JSON.stringify(payload)
+        axios.post('/api/internal/client_csv', {payload:csv_data}, headers)
+        .then(response => {
+            resolve(response);
+        })
+        .catch(error => {
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+            
+        })
+    });
 }
 
 export function removeFromAnalytics (id) {

@@ -125,29 +125,14 @@ export const requestNoShow = (clientId, type) => {
     })
   } 
 
-  export const getAppointmentClients = (payload) => {
-    return new Promise((resolve, reject) => {
-        const { user, business } = getStateData();
-        const header = getHeaders();
-        const data = { ...payload, bid: business._id}
-        axios.get('/api/internal/appointment_data', data, header)
-        .then(response => {
-            resolve(response.data);
-        })
-        .catch(error => {
-            console.log(error);
-            reject("Error cannot hit analytics.");
-        })
-        
-    })
-  } 
+ 
 
   export const getWaitlistWaittime = () => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const headers = getHeaders();
         const date = DateTime.local().setZone(business.timezone).toISO();
-        axios.get(`/api/internal/waittime/${date}/${business._id}`, headers)
+        axios.get(`/api/internal/waittime`, {params: {date, bid: business._id }} , headers)
         .then(response => {
           resolve(response.data);
         })
@@ -386,7 +371,7 @@ export const getServingClients = () => {
     const bid = business._id;
     const headers = getHeaders();
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/serving_table/${bid}`, headers)
+        axios.get(`/api/internal/serving_table`,{params: {bid}}, headers)
         .then(response => {
             resolve(response.data.result);
         })
@@ -530,7 +515,7 @@ export const getAppointmentTable = (date) => {
         const { user,  business} = getStateData();
         const bid = business._id;
         const headers = getHeaders();
-        axios.get(`/api/internal/appointment_data/${bid}/${date}`, headers)
+        axios.get(`/api/internal/appointment_data`, {params: {bid, appointmentDate: date}}, headers)
         .then(response => {
             resolve(response.data);
         })
@@ -557,7 +542,7 @@ export const getNoShowClients = () => {
     const { user, business } = getStateData();
     const headers = getHeaders();
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/no_show/${business._id}`, headers)
+        axios.get(`/api/internal/no_show`, {params: {bid: business._id}}, headers)
         .then(response => {
             resolve(response);
         })
@@ -585,8 +570,9 @@ export function getWaitlistTable () {
     const { _ , business } = getStateData();
     const headers = getHeaders();
     const bid = business._id;
+    const time = DateTime.local().setZone(business.timezone).toISO();
     return new Promise((resolve, reject) => {   
-        axios.get(`/api/internal/get_waitlist/${bid}`, headers)
+        axios.get(`/api/internal/get_waitlist`, {params: {time, bid}}, headers)
         .then(response => {
             resolve(response.data.result);
         })
