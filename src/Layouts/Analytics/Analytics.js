@@ -364,11 +364,11 @@ const Analytics = () => {
                                 <Card elevation={0} sx={{ maxWidth: 200}}>
                                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                             <HourglassHigh alignmentBaseline="center" size={22}  />
-                                            <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                            <Typography textAlign={'center'} gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                 {'Wait time average'}
                                             </Typography>
 
-                                            <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                            <Typography textAlign={'center'}  gutterBottom fontWeight={'normal'} variant="body2">
                                             { Math.ceil(businessData.wait_time) + " min" }
                                             </Typography>
                                         </CardContent>
@@ -377,11 +377,11 @@ const Analytics = () => {
                                     <Card elevation={0} sx={{ maxWidth: 200}}>
                                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                             <UserSwitch alignmentBaseline="center" size={22}  />
-                                            <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                            <Typography textAlign={'center'}  gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                 {'Serve time average'}
                                             </Typography>
 
-                                            <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                            <Typography textAlign={'center'}  gutterBottom fontWeight={'normal'} variant="body2">
                                             { Math.ceil(businessData.serve_time) + " min" }
                                             </Typography>
                                         </CardContent>
@@ -390,11 +390,11 @@ const Analytics = () => {
                                     <Card elevation={0} sx={{ maxWidth: 200}}>
                                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                             <UsersThree alignmentBaseline="center" size={22}  />
-                                            <Typography gutterBottom fontWeight={'bold'} variant="subtitle2">
+                                            <Typography textAlign={'center'}  gutterBottom fontWeight={'bold'} variant="subtitle2">
                                                 {'Party size average'}
                                             </Typography>
 
-                                            <Typography gutterBottom fontWeight={'normal'} variant="body2">
+                                            <Typography textAlign={'center'} gutterBottom fontWeight={'normal'} variant="body2">
                                             { Math.ceil(businessData.party_size)}
                                             </Typography>
                                         </CardContent>

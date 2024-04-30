@@ -32,7 +32,6 @@ export const allowClientJoin = (time,link) => {
   export const findServicesAssociatedWithEmployee = (id, services) => {
     const collection = [];
     for (var service of services){
-
       if (service._id === id){
         collection.push(service)
       }
@@ -61,12 +60,9 @@ export const allowClientJoin = (time,link) => {
   export const getExtras = (link, date) => {
     return new Promise((resolve, reject) => {
       axios
-      .get('/api/external/buisnessExtras', { params: {link, date} })
+      .get('/api/external/businessExtras', { params: {link, date} })
       .then((response) => {
-        if (response.status === 200) {
-          resolve(response.data);
-        }
-        resolve(response.data.msg);
+        resolve(response.data);
       })
       .catch((error) => {
         reject(error);
@@ -78,6 +74,7 @@ export const allowClientJoin = (time,link) => {
     return new Promise((resolve, reject) => {
         axios.get(`/api/external/businessArgs`, {params: {link}})
         .then(response => {
+            console.log(response);
             resolve(response.data.payload);
         }) 
         .catch(error => {
@@ -90,6 +87,7 @@ export const allowClientJoin = (time,link) => {
     return new Promise((resolve, reject) => {
         axios.get(`/api/external/businessSchedule`, {params: {link}})
         .then(response => {
+            console.log(response);
             resolve(response.data);
         }) 
         .catch(error => {

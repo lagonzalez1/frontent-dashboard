@@ -217,7 +217,7 @@ export default function WelcomeDetails() {
                 >
                     <Zoom in={zoomIntoView}>
                         <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
-                        <Card raised={true} sx={{pt: 1, borderRadius: 5, p: 3}}>
+                        <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
                         <Container sx={{ textAlign: 'left'}}>
                             <IconButton onClick={ () => redirectBack() }>
                                 <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>

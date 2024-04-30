@@ -265,12 +265,10 @@ export const removeClient = (id, type) => {
   const payload = { clientId: id, bId: business._id, type };
   const headers = { headers: { 'x-access-token': accessToken } };
   return new Promise((resolve, reject) => {
-    axios.put('/api/internal/remove_client', payload, headers)
+    axios.post('/api/internal/remove_client', payload, headers)
       .then((response) => {
-        // If the request is successful, resolve the promise with the response data
-        if ( response.status === 200) {
-          resolve(response.data.msg);
-        }
+        resolve(response.data.msg);
+
       })
       .catch(error => {
         console.log(error);

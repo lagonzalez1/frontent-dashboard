@@ -66,13 +66,11 @@ export default function Welcome() {
                 setLoading(false);
                 return;
             }
-
             setSchedule(scheduleResponse.schedule); // Get schedule
             setNextAvailableDate(scheduleResponse.nextAvailable); // Get next available date
             setIconImage(argsResponse.profileLink); // Get image link
             setPresent(argsResponse.present) // What can i present to user Waittime,est time...
             setSystem(argsResponse.system); // What can i show, waitlist and or appointments.
-
 
             if (stateResponse.status === 200){
                 setAcceptingStatus({ waitlist: stateResponse.data.isAccepting, appointments: stateResponse.data.acceptingAppointments});
@@ -126,6 +124,8 @@ export default function Welcome() {
                 <Typography textAlign={'center'} variant="caption" gutterBottom>Possible issues</Typography>
                 <br/>
                 <Typography textAlign={'center'} variant="caption" gutterBottom>incorrect or case sensitive value after www.waitlist.com/welcome/ISSUE</Typography>
+                <Typography textAlign={'center'} variant="caption" gutterBottom>not connected to a stable internet</Typography>
+
             
             </>
         )
@@ -192,7 +192,7 @@ export default function Welcome() {
                 >   
                     <Zoom in={zoomIntoView}>
                     <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
-                    <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 4}}>
+                    <Card raised variant="outlined" sx={{pt: 1, borderRadius: 5, p: 4}}>
                             { loading ? 
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
                                 <CircularProgress size={20}/>
@@ -233,16 +233,20 @@ export default function Welcome() {
                 onClose={closeBusinessInfo}
                 id="businessInfo"
             >
-            <DialogTitle><strong>Business information</strong></DialogTitle>
+            <DialogTitle><Typography variant="subtitle1" fontWeight={'bolder'}>Business information</Typography></DialogTitle>
             <Divider />
             <DialogContent>
                 { businessDetails ? (
-                    <>
-                        <Typography variant="subtitle1"><strong>Name</strong> {businessDetails.name} </Typography>
-                        <Typography variant="subtitle1"><strong>Address</strong> { businessDetails.address} </Typography>
-                        <Typography variant="subtitle1"><strong>Phone</strong> { businessDetails.phone} </Typography>
-                        <Typography variant="subtitle1"><strong>Website</strong> { businessDetails.website} </Typography>
-                    </>
+                    <Stack>
+                        <Typography variant="caption">Name</Typography>
+                        <Typography variant="subtitle1">{businessDetails.name} </Typography>
+                        <Typography variant="caption">Address</Typography>
+                        <Typography variant="subtitle1">{businessDetails.address} </Typography>
+                        <Typography variant="caption">Phone</Typography>
+                        <Typography variant="subtitle1">{businessDetails.phone} </Typography>
+                        <Typography variant="caption">Website</Typography>
+                        <Typography variant="subtitle1">{businessDetails.website} </Typography>
+                    </Stack>
                 )
                 : null}
             </DialogContent>

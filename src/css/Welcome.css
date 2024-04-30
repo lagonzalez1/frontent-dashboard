@@ -9,6 +9,11 @@
   min-height: 100% !important;
 }
 
+#intervalSelect {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 .large-desc {
   text-wrap: wrap !important;
 }
@@ -61,18 +66,22 @@
 
 @media (min-width: 900px) {
   .grid-item {
-    max-width: 55vw !important;
+    max-width: 30vw !important;
+    min-width: 30vw !important;
   }
 }
 
 @media (min-width: 1200px) {
   .grid-item {
-    max-width: 50vw !important;
+    max-width: 20vw !important;
+    min-width: 20vw !important;
   }
 }
 
+
 @media (min-width: 1600px) {
   .grid-item {
-    max-width: 45vw !important;
+    max-width: 20vw !important;
+    min-width: 20vw !important;
   }
 }

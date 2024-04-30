@@ -436,7 +436,7 @@ export default function WelcomeSelector() {
                             {
                                 systemTypeSelected === APPOINTMENT 
                                 &&
-                                <Container id="appointmentSection" sx={{paddingLeft: 0, paddingRight: 0}}>
+                                <Container id="appointmentSection">
                                     <Typography align="left" sx={{pt: 1}} variant="body1" fontWeight={'bold'}>Select a date</Typography>
                                         <DateCalendar
                                             sx={{width: 'auto'}}

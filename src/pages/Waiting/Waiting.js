@@ -29,7 +29,7 @@ import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
 import { Field, Formik,Form, ErrorMessage, useFormik } from "formik";
-import { CheckCircle, Check, Star, Calendar, NavigationArrow, Share, Copy  } from "phosphor-react";
+import { CheckCircle, Check, Star, Calendar, NavigationArrow, Share, Copy, Flag  } from "phosphor-react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
@@ -533,12 +533,12 @@ export default function Waiting() {
         if (type === APPOINTMENT) {
             return (
                 <>
-                <Grid sx={{paddingRight: 0, paddingLeft: 0}} container spacing={1}>
+                <Grid container justifyItems={'center'} alignItems={'center'} spacing={1}>
                     <Grid item xs>
                     <Card variant="outlined">
                         <CardActionArea onClick={ () => handleDirectionsClick() }>
                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                            <NavigationArrow alignmentBaseline="center" size={24} />
+                            <NavigationArrow alignmentBaseline="center" weight="duotone" size={24} />
                             <Typography variant="caption">Directions</Typography>
                         </CardContent>
                         </CardActionArea>
@@ -550,7 +550,7 @@ export default function Waiting() {
                     <Card variant="outlined">
                         <CardActionArea onClick={() => copyToClipboardHandler()}>
                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                <Share alignmentBaseline="center" size={24} />
+                                <Share alignmentBaseline="center" weight="duotone" size={24} />
                                 <Typography variant="caption">Share</Typography>
                             </CardContent>
                             </CardActionArea>
@@ -709,7 +709,7 @@ export default function Waiting() {
                 <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 
                 <div className="circle_green">
-                    <Check size={88} color="#40932a" weight="bold" />
+                    <Flag size={68} color="#40932a" weight="duotone" />
                 </div>
                 </Container>
                 <Typography textAlign={'center'} variant="h5" fontWeight={'bold'}>Thanks for completing our survey</Typography>
@@ -960,14 +960,14 @@ export default function Waiting() {
                                                 wait ? <LinearProgress />: 
                                             
                                             <Box sx={{ display: 'flex', flexWrap: 'wrap'}}> 
-                                            <Stack direction={'row'} sx={{ backgroundColor: 'lightgray'}}>
+                                            <Stack direction={'row'}>
                                             
                                             { 
                                             Object.keys(appointments).map((key, index) => {
                                                 const appointment = appointments[key];
                                                 return (
                                                     <Button 
-                                                        sx={{ margin: 1, borderRadius: 10}}
+                                                        sx={{ margin: 1, borderRadius: 7}}
                                                         variant={values.start === appointment.start ? "contained": "outlined"}
                                                         onClick={() => handleAppointmentClick(appointment, setFieldValue)} 
                                                         color={values.start === appointment.start ? 'primary': 'secondary'}
@@ -1055,7 +1055,7 @@ export default function Waiting() {
 
                     {
                         service ? (
-                            <>
+                            <Container>
                                 <Divider />
                                 <Typography sx={{pt: 1}} fontWeight={'bolder'} textAlign={'center'} variant="h5">Your service</Typography>
                                 <Typography variant="caption">Title</Typography>
@@ -1068,7 +1068,7 @@ export default function Waiting() {
                                 <Typography fontWeight={'bold'} variant="subtitle1">{service[0].description}</Typography>
 
 
-                            </>
+                            </Container>
                         ): null
                     }
                     </Card>
