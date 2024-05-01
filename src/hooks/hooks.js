@@ -132,7 +132,7 @@ export const requestNoShow = (clientId, type) => {
         const { user, business } = getStateData();
         const headers = getHeaders();
         const date = DateTime.local().setZone(business.timezone).toISO();
-        axios.get(`/api/internal/waittime`, {params: {date, bid: business._id, email: user.email}, headers})
+        axios.get(`/api/internal/waittime`, {headers, params: {date, bid: business._id, email: user.email}})
         .then(response => {
           resolve(response.data);
         })
@@ -371,7 +371,7 @@ export const getServingClients = () => {
     const bid = business._id;
     const headers = getHeaders();
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/serving_table`,{params: {bid}}, headers)
+        axios.get(`/api/internal/serving_table`,{headers, params: {bid}})
         .then(response => {
             resolve(response.data.result);
         })
@@ -542,7 +542,7 @@ export const getNoShowClients = () => {
     const { user, business } = getStateData();
     const headers = getHeaders();
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/no_show`, {params: {bid: business._id}, headers})
+        axios.get(`/api/internal/no_show`, {headers, params: {bid: business._id}})
         .then(response => {
             resolve(response);
         })
@@ -573,7 +573,7 @@ export function getWaitlistTable () {
     const bid = business._id;
     const time = DateTime.local().setZone(business.timezone).toISO();
     return new Promise((resolve, reject) => {   
-        axios.get(`/api/internal/get_waitlist`, {params: {time, bid, email}, headers})
+        axios.get(`/api/internal/get_waitlist`, {headers, params: {time, bid, email}})
         .then(response => {
             resolve(response.data.result);
         })
