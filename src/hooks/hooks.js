@@ -101,7 +101,7 @@ export const requestNoShow = (clientId, type) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
-        const data = { ...payload, bid: business._id}
+        const data = { ...payload, bid: business._id, email: user.email}
         axios.post('/api/internal/analytics_data', data, header)
         .then(response => {
             resolve(response.data);
@@ -132,7 +132,7 @@ export const requestNoShow = (clientId, type) => {
         const { user, business } = getStateData();
         const headers = getHeaders();
         const date = DateTime.local().setZone(business.timezone).toISO();
-        axios.get(`/api/internal/waittime`, {params: {date, bid: business._id }, headers})
+        axios.get(`/api/internal/waittime`, {params: {date, bid: business._id, email: user.email}, headers})
         .then(response => {
           resolve(response.data);
         })
@@ -515,7 +515,7 @@ export const getAppointmentTable = (date) => {
         const { user,  business} = getStateData();
         const bid = business._id;
         const headers = getHeaders();
-        axios.get(`/api/internal/appointment_data`, {params: {bid, appointmentDate: date}}, headers)
+        axios.get(`/api/internal/appointment_data`, {params: {bid, appointmentDate: date, email: user.email}}, headers)
         .then(response => {
             resolve(response.data);
         })
@@ -567,12 +567,13 @@ export const getNoShowClients = () => {
 
 // Need to complete, this is the waitlist on Dashboard
 export function getWaitlistTable () {
-    const { _ , business } = getStateData();
+    const { user , business } = getStateData();
     const headers = getHeaders();
+    const email = user.email;
     const bid = business._id;
     const time = DateTime.local().setZone(business.timezone).toISO();
     return new Promise((resolve, reject) => {   
-        axios.get(`/api/internal/get_waitlist`, {params: {time, bid}, headers})
+        axios.get(`/api/internal/get_waitlist`, {params: {time, bid, email}, headers})
         .then(response => {
             resolve(response.data.result);
         })
