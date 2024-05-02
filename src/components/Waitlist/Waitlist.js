@@ -32,6 +32,7 @@ const Waitlist = ({setClient, setEditClient}) => {
     
     const { checkPermission } = usePermission();
     const dispatch = useDispatch();
+    const accessToken = useSelector((state) => state.tokens.access_token);
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
@@ -62,7 +63,8 @@ const Waitlist = ({setClient, setEditClient}) => {
     }, [reload])
 
     const getWaitlistData = () => {
-        getWaitlistTable()
+        if (accessToken === undefined) { return ;}
+        getWaitlistTable(accessToken)
         .then(response => {
             setTableData(response);
         })
@@ -74,7 +76,8 @@ const Waitlist = ({setClient, setEditClient}) => {
         })
     }
     const loadNoShowData = () => {
-        getNoShowClients()
+        if (accessToken === undefined) { return ;}
+        getNoShowClients(accessToken)
         .then(response => {
             setNoShowData(response.data.result)
         })
@@ -83,7 +86,8 @@ const Waitlist = ({setClient, setEditClient}) => {
         })
     }
     const getWaittime = () => {
-        getWaitlistWaittime()
+        if (accessToken === undefined) { return ;}
+        getWaitlistWaittime(accessToken)
         .then(response => {
             setWaittime(response.waittime);
         })

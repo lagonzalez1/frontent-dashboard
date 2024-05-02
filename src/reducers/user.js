@@ -60,10 +60,13 @@ const userSlice = createSlice({
     },
     setOptions: (state, action) => {
       state.options = action.payload;
-    }
-    
+    }  
   },
 });
+
+
+
+
 
 export const { setUser, logoutUser, setPermisisons, setIndex, setLocation, 
   setSnackbar, setBusinessRef, setReload, setSearchDate, setOptions } = userSlice.actions;

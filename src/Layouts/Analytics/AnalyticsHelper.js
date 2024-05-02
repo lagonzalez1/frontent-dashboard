@@ -5,12 +5,12 @@ import { getHeaders, getStateData } from "../../auth/Auth";
 
 
 // Get Totals
-export function getEmployeeAnalytics (id) {
+export function getEmployeeAnalytics (id, accessToken) {
     return new Promise((resolve, reject) => {
        const { user, business} = getStateData();
        const headers = getHeaders();
        const params = { bid: business._id, eid: id}
-       axios.get(`/api/internal/employee_analytics/${business._id}/${id}`, headers)
+       axios.get(`/api/internal/employee_analytics/${business._id}/${id}`, {headers: {'x-access-token': accessToken}})
        .then(response => {
             resolve(response.data.data);
        }) 
@@ -62,11 +62,11 @@ export function getEmployeeAnalyticsRange (payload) {
  }
 
 
- export function getBusinessAnalytics () {
+ export function getBusinessAnalytics (accessToken) {
      return new Promise((resolve, reject) => {
         const { user, business} = getStateData();
         const headers = getHeaders();
-        axios.get(`/api/internal/business_analytics/${business._id}`,headers)
+        axios.get(`/api/internal/business_analytics/${business._id}`,{headers: {'x-access-token': accessToken}})
         .then(response => {
              resolve(response.data.data);
         }) 

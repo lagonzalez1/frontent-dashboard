@@ -44,8 +44,7 @@ const Customers = () => {
   const [client, setClient] = useState(null);
   const [clientNotes, setClientNotes] = useState(false);
   const [notes, setNotes] = useState({timestamp: null, notes: null});
-
-  const [alert, setAlert] = useState(false);
+  const [alert, setAlert] = useState(false); 
   const [alertMessage, setAlertMessage] = useState({title: null, body: null});
 
 

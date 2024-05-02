@@ -11,6 +11,8 @@ import axios from "axios";
 import { setBusiness } from "../reducers/business";
 import { setIndex, setLocation, setOptions, setUser } from "../reducers/user";
 import { useSelector } from "react-redux";
+import { setAuthAccessToken, setAuthCookieToken } from "../reducers/tokens";
+
 const TOKEN_KEY = 'access_token';
 const BUSINESS = 'business';
 const USER = 'user';
@@ -19,7 +21,6 @@ const USER = 'user';
   export const getStateData = () => {
     const business = JSON.parse(localStorage.getItem(BUSINESS));
     const user = JSON.parse(localStorage.getItem(USER));
-    
     return { user, business };
   }
 
@@ -33,7 +34,7 @@ const USER = 'user';
   }
 
   export const setAccessToken = (accessToken) => {
-  localStorage.setItem(TOKEN_KEY, accessToken);
+    localStorage.setItem(TOKEN_KEY, accessToken);
   };
   
   export const getAccessToken = () => {
@@ -42,9 +43,10 @@ const USER = 'user';
 
   export const getHeaders = () => {
     if (localStorage.getItem(TOKEN_KEY)){
-      const token = localStorage.getItem(TOKEN_KEY)
-      return {headers: {'x-access-token': token }}
+      const token = localStorage.getItem(TOKEN_KEY);
+      return { headers: { 'x-access-token': token } }
     }
+    else { return {} }
   }
   
   export const removeAccessToken = () => {
@@ -95,9 +97,10 @@ const USER = 'user';
       dispatch(setBusiness(status.business));
       dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription, trial: status.trial, trialStatus: status.trialStatus}))
       dispatch(setIndex(status.defaultIndex));
+      dispatch(setAuthAccessToken(status.accessToken));
+      dispatch(setAuthCookieToken(status.token));
       dispatch(setLocation(0));
       dispatch(setOptions(status.businessOptions));
-
       return true;
     } catch (error) {
       return false;

@@ -429,7 +429,7 @@ export default function WelcomeSelector() {
 
                                 </Tooltip>
                                 <Tooltip title="Appointment - Schedule an appointment that best suits your schedule.">
-                                    <Button disabled={args && !args.system.appointments} variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> Appointment</Button>
+                                    <Button disabled={args && !args.system.appointments || acceptingStatus.appointments === false} variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> Appointment</Button>
                                 </Tooltip>
                                 
                             </ButtonGroup>

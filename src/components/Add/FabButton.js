@@ -21,8 +21,9 @@ import PersonIcon from '@mui/icons-material/Person';
 
 export default function FabButton () {
 
-
     const dispatch = useDispatch();
+    const accessToken = useSelector((state) => state.tokens.access_token);
+
     const { cancelledSubscription } = useSubscription();
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
@@ -47,7 +48,8 @@ export default function FabButton () {
     }, [])
 
     const getWaittime = () => {
-        getWaitlistWaittime()
+        if (accessToken === undefined ) { return;}
+        getWaitlistWaittime(accessToken)
         .then(response => {
             setWaittime(response.waittimeObject);
         })

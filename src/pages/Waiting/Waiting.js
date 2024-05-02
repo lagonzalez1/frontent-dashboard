@@ -414,8 +414,8 @@ export default function Waiting() {
                         <Star size={88} color="white" weight="thin" />
                     </div>
                 </Container>
-                    <Typography variant="h4" fontWeight="bold" > {'Thanks for choosing us!'} </Typography>
-                    <Typography variant="body2" fontWeight={'bold'}> {'Enjoy your service'} </Typography>
+                    <Typography textAlign={'center'} variant="h4" fontWeight="bold" > {'Thanks for choosing us!'} </Typography>
+                    <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> {'Enjoy your service'} </Typography>
                 </Stack>
             )
         }

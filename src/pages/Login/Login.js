@@ -10,6 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
 import { useSelector, useDispatch } from 'react-redux';
 import { setLocation, setPermisisons, setUser } from '../../reducers/user';
+import { setAuthAccessToken, setAuthCookieToken } from "../../reducers/tokens";
 import { DateTime } from "luxon";
 import loginImage from "../../assets/images/login.jpg"
 import { HomePageTheme } from "../../theme/theme";
@@ -52,6 +53,8 @@ export default function Login() {
                     });
                     setAccessToken(response.data.accessToken);
                     dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions }));
+                    dispatch(setAuthAccessToken(response.data.accessToken));
+                    dispatch(setAuthCookieToken(response.data.token));
                     navigate('/Dashboard');
                     setLoading(false);
                     return;

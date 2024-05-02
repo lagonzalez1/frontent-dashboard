@@ -32,6 +32,7 @@ const Analytics = () => {
         waittime: 90,
         serve_time: 60
     })
+    const accessToken = useSelector((state) => state.tokens.access_token);
     const [type, setType] = useState('AVERAGE');
     const [employeeId, setEmployeeSelect] = useState('');
     const [employeeData, setEmployeeData] = useState(null);
@@ -66,7 +67,8 @@ const Analytics = () => {
     }, [loadBusiness])
 
     const getBusinessData = () => {
-        getBusinessAnalytics()
+        if (accessToken === undefined) { return; }
+        getBusinessAnalytics(accessToken)
         .then(response => {
             setBusinessData(response);
         })
@@ -82,11 +84,11 @@ const Analytics = () => {
     }
 
     const getEmployeeData = () => {
-        if (employeeId === "") {
+        if (employeeId === "" || accessToken === undefined) {
             return;
         }
         setLoading(true)
-        getEmployeeAnalytics(employeeId)
+        getEmployeeAnalytics(employeeId, accessToken)
         .then(response => {
             setEmployeeData(response);
         })

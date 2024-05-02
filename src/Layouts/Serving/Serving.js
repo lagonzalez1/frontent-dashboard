@@ -19,6 +19,7 @@ export default function Serving({setClient}) {
 
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
+    const accessToken = useSelector((state) => state.tokens.access_token);
     const [loading, setLoading] = useState(false);
     const [servingList, setServingList] = useState([]);
     const [errors, setErrors] = useState({title: null, body: null});
@@ -46,7 +47,8 @@ export default function Serving({setClient}) {
 
     const getServingList = () => {
         setLoading(true);
-        getServingClients()
+        if (accessToken === undefined) { return; }
+        getServingClients(accessToken)
         .then(response => {
             setServingList(response);
         })

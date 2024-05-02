@@ -23,6 +23,7 @@ const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
     const { checkPermission } = usePermission();
 
+    const accessToken = useSelector((state) => state.tokens.access_token);
     const reload = useSelector((state) => state.reload);
     const [loading, setLoading] = useState(false);
     const [reloadPage, setReloadPage] = useState(false);
@@ -46,10 +47,11 @@ const Appointments = ({setClient, setEditClient}) => {
     function getLastSearchedDate () {
         const date = sessionStorage.getItem(APPOINTMENT_DATE_SELECT);
         if (date) {
+            if (accessToken === undefined) { return; }
             setLoading(true);
             let lastDate = DateTime.fromISO(date);
             setSelectedDate(lastDate)
-            getAppointmentTable(lastDate)
+            getAppointmentTable(lastDate, accessToken)
             .then(response => {
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
@@ -63,9 +65,10 @@ const Appointments = ({setClient, setEditClient}) => {
             })
         }
         else {
+            if (accessToken === undefined) { return;}
             setLoading(true);
             setSelectedDate(currentDate)
-            getAppointmentTable(currentDate)
+            getAppointmentTable(currentDate, accessToken)
             .then(response => {
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);

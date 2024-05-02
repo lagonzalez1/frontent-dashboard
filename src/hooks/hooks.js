@@ -3,6 +3,7 @@ import axios from "axios";
 import { DateTime } from "luxon";
 import { getStateData, getAccessToken, getHeaders } from "../auth/Auth";
 import { setBusiness } from "../reducers/business";
+import { useDispatch, useSelector } from "react-redux";
 let GET_BUSINESS = '/api/internal/reload_business/'
 
 
@@ -15,6 +16,7 @@ export const reloadBusinessData = (dispatch) => {
     axios.get(ENDPOINT, headers)
     .then(response => {
         dispatch(setBusiness(response.data.result));
+        // Maybe get headers here again ?
     })
     .catch(error => {
         console.log(error);
@@ -127,12 +129,11 @@ export const requestNoShow = (clientId, type) => {
 
  
 
-  export const getWaitlistWaittime = () => {
+  export const getWaitlistWaittime = (accessToken) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
-        const headers = getHeaders();
         const date = DateTime.local().setZone(business.timezone).toISO();
-        axios.get(`/api/internal/waittime`, {headers, params: {date, bid: business._id, email: user.email}})
+        axios.get(`/api/internal/waittime`, {headers: {'x-access-token': accessToken}, params: {date, bid: business._id, email: user.email}})
         .then(response => {
           resolve(response.data);
         })
@@ -366,12 +367,12 @@ export const getWaitlistServingTable = () => {
 }
 
 
-export const getServingClients = () => {
+export const getServingClients = (accessToken) => {
     const { user, business } = getStateData();
     const bid = business._id;
     const headers = getHeaders();
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/serving_table`,{headers, params: {bid}})
+        axios.get(`/api/internal/serving_table`,{headers: {'x-access-token': accessToken}, params: {bid}})
         .then(response => {
             resolve(response.data.result);
         })
@@ -391,49 +392,6 @@ export const getServingClients = () => {
     }) 
 }
 
-export const getAppointmentServingTable = () => {
-    const { user, business } = getStateData();
-    const currentTime = DateTime.local();
-    try {
-            let currentAppointments = business.appointments;
-            let currentWaitlist = business.currentClients;
-            let sameDayWaitlist = business.system.equalDate;
-        
-            let waitlist = [];
-            let appointments = [];
-            let sorted = null;
-
-            console.log("Current", currentAppointments);
-
-            for (var client of currentAppointments) {
-                console.log(client);
-                if (client.status.serving === true){
-                    appointments.push(client);
-                }
-            }
-            console.log(appointments);
-
-            sorted = appointments.sort(sortAppointmentTime);
-            
-            // Add wait time in {hour, minute}
-            const wait = sorted.map((client) => {
-            const luxonDateTime = DateTime.fromISO(client.status.serve_time);
-            const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
-            const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
-            const hours = Math.floor(diffHours);
-            const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
-                return {
-                    ...client,
-                    waittime: { hours, minutes },
-                };
-            });
-            return wait;
-      } catch (error) {
-            // Handle the error here
-            console.error(error);
-            return new Error(error); // Return an empty array or any other appropriate value
-      }
-};
 
 
 export const sendNotification = (payload) => {
@@ -468,7 +426,7 @@ export const getServingCount = () => {
             let currentClients = business.currentClients;
             let clients = [];
             for (var client of currentClients){
-                if (client.status.serving === true) {
+                if (client.status.serving === true && client.status.cancelled === false && client.status.noShow === false) {
                     clients.push(client);
                 }
             }
@@ -510,12 +468,11 @@ export const getServingCount = () => {
 
 
 // This might not be in use.
-export const getAppointmentTable = (date) => {
+export const getAppointmentTable = (date, accessToken) => {
     return new Promise((resolve, reject) => {
         const { user,  business} = getStateData();
         const bid = business._id;
-        const headers = getHeaders();
-        axios.get(`/api/internal/appointment_data`, {params: {bid, appointmentDate: date, email: user.email}}, headers)
+        axios.get(`/api/internal/appointment_data`, {headers: {'x-access-token': accessToken} , params: {bid, appointmentDate: date, email: user.email}})
         .then(response => {
             resolve(response.data);
         })
@@ -538,11 +495,11 @@ export const getAppointmentTable = (date) => {
 }
 
 
-export const getNoShowClients = () => {
+export const getNoShowClients = (accessToken) => {
     const { user, business } = getStateData();
     const headers = getHeaders();
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/no_show`, {headers, params: {bid: business._id}})
+        axios.get(`/api/internal/no_show`, {headers: {'x-access-token' : accessToken}, params: {bid: business._id}})
         .then(response => {
             resolve(response);
         })
@@ -566,14 +523,14 @@ export const getNoShowClients = () => {
 
 
 // Need to complete, this is the waitlist on Dashboard
-export function getWaitlistTable () {
+export function getWaitlistTable (accessToken) {
     const { user , business } = getStateData();
     const headers = getHeaders();
     const email = user.email;
     const bid = business._id;
     const time = DateTime.local().setZone(business.timezone).toISO();
     return new Promise((resolve, reject) => {   
-        axios.get(`/api/internal/get_waitlist`, {headers, params: {time, bid, email}})
+        axios.get(`/api/internal/get_waitlist`,{headers: {'x-access-token': accessToken}, params: {time, bid, email}})
         .then(response => {
             resolve(response.data.result);
         })
