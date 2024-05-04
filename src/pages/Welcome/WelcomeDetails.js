@@ -6,7 +6,7 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent,
      Zoom} from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
-import { waitlistRequest,checkDuplicatesRequest, isBusinesssOpen } from "./WelcomeHelper";
+import { waitlistRequest,checkDuplicatesRequest, isBusinesssOpen, getBusinessForm } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
@@ -46,16 +46,17 @@ export default function WelcomeDetails() {
 
     const { link } = useParams();
     const navigate = useNavigate();
-    const [inputs, setInputs] = useState({});
     const [errors, setErrors] = useState({title: null, body: null});
     const [loading, setLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(null);
     const [preview, setPreview] = useState(null);
     
     const [showDisclosure, setShowDisclosure] = useState(false);
-    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
+    const [open, setOpen] = useState(false);
     const [zoomIntoView, setZoomIntoView] = useState(false);
     const [disable, setDisable] = useState(false);
+    const [seconds, setSeconds] = useState(120);
 
     const [formFields, setFormFields] = useState({
         fullname: null,
@@ -64,23 +65,10 @@ export default function WelcomeDetails() {
 
     })
 
-    const businessForm = () => {
-        getBuisnessForm(link)
-        .then(data => {
-            setInputs(data.inputFields);
-        })
-        .catch(error => {
-            setErrors(errors);
-            if (error.response.status === 404) {
-                navigate(`/welcome/${link}`);
-                return;
-            }
-        })
-    }
 
     useEffect(() => {
         setZoomIntoView(true);
-        businessForm();
+        getbusinessFormDetails()
         getPreview();
         return() => {
             setLoading(false)
@@ -88,16 +76,16 @@ export default function WelcomeDetails() {
     }, []);
 
 
-    const getbusinessForm = () => {
+    const getbusinessFormDetails = () => {
         const time = DateTime.local().toISO();
         Promise.all([
             isBusinesssOpen(link, time),
-            getbusinessForm(link)
+            getBusinessForm(link)
         ])
         .then(([businessOpenResponse, businessFormResponse]) => {
             setAcceptingStatus({waitlist: businessOpenResponse.acceptingWaitlist, appointments: businessOpenResponse.acceptingAppointments});
             setOpen(businessOpenResponse.isOpen);
-            setFormFields(businessFormResponse.data.inputFields);
+            setFormFields(businessFormResponse.inputFields);
             if (businessOpenResponse.acceptingWaitlist === false && businessOpenResponse.acceptingAppointments === false && businessOpenResponse.isOpen === false) {
                 setOpen(false);
                 setDisable(true);
@@ -121,7 +109,7 @@ export default function WelcomeDetails() {
     const getPreview = () => {
         const clientJson = sessionStorage.getItem(CLIENT);
         if (clientJson === null) {
-            setErrors('No data has been saved.');
+            setErrors({title: 'Error', body: 'There is nothing saved on file.'});
             return 
         }
         const clientData = JSON.parse(clientJson);
@@ -156,7 +144,7 @@ export default function WelcomeDetails() {
         })
         .catch(error => {
             setLoading(false);
-            setErrors(error);
+            setErrors({title: 'Error', body: error.msg});
         })
         .finally(() => {
             setZoomIntoView(false);
@@ -184,8 +172,34 @@ export default function WelcomeDetails() {
     }
 
     const redirectBack = () => {
-        navigate(`/welcome/${link}/selector`)
+        sessionStorage.removeItem(CLIENT);
+        navigate(`/welcome/${link}`)
     }
+
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const remainingSeconds = time % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    };
+
+    useEffect(() => {
+        const intervalId = setInterval(() => {
+          setSeconds(prevSeconds => {
+            if (prevSeconds > 0) {
+              return prevSeconds - 1;
+            } else {
+              clearInterval(intervalId); // Clear interval when countdown reaches 0
+              redirectBack(); // Execute function when countdown reaches 0
+              return 0; // Ensure the countdown stops at 0
+            }
+          });
+        }, 1000);
+      
+        // Clear interval when unmounting
+        return () => clearInterval(intervalId);
+      }, []);
+
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
@@ -207,13 +221,19 @@ export default function WelcomeDetails() {
                             </IconButton>
                         </Container>
                         <CardContent sx={{textAlign: 'center'}}>
-                            { errors ? <Alert color="warning">{errors}</Alert>: null} 
+                            { errors.title === "Error" ? <Alert color={errors.title === "Errors" ? 'error': 'success'}>
+                                <AlertTitle>{errors.title}</AlertTitle>
+                                - {errors.body}
+                            </Alert>: null} 
                         
                             <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                 {link}
                             </Typography>
                             <Typography variant="h4" fontWeight="bold" gutterBottom>
                                 Enter your details
+                            </Typography>
+                            <Typography variant="body2" textAlign={'center'} gutterBottom>
+                                You have <strong>{`${formatTime(seconds)}`} </strong>to secure your spot!
                             </Typography>
 
                             

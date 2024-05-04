@@ -179,7 +179,6 @@ export default function Welcome() {
         return (
             <>
             <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bolder" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
-            { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography textAlign={'center'} variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
 
             {businessPresent ? <PresentWaitlineInformation present={businessPresent} acceptingStatus={acceptingStatus}/> : <CircularProgress  size={20}/> }
@@ -231,13 +230,11 @@ export default function Welcome() {
                                 <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                                 <br/>                        
                             </CardActions>
-                            {errors ? (null) : 
                             <Box textAlign={'center'}>
                             <IconButton onClick={() => setShowBusinessInfo(true)}>
                                 <InfoOutlinedIcon fontSize="small"/>
                             </IconButton>
                             </Box>
-                            }
 
                         </Card>
                     </Grid>
@@ -255,13 +252,13 @@ export default function Welcome() {
             <DialogContent>
                 { business ? (
                     <Stack>
-                        <Typography variant="caption">Name</Typography>
+                        <Typography variant="caption" fontWeight={'bold'}>Name</Typography>
                         <Typography variant="subtitle2">{business.businessName} </Typography>
-                        <Typography variant="caption">Address</Typography>
-                        <Typography variant="subtitle2">{business.businessAddress} </Typography>
-                        <Typography variant="caption">Phone</Typography>
+                        <Typography variant="caption" fontWeight={'bold'}>Address</Typography>
+                        <Typography variant="subtitle2" >{business.businessAddress} </Typography>
+                        <Typography variant="caption" fontWeight={'bold'}>Phone</Typography>
                         <Typography variant="subtitle2">{business.businessPhone} </Typography>
-                        <Typography variant="caption">Website</Typography>
+                        <Typography variant="caption" fontWeight={'bold'}>Website</Typography>
                         <Typography variant="subtitle2">{business.businessWebsite} </Typography>
                     </Stack>
                 )

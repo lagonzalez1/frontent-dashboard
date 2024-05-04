@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
     Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert, Chip, Divider, AlertTitle, Tooltip, 
     useMediaQuery,
-    Zoom} from "@mui/material";
+    Zoom,
+    ListItemIcon} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
@@ -15,13 +16,13 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
-import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
+
 import { ThemeProvider, useTheme } from "@emotion/react";
 import { ClientWelcomeTheme } from "../../theme/theme";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
-import { SettingsEthernetRounded } from "@mui/icons-material";
-
+import { AttachMoney, AttachMoneyOutlined, FiberManualRecord, SetMeal, SettingsEthernetRounded } from "@mui/icons-material";
+import AvTimerIcon from '@mui/icons-material/AvTimer';
 
 export default function WelcomeSelector() {
 
@@ -46,6 +47,7 @@ export default function WelcomeSelector() {
 
     const [alertAppointments, setAlertAppointment] = useState(false);
     const [errorMessage, setErrorMessage] = useState({title: '', body: ''});
+    const [appointmentSearchErrors, setAppointmentSearchErrors] = useState({title: null, body: null});
 
 
     const [open, setOpen] = useState(false);
@@ -78,11 +80,9 @@ export default function WelcomeSelector() {
         employee_id: null,
         service_id: null,
         resource_id: null,
-        start: null,
         end: null,
         date: null,
         start: null,
-        end: null,
         notes: null,
     });
 
@@ -243,7 +243,11 @@ export default function WelcomeSelector() {
             date: null,
             start: null,
             end: null
-        })
+        });
+        setSlots(null);
+        setAppEmployees(null);
+        setOpenEmployees(false);
+        setOpenAvailability(false)
         setOpenWaitlistSummary(false);
         setOpenSummary(false);
     }
@@ -275,12 +279,15 @@ export default function WelcomeSelector() {
      *  
      */
     const handleDateChange = (date) => {
+        setAppointmentSearchErrors({title: null, body: null})
         setOpenEmployees(false);
         setOpenSummary(false);
+        setAppEmployees(null);
         setOpenWaitlistSummary(false);
         setSlots(null);
         setOpenServices(false);
         setAppointmentData((prev) => ({...prev, date: date, start: null, end: null}));
+        setAppointmentSearchErrors({title: null, body: null})
         getAvailableEmployees(date);
         handleEmployeeRefChange(); // Trigger focus on employee section
         
@@ -293,7 +300,8 @@ export default function WelcomeSelector() {
      */
     const handleServiceChange = (service) => {
         setOpenAvailability(true);
-        setAppointmentData((prev) => ({...prev, service_id: service._id, serviceName: service.title})); // Assume this will not fail, might be q issue later. 
+        setSlots(null)
+        setAppointmentData((prev) => ({...prev, service_id: service._id, serviceName: service.title, start: null, end: null})); // Assume this will not fail, might be q issue later. 
         searchAppointments(service._id);
         handleAvailabilityRefChange() // Trigger focus on intervals.
     }
@@ -326,7 +334,7 @@ export default function WelcomeSelector() {
         .then(response => {
             if(response.data.length === 0){
                 setAlertAppointment(true);
-                setErrorMessage({title: 'Error',body: 'No available appointments.'})
+                setAppointmentSearchErrors({title: 'Error',body: 'No available appointments.'})
                 return;
             }
             setSlots(response.data);
@@ -371,7 +379,7 @@ export default function WelcomeSelector() {
                 >   
                     <Zoom in={zoomIntoView}>
                     <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
-                        <Card className="wcard" variant="outlined" sx={{ borderRadius: 5, p: 3, pt: 1}}>
+                        <Card className="wcard" variant="outlined" sx={{ borderRadius: 5, p: 2, pt: 1}}>
                         {loading ? (<CircularProgress />): 
                         <CardContent sx={{ pt: 1, justifyItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                             <Box sx={{ textAlign: 'left'}}>
@@ -386,21 +394,24 @@ export default function WelcomeSelector() {
                             <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
                                 Type
                             </Typography>
+                            <Typography variant="body2" fontWeight="bold" textAlign={'center'}>
+                                Choose which suits your schedule!
+                            </Typography>
                             </Box>
                             
                             <Container sx={{ justifyContent: 'center', alignItems: 'center', paddingRight: '2px', paddingLeft: '2px'}}>
-                            { error ? (
+                            { errorMessage.title ? (
                                 <Alert
                                 ref={errorRef}
                                 severity="error"
                                 action={
                                     <IconButton
-                                    aria-label="close"
-                                    color="error"
-                                    size="small"
-                                    onClick={() => {
-                                        setError(null);
-                                    }}
+                                        aria-label="close"
+                                        color="error"
+                                        size="small"
+                                        onClick={() => {
+                                            setErrorMessage({title: null, body: null})
+                                        }}
                                     >
                                     <CloseIcon fontSize="inherit" />
                                     </IconButton>
@@ -427,7 +438,7 @@ export default function WelcomeSelector() {
                                 systemTypeSelected === APPOINTMENT 
                                 &&
                                 <Container id="appointmentSection">
-                                    <Typography align="left" sx={{pt: 1}} variant="body1" fontWeight={'bold'}>Select a date</Typography>
+                                    <Typography align="left" sx={{pt: 1}} variant="body1" fontWeight={'bold'}>Select a preferred date</Typography>
                                         <DateCalendar
                                             sx={{width: 'auto'}}
                                             disablePast={true}
@@ -464,7 +475,7 @@ export default function WelcomeSelector() {
                                                                             <CardActionArea>
                                                                                 <CardContent>
                                                                                     <PersonIcon fontSize="small" />
-                                                                                    <Typography variant="caption">{employee.fullname}</Typography>
+                                                                                    <Typography variant="caption" fontWeight={'bold'}>{employee.fullname}</Typography>
                                                                                 </CardContent>
                                                                             </CardActionArea>
                                                                         </Card>
@@ -514,8 +525,8 @@ export default function WelcomeSelector() {
                                                                             </Stack>
                                                                             <Divider variant="middle" />                                                                    
                                                                             <Stack sx={{m: 1}} spacing={0.5}>
-                                                                                <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
-                                                                                <Chip size="small" label={"Cost: " + service.cost} avatar={<PaidRoundedIcon fontSize="small" />} />
+                                                                                <Chip color="info" variant="outlined" label={"Duration: " + service.duration + " min" } avatar={<AvTimerIcon fontSize="small" />} />
+                                                                                <Chip color="success" variant="outlined" label={"Cost: " + service.cost} avatar={<AttachMoneyOutlined fontSize="small" />} />
                                                                             </Stack>
                                                                             </CardContent>
                                                                         </CardActionArea>
@@ -563,7 +574,7 @@ export default function WelcomeSelector() {
                                                                             onClick={() => appointmentSlotSelect(appointment)} 
                                                                             color={appointmentData.start === appointment.start ? 'secondary': 'secondary'}
                                                                             id="appointmentButtons">
-                                                                            <Typography variant="body2" sx={{ pl: 1, pr: 1}}>{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>
+                                                                            {appointment.start ? (<Typography variant="body2" sx={{ pl: 1, pr: 1}}>{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>) : null}
                                                                             
                                                                         </Button>
                                                                         </Grid>
@@ -573,7 +584,7 @@ export default function WelcomeSelector() {
                                                             ): null
                                                         }
                                                             <Grid item>
-                                                                <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={errorMessage.title} body={''} />
+                                                                <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={appointmentSearchErrors.title} body={appointmentSearchErrors.body} />
                                                             </Grid>
                                                         </Grid>
                                                     </Box>
@@ -607,14 +618,18 @@ export default function WelcomeSelector() {
                                                     <Box sx={{ pt: 2, display: openSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
                                                         <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
                                                             <AlertTitle><Typography variant="body1"><strong>Details saved</strong></Typography></AlertTitle>
-                                                            <Typography variant="caption">Date assigned — <strong>{appointmentData && appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>
+                                                            {appointmentData.date ? (<Typography variant="caption">Date assigned — <strong>{appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>) : null}
                                                             <br/>
-                                                            <Typography variant="caption">Start — <strong>{appointmentData && DateTime.fromFormat(appointmentData.start, "HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(appointmentData.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>
+                                                            {appointmentData.start && appointmentData.end ? 
+                                                            (<Typography variant="caption">Start — <strong>{appointmentData.start && DateTime.fromFormat(appointmentData.start,"HH:mm").toFormat("h:mm a")}</strong> — End <strong>{DateTime.fromFormat(appointmentData.end, "HH:mm").toFormat("h:mm a")} </strong></Typography>): null}
                                                             <br/>
-                                                            <Typography variant="caption">With — <strong>{appointmentData && appointmentData.fullname}</strong></Typography>
+                                                            {appointmentData.fullname ? (
+                                                                <Typography variant="caption">With — <strong>{appointmentData.fullname}</strong></Typography>
+                                                            ): null}
                                                             <br/>
-                                                            <Typography variant="caption">Service — <strong>{appointmentData && appointmentData.serviceName}  </strong></Typography>
-                                                            
+                                                            {appointmentData.serviceName ? (
+                                                                <Typography variant="caption">With — <strong>{appointmentData.serviceName}</strong></Typography>
+                                                            ): null}                                                            
                                                         </Alert>
                                                     </Box>
                                                 ) : null
@@ -635,11 +650,12 @@ export default function WelcomeSelector() {
                                                 <Select
                                                     id="employee"
                                                     name="employee_id"
-                                                    defaultValue={waitlistData.employee_id}
+                                                    color="secondary"
+                                                    value={waitlistData.employee_id}
                                                     onChange={(event) => {
                                                         const selectedEmployeeId = event.target.value;
                                                         const selectedEmployee = businessExtras.employees.find(employee => employee.id === selectedEmployeeId);
-                                                        setWaitlistData(prev => ({
+                                                        setWaitlistData((prev) => ({
                                                             ...prev,
                                                             employee_id: selectedEmployeeId,
                                                             fullname: selectedEmployee ? selectedEmployee.fullname : ''
@@ -648,10 +664,11 @@ export default function WelcomeSelector() {
                                                 >
                                                     {Array.isArray(businessExtras.employees) ? businessExtras.employees.map((employee) => (
                                                         <MenuItem key={employee.id} value={employee.id}>
-                                                            {employee.fullname}
+                                                            <Typography variant="body2">{employee.fullname}</Typography>
                                                         </MenuItem>
                                                     )) : null}
                                                 </Select>
+
                                             </>
                                         ) : null}
                                         {businessPresent && businessPresent.services === true ? (
@@ -660,19 +677,22 @@ export default function WelcomeSelector() {
                                             <Select
                                             id="services"
                                             name="service_id"
+                                            color="secondary"
                                             value={waitlistData.service_id}
                                             >
                                             { Array.isArray(businessExtras.services) ? businessExtras.services.map((service) => {
                                                 if (!service.public) { return null;}
                                                 return (
+                                                
                                                 <MenuItem key={service._id} value={service._id} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
-                                                    <Stack>
-                                                        <Typography variant="body2">{service.title}</Typography>
-                                                        <Typography variant="caption">{'Duration: ' + service.duration + " (min) " }</Typography>
-                                                        <Typography variant="caption">{businessPresent.servicePrice ? ("Cost: " + service.cost) : null}</Typography>
-                                                    </Stack>
-                                        
-                                                </MenuItem>
+                                                <ListItemIcon>
+                                                    { service.active ? <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> : <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> }
+                                                </ListItemIcon>
+                                                <Typography variant="body2">{service.title} </Typography>
+                                                <Typography variant="caption">{`Duration: ${service.duration} min`}</Typography>
+                                                {service.cost ? (<Typography variant="caption">{businessPresent.servicePrice ? ("Cost: " + service.cost) : null}</Typography>): null}
+                                            </MenuItem>
+
                                                 )}):null }
                                             </Select>
                                         </>
@@ -685,13 +705,16 @@ export default function WelcomeSelector() {
                                             as={Select}
                                             id="resources"
                                             name="resource_id"
+                                            color="secondary"
                                             value={waitlistData.resource_id}
                                             >
                                             {Array.isArray(businessExtras.resources) ? businessExtras.resources.map((resource) => {
-                                                if (!resource.public) { return null }
                                                 return (
                                                 <MenuItem key={resource._id} value={resource._id} onClick={() => setWaitlistData((prev) => ({...prev, resource_id: resource._id, resourceTitle: resource.title}))}>
-                                                    <Typography variant="body2">{resource.title} </Typography>
+                                                    <Stack>
+                                                    <Typography variant="body2" fontWeight={'bold'}>{resource.title} </Typography>
+                                                        {resource.description ? (<Typography variant="caption">{`Description: ${resource.description}`}</Typography>): null}
+                                                    </Stack>
                                                 </MenuItem>
                                                 )}) : null}
                                             </Select>
@@ -705,6 +728,7 @@ export default function WelcomeSelector() {
                                                     id="notes"
                                                     name="notes"
                                                     label="Notes"
+                                                    color="secondary"
                                                     placeholder="Additional notes"
                                                     value={waitlistData.notes}
                                                 onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }

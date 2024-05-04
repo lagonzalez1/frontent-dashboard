@@ -175,6 +175,9 @@ export default function WelcomeSize() {
                         <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
                             Party size
                         </Typography>
+                        <Typography variant="body2" fontWeight={'bolder'} textAlign={'center'}>
+                            Is anyone joining you ?
+                        </Typography>
 
                         <Stack direction='row' spacing={2} sx={{ pt: 5, p: 2}}>
                         <ToggleButtonGroup
