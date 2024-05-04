@@ -1,6 +1,57 @@
 import axios from "axios"
-import { styled } from '@mui/system';
-import { Card } from '@mui/material';
+
+
+
+// Return the acceptance of both waittime and appointments
+// Also checks for closedDate range {start and end} for waitlist
+export const isBusinesssOpen = (link, time) => {   
+  return new Promise((resolve, reject) => {
+    axios.get('/api/external/isBusinessOpen', { params: {link, time}})
+    .then((response) => {
+      resolve(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+      if (error.response) {
+          console.log(error.response);
+          reject({msg: 'Response error', error: error.response});
+      }
+      else if (error.request){
+          console.log(error.request);
+          reject({msg: 'No response from server', error: error.request})
+      }
+      else {
+          reject({msg: 'Request setup error', error: error.message})
+      }
+      
+  })
+  })
+}
+
+export const getBusinessPresent = (link, time) => {
+  return new Promise((resolve, reject) => {
+    axios.get('/api/external/businessPresentables', {params: {link, time}})
+    .then(response => {
+      resolve(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+      if (error.response) {
+          console.log(error.response);
+          reject({msg: 'Response error', error: error.response});
+      }
+      else if (error.request){
+          console.log(error.request);
+          reject({msg: 'No response from server', error: error.request})
+      }
+      else {
+          reject({msg: 'Request setup error', error: error.message})
+      }
+      
+  })
+  })
+}
+
 
 export const allowClientJoin = (time,link) => {
     return new Promise((resolve, reject) => {
@@ -14,7 +65,7 @@ export const allowClientJoin = (time,link) => {
         });
     });
   };
-  // 
+  
   export const getAvailableAppointments = (payload) => {
     return new Promise((resolve, reject) => {
         const data = { ...payload}
@@ -23,9 +74,20 @@ export const allowClientJoin = (time,link) => {
             resolve(response.data);
         })
         .catch(error => {
-            reject(error);
-
-        })
+          console.log(error);
+          if (error.response) {
+              console.log(error.response);
+              reject({msg: 'Response error', error: error.response});
+          }
+          else if (error.request){
+              console.log(error.request);
+              reject({msg: 'No response from server', error: error.request})
+          }
+          else {
+              reject({msg: 'Request setup error', error: error.message})
+          }
+          
+      })
     })
 }
 
@@ -49,9 +111,21 @@ export const allowClientJoin = (time,link) => {
           }
           resolve(response.data.msg);
         })
-        .catch((error) => {
-          reject(error);
-        });
+        .catch(error => {
+          console.log(error);
+          if (error.response) {
+              console.log(error.response);
+              reject({msg: 'Response error', error: error.response});
+          }
+          else if (error.request){
+              console.log(error.request);
+              reject({msg: 'No response from server', error: error.request})
+          }
+          else {
+              reject({msg: 'Request setup error', error: error.message})
+          }
+          
+      })
     });
   };
 
@@ -69,6 +143,8 @@ export const allowClientJoin = (time,link) => {
       })
     })
   }
+
+  
 
   export const requestBusinessArguments = (link) => {
     return new Promise((resolve, reject) => {
@@ -91,11 +167,48 @@ export const allowClientJoin = (time,link) => {
             resolve(response.data);
         }) 
         .catch(error => {
-            reject(error);
-        })
+          console.log(error);
+          if (error.response) {
+              console.log(error.response);
+              reject({msg: 'Response error', error: error.response});
+          }
+          else if (error.request){
+              console.log(error.request);
+              reject({msg: 'No response from server', error: error.request})
+          }
+          else {
+              reject({msg: 'Request setup error', error: error.message})
+          }
+          
+      })
     })
   }
 
+
+  export const getBusinessServeMax = (link) => {
+    return new Promise((resolve, reject) => {
+      axios
+      .get('/api/external/serveMax', { params: {link} })
+      .then((response) => {
+        resolve(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
+    })
+  }
 
   export const getMax = (link) => {
     return new Promise((resolve, reject) => {
@@ -104,22 +217,46 @@ export const allowClientJoin = (time,link) => {
       .then((response) => {
         resolve(response.data);
       })
-      .catch((error) => {
-        reject(error);
-      })
+      .catch(error => {
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
     })
   }
 
-  export const getBuisnessForm = (link) => {
+  export const getBusinessForm = (link) => {
     return new Promise((resolve, reject) => {
       axios
       .get('/api/external/businessForm', { params: {link} })
       .then((response) => {
         resolve(response.data);
       })
-      .catch((error) => {
-        reject(error);
-      })
+      .catch(error => {
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
     })
   }
 
@@ -129,9 +266,21 @@ export const allowClientJoin = (time,link) => {
       .then((res) => {
         resolve(res.data);
       })
-      .catch((error) => {
-        reject(error);
-      })
+      .catch(error => {
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
     })
   }
 
@@ -142,9 +291,21 @@ export const allowClientJoin = (time,link) => {
       .then((response) => {
         resolve(response.data);
       })
-      .catch((error) => {
-        reject(error);
-      })
+      .catch(error => {
+        console.log(error);
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
     })
   }
   

@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, Alert, CircularProgress, Stack, 
     Avatar, Divider, IconButton, List, ListItem, ListItemText, Chip, Dialog, DialogTitle, DialogContent, DialogActions, 
     Grid,
-    Zoom} from "@mui/material";
+    Zoom,
+    Slide,
+    AlertTitle} from "@mui/material";
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { allowClientJoin, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
+import { allowClientJoin, getBusinessPresent, isBusinesssOpen, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 import { ThemeProvider } from "@emotion/react";
@@ -18,24 +20,42 @@ export default function Welcome() {
     const { link } = useParams();
     const [open, setOpen] = useState(false);
 
-    
 
     const [loading, setLoading] = useState(true);
-    const [errors, setErrors] = useState();
-
+    const [errors, setErrors] = useState({title: null, body: null});
     const [iconImageLink, setIconImage] = useState(null);
-    const [system, setSystem] = useState(null);
-    const [present, setPresent] = useState(null);
-    const [waittime, setWaittime] = useState(null);
     const [waittimeRange, setWaittimeRange] = useState(null);
     const [position, setPosition] = useState(null);
 
-    const [schedule, setSchedule] = useState({});
+    
+    const [businessPresent, setBusinessPresent] = useState({
+        position: null,
+        waittime: null,
+        waitlist: null,
+        services: null,
+        employees: null,
+        resources: null,
+        servicePrice: null
+    });
 
-    const [businessDetails, setBusiness] = useState(null);
+    const [system, setSystem] = useState({
+        waitlist: null,
+        appointments: null,
+        equalDate: null,
+        autoDelete: null,
+        maxAppointmentDate: null
+    })
+
+    const [businessInfo, setShowBusinessInfo] = useState(false);
+    const [business, setBusinessInfo] = useState({
+        businessName: null,
+        businessAddress: null,
+        businessPhone: null,
+        businessWebsite: null
+    })
+
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
-    const [nextDate, setNextAvailableDate] = useState({});
-    const [businessInfo, showBusinessInfo] = useState(false);
+    const [nextDate, setNextAvailableDate] = useState(null);
     const [zoomIntoView, setZoomIntoView] = useState(false);
 
     const navigate = useNavigate();
@@ -48,51 +68,44 @@ export default function Welcome() {
 
 
     useEffect(() => {
-        gatherBusinessData();
+        getBusinessData();
     }, [])
 
-    const gatherBusinessData = () => {
-        setLoading(true);
-        const currentTime = DateTime.local().toISO();       
-        Promise.all([
-            requestBusinessSchedule(link),
-            requestBusinessArguments(link),
-            allowClientJoin(currentTime, link)
-        ])
-        .then(([scheduleResponse, argsResponse, stateResponse]) => {
-            if (stateResponse.status === 404){
-                setOpen(false);
-                setErrors(stateResponse.data.msg);
-                setLoading(false);
-                return;
-            }
-            setSchedule(scheduleResponse.schedule); // Get schedule
-            setNextAvailableDate(scheduleResponse.nextAvailable); // Get next available date
-            setIconImage(argsResponse.profileLink); // Get image link
-            setPresent(argsResponse.present) // What can i present to user Waittime,est time...
-            setSystem(argsResponse.system); // What can i show, waitlist and or appointments.
 
-            if (stateResponse.status === 200){
-                setAcceptingStatus({ waitlist: stateResponse.data.isAccepting, appointments: stateResponse.data.acceptingAppointments});
-                if (stateResponse.data.isAccepting === false && stateResponse.data.acceptingAppointments === false) {
-                    navigate(`/welcome/${link}`);
-                    return;
-                }
-                setWaittime(stateResponse.data.waittime); 
-                setWaittimeRange(stateResponse.data.waittimeRange)
-                setOpen(stateResponse.data.isAccepting);
-                setPosition(stateResponse.data.waitlistLength);
-                setBusiness(argsResponse.businessDetails);
-                setLoading(false);
-            }
+    // 1. Waittime data
+    // 2. Check if closed overall.
+    // 3. If open or closed. {appointment, waitlist}
+    const getBusinessData = () => {
+        setLoading(true);
+        const currentTime = DateTime.local().toISO();
+        Promise.all([
+            isBusinesssOpen(link, currentTime),
+            getBusinessPresent(link, currentTime)
+        ])
+        .then(([businessOpenResponse, businessPresentResponse]) => {
+            setOpen(businessOpenResponse.isOpen);
+            setNextAvailableDate(businessPresentResponse.nextAvailable);
+            setAcceptingStatus({appointments: businessOpenResponse.acceptingAppointments, waitlist: businessOpenResponse.acceptingWaitlist});
+            setBusinessPresent(businessPresentResponse.presentables);
+            setSystem(businessPresentResponse.system);
+            setWaittimeRange(businessPresentResponse.waittimeRange);
+            setBusinessInfo(businessPresentResponse.businessInformation);
+            setIconImage(businessPresentResponse.profileLink);
+            setPosition(businessPresentResponse.position);
         })
         .catch(error => {
             console.log(error);
             if (error.status === 404) {
-                setErrors(errors.response.data.msg);
+                setErrors({title: 'Error', body: errors.response.data.msg});
+                setOpen(false);
+                setNextAvailableDate(null);
+                return;
             }
             else {
-                setErrors('Error found when collecting data.');
+                setErrors({title: 'Error', body: 'Error found when collecting data.'});
+                setOpen(false);
+                setNextAvailableDate(null);
+                return;
             }
         })
         .finally(() => {
@@ -101,23 +114,26 @@ export default function Welcome() {
         });
     }
 
+
+
+
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
-            <Stack spacing={0.5} mb={1}>
-                { present.position === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
+            <Stack spacing={0.2} mb={0.5}>
+                { present.position === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="caption">currently <strong>{position}</strong> in line</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="caption">est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }
 
     const closeBusinessInfo = () => {
-        showBusinessInfo(false);
+        setShowBusinessInfo(false);
     }
 
 
     const ErrorNotFound = () => {
         return (
-            <>
+            <Box>
                 <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
                 <Typography textAlign={'center'} variant="body2" gutterBottom>Unfortunately the link you have used does not exist.</Typography> 
                 <br/>
@@ -127,26 +143,26 @@ export default function Welcome() {
                 <Typography textAlign={'center'} variant="caption" gutterBottom>not connected to a stable internet</Typography>
 
             
-            </>
+            </Box>
         )
     }
 
     const CheckBusinessArguments = () => {
-        if ( nextDate === 'No upcoming available dates in the schedule.') { 
+        if ( nextDate === 'No upcoming available dates in the schedule.' || nextDate === null) { 
             return <ErrorNotFound />
         }
         // Closed for both options
-        if (acceptingStatus.waitlist === false && acceptingStatus.appointments === false) {
+        if (open === false && acceptingStatus.appointments === false) {
             const start = DateTime.fromFormat( nextDate.start, "HH:mm").toFormat('h:mm a');
             const end = DateTime.fromFormat( nextDate.end, "HH:mm").toFormat('h:mm a');
             return (
                 <>
-                    <Typography textAlign={'center'} sx={{  pt: 2}} variant="h5" fontWeight='bold'>
+                    <Typography textAlign={'center'} sx={{ pt: 2}} variant="h5" fontWeight='bolder'>
                             This waitlist is currently closed.
                     </Typography>
 
                     <Container sx={{ justifyContent: 'center', justifyItems: 'center', pt: 2}}>
-                    <Stack spacing={0.5}>
+                    <Stack spacing={0}>
                         <Typography textAlign={'center'} variant="subtitle1">
                             {"Waitlist will open again"}
                         </Typography>
@@ -166,18 +182,16 @@ export default function Welcome() {
             { acceptingStatus.waitlist === false && acceptingStatus.appointments === true ? (<Typography textAlign={'center'} variant="body2" gutterBottom>Only appointments are available to make.</Typography> ): null }
             <br/>
 
-            {present ? <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/> : <CircularProgress  size={20}/> }
+            {businessPresent ? <PresentWaitlineInformation present={businessPresent} acceptingStatus={acceptingStatus}/> : <CircularProgress  size={20}/> }
             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
                 <Typography variant="body2"  fontWeight="bold" sx={{color: ' white', margin: 1 }}>
-                    { acceptingStatus.waitlist && acceptingStatus.appointments ? 'Join waitlist' : 'create appointment'}
+                    { acceptingStatus.waitlist === true && acceptingStatus.appointments === false ? 'Join waitlist' : 'create appointment'}
                 </Typography>
             </Button>
             </>
         )
     }
     
-
-
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
@@ -190,15 +204,18 @@ export default function Welcome() {
                     justifyContent="center"
                     alignItems="center"                      
                 >   
-                    <Zoom in={zoomIntoView}>
+                    <Slide direction="up" in={zoomIntoView} mountOnEnter unmountOnExit>
                     <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
-                    <Card raised variant="outlined" sx={{pt: 1, borderRadius: 5, p: 4}}>
+                    <Card raised variant="outlined" className="wcard" sx={{pt: 1, borderRadius: 5, p: 4}}>
                             { loading ? 
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
                                 <CircularProgress size={20}/>
                             </Box> : 
                             (<>
-                            {errors ? <Alert color="error">{errors}</Alert>: null}
+                            {errors.title ? <Alert color={errors.title === "Error" ? 'error': 'success'}>
+                                <AlertTitle>{errors.title}</AlertTitle>
+                                {errors.body}
+                            </Alert>: null}
                             <CardContent>
                                 <Typography textAlign={'center'} variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                     {link}
@@ -216,7 +233,7 @@ export default function Welcome() {
                             </CardActions>
                             {errors ? (null) : 
                             <Box textAlign={'center'}>
-                            <IconButton onClick={() => showBusinessInfo(true)}>
+                            <IconButton onClick={() => setShowBusinessInfo(true)}>
                                 <InfoOutlinedIcon fontSize="small"/>
                             </IconButton>
                             </Box>
@@ -224,7 +241,7 @@ export default function Welcome() {
 
                         </Card>
                     </Grid>
-                    </Zoom>
+                    </Slide>
                 </Grid>
 
                 </Box>
@@ -233,19 +250,19 @@ export default function Welcome() {
                 onClose={closeBusinessInfo}
                 id="businessInfo"
             >
-            <DialogTitle><Typography variant="subtitle1" fontWeight={'bolder'}>Business information</Typography></DialogTitle>
+            <DialogTitle><Typography variant="h6" fontWeight={'bolder'}>Business information</Typography></DialogTitle>
             <Divider />
             <DialogContent>
-                { businessDetails ? (
+                { business ? (
                     <Stack>
                         <Typography variant="caption">Name</Typography>
-                        <Typography variant="subtitle1">{businessDetails.name} </Typography>
+                        <Typography variant="subtitle2">{business.businessName} </Typography>
                         <Typography variant="caption">Address</Typography>
-                        <Typography variant="subtitle1">{businessDetails.address} </Typography>
+                        <Typography variant="subtitle2">{business.businessAddress} </Typography>
                         <Typography variant="caption">Phone</Typography>
-                        <Typography variant="subtitle1">{businessDetails.phone} </Typography>
+                        <Typography variant="subtitle2">{business.businessPhone} </Typography>
                         <Typography variant="caption">Website</Typography>
-                        <Typography variant="subtitle1">{businessDetails.website} </Typography>
+                        <Typography variant="subtitle2">{business.businessWebsite} </Typography>
                     </Stack>
                 )
                 : null}

@@ -6,7 +6,7 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent,
      Zoom} from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
-import { allowClientJoin, getBuisnessForm, waitlistRequest,checkDuplicatesRequest } from "./WelcomeHelper";
+import { waitlistRequest,checkDuplicatesRequest, isBusinesssOpen } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
@@ -14,7 +14,7 @@ import * as Yup from 'yup';
 import { DateTime } from "luxon";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import { ThemeProvider } from "@emotion/react";
+import { ThemeProvider, useTheme } from "@emotion/react";
 import { ClientWelcomeTheme } from "../../theme/theme";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -40,23 +40,29 @@ export default function WelcomeDetails() {
         validationSchema: validationSchema,
         onSubmit: (values) => {
             setLoading(true);
-            checkAcceptingState(values);
+            externalWaitlistRequest(values);
         },
     });
 
     const { link } = useParams();
     const navigate = useNavigate();
     const [inputs, setInputs] = useState({});
-    const [errors, setErrors] = useState(null);
+    const [errors, setErrors] = useState({title: null, body: null});
     const [loading, setLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(null);
     const [preview, setPreview] = useState(null);
-    const [appointmentsOnly, setAppointmentsOnly] = useState(false);
+    
     const [showDisclosure, setShowDisclosure] = useState(false);
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
     const [zoomIntoView, setZoomIntoView] = useState(false);
+    const [disable, setDisable] = useState(false);
 
+    const [formFields, setFormFields] = useState({
+        fullname: null,
+        phone: null,
+        email: null,
 
+    })
 
     const businessForm = () => {
         getBuisnessForm(link)
@@ -74,13 +80,38 @@ export default function WelcomeDetails() {
 
     useEffect(() => {
         setZoomIntoView(true);
-        redirectStatus();
         businessForm();
         getPreview();
         return() => {
             setLoading(false)
         }
     }, []);
+
+
+    const getbusinessForm = () => {
+        const time = DateTime.local().toISO();
+        Promise.all([
+            isBusinesssOpen(link, time),
+            getbusinessForm(link)
+        ])
+        .then(([businessOpenResponse, businessFormResponse]) => {
+            setAcceptingStatus({waitlist: businessOpenResponse.acceptingWaitlist, appointments: businessOpenResponse.acceptingAppointments});
+            setOpen(businessOpenResponse.isOpen);
+            setFormFields(businessFormResponse.data.inputFields);
+            if (businessOpenResponse.acceptingWaitlist === false && businessOpenResponse.acceptingAppointments === false && businessOpenResponse.isOpen === false) {
+                setOpen(false);
+                setDisable(true);
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            setErrors({title: 'Error', body: error.msg});
+            setDisable(true); 
+        })
+        .finally(() => {
+            setLoading(false);
+        })
+    }
 
 
     const closeDisclosure = () => {
@@ -97,55 +128,6 @@ export default function WelcomeDetails() {
         setPreview(() => ({...clientData, date: DateTime.fromISO(clientData.date)})) ;
     }
 
-
-    const redirectStatus = () => {
-        const currentTime = DateTime.local().toISO();       
-        allowClientJoin(currentTime, link)
-        .then(response => {
-            if (response.status === 200) {
-                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
-                if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
-                    setZoomIntoView(false)
-                    navigate(`/welcome/${link}`);
-                    return;
-                }
-            }            
-        })
-        .catch(error => {
-            if (error.response.status === 404) {
-                setZoomIntoView(false)
-                navigate(`/welcome/${link}`);
-                return;
-            }
-            setErrors('Error found when trying to reach business.');
-        })
-    }
-
-    const checkAcceptingState = async (values) => {
-        let timestamp = DateTime.local().toUTC();
-        try {
-            const response = await allowClientJoin(timestamp, link);
-            const { isAccepting, acceptingAppointments } = response.data;
-            if ( acceptingAppointments === true || isAccepting === true ) {
-                externalWaitlistRequest(values);
-            }
-            else if (acceptingAppointments === false && isAccepting === false){
-                setErrors('Business is currently not accpeting appointments and waitlist request.');
-                setLoading(false);
-                return;
-            }
-            else{
-                setLoading(false);
-                redirectBack();
-            }
-            
-        }catch(error) {
-            setLoading(false);
-            redirectBack();
-        }
-    }
-
-
     const externalWaitlistRequest = (values) => {
         const clientPayload = sessionStorage.getItem(CLIENT);
         if (clientPayload === null) { 
@@ -161,6 +143,7 @@ export default function WelcomeDetails() {
         checkDuplicatesRequest(duplicatePayload)
         .then((response) => {
             if(response.duplicate === true) {
+                // This should allow the request to complete if less than 4
                 setLoading(false);
                 navigate(`/welcome/${link}/visits/${response.identifier}`);
             }else{
@@ -217,7 +200,7 @@ export default function WelcomeDetails() {
                 >
                     <Zoom in={zoomIntoView}>
                         <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
-                        <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
+                        <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
                         <Container sx={{ textAlign: 'left'}}>
                             <IconButton onClick={ () => redirectBack() }>
                                 <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
@@ -237,7 +220,7 @@ export default function WelcomeDetails() {
                             <form onSubmit={formik.handleSubmit}>
                             <Stack sx={{pt: 2}} spacing={1}>
 
-                                { inputs.fullname ? (
+                                { formFields && formFields.fullname ? (
                                     <>
                                     <InputLabel htmlFor="fullname" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Name *</InputLabel>
                                         <TextField
@@ -252,7 +235,7 @@ export default function WelcomeDetails() {
                                 </>
                                 ): null}
                                 
-                                { inputs.phone ? (
+                                { formFields && formFields.phone ? (
                                     <>
                                     <InputLabel htmlFor="phoneNumber" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Phone *</InputLabel>
                                         <TextField
@@ -269,7 +252,7 @@ export default function WelcomeDetails() {
                                 ) : null}
                                 
                                 
-                                { inputs.email ? (
+                                { formFields && formFields.email ? (
                                     <>
                                         <InputLabel htmlFor="email" sx={{ textAlign: 'left', fontWeight: 'bold'}}>Email *</InputLabel>
                                         <TextField
@@ -287,7 +270,7 @@ export default function WelcomeDetails() {
                                 
                                 
                                 <Divider/>
-                                <LoadingButton loading={loading} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+                                <LoadingButton disabled={disable} loading={loading} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
                                 <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
                                     submit 
                                 </Typography> 

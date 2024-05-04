@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { requestBusinessArguments, getExtras, getEmployeeList,getAvailableAppointments, allowClientJoin  } from "./WelcomeHelper";
+import { requestBusinessArguments, getExtras, getEmployeeList,getAvailableAppointments, allowClientJoin, isBusinesssOpen, getBusinessPresent  } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
@@ -20,6 +20,7 @@ import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
 import { ThemeProvider, useTheme } from "@emotion/react";
 import { ClientWelcomeTheme } from "../../theme/theme";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
+import { SettingsEthernetRounded } from "@mui/icons-material";
 
 
 export default function WelcomeSelector() {
@@ -29,31 +30,29 @@ export default function WelcomeSelector() {
     const currentDate = DateTime.now();
     const navigate = useNavigate();
 
-    const [loading, setLoading] = useState(true);
-    const [args, setArguments] = useState(null);
-    const [openEmployees, setOpenEmployees] = useState(false);
-    const [openServices, setOpenServices] = useState(false);
-    const [openAvailabity, setOpenAvailability] = useState(false);
-    const [openSummary, setOpenSummary] = useState(false);
-    const [openWaitlistSummary, setOpenWaitlistSummary] = useState(false);
-    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
-
     const errorRef = useRef();
     const employeesRef = useRef();
     const servicesRef = useRef();
     const availabiltyRef = useRef();
 
+    const [loading, setLoading] = useState(true);
+    const [openEmployees, setOpenEmployees] = useState(false);
+    const [openServices, setOpenServices] = useState(false);
+    const [openAvailabity, setOpenAvailability] = useState(false);
+
+    const [openSummary, setOpenSummary] = useState(false);
+    const [openWaitlistSummary, setOpenWaitlistSummary] = useState(false);
+    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
+
     const [alertAppointments, setAlertAppointment] = useState(false);
     const [errorMessage, setErrorMessage] = useState({title: '', body: ''});
 
 
+    const [open, setOpen] = useState(false);
+
     const [systemTypeSelected, setSystem] = useState(null);
 
     const [error, setError] = useState(null);
-    const [employees, setEmployees] = useState(null);
-    const [present, setPresent] = useState(null);
-    const [services, setServices] = useState(null);
-    const [resources, setResouces] = useState(null);
     const [slots, setSlots] = useState(false);
     const [disable, setDisable] = useState(false);
     const [zoomIntoView, setZoomIntoView] = useState(false);
@@ -87,6 +86,33 @@ export default function WelcomeSelector() {
         notes: null,
     });
 
+    const [system, setBusinessSystem] = useState({
+        waitlist: null,
+        appointments: null,
+        equalDate: null,
+        autoDelete: null,
+        maxAppointmentDate: null
+    })
+
+    const [businessPresent, setBusinessPresent] = useState({
+        position: null,
+        waittime: null,
+        waitlist: null,
+        services: null,
+        employees: null,
+        resources: null,
+        servicePrice: null,
+        notes: null
+    });
+
+    const [businessExtras, setBusinessExtras] = useState({
+        maxDateAvailable: null,
+        services: null,
+        resources: null,
+        employees: null,
+        timezone: null
+    })
+
     
 
     const appointmentSlotSelect = (duration) => {
@@ -99,13 +125,13 @@ export default function WelcomeSelector() {
         if (systemTypeSelected === APPOINTMENT){
             if (appointmentData.date === null || appointmentData.start === null || appointmentData.end === null || appointmentData.employee_id === null){
                 handleErrorRefChange(); // Trigger ref to show error message.
-                setError('Please select a date, employee and service.');
+                setErrorMessage({title: 'Error', body: 'Please select a date, employee and service.'});
                 return;
             }
             const payload = sessionStorage.getItem(CLIENT);
             if (payload === null) { 
                 handleErrorRefChange(); // Trigger ref to show error message.
-                setError('Unable to find previous values.');
+                setErrorMessage({title: 'Error', body: 'Unable to find previous saved values.'});
                 return;
             }
             // Check if data is empty.
@@ -125,7 +151,7 @@ export default function WelcomeSelector() {
             const payload = sessionStorage.getItem(CLIENT);
             if (payload === null) { 
                 handleErrorRefChange(); // Trigger ref to show error message.
-                setError('Unable to find previous values.');
+                setErrorMessage({title: 'Error', body: 'Unable to find previous saved values.'});
                 return;
             }
             let previousData = JSON.parse(payload);
@@ -141,7 +167,7 @@ export default function WelcomeSelector() {
             return;
         }
         handleErrorRefChange(); // Trigger ref to show error message.
-        setError('Please select from the options available.');
+        setErrorMessage({title: 'Error', body: 'Please select from the options available.'});
         return;
     }
 
@@ -165,74 +191,40 @@ export default function WelcomeSelector() {
     
     useEffect(() => {
         setZoomIntoView(true);
-        redirectStatus();
-        getBuisnessForm();
-        getBuisnessExtras();
+        getBusinessData();
         getPreviouslySaved();
         return() => {
             setLoading(false);
         }
-    }, [loading])
+    }, [loading]);
 
 
-    const redirectStatus = () => {
-        const currentTime = DateTime.local().toISO();       
-        allowClientJoin(currentTime, link)
-        .then(response => {
-            if (response.status === 200) {
-                if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
-                    setZoomIntoView(false);
-                    navigate(`/welcome/${link}`);
-                    return;
-                }
-                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
-            }       
+    const getBusinessData = () => {
+        const time = DateTime.local().toISO();
+        Promise.all([
+            isBusinesssOpen(link, time),
+            getBusinessPresent(link, time),
+            getExtras(link, time)
+        ])
+        .then(([businessOpenResponse, businessPresentResponse, extrasResponse]) => {
+            setOpen(businessOpenResponse.isOpen);
+            setAcceptingStatus({appointments: businessOpenResponse.acceptingAppointments, waitlist: businessOpenResponse.acceptingWaitlist});
+            setBusinessPresent(businessPresentResponse.presentables);
+            setBusinessSystem(businessPresentResponse.system);
+            setBusinessExtras(extrasResponse);
         })
         .catch(error => {
-            if (error.response.status === 404) {
-                setZoomIntoView(false);
-                navigate(`/welcome/${link}`);
-                return;
-            }
+            handleErrorRefChange();
+            setAcceptingStatus({waitlist: false, appointments: false});
+            setErrorMessage({title: 'Error', body: error.msg});
             setDisable(true);
-            handleErrorRefChange(); // Trigger ref to show error message.
-            setError('Error found when trying to reach business.');
-            return;
-        })
-    }
 
-    const getBuisnessForm = () => {
-        requestBusinessArguments(link)
-        .then(data => {
-            setArguments(data);
-        })
-        .catch(error => {
-            if (error.response.status === 400) {
-                navigate(`/welcome/${link}`);
-                return;
-            }
         })
         .finally(() => {
             setLoading(false);
-        })
+        });
     }
-
-    const getBuisnessExtras = () => {
-        const date = DateTime.local().toISO();
-        getExtras(link, date)
-        .then(data => {
-            setPresent(data.present);
-            setEmployees(data.employees);
-            setResouces(data.resources);
-            setServices(data.services);
-        })
-        .catch(error => {
-            setLoading(false);
-        })
-        .finally(() => {
-            setLoading(false);
-        })
-    }
+   
    
     const typeChange = (TYPE) => {
         setSystem(TYPE);
@@ -324,7 +316,7 @@ export default function WelcomeSelector() {
         setAlertAppointment(false);
         if (appointmentData.date === null || appointmentData.employee_id === null){ 
             handleErrorRefChange(); // Trigger ref to show error message.
-            setError("Please check if date, employee or resource is cheked.");
+            setErrorMessage({title: 'Error', body: 'Please make sure you have selected a date, employee and service.'});
             return;
         }
         const currentDate = DateTime.now().toISO();
@@ -332,18 +324,16 @@ export default function WelcomeSelector() {
         setAppSlotLoader(true)
         getAvailableAppointments(payload)
         .then(response => {
-            
             if(response.data.length === 0){
                 setAlertAppointment(true);
-                setErrorMessage({title: 'No available appointments.'})
+                setErrorMessage({title: 'Error',body: 'No available appointments.'})
                 return;
             }
             setSlots(response.data);
         })
         .catch(error => {
             handleErrorRefChange(); // Trigger ref to show error message.
-            setError(error);
-            console.log(error)
+            setErrorMessage({title: 'Error', body: error.msg});
         })
         .finally(() => {
             setAppSlotLoader(false);
@@ -358,7 +348,7 @@ export default function WelcomeSelector() {
         })
         .catch(error => {
             handleErrorRefChange(); // Trigger ref to show error message.
-            setError(error);
+            setErrorMessage({title: 'Error', body: error.msg});
         })  
         .finally(() => {
             setLoading(false);
@@ -381,7 +371,7 @@ export default function WelcomeSelector() {
                 >   
                     <Zoom in={zoomIntoView}>
                     <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
-                        <Card variant="outlined" sx={{ borderRadius: 5, p: 3, pt: 1}}>
+                        <Card className="wcard" variant="outlined" sx={{ borderRadius: 5, p: 3, pt: 1}}>
                         {loading ? (<CircularProgress />): 
                         <CardContent sx={{ pt: 1, justifyItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                             <Box sx={{ textAlign: 'left'}}>
@@ -389,7 +379,6 @@ export default function WelcomeSelector() {
                                     <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                                 </IconButton>
                             </Box>
-
                             <Box id="header_selector">
                             <Typography textAlign={'center'} variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                 {link}
@@ -401,7 +390,7 @@ export default function WelcomeSelector() {
                             
                             <Container sx={{ justifyContent: 'center', alignItems: 'center', paddingRight: '2px', paddingLeft: '2px'}}>
                             { error ? (
-                            <Alert
+                                <Alert
                                 ref={errorRef}
                                 severity="error"
                                 action={
@@ -418,18 +407,19 @@ export default function WelcomeSelector() {
                                 }
                                 sx={{ mb: 2 }}
                                 >
-                                {error}
+                                <AlertTitle>{errorMessage.title}</AlertTitle>
+                                - {errorMessage.body}
                                 </Alert>
                             ): null}
 
                             <br/>
                             <ButtonGroup size="large" fullWidth={true} variant="outlined">
                                 <Tooltip title="Waitlist - Wait in a general line.">
-                                    <Button disabled={args && !args.system.waitlist || acceptingStatus.waitlist === false} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
+                                    <Button disabled={acceptingStatus && (acceptingStatus.waitlist === true && open === true) ? false : true} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
 
                                 </Tooltip>
                                 <Tooltip title="Appointment - Schedule an appointment that best suits your schedule.">
-                                    <Button disabled={args && !args.system.appointments || acceptingStatus.appointments === false} variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> Appointment</Button>
+                                    <Button disabled={acceptingStatus && !acceptingStatus.appointments } variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> Appointment</Button>
                                 </Tooltip>
                                 
                             </ButtonGroup>
@@ -444,7 +434,7 @@ export default function WelcomeSelector() {
                                             value={appointmentData.date}
                                             onChange={(newDate) => handleDateChange(newDate) }
                                             defaultValue={currentDate} 
-                                            maxDate={args && DateTime.fromISO(args.maxDateAvailable)}
+                                            maxDate={businessExtras && DateTime.fromISO(businessExtras.maxDateAvailable)}
                                         />
                                             <Box sx={{pt: 1, display: openEmployees ? 'flex': 'none', paddingLeft: 0, paddingRight: 0}}>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Employees available</Typography>
@@ -507,8 +497,8 @@ export default function WelcomeSelector() {
                                                     >
 
                                                         {
-                                                            services ? 
-                                                            services
+                                                            businessExtras.services ? 
+                                                            businessExtras.services
                                                             .filter((service) => service.employeeTags.includes(appointmentData.employee_id))
                                                             .map((service) => (
                                                                 <Grid item key={service._id}>
@@ -592,8 +582,8 @@ export default function WelcomeSelector() {
                                             </Container>
 
                                             <Box sx={{pt: 1.5}}>
-                                                {present && present.notes === true ? (
-                                                    <>
+                                                {businessPresent && businessPresent.notes === true ? (
+                                                <>
                                                 <TextField
                                                     id="notes"
                                                     name="notes"
@@ -639,7 +629,7 @@ export default function WelcomeSelector() {
                                     
                                     <Stack sx={{ pt: 1 }} direction="column" spacing={1.5} textAlign="left">
                                         <Typography textAlign={'center'} variant="body1" fontWeight={'bold'}>Choose from the following</Typography>
-                                        {employees && present.employees === true ? (
+                                        {businessPresent && businessPresent.employees === true ? (
                                             <>
                                                 <Typography  fontWeight={'bold'} id="employee" variant="subtitle2">Employee preference</Typography>
                                                 <Select
@@ -648,7 +638,7 @@ export default function WelcomeSelector() {
                                                     defaultValue={waitlistData.employee_id}
                                                     onChange={(event) => {
                                                         const selectedEmployeeId = event.target.value;
-                                                        const selectedEmployee = employees.find(employee => employee.id === selectedEmployeeId);
+                                                        const selectedEmployee = businessExtras.employees.find(employee => employee.id === selectedEmployeeId);
                                                         setWaitlistData(prev => ({
                                                             ...prev,
                                                             employee_id: selectedEmployeeId,
@@ -656,7 +646,7 @@ export default function WelcomeSelector() {
                                                         }));
                                                     }}
                                                 >
-                                                    {Array.isArray(employees) ? employees.map((employee) => (
+                                                    {Array.isArray(businessExtras.employees) ? businessExtras.employees.map((employee) => (
                                                         <MenuItem key={employee.id} value={employee.id}>
                                                             {employee.fullname}
                                                         </MenuItem>
@@ -664,7 +654,7 @@ export default function WelcomeSelector() {
                                                 </Select>
                                             </>
                                         ) : null}
-                                        {services && present.services === true ? (
+                                        {businessPresent && businessPresent.services === true ? (
                                         <>
                                             <Typography fontWeight={'bold'} variant="subtitle2" id="services">Services</Typography>
                                             <Select
@@ -672,14 +662,14 @@ export default function WelcomeSelector() {
                                             name="service_id"
                                             value={waitlistData.service_id}
                                             >
-                                            { Array.isArray(services) ? services.map((service) => {
+                                            { Array.isArray(businessExtras.services) ? businessExtras.services.map((service) => {
                                                 if (!service.public) { return null;}
                                                 return (
                                                 <MenuItem key={service._id} value={service._id} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
                                                     <Stack>
                                                         <Typography variant="body2">{service.title}</Typography>
                                                         <Typography variant="caption">{'Duration: ' + service.duration + " (min) " }</Typography>
-                                                        <Typography variant="caption">{present.servicePrice ? ("Cost: " + service.cost) : null}</Typography>
+                                                        <Typography variant="caption">{businessPresent.servicePrice ? ("Cost: " + service.cost) : null}</Typography>
                                                     </Stack>
                                         
                                                 </MenuItem>
@@ -688,7 +678,7 @@ export default function WelcomeSelector() {
                                         </>
                                         ) : null}
 
-                                        {resources && present.resources === true ? (
+                                        {businessPresent && businessPresent.resources === true ? (
                                         <>
                                             <Typography fontWeight={'bold'} variant="subtitle2" id="resources" textAlign="left">Resources</Typography>
                                             <Select
@@ -697,7 +687,7 @@ export default function WelcomeSelector() {
                                             name="resource_id"
                                             value={waitlistData.resource_id}
                                             >
-                                            {Array.isArray(resources) ? resources.map((resource) => {
+                                            {Array.isArray(businessExtras.resources) ? businessExtras.resources.map((resource) => {
                                                 if (!resource.public) { return null }
                                                 return (
                                                 <MenuItem key={resource._id} value={resource._id} onClick={() => setWaitlistData((prev) => ({...prev, resource_id: resource._id, resourceTitle: resource.title}))}>
@@ -708,7 +698,7 @@ export default function WelcomeSelector() {
                                         </>
                                         ) : null}
                                         {
-                                            present && present.notes === true ? (
+                                            businessPresent && businessPresent.notes === true ? (
                                                 <>
                                                 <Typography variant="subtitle2" fontWeight={'bold'} id="notes">Anything we need to know before hand?</Typography>
                                                 <TextField

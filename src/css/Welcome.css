@@ -9,6 +9,10 @@
   min-height: 100% !important;
 }
 
+.wcard {
+  background-color: hsl(0, 0%, 97%) !important;
+}
+
 #intervalSelect {
   padding-left: 0 !important;
   padding-right: 0 !important;

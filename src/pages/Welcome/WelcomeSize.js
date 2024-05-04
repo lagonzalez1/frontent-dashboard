@@ -3,12 +3,15 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent,
     Fade, CircularProgress, Stack, ToggleButtonGroup, ToggleButton, IconButton, Zoom, TextField, ThemeProvider, paperClasses, 
     Grid,
     Grow,
-    Collapse} from "@mui/material";
+    Collapse,
+    Slide,
+    Alert,
+    AlertTitle} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
-import { allowClientJoin, getMax, requestBusinessArguments} from "./WelcomeHelper";
+import { allowClientJoin, getBusinessServeMax, getMax, isBusinesssOpen, requestBusinessArguments} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { CLIENT } from "../../static/static";
 import "../../css/Welcome.css";
@@ -51,33 +54,15 @@ export default function WelcomeSize() {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [size,setSize] = useState(1);
+    const [disable, setDisable] = useState(false);
 
     const [maxSize, setMaxSize] = useState(0);
-    const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
-    const [errors, setErrors] = useState(null);
+    const [errors, setErrors] = useState({title: null, body: null});
     const [zoomIntoView, setZoomIntoView] = useState(false);
 
-    const [present, setPresent] = useState(null);
-    const [waittime, setWaittime] = useState(null);
-    const [position, setPosition] = useState(null);
-    const [waittimeRange, setWaittimeRange] = useState(null);
 
     const navigate = useNavigate();
 
-
-    const getBuisnessForm = () => {
-        getMax(link)
-        .then(data => {
-            setMaxSize(data.serveMax);
-        })
-        .catch(error => {
-            setErrors(error);
-            console.log(error);
-        })
-        .finally(() => {
-            setZoomIntoView(true)
-        })
-    }
 
     const setDataAndContinue = () => {
         const object = {
@@ -98,43 +83,30 @@ export default function WelcomeSize() {
             return;
         }
     }
-
-    const businessArguments = () => {
-        requestBusinessArguments(link)
-        .then(response => {
-            setPresent(response.present);
-        })
-        .catch(error => {
-            console.log(error)
-            setErrors('Error found when trying to reach business.');
-        })
-
-    }
     
     useEffect(() => {
-        redirectStatus();
-        businessArguments();
-        getBuisnessForm();
         getAnySavedFields();
+        getBusinessData();
         return() => {
             setLoading(false);
         }
-    }, [loading])
+    }, [loading]);
 
-    const redirectStatus = () => {
-        const currentTime = DateTime.local().toISO();       
-        allowClientJoin(currentTime, link)
-        .then(response => {
-            if (response.status === 200) {
-                setAcceptingStatus({ waitlist: response.data.isAccepting, appointments: response.data.acceptingAppointments});
-                setPosition(response.data.waitlistLength);
-                setWaittime(response.data.waittime);
-                setWaittimeRange(response.data.waittimeRange);
-                if (response.data.isAccepting === false && response.data.acceptingAppointments === false) {
-                    navigate(`/welcome/${link}`);
-                    return;
-                }
-            }            
+
+    const getBusinessData = () => {
+        const time = DateTime.local().toISO();
+        Promise.all([
+            isBusinesssOpen(link, time),
+            getBusinessServeMax(link)
+        ])
+        .then(([businessOpenResponse, businessMaxResponse]) => {
+            if (businessOpenResponse.isOpen === false && businessOpenResponse.acceptingAppointments === false) { 
+                setDisable(true);
+                setErrors({title: 'Error', body: 'Business is currently not accepting request.'});
+                return;
+            }
+            setDisable(false);
+            setMaxSize(businessMaxResponse.serveMax);
             
         })
         .catch(error => {
@@ -142,10 +114,15 @@ export default function WelcomeSize() {
                 navigate(`/welcome/${link}`);
             }
             else {
-                setErrors('Error found when collecting data.');
+                setErrors({title: 'Error', body: 'Business is currently not accepting request.'});
             }
         })
+        .finally(() => {
+            setZoomIntoView(true);
+        })
     }
+
+   
    
     const handleChange = (event, value) => {
         if (value === 6){
@@ -161,14 +138,7 @@ export default function WelcomeSize() {
         navigate(`/welcome/${link}`)
     }
 
-    const PresentWaitlineInformation = ({present, acceptingStatus}) => {
-        return (
-            <Stack spacing={0.5} mb={1}>
-                { present.position === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="body2">Est wait <strong>{waittimeRange}</strong></Typography>}                
-            </Stack>
-        )
-    }
+
 
     return (
         <>
@@ -183,76 +153,82 @@ export default function WelcomeSize() {
                     justifyContent="center"
                     alignItems="center"                      
                 >
-                    <Zoom in={zoomIntoView}>
-                        <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
-                        <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
-                            <Container sx={{}}>
-                                <IconButton onClick={ () => redirectBack() }>
-                                    <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
-                                </IconButton>
-                            </Container>
-                            <CardContent sx={{}}>
+                <Slide direction="down" in={zoomIntoView} mountOnEnter unmountOnExit>
+                <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
+                <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
+                    <Container sx={{}}>
+                        <IconButton onClick={ () => redirectBack() }>
+                            <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
+                        </IconButton>
+                    </Container>
+                    {errors.title ? (
+                        <Alert variant="filled" color={errors.title === "Error" ? 'error': 'warning'}>
+                            <AlertTitle>{errors.title}</AlertTitle>
+                            - {errors.body}
+                        </Alert>
+                    ) : null}
+                    <CardContent sx={{}}>
 
-                                <Typography variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
-                                    {link}
-                                </Typography>
-                                <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
-                                    Party size
-                                </Typography>
+                        <Typography variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
+                            {link}
+                        </Typography>
+                        <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
+                            Party size
+                        </Typography>
 
-                                <Stack direction='row' spacing={2} sx={{ pt: 5, p: 2}}>
-                                <ToggleButtonGroup
-                                    value={size}
-                                    onChange={handleChange}
-                                    fullWidth={true}
-                                    exclusive
-                                    size="large"
-                                    >
-                                    {Array(6).fill().map((_, index) => (
-                                        <ToggleButton
-                                        value={index+1}
-                                        key={index+1}                               
-                                        >
-                                            <strong>{index + 1}{index === 5 ? '+' : ''}</strong>
-                                        </ToggleButton>
-                                    ))}
-                                    </ToggleButtonGroup>
+                        <Stack direction='row' spacing={2} sx={{ pt: 5, p: 2}}>
+                        <ToggleButtonGroup
+                            value={size}
+                            onChange={handleChange}
+                            fullWidth={true}
+                            exclusive
+                            size="large"
+                            >
+                            {Array(6).fill().map((_, index) => (
+                                <ToggleButton
+                                value={index+1}
+                                key={index+1}                               
+                                >
+                                    <strong>{index + 1}{index === 5 ? '+' : ''}</strong>
+                                </ToggleButton>
+                            ))}
+                            </ToggleButtonGroup>
+                            
+                        </Stack>
+
+
+                        <Box sx={{ display: 'flex', pt: 2, height: open ? 'auto' : 0, justifyContent: 'center' }}>
+                            <Fade in={open}>
+                            <NumberInput
+                                aria-label="party-size"
+                                placeholder="Party size"
+                                value={size}
+                                onChange={(event, val) => setSize(val)}
+                                max={maxSize}
+                                min={6}
+                                />
+                            </Fade>
+                        </Box>
+
+                        
+                        <Container sx={{ pt: 2}}>
+                            <Button disabled={disable} fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
+                                <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
+                                    Next
+                                </Typography>
+                            </Button> 
+                        </Container>
                                     
-                                </Stack>
+                    </CardContent>
 
 
-                                <Box sx={{ display: 'flex', pt: 2, height: open ? 'auto' : 0, justifyContent: 'center' }}>
-                                    <Fade in={open}>
-                                    <NumberInput
-                                        aria-label="party-size"
-                                        placeholder="Party size"
-                                        value={size}
-                                        onChange={(event, val) => setSize(val)}
-                                        max={maxSize}
-                                        min={6}
-                                        />
-                                    </Fade>
-                                </Box>
-
-                                {present ? <PresentWaitlineInformation present={present} acceptingStatus={acceptingStatus}/>: <Box textAlign={'center'}><CircularProgress size={20}/></Box>}
-                                
-                                <Container sx={{ pt: 2}}>
-                                    <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => setDataAndContinue()}>
-                                        <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>
-                                            Next
-                                        </Typography>
-                                    </Button> 
-                                </Container>
-                                            
-                            </CardContent>
-
-
-                            <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
-                                <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
-                            </CardActions>
-                        </Card>
-                        </Grid>
-                    </Zoom>
+                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 7}}>
+                        <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                    </CardActions>
+                </Card>
+                </Grid>
+                </Slide>
+                    
 
                 </Grid>
             </Box>
