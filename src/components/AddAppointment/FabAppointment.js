@@ -28,7 +28,6 @@ export default function FabAppointment () {
     const [errors, setError] = useState();
     const [success, setSuccess] = useState();
     const [nextStep, setNextStep] = useState(false);
-    const permissionLevel = useSelector((state) => state.user.permissions);
 
 
     const [loading, setLoading] = useState(false);
@@ -87,8 +86,8 @@ export default function FabAppointment () {
             return;
         }
         setApp_loader(true);
-        const timestamp = DateTime.local().setZone(business.timezone).toISO();
-        const data = { ...payload, appointmentDate: selectedDate.toISO(), appointment: selectedAppointment, timestamp};
+        const timestamp = DateTime.local().setZone(business.timezone).toUTC();
+        const data = { ...payload, appointmentDate: selectedDate, appointment: selectedAppointment, timestamp};
         createAppointmentPretense(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
@@ -108,7 +107,8 @@ export default function FabAppointment () {
     }
     
     const handleDateChange = (date) => {
-        setSelectedDate(date);
+        const l = DateTime.fromISO(date).setZone(business.timezone).toUTC();
+        setSelectedDate(l);
     };
 
     const formatPhoneNumber = (input) => {

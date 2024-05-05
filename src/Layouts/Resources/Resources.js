@@ -86,8 +86,8 @@ export default function Resources() {
             <Divider />
             {inUse.map((client, index) => 
                 <>
-                <Typography variant="body2" component="p">Name {client.fullname}</Typography>
-                <Typography variant="body2" component="p">Party size: {client.partySize}</Typography>
+                <Typography variant="body2" component="p">Name: <strong>{client.fullname}</strong></Typography>
+                <Typography variant="body2" component="p">Party size: <strong>{client.partySize}</strong></Typography>
                 <Divider />
                 </>
             )}

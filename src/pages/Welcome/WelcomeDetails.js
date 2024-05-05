@@ -176,6 +176,10 @@ export default function WelcomeDetails() {
         navigate(`/welcome/${link}`)
     }
 
+    const redirectBackPage = () => {
+        navigate(`/welcome/${link}/selector`)
+    }
+
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -216,7 +220,7 @@ export default function WelcomeDetails() {
                         <Grid className="grid-item" item xs={12} md={4} lg={4} xl={4}>
                         <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
                         <Container sx={{ textAlign: 'left'}}>
-                            <IconButton onClick={ () => redirectBack() }>
+                            <IconButton onClick={ () => redirectBackPage() }>
                                 <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                             </IconButton>
                         </Container>

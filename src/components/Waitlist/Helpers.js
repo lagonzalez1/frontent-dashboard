@@ -85,7 +85,7 @@ export const requestChangeAccept = (accepting) => {
     const email = user.email;
     const b_id = business._id;
     const headers = { headers: { 'x-access-token': accessToken } };
-    const currentDate = DateTime.local().setZone(business.timezone).toISO();
+    const currentDate = DateTime.local().toISO();
     const requestBody = {
       currentDate,
       accessToken,
@@ -130,7 +130,7 @@ export const moveClientUp = (clientId, currentClients) => {
     const { user, business } = getStateData();
     const list = currentClients;
     // No change to be made since list to small.
-    if (list.length < 2) { return list; }
+    if (list.length < 2) { return resolve('No changes made.'); }
     const timezone = business.timezone;
     let clientAbove = null;
     let clientTimestamp = null;
@@ -200,7 +200,7 @@ export const moveClientDown = (clientId, currentClients) => {
     const { user, business } = getStateData();
     const list = currentClients
     // No change to be made since list to small.
-    if (list.length < 2) { return list; }
+    if (list.length < 2) { return resolve('No changes made'); }
     const timezone = business.timezone;
     let clientBelow = null;
     let clientTimestamp = null;

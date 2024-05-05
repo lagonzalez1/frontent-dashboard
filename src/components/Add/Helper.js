@@ -2,6 +2,7 @@ import React from "react";
 import axios from "axios";
 import { Slide } from "@mui/material";
 import { getAccessToken, getStateData } from "../../auth/Auth";
+import { DateTime } from "luxon";
 
 export const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -23,7 +24,8 @@ export const addCustomerWaitlist = (payload) => {
       const id = user.id;
       const b_id = business._id;
       const timezone = business.timezone;
-      const data = { id, b_id, timezone, ...payload };
+      const timestamp = DateTime.local().setZone(business.timezone).toISO();
+      const data = { id, b_id, timezone, ...payload, timestamp };
       axios
         .post('/api/internal/create_client', data, headers)
         .then(response => {

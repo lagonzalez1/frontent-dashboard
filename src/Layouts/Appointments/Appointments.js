@@ -25,9 +25,10 @@ const Appointments = ({setClient, setEditClient}) => {
 
     const accessToken = useSelector((state) => state.tokens.access_token);
     const reload = useSelector((state) => state.reload);
+    const business = useSelector((state) => state.business);
+
     const [loading, setLoading] = useState(false);
     const [reloadPage, setReloadPage] = useState(false);
-    const business = useSelector((state) => state.business);
     const [error, setError] = useState(false);
     const [alert, setAlert] = useState({title: null, body: null});
 
@@ -51,8 +52,9 @@ const Appointments = ({setClient, setEditClient}) => {
             setLoading(true);
             let lastDate = DateTime.fromISO(date);
             setSelectedDate(lastDate)
-            getAppointmentTable(lastDate, accessToken)
+            getAppointmentTable(lastDate.toISO(), accessToken)
             .then(response => {
+                console.log(response)
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
             })
@@ -68,10 +70,12 @@ const Appointments = ({setClient, setEditClient}) => {
             if (accessToken === undefined) { return;}
             setLoading(true);
             setSelectedDate(currentDate)
-            getAppointmentTable(currentDate, accessToken)
+            getAppointmentTable(currentDate.toISO(), accessToken)
             .then(response => {
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
+                console.log(response)
+
             })
             .catch(error => {
                 setError(true);
@@ -258,7 +262,7 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Typography fontWeight={'bold'} variant="body2">
-                                                        {DateTime.fromISO(client.appointmentDate).toFormat('LLL dd yyyy')}
+                                                        {DateTime.fromISO(client.appointmentDate).setZone(business.timezone).toFormat('LLL dd yyyy')}
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell>

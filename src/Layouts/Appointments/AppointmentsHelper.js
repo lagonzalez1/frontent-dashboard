@@ -22,9 +22,6 @@ export function getHighlightedDays (date) {
                 return [];
             }
             let highlightDays = [];
-            const daysInMonth = DateTime.fromISO(appointments[0].appointmentDate).daysInMonth;
-            const currentDayInMonth = DateTime.fromISO(appointments[0].appointmentDate).day;
-
             const incomingDate = DateTime.fromISO(date); // Check the incoming date appointments slots for the month.
             for (let appointment of appointments){
                 // Check if 

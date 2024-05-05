@@ -370,7 +370,6 @@ export const getWaitlistServingTable = () => {
 export const getServingClients = (accessToken) => {
     const { user, business } = getStateData();
     const bid = business._id;
-    const headers = getHeaders();
     return new Promise((resolve, reject) => {
         axios.get(`/api/internal/serving_table`,{headers: {'x-access-token': accessToken}, params: {bid}})
         .then(response => {
@@ -497,7 +496,6 @@ export const getAppointmentTable = (date, accessToken) => {
 
 export const getNoShowClients = (accessToken) => {
     const { user, business } = getStateData();
-    const headers = getHeaders();
     return new Promise((resolve, reject) => {
         axios.get(`/api/internal/no_show`, {headers: {'x-access-token' : accessToken}, params: {bid: business._id}})
         .then(response => {
@@ -565,57 +563,6 @@ export function getWaitlistTable (accessToken) {
  * 
  *  @returns Sorted business table, decending order based on timestamp.
  */
-export const getUserTable = () => {
-    const { user, business } = getStateData();
-    try {
-            let currentClients = business.currentClients;
-            let clients = [];
-            for (var client of currentClients){
-                if (client.status.serving === false) {
-                    clients.push(client);
-                }
-            }
-            const type = business.system.equalDate;
-
-            const timezone = business.timezone;
-            if (!timezone) {
-                return new Error('No timezone to validate.');
-            }
-            // Compare the current date to each client.
-            let currentDates = [];
-            let sorted = null;
-            const currentTime = DateTime.local().setZone(timezone);            
-            if(type) {
-                for (var client of clients) {
-                    const clientDate = DateTime.fromISO(client.timestamp);
-                    if ( currentTime.hasSame(clientDate, 'day')){
-                        currentDates.push(client);
-                    }
-                }
-                sorted = currentDates.sort(sortBaseTime);
-            }else {
-                sorted = clients.sort(sortBaseTime);
-            }
-            // Add wait time in {hour, minute}
-            const wait = sorted.map((client) => {
-            const luxonDateTime = DateTime.fromISO(client.timestampOrigin);
-
-            const diffMinutes = currentTime.diff(luxonDateTime, 'minutes').minutes;
-            const diffHours = currentTime.diff(luxonDateTime, 'hours').hours;
-            const hours = Math.floor(diffHours);
-            const minutes = Math.floor(diffMinutes % MINUTES_IN_HOUR);
-            return {
-                ...client,
-                waittime: { hours, minutes },
-            };
-            });
-            return wait;
-      } catch (error) {
-            // Handle the error here
-            console.error(error);
-            return new Error(error); // Return an empty array or any other appropriate value
-      }
-};
 
   function sortBaseTime(a, b) {
     const timestampA = DateTime.fromISO(a.timestamp);

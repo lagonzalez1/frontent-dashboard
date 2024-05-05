@@ -423,13 +423,15 @@ export default function Waiting() {
         // Appointment case
         if (type === APPOINTMENT) {
             return (
-            <Stack spacing={2.5}>
+            <Stack spacing={2.0}>
                 <Container sx={{display: 'flex', justifyContent: 'center',  justifyItems: 'center'}}>
                     <div className="blob_appointment">
                         <Calendar color="white" size={70} weight="light"/>
                     </div>
                 </Container>
                 <Typography textAlign={'center'} variant="h5" fontWeight="bold"> Appointment details </Typography>
+                <Typography textAlign={'center'} variant="body2"> Keep this page open for any updates!</Typography>
+
                 <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
                     <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
                     </Typography>
@@ -615,9 +617,8 @@ export default function Waiting() {
                 </div>
             </Container>
                 <Typography textAlign={'center'} variant="h4" fontWeight="bold" > {'Thank you for choosing us'} </Typography>
-                <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> {'Enjoyed your service ? '} </Typography>
-                <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> {'Leave us a review'} </Typography>
-
+                <Typography textAlign={'center'} variant="body2"> {'Enjoyed your service ? '} </Typography>
+                <Typography textAlign={'center'} variant="body2"> {'Leave us a review'} </Typography>
             </Stack>
         )
     }

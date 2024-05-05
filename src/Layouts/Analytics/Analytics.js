@@ -494,6 +494,7 @@ const Analytics = () => {
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     { /** Ratings */}
                     <Typography variant="h6" fontWeight={'bold'}>Employee Ratings</Typography>
+                    <Typography variant="body2">Average</Typography>
                     <List sx={{overflow: 'auto', maxHeight: 300}} component="nav" aria-label="employeeSelect">
 
                             {businessData && businessData.employeeRatings.map((item, index) => {

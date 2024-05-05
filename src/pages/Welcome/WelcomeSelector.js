@@ -683,15 +683,14 @@ export default function WelcomeSelector() {
                                             { Array.isArray(businessExtras.services) ? businessExtras.services.map((service) => {
                                                 if (!service.public) { return null;}
                                                 return (
-                                                
                                                 <MenuItem key={service._id} value={service._id} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
-                                                <ListItemIcon>
-                                                    { service.active ? <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> : <FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/> }
-                                                </ListItemIcon>
-                                                <Typography variant="body2">{service.title} </Typography>
+                                                <Stack>
+                                                <Typography fontWeight={'bold'} variant="body2">{service.title} </Typography>
                                                 <Typography variant="caption">{`Duration: ${service.duration} min`}</Typography>
                                                 {service.cost ? (<Typography variant="caption">{businessPresent.servicePrice ? ("Cost: " + service.cost) : null}</Typography>): null}
-                                            </MenuItem>
+                                                </Stack>
+
+                                                </MenuItem>
 
                                                 )}):null }
                                             </Select>
