@@ -52,7 +52,7 @@ const Appointments = ({setClient, setEditClient}) => {
             setLoading(true);
             let lastDate = DateTime.fromISO(date);
             setSelectedDate(lastDate)
-            getAppointmentTable(lastDate.toISO(), accessToken)
+            getAppointmentTable(lastDate, accessToken)
             .then(response => {
                 console.log(response)
                 setHighlightedDays(response.highlightDays)
@@ -70,7 +70,7 @@ const Appointments = ({setClient, setEditClient}) => {
             if (accessToken === undefined) { return;}
             setLoading(true);
             setSelectedDate(currentDate)
-            getAppointmentTable(currentDate.toISO(), accessToken)
+            getAppointmentTable(currentDate, accessToken)
             .then(response => {
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
@@ -262,7 +262,7 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Typography fontWeight={'bold'} variant="body2">
-                                                        {DateTime.fromISO(client.appointmentDate).setZone(business.timezone).toFormat('LLL dd yyyy')}
+                                                        {DateTime.fromJSDate( new Date(client.appointmentDate)).setZone(business.timezone).toFormat('LLL dd yyyy')}
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell>
