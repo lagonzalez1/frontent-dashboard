@@ -180,7 +180,6 @@ export default function Welcome() {
             <>
             <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bolder" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
             <br/>
-
             {businessPresent ? <PresentWaitlineInformation present={businessPresent} acceptingStatus={acceptingStatus}/> : <CircularProgress  size={20}/> }
             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>
                 <Typography variant="body2"  fontWeight="bold" sx={{color: ' white', margin: 1 }}>

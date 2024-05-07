@@ -36,7 +36,7 @@ export default function WelcomeSelector() {
     const servicesRef = useRef();
     const availabiltyRef = useRef();
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [openEmployees, setOpenEmployees] = useState(false);
     const [openServices, setOpenServices] = useState(false);
     const [openAvailabity, setOpenAvailability] = useState(false);
@@ -200,6 +200,7 @@ export default function WelcomeSelector() {
 
 
     const getBusinessData = () => {
+        setLoading(true);
         const time = DateTime.local().toISO();
         Promise.all([
             isBusinesssOpen(link, time),
@@ -380,7 +381,9 @@ export default function WelcomeSelector() {
                     <Zoom in={zoomIntoView}>
                     <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
                         <Card className="wcard" variant="outlined" sx={{ borderRadius: 5, p: 2, pt: 1}}>
-                        {loading ? (<CircularProgress />): 
+                        {loading ? (<Box sx={{display: 'flex', justifyContent: 'center', alignContent: 'center', pt: 2}}>
+                            <CircularProgress size={15} />
+                        </Box>): 
                         <CardContent sx={{ pt: 1, justifyItems: 'center', paddingLeft: 0, paddingRight: 0}}>
                             <Box sx={{ textAlign: 'left'}}>
                                 <IconButton onClick={ () => redirectBack() }>
@@ -548,7 +551,7 @@ export default function WelcomeSelector() {
                                                 <Grow ref={availabiltyRef} in={openAvailabity}>
                                                     {appSlotLoader === true ? (
                                                         <Box>
-                                                            <CircularProgress size={'small'}/>
+                                                            <CircularProgress size={'small'} />
                                                         </Box>
                                                     ) :
                                                     <Box className="scroll-left" sx={{display: 'block', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
@@ -796,7 +799,7 @@ export default function WelcomeSelector() {
                     </Grid>
                     </Zoom>
                     </Grid>
-                </Box>
+            </Box>
             </ThemeProvider>
 
         </>

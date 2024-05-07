@@ -167,8 +167,7 @@ export default function WelcomeSize() {
                             - {errors.body}
                         </Alert>
                     ) : null}
-                    <CardContent sx={{}}>
-
+                    <CardContent>
                         <Typography variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
                             {link}
                         </Typography>

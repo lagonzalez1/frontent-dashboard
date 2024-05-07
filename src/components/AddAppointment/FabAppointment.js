@@ -86,8 +86,9 @@ export default function FabAppointment () {
             return;
         }
         setApp_loader(true);
-        const timestamp = DateTime.local().setZone(business.timezone).toUTC();
-        const data = { ...payload, appointmentDate: selectedDate, appointment: selectedAppointment, timestamp};
+        const timestamp = DateTime.local().setZone(business.timezone).toUTC().toISO();
+        const date = DateTime.fromISO(selectedDate, {zone: 'utc'}).toUTC().toISO();
+        const data = { ...payload, appointmentDate: date, appointment: selectedAppointment, timestamp};
         createAppointmentPretense(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
@@ -107,8 +108,7 @@ export default function FabAppointment () {
     }
     
     const handleDateChange = (date) => {
-        const l = DateTime.fromISO(date).setZone(business.timezone).toUTC();
-        setSelectedDate(l);
+        setSelectedDate(date);
     };
 
     const formatPhoneNumber = (input) => {
