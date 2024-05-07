@@ -190,17 +190,18 @@ export default function WelcomeSelector() {
     }
     
     useEffect(() => {
+        setLoading(true);
         setZoomIntoView(true);
         getBusinessData();
         getPreviouslySaved();
         return() => {
             setLoading(false);
         }
-    }, [loading]);
+    }, []);
 
 
     const getBusinessData = () => {
-        setLoading(true);
+        // Local timezone applied.
         const time = DateTime.local().toISO();
         Promise.all([
             isBusinesssOpen(link, time),
@@ -219,7 +220,6 @@ export default function WelcomeSelector() {
             setAcceptingStatus({waitlist: false, appointments: false});
             setErrorMessage({title: 'Error', body: error.msg});
             setDisable(true);
-
         })
         .finally(() => {
             setLoading(false);
@@ -397,7 +397,7 @@ export default function WelcomeSelector() {
                             <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
                                 Type
                             </Typography>
-                            <Typography variant="body2" fontWeight="bold" textAlign={'center'}>
+                            <Typography variant="body2" fontWeight="normal" textAlign={'center'}>
                                 Choose which suits your schedule!
                             </Typography>
                             </Box>

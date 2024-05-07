@@ -10,7 +10,7 @@ import { usePermission } from "../../auth/Permissions";
 import { setSnackbar } from '../../reducers/user';
 import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";
-import { Lock } from "phosphor-react";
+import { Lock, QrCode } from "phosphor-react";
 
 export default function Personalization ({reloadPage}) {
 
@@ -173,7 +173,7 @@ export default function Personalization ({reloadPage}) {
                 <br/>
 
                 <Typography variant="subtitle2" fontWeight={'bold'}>Generate QR code</Typography>
-                <Button size="small" sx={{ borderRadius: 15 }} variant="outlined" onClick={() => generateQRCode()}>QR code</Button>
+                <Button startIcon={<QrCode size={20} />} size="small" sx={{ borderRadius: 15 }} variant="outlined" onClick={() => generateQRCode()}>QR code</Button>
                 <Box sx={{ display: 'flex' }}>
                     <Grow in={checked}>
                     <div id='QR_code' style={{ height: checked ? 'auto': 0,  maxWidth: 100, width: "100%" }}>

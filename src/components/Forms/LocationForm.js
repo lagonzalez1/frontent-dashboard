@@ -10,6 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
+import { ArrowSquareOut } from 'phosphor-react';
 
 
 
@@ -160,7 +161,7 @@ const LocationForm = ({reloadPage}) => {
               />
             </Grid>
             <Grid item xs={12}>
-            <Button variant='outlined' size={'small'} onClick={() => navigateToWaitlist()} sx={{borderRadius: 10}}>
+            <Button variant='outlined' size={'small'} onClick={() => navigateToWaitlist()} sx={{borderRadius: 7}} startIcon={<ArrowSquareOut size={20} />}>
                 Show waitlist
             </Button>
             </Grid>

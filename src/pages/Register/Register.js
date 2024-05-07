@@ -308,7 +308,7 @@ export default function Register(props){
                 { step === 10 ?(
                         <Container className="content_container" sx={{ p: 3}}>
                         <Box sx={{ flexGrow: 1, p: 1}}>
-                            <Typography variant="h3">Tell us about your business.</Typography>
+                            <Typography variant="h3" fontWeight={'bold'}>Tell us about your business.</Typography>
                             {error.title !== "" ? 
                             (<Alert severity={error && error.severity}>
                             <AlertTitle sx={{textAlign: 'left', fontWeight:'bold'}}>{error.title}</AlertTitle>
@@ -412,7 +412,7 @@ export default function Register(props){
                     (
                         <Container className="content_container" sx={{ p: 3}}>
                             <Box sx={{ flexGrow: 1, p: 1}}>
-                                <Typography variant="h3">How would you like to use "{user.businessName}"?</Typography>
+                                <Typography variant="h3" fontWeight={'bold'}>How would you like to use "{user.businessName}"?</Typography>
                             </Box>
 
                             <Container sx={{ pt: 5}}>
@@ -493,7 +493,7 @@ export default function Register(props){
                     (
                         <Container className="content_container" sx={{ p: 3}}>
                             <Box sx={{ flexGrow: 1, p: 1}}>
-                                <Typography variant="h3">Let users choose the service they want.</Typography>
+                                <Typography variant="h3" fontWeight={'bold'}>Let users choose the service they want.</Typography>
                                 <Typography sx={{pt: 1}} variant="h6">If you have services or resources, you can add them and assign to your customers when they join your waitlist.</Typography>
 
                                 <Container sx={{ pt: 5}}>
@@ -548,7 +548,7 @@ export default function Register(props){
                     step === 77.5 ? (
                         <Container className="content_container" sx={{ p: 3}}>
                                 <Box sx={{ flexGrow: 1, p: 1}}>
-                                    <Typography variant="h3">Add your hours of operation. </Typography>
+                                    <Typography variant="h3" fontWeight={'bold'}>Add your hours of operation. </Typography>
 
                                     <Container sx={{ pt: 5}}>
                                         <Typography variant="subtitle2" textAlign="left"><strong>Hours *</strong></Typography>
@@ -646,7 +646,7 @@ export default function Register(props){
                     step === 100? (
                         <Container className='content_container'>
                             <Box sx={{ pl: 2, pr: 2}}>
-                                <Typography variant="h3">Finally, Login information, Last step!</Typography>
+                                <Typography variant="h3" fontWeight={'bold'}>Finally, Login information, Last step!</Typography>
                                 {error.title !== "" ? 
                                     (<Alert severity={error && error.severity}>
                                     <AlertTitle sx={{textAlign: 'left', fontWeight:'bold'}}>{error.title}</AlertTitle>

@@ -88,7 +88,7 @@ const SubscriptionForm = () => {
   }
 
   const manageSubscription = () => {
-    if (!stripe.customer_id) { return; }
+    if (stripe.customer_id === ""|| stripe.customer_id === undefined) { return; }
     setLoading(true);
     const customer_id = stripe.customer_id;
     manageUserSubscription(customer_id)

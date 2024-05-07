@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
-import { Avatar, Typography ,Button, TextField, Link, Box, Grid, Container, Alert, ToggleButtonGroup, ToggleButton, Tooltip, IconButton, Collapse, Paper, ThemeProvider} from "@mui/material";
+import { Avatar, Typography ,Button, TextField, Link, Box, Grid, Container, Alert, ToggleButtonGroup, InputAdornment,
+    ToggleButton, Tooltip, IconButton, Collapse, Paper, ThemeProvider} from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useNavigate  } from "react-router-dom";
 import { useSignIn } from "react-auth-kit";
@@ -14,7 +15,8 @@ import { setAuthAccessToken, setAuthCookieToken } from "../../reducers/tokens";
 import { DateTime } from "luxon";
 import loginImage from "../../assets/images/login.jpg"
 import { HomePageTheme } from "../../theme/theme";
-
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 export default function Login() {
     
@@ -36,6 +38,12 @@ export default function Login() {
         email: '',
         password: '',
     })
+
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handlePasswordToggle = () => {
+        setShowPassword(prevShowPassword => !prevShowPassword);
+    };
 
     const handleEmployeeLogin = () => {
         setLoading(true);
@@ -136,7 +144,6 @@ export default function Login() {
         <>  
             <ThemeProvider theme={HomePageTheme}>
             <Container sx={{ pt: 1, p: 2, mt:0, mb:0, height: '100vh', width: '100%'}}>
-                    
 
             { isRoot === "root" ? 
                 (
@@ -151,9 +158,9 @@ export default function Login() {
                     alignItems: 'center',
                     }}
                 >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+                <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
                 </Avatar>
-                <Typography component="h1" variant="h5">
+                <Typography component="h1" variant="h4" fontWeight={'bold'}>
                     Sign in
                 </Typography>
                 <Typography component="subtitle2" variant="caption">
@@ -197,11 +204,18 @@ export default function Login() {
                     required
                     fullWidth
                     label="Password"
-                    type="password"
                     id="password"
                     value={credentials.password}
                     onChange={e => setCredentials((prev) => ({ ...prev, password: e.target.value}))}
+                    type={ showPassword ? "text": "password"} 
                     autoComplete="current-password"
+                    InputProps={{ endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton onClick={handlePasswordToggle}>
+                            {showPassword ? <Visibility /> : <VisibilityOff />}
+                            </IconButton>
+                        </InputAdornment>
+                    )}} 
                 />
                 { loading ? (<LoadingButton
                                 fullWidth
@@ -222,13 +236,13 @@ export default function Login() {
                 }
                 <Grid container sx={{ textAlign: 'center'}}>
                     <Grid item xs>
-                    <Link href="/ForgotPassword" variant="caption">
-                        Forgot password?
+                    <Link href="/ForgotPassword">
+                        <Typography component="body2" variant="caption">Forgot password?</Typography>
                     </Link>
                     </Grid>
                     <Grid item xs>
                         <Link href="/Register" variant="caption">
-                            {"Don't have an account? Register now!"}
+                        <Typography component="body2" variant="caption">Dont have an acccount? Register now!</Typography>
                         </Link>
                     </Grid>
                 </Grid>
@@ -250,7 +264,7 @@ export default function Login() {
                 >
                 <Avatar sx={{ m: 1, bgcolor: 'secondary' }}>
                 </Avatar>
-                <Typography component="h1" variant="h5">
+                <Typography component="h1" variant="h4" fontWeight={'bold'}>
                     Sign in
                 </Typography>
                 <Typography component="subtitle2" variant="caption">
@@ -370,7 +384,6 @@ export default function Login() {
 
                 
             </Container>
-                
             </Container>
             </ThemeProvider>
 

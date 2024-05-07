@@ -8,25 +8,25 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useDispatch, useSelector } from 'react-redux';
 import { setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
+import { ClockCounterClockwise } from "phosphor-react";
 
 
 export default function Trial() {
 
     const termDate = useSelector((state) => state.user.trial)
     const requestStatus = useSelector((state) => state.user.trialStatus);
-
-
     const [daysLeft, setDaysLeft] = useState(null);
+
     useEffect(() => {
       calculateDaysLeft();
     }, [])
 
     const calculateDaysLeft = () => {
       if (requestStatus){
-        const term = DateTime.fromISO(termDate);
-        const current = DateTime.now();
+        const term = DateTime.fromJSDate( new Date(termDate));
+        const current = DateTime.local();
         const difference = term.diff(current, 'day').toObject();
-        setDaysLeft(Math.floor(difference.days));
+        setDaysLeft(Math.floor(difference.days) * 10);
       }
     }
 
@@ -43,11 +43,12 @@ export default function Trial() {
           >
             <Alert
             severity="error"
+            icon={<ClockCounterClockwise size={32} />}
             variant="filled">
-                {'You account is active until ' + DateTime.fromISO(termDate).toLocaleString() + "." }
+                <Typography variant='body2'>{'You account is active until ' + DateTime.fromISO(termDate).toLocaleString() + "." }</Typography>
                 <LinearProgress color="secondary" variant="determinate" value={daysLeft} />
                 <Box sx={{ minWidth: 35 }}>
-                  <Typography variant="body2" color="text.secondary">{`Days left ${daysLeft}`}</Typography>
+                  <Typography variant="body2" color="text.secondary">{`Days left ${daysLeft/10}`}</Typography>
                 </Box>
           </Alert>    
         </Snackbar>

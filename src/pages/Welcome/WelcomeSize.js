@@ -174,7 +174,7 @@ export default function WelcomeSize() {
                         <Typography variant="h4" fontWeight="bolder" textAlign={'center'}>
                             Party size
                         </Typography>
-                        <Typography variant="body2" fontWeight={'bolder'} textAlign={'center'}>
+                        <Typography variant="body2" fontWeight={'normal'} textAlign={'center'}>
                             Is anyone joining you ?
                         </Typography>
 

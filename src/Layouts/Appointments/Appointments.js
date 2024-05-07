@@ -50,7 +50,7 @@ const Appointments = ({setClient, setEditClient}) => {
         if (date) {
             if (accessToken === undefined) { return; }
             setLoading(true);
-            let lastDate = DateTime.fromISO(date);
+            let lastDate = DateTime.fromISO(date, {zone: 'utc'});
             setSelectedDate(lastDate)
             getAppointmentTable(lastDate, accessToken)
             .then(response => {

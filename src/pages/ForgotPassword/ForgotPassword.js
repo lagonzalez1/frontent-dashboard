@@ -80,7 +80,7 @@ export default function ForgotPassword () {
                     
 
 
-                <Typography textAlign={'left'} variant="h5">
+                <Typography textAlign={'left'} variant="h5" fontWeight={'bold'}>
                     Forgot password
                 </Typography>
 
@@ -88,15 +88,15 @@ export default function ForgotPassword () {
                     <u>Attention:</u> This section is only for ROOT users. For employees please refer to your root user to update any password.
                 </Typography>
                 <Typography textAlign={'left'} variant="body2">
-                    <u>Follow</u>: Please enter your email associated with your account. You will recive a confirmation email.
+                    <u>1</u>: Please enter your email associated with your account. You will recive a confirmation email.
                 </Typography>
                 <Typography textAlign={'left'} variant="body2">
-                        <u>Security</u>: Note you will have a total of 3 minutes to complete this task.
+                        <u>2</u>: Note you will have a total of 3 minutes to complete this task.
                 </Typography>
 
 
                 <TextField id="outlined-basic" label="Root email" variant="outlined" value={email} placeholder="Email" onChange={(e) => setEmail(e.target.value)}  />
-                <LoadingButton sx={{ borderRadius: 10}} loading={loading} onClick={() => requestToken()} variant="contained">Send</LoadingButton>
+                <LoadingButton sx={{ borderRadius: 7}} loading={loading} onClick={() => requestToken()} variant="contained">Send</LoadingButton>
 
                 <Divider />
                 <Link href="/Login">Back to login</Link>
