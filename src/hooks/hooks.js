@@ -472,8 +472,8 @@ export const getAppointmentTable = (date, accessToken) => {
         const { user,  business} = getStateData();
         const bid = business._id;
         console.log("NON-UTC", date);
-
-        axios.get(`/api/internal/appointment_data`, {headers: {'x-access-token': accessToken} , params: {bid, appointmentDate: date, email: user.email}})
+        const UTC_DATE = DateTime.fromISO(date).toUTC().toISO();
+        axios.get(`/api/internal/appointment_data`, {headers: {'x-access-token': accessToken} , params: {bid, appointmentDate: UTC_DATE, email: user.email}})
         .then(response => {
             resolve(response.data);
         })
