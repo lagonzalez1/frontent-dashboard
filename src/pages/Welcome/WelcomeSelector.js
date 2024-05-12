@@ -23,6 +23,7 @@ import { ClientWelcomeTheme } from "../../theme/theme";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import { AttachMoney, AttachMoneyOutlined, FiberManualRecord, SetMeal, SettingsEthernetRounded } from "@mui/icons-material";
 import AvTimerIcon from '@mui/icons-material/AvTimer';
+import { CurrencyCircleDollar } from "phosphor-react";
 
 export default function WelcomeSelector() {
 
@@ -459,7 +460,6 @@ export default function WelcomeSelector() {
                                                     style={{ transformOrigin: '0 0 0' }}
                                                     {...(openEmployees ? { timeout: 1000 } : {})}
                                                 >
-
                                                     <Grid
                                                         maxHeight={1}
                                                         container 
@@ -509,7 +509,6 @@ export default function WelcomeSelector() {
                                                         spacing={.5}
                                                         alignItems="stretch"
                                                     >
-
                                                         {
                                                             businessExtras.services ? 
                                                             businessExtras.services
@@ -521,15 +520,14 @@ export default function WelcomeSelector() {
                                                                             <CardContent>
                                                                             <Stack spacing={0.2}>
                                                                                 <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
-                                                                                <Typography className="large-desc" textAlign="left" gutterBottom color="text.secondary" variant="caption">
+                                                                                <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
                                                                                     {service.description}
-
                                                                                 </Typography>
                                                                             </Stack>
                                                                             <Divider variant="middle" />                                                                    
                                                                             <Stack sx={{m: 1}} spacing={0.5}>
                                                                                 <Chip color="info" variant="outlined" label={"Duration: " + service.duration + " min" } avatar={<AvTimerIcon fontSize="small" />} />
-                                                                                <Chip color="success" variant="outlined" label={"Cost: " + service.cost} avatar={<AttachMoneyOutlined fontSize="small" />} />
+                                                                                <Chip color="success" variant="outlined" label={"Cost: " + service.cost} avatar={<CurrencyCircleDollar fontSize="small" />} />
                                                                             </Stack>
                                                                             </CardContent>
                                                                         </CardActionArea>

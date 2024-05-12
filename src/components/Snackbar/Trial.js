@@ -15,6 +15,7 @@ export default function Trial() {
 
     const termDate = useSelector((state) => state.user.trial)
     const requestStatus = useSelector((state) => state.user.trialStatus);
+    const tz = useSelector((state) => state.business.timezone);
     const [daysLeft, setDaysLeft] = useState(null);
 
     useEffect(() => {
@@ -23,10 +24,10 @@ export default function Trial() {
 
     const calculateDaysLeft = () => {
       if (requestStatus){
-        const term = DateTime.fromJSDate( new Date(termDate));
+        const term = DateTime.fromJSDate(new Date(termDate)).setZone(tz);
         const current = DateTime.local();
         const difference = term.diff(current, 'day').toObject();
-        setDaysLeft(Math.floor(difference.days) * 10);
+        setDaysLeft(Math.ceil(difference.days) * 10);
       }
     }
 
@@ -45,7 +46,8 @@ export default function Trial() {
             severity="error"
             icon={<ClockCounterClockwise size={32} />}
             variant="filled">
-                <Typography variant='body2'>{'You account is active until ' + DateTime.fromISO(termDate).toLocaleString() + "." }</Typography>
+              {console.log(tz)}
+                <Typography variant='body2'>{'You account is active until ' + DateTime.fromJSDate( new Date(termDate)).setZone(tz).toLocaleString() + "." }</Typography>
                 <LinearProgress color="secondary" variant="determinate" value={daysLeft} />
                 <Box sx={{ minWidth: 35 }}>
                   <Typography variant="body2" color="text.secondary">{`Days left ${daysLeft/10}`}</Typography>

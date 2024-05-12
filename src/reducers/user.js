@@ -17,7 +17,8 @@ const initialState = {
   options: null,
   subscription: null,
   trialStatus: null,
-  trial: null
+  trial: null,
+  emailConfirm: null,
 };
 
 
@@ -34,6 +35,7 @@ const userSlice = createSlice({
       state.subscription = action.payload.subscription;
       state.trial = action.payload.trial;
       state.trialStatus = action.payload.trialStatus;
+      state.emailConfirm = action.payload.emailConfirm;
     },
     logoutUser: (state) => {
       state.email = null;

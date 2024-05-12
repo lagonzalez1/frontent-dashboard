@@ -33,7 +33,7 @@ export default function NavBar({ navState, openNav }) {
       }, [timezone]);
     
       return (
-        <Typography variant="h5">
+        <Typography variant="h5" fontWeight={'bold'}>
           {"Welcome " + currentTime.toFormat('hh:mm a') + " "}
           <DetermineDaytimeOrEvening />
         </Typography>
@@ -66,7 +66,9 @@ export default function NavBar({ navState, openNav }) {
               <LiveClock />
             </Typography>
             <Box>
-              <Button onClick={() => logout()} color="inherit">Logout</Button>
+              <Button onClick={() => logout()} color="inherit">
+                <Typography variant="body1" fontWeight={'bold'}>Logout</Typography>
+              </Button>
             </Box>
           </Toolbar>
       </AppBar>

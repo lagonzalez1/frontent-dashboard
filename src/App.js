@@ -16,6 +16,7 @@ import BusinessWaitlist from './pages/Waitlist/BusinessWaitlist';
 import WelcomeSelector from './pages/Welcome/WelcomeSelector';
 import LandingPage from './pages/Landing/LandingPage';
 import PasswordReset from './pages/PasswordReset/PasswordReset';
+import VerifyUser from "./pages/Verify/VerifyUser";
 
 import Resources from './pages/Resources/Resources';
 import Features from './pages/Features/Features';
@@ -54,10 +55,8 @@ function App() {
           <Route path='/Features' element={<Features />}></Route>
           <Route path='/Pricing' element={<Pricing />}></Route>
 
-          
           <Route path='/PasswordReset/:token' element={<PasswordReset />}></Route>
           <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
-
           
           <Route path={'/welcome/:link'} element={<Welcome />}></Route> { /** Check if business open. Advance if so. */}
           <Route path={'/welcome/:link/selector'} element={<WelcomeSelector />}></Route> { /** Check if business open. Advance if so. */}
@@ -67,6 +66,7 @@ function App() {
           <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
           <Route path={'/welcome/:link/waitlist'} element={<BusinessWaitlist />}></Route>
           <Route path={'/welcome/:link/:status/landingPage'} element={<LandingPage />}></Route>
+          <Route path={'/verify/user/:idd/:email'} element={<VerifyUser />}></Route>
           
 
           <Route path={'/Dashboard'} element={

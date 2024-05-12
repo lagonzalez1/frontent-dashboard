@@ -215,7 +215,6 @@ export default function FabAppointment () {
                 <DialogContent>
                     { employeeList && employeeList.length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order to use appointments, you must have employees with schedules ready to book. 
                     Check out settings page under <u> add employees!</u></Alert>): null}
-
                     { serviceList && serviceList
                                 .filter((service) => service.employeeTags.includes(formik.values.employee_id)).length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order for your customers to book appointments you need to attach your employees to your services! Check out the side bar <u>Services</u></Alert>): null}
                     { errors ? <Alert severity="error">{errors}</Alert>: null }

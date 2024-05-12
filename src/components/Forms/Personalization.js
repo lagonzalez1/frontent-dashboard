@@ -30,7 +30,7 @@ export default function Personalization ({reloadPage}) {
 
     const [checked, setChecked] = useState(false);
     const [publicLink, setPublicLink] = useState(null);
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
 
     useEffect(() => {
@@ -40,8 +40,7 @@ export default function Personalization ({reloadPage}) {
         if (link) {
             const fullLink = "https://waitonline.us/welcome/" + link;
             setPublicLink(fullLink)
-        }
-        
+        }   
     }, [])
 
     
@@ -71,7 +70,7 @@ export default function Personalization ({reloadPage}) {
             }
         })
         .finally(() => {
-            setLoading(true);
+            setLoading(false);
         })
     }
 

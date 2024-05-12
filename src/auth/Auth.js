@@ -95,7 +95,8 @@ const USER = 'user';
     try {
       const status = await checkAccessToken();
       dispatch(setBusiness(status.business));
-      dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription, trial: status.trial, trialStatus: status.trialStatus}))
+      dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription, 
+        trial: status.trial, trialStatus: status.trialStatus, emailConfirm: status.emailConfirm }))
       dispatch(setIndex(status.defaultIndex));
       dispatch(setAuthAccessToken(status.accessToken));
       dispatch(setAuthCookieToken(status.token));

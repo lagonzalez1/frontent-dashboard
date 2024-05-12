@@ -4,7 +4,8 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent, Ale
     Grid,
     Zoom,
     Slide,
-    AlertTitle} from "@mui/material";
+    AlertTitle,
+    Icon} from "@mui/material";
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +15,7 @@ import "../../css/Welcome.css";
 import { ThemeProvider } from "@emotion/react";
 import { ClientWelcomeTheme } from "../../theme/theme";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { FacebookLogo, InstagramLogo, TwitterLogo, XLogo } from "phosphor-react";
 
 export default function Welcome() {
 
@@ -219,7 +221,7 @@ export default function Welcome() {
                                     {link}
                                 </Typography>
                                 {iconImageLink ? (
-                                <Avatar sx={{ width: 67, height: 67, mx: 'auto' }} src={iconImageLink} />
+                                <Avatar sx={{ width: 96, height: 97, mx: 'auto' }} src={iconImageLink} />
                             ) : null}
                                 <CheckBusinessArguments />
                             </CardContent>
@@ -259,10 +261,23 @@ export default function Welcome() {
                         <Typography variant="subtitle2">{business.businessPhone} </Typography>
                         <Typography variant="caption" fontWeight={'bold'}>Website</Typography>
                         <Typography variant="subtitle2">{business.businessWebsite} </Typography>
+                        <Typography variant="caption" fontWeight={'bold'}>Social</Typography>
+                        <Stack direction={'row'} spacing={3} justifyContent={'center'}>
+                            <IconButton>
+                                <InstagramLogo size={20} />
+                            </IconButton>
+                            <IconButton>
+                                <TwitterLogo size={20} />
+                            </IconButton>
+                            <IconButton>
+                                <FacebookLogo size={20} />
+                            </IconButton>
+                        </Stack>
                     </Stack>
                 )
                 : null}
             </DialogContent>
+            <Divider />
             <DialogActions>
                 <Button sx={{borderRadius: 7}} variant='contained' onClick={closeBusinessInfo}>Close</Button>
             </DialogActions>

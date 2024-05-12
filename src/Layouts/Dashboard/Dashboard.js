@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, memo, useMemo } from "react";
+import React, { useEffect, useState, memo, useMemo } from "react";
 import { Box, CircularProgress, Backdrop } from "@mui/material";
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
@@ -9,7 +9,6 @@ import Settings from "../Settings/Settings";
 import Services from "../Services/Services";
 import Help from "../Help/Help";
 import Drawer from "../../components/Drawer/Drawer";
-
 
 import { useSignOut } from "react-auth-kit";
 import { DashboardHeader } from "./DashboardHelper"
@@ -27,8 +26,6 @@ import Analytics from "../Analytics/Analytics";
 import Trial from "../../components/Snackbar/Trial";
 import { setLocation } from "../../reducers/user";
 import StripeCompletion from "../../components/Dialog/StripeCompletion";
-import axios from "axios";
-
 
 /**
  * 
@@ -52,7 +49,6 @@ export default function Dashboard () {
     const [openCompletion, openStripeCompletion] = useState(false);
     const [stripeSession, setStripeSession] = useState({sessionId: '', status: '', title: ''})
 
-
     const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
     const [openNav, setOpenNav] = useState(false);
 
@@ -63,9 +59,7 @@ export default function Dashboard () {
         setLoading(true);
         try {
             const isAuth = await isAuthenticated(dispatch);     
-            console.log(isAuth)       
             if (isAuth === false) {
-                
                 removeUserState();
                 signOut();
                 return;
@@ -83,12 +77,10 @@ export default function Dashboard () {
     useEffect(() => { 
         console.log("Dashboard-render.");
         checkAuthStatus();
-
     },[reload]);
 
 
     useEffect(() => {
-        
         const myFunction = () => {
             reloadBusinessData(dispatch);
         };
@@ -99,10 +91,6 @@ export default function Dashboard () {
             clearInterval(intervalId);
         };
     }, []);
-
-    
- 
-    
 
     //** User completes the subscrtiption cycle. */
     const closeStripeCompletion = () => {
@@ -121,7 +109,7 @@ export default function Dashboard () {
         const query = new URLSearchParams(window.location.search);
         if (query.get('success')) {
         openStripeCompletion(true);
-        setStripeSession({sessionId: query.get('session_id'), status: 'Subscription has been proccess and completed!', title: 'Success', icon: 'okay'})
+        setStripeSession({sessionId: query.get('session_id'), status: 'Thank you for your support! Your account is active and ready to use.', title: 'Success', icon: 'okay'})
         }
 
         if (query.get('cancelled')) {
@@ -134,6 +122,8 @@ export default function Dashboard () {
 
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
+        const emailConfirm = useSelector((state) => state.user.emailConfirm);
+        if (!emailConfirm) { return <ErrorPage errorMessage={"Your account has not been authorized/confirmed. Confirm your account via email, then come back and refresh the page!"} type={403} />; }
         switch(location) {
             case 0:
                 return <Waitlist setClient={setClient} setEditClient={setEditClient} />;
@@ -154,7 +144,7 @@ export default function Dashboard () {
             case 8: 
                 return <Help />;
             default:
-                <ErrorPage errorMessage={"Failed to load the current location."} type={404} /> 
+                <ErrorPage errorMessage={"Failed to load the current location. Please feel free to reload this page. If that doesnt relsove this issue. Send us a email at support@waitonline.us"} type={404} /> 
         }
     }
     const MemoizedRenderLocation = useMemo(() => RenderLocation, [reload]);
@@ -183,6 +173,7 @@ export default function Dashboard () {
                  { client.open ? <Drawer setClient={setClient} client={client} />  : null}
                  { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }
                  <StripeCompletion payload={stripeSession} open={openCompletion} onClose={closeStripeCompletion}/>
+
                  </SubscriptionProvider>
             </Box>
 

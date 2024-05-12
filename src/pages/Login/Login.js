@@ -53,11 +53,12 @@ export default function Login() {
             .then(response => {
                 console.log(response);
                 if (response.status === 200){
+                    // Send via cookies
                     signIn({
                         token: response.data.token,
                         expiresIn: response.data.expiration,
                         tokenType: "Bearer",
-                        authState: { id: response.data.id },
+                        authState: { id: response.data.id, email: employeeCred.employeeUsername },    
                     });
                     setAccessToken(response.data.accessToken);
                     dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions }));
@@ -107,7 +108,7 @@ export default function Login() {
                         token: response.data.token,
                         expiresIn: response.data.expiration,
                         tokenType: "Bearer",
-                        authState: { id: response.data.id },
+                        authState: { id: response.data.id, email: credentials.email },
                     });
                     
                     setAccessToken(response.data.accessToken);

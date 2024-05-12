@@ -4,7 +4,8 @@ import { DateTime } from "luxon";
 import { getStateData, getAccessToken, getHeaders } from "../auth/Auth";
 import { setBusiness } from "../reducers/business";
 import { useDispatch, useSelector } from "react-redux";
-let GET_BUSINESS = '/api/internal/reload_business/'
+let GET_BUSINESS = '/api/internal/reload_business/';
+
 
 
 export const reloadBusinessData = (dispatch) => {
@@ -223,8 +224,19 @@ export const requestNoShow = (clientId, type) => {
             resolve(response.data);
         })
         .catch(error => {
-            reject(error.response.data);
-        })
+            console.log(error);
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }      
+        }) 
         
     })
 }
