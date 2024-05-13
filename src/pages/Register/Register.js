@@ -478,7 +478,7 @@ export default function Register(props){
                                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center',}}>
                                 <Stack sx={{ pt: 3}} direction="row" spacing={2}>
                                     <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => previous() }>Back</Button>
-                                    <Button sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => durationInfo() }>Next</Button>
+                                    <Button disabled={mode === null ? true: false} sx={{ width: '100px', width: '120px', height: '45px', borderRadius: 7}} variant="contained" color="primary" onClick={() => durationInfo() }>Next</Button>
                                 </Stack>
                                 </Box>
                                 

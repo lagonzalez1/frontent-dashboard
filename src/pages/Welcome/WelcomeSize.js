@@ -110,7 +110,8 @@ export default function WelcomeSize() {
             
         })
         .catch(error => {
-            if (error.response.status === 404) {
+            console.log(error)
+            if (error.error.status === 404) {
                 navigate(`/welcome/${link}`);
             }
             else {

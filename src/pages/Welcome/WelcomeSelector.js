@@ -217,6 +217,9 @@ export default function WelcomeSelector() {
             setBusinessExtras(extrasResponse);
         })
         .catch(error => {
+            if (error.error.status === 404) {
+                navigate(`/welcome/${link}`);
+            }
             handleErrorRefChange();
             setAcceptingStatus({waitlist: false, appointments: false});
             setErrorMessage({title: 'Error', body: error.msg});

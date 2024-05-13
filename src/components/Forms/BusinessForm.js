@@ -14,7 +14,10 @@ const validationSchema = Yup.object().shape({
   businessName: Yup.string().required(),
   businessWebsite: Yup.string(),
   businessAddress: Yup.string(),
-  businessPhone: Yup.string()
+  businessPhone: Yup.string(),
+  instagram: Yup.string(),
+  twitter: Yup.string(),
+  facebook: Yup.string(),
 });
 
 const BusinessForm = ({reloadPage}) => {
@@ -59,6 +62,9 @@ const BusinessForm = ({reloadPage}) => {
     businessWebsite: business ? business.businessWebsite: "",
     businessAddress: business ? business.businessAddress: "",
     businessPhone: business ? business.businessPhone: "",
+    instagram: business ? business.social.instagram: "",
+    twitter: business ? business.social.twitter: "",
+    facebook: business ? business.social.facebook: ""
   }
 
   return (
@@ -111,6 +117,63 @@ const BusinessForm = ({reloadPage}) => {
                   defaultValue={initialValue.businessPhone}
                   error={touched.businessPhone && !!errors.businessPhone}
                   helperText={touched.businessPhone && errors.businessPhone}
+                />
+                <Field
+                  name="twitter"
+                  label="Twitter link"
+                  variant="outlined"
+                  as={TextField}
+                  defaultValue={initialValue.twitter}
+                  fullWidth
+                  error={touched.twitter && !!errors.twitter}
+                  helperText={touched.twitter && errors.twitter}
+                  validate={(value) => {
+                    if (!value) {
+                      return;
+                    }
+                    const urlRegex = /^(https?:\/\/)?([\w-]+\.)*([\w-]+)\.[a-zA-Z]{2,}(\/[\w-]*)*(\/?|\/\w+\.[a-zA-Z]{2,})(\?\S*)?$/;
+                    if (!urlRegex.test(value)) {
+                      return 'Invalid URL';
+                    }
+                  }}
+                />
+                <Field
+                  name="facebook"
+                  label="Facebook link"
+                  variant="outlined"
+                  as={TextField}
+                  defaultValue={initialValue.facebook}
+                  fullWidth
+                  error={touched.facebook && !!errors.facebook}
+                  helperText={touched.facebook && errors.facebook}
+                  validate={(value) => {
+                    if (!value) {
+                      return;
+                    }
+                    const urlRegex = /^(https?:\/\/)?([\w-]+\.)*([\w-]+)\.[a-zA-Z]{2,}(\/[\w-]*)*(\/?|\/\w+\.[a-zA-Z]{2,})(\?\S*)?$/;
+                    if (!urlRegex.test(value)) {
+                      return 'Invalid URL';
+                    }
+                  }}
+                />
+                <Field
+                  name="instagram"
+                  label="Instagram link"
+                  variant="outlined"
+                  as={TextField}
+                  defaultValue={initialValue.instagram}
+                  fullWidth
+                  error={touched.instagram && !!errors.instagram}
+                  helperText={touched.instagram && errors.instagram}
+                  validate={(value) => {
+                    if (!value) {
+                      return;
+                    }
+                    const urlRegex = /^(https?:\/\/)?([\w-]+\.)*([\w-]+)\.[a-zA-Z]{2,}(\/[\w-]*)*(\/?|\/\w+\.[a-zA-Z]{2,})(\?\S*)?$/;
+                    if (!urlRegex.test(value)) {
+                      return 'Invalid URL';
+                    }
+                  }}
                 />
               </Stack>
             </Grid>

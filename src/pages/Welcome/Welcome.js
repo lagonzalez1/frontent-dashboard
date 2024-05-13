@@ -17,6 +17,8 @@ import { ClientWelcomeTheme } from "../../theme/theme";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { FacebookLogo, InstagramLogo, TwitterLogo, XLogo } from "phosphor-react";
 
+
+
 export default function Welcome() {
 
     const { link } = useParams();
@@ -25,6 +27,7 @@ export default function Welcome() {
 
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState({title: null, body: null});
+    const [disable, setDisabled] = useState(false);
     const [iconImageLink, setIconImage] = useState(null);
     const [waittimeRange, setWaittimeRange] = useState(null);
     const [position, setPosition] = useState(null);
@@ -54,6 +57,11 @@ export default function Welcome() {
         businessAddress: null,
         businessPhone: null,
         businessWebsite: null
+    })
+    const [social, setSocial] = useState({
+        instagram: null,
+        twitter: null,
+        facebook: null
     })
 
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false})
@@ -92,19 +100,21 @@ export default function Welcome() {
             setSystem(businessPresentResponse.system);
             setWaittimeRange(businessPresentResponse.waittimeRange);
             setBusinessInfo(businessPresentResponse.businessInformation);
+            setSocial(businessPresentResponse.social)
             setIconImage(businessPresentResponse.profileLink);
             setPosition(businessPresentResponse.position);
         })
         .catch(error => {
-            console.log(error);
-            if (error.status === 404) {
-                setErrors({title: 'Error', body: errors.response.data.msg});
+            if (error.error.status === 404) {
+                setDisabled(true)
+                setErrors({title: 'Error', body: error.error.data.msg});
                 setOpen(false);
                 setNextAvailableDate(null);
                 return;
             }
             else {
-                setErrors({title: 'Error', body: 'Error found when collecting data.'});
+                setDisabled(true)
+                setErrors({title: 'Error', body: error.error.data.msg});
                 setOpen(false);
                 setNextAvailableDate(null);
                 return;
@@ -117,7 +127,24 @@ export default function Welcome() {
     }
 
 
-
+    const openSocial = (type) => {
+        
+        switch(type) {
+            case 'FACE':
+                const facebook = window.open(social.facebook, '_blank', 'noopener,noreferrer')
+                if (facebook) newWindow.opener = null    
+            break;
+            case 'TWIT':
+                const twitter = window.open(social.twitter, '_blank', 'noopener,noreferrer')
+                if (twitter) newWindow.opener = null
+                break;
+            case 'INSTA':
+                const instagram = window.open(social.instagram, '_blank', 'noopener,noreferrer')
+                if (instagram) newWindow.opener = null
+                break;
+        }
+        
+    }
 
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
@@ -139,10 +166,9 @@ export default function Welcome() {
                 <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bold" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
                 <Typography textAlign={'center'} variant="body2" gutterBottom>Unfortunately the link you have used does not exist.</Typography> 
                 <br/>
-                <Typography textAlign={'center'} variant="caption" gutterBottom>Possible issues</Typography>
-                <br/>
-                <Typography textAlign={'center'} variant="caption" gutterBottom>incorrect or case sensitive value after www.waitlist.com/welcome/ISSUE</Typography>
-                <Typography textAlign={'center'} variant="caption" gutterBottom>not connected to a stable internet</Typography>
+                <Typography textAlign={'center'} variant="body2" fontWeight={'bold'} gutterBottom>Possible issues</Typography>
+                <Typography textAlign={'center'} variant="body2" gutterBottom>- incorrect or case sensitive value after www.waitlist.com/welcome/BUSINESS-NAME</Typography>
+                <Typography textAlign={'center'} variant="body2" gutterBottom>- not connected to a stable internet</Typography>
 
             
             </Box>
@@ -213,7 +239,9 @@ export default function Welcome() {
                             </Box> : 
                             (<>
                             {errors.title ? <Alert color={errors.title === "Error" ? 'error': 'success'}>
-                                <AlertTitle>{errors.title}</AlertTitle>
+                                <AlertTitle>
+                                    <Typography fontWeight={'bold'} variant="body1">{errors.title}</Typography>
+                                </AlertTitle>
                                 {errors.body}
                             </Alert>: null}
                             <CardContent>
@@ -263,13 +291,13 @@ export default function Welcome() {
                         <Typography variant="subtitle2">{business.businessWebsite} </Typography>
                         <Typography variant="caption" fontWeight={'bold'}>Social</Typography>
                         <Stack direction={'row'} spacing={3} justifyContent={'center'}>
-                            <IconButton>
+                            <IconButton disabled={disable} onClick={() => openSocial('INSTA')}>
                                 <InstagramLogo size={20} />
                             </IconButton>
-                            <IconButton>
+                            <IconButton disabled={disable} onClick={() => openSocial('TWIT')}>
                                 <TwitterLogo size={20} />
                             </IconButton>
-                            <IconButton>
+                            <IconButton disabled={disable} onClick={() => openSocial('FACE')}>
                                 <FacebookLogo size={20} />
                             </IconButton>
                         </Stack>

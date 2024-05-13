@@ -123,7 +123,7 @@ export default function Dashboard () {
     const RenderLocation = () => {
         const location = useSelector((state) => state.user.location);
         const emailConfirm = useSelector((state) => state.user.emailConfirm);
-        if (!emailConfirm) { return <ErrorPage errorMessage={"Your account has not been authorized/confirmed. Confirm your account via email, then come back and refresh the page!"} type={403} />; }
+        if (!emailConfirm) { return <ErrorPage errorMessage={"Please confirm your email by verifying your identity. Once completed come back here and refresh the page."} type={403} />; }
         switch(location) {
             case 0:
                 return <Waitlist setClient={setClient} setEditClient={setEditClient} />;

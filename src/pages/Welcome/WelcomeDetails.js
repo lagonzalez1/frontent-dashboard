@@ -92,7 +92,9 @@ export default function WelcomeDetails() {
             }
         })
         .catch(error => {
-            console.log(error);
+            if (error.error.status === 404) {
+                navigate(`/welcome/${link}`);
+            }
             setErrors({title: 'Error', body: error.msg});
             setDisable(true); 
         })
@@ -140,6 +142,7 @@ export default function WelcomeDetails() {
             }
         })
         .then(response => {
+            
             navigate(`/welcome/${link}/visits/${response.unid}`);
         })
         .catch(error => {

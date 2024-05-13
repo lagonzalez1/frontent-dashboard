@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip, Typography} from "@mui/material";
+import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip, Typography, Badge} from "@mui/material";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
@@ -261,6 +261,7 @@ const SideBar = ({navState, openNav}) => {
         
         <Divider/>
         <List>
+
               <ListItem disablePadding sx={{ display: 'block' }}>
               <BootstrapTooltip title="Help" placement="right">
                 <ListItemButton
