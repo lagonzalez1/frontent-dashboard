@@ -1060,15 +1060,13 @@ export default function Waiting() {
                                 <Divider />
                                 <Typography sx={{pt: 1}} fontWeight={'bolder'} textAlign={'center'} variant="h5">Your service</Typography>
                                 <Typography variant="caption">Title</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].title}</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].title}</Typography>
                                 <Typography variant="caption">Duration</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].duration + "min"}</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].duration + "min"}</Typography>
                                 <Typography variant="caption">Cost</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].cost}</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].cost}</Typography>
                                 <Typography variant="caption">Description</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service[0].description}</Typography>
-
-
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].description}</Typography>
                             </Container>
                         ): null
                     }
