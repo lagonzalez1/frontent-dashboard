@@ -14,8 +14,8 @@ export const submitService = (data) => {
     const { user, business } = getStateData();
     const accessToken = getAccessToken();
     const headers = { headers: { 'x-access-token': accessToken } };
-    const payload = { b_id: business._id, ...data}
-    axios.post('/api/internal/create_service', payload, headers)
+    const payload = { b_id: business._id, ...data, email: user.email}
+    axios.post('/api/internal/create_service', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       if(response.status === 200){
         resolve(response.data);
@@ -23,6 +23,9 @@ export const submitService = (data) => {
     })
     .catch(error => {
       console.log(error);
+      if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+        reject('Request timed out. Please try again later.'); // Handle timeout error
+    }
       if (error.response) {
           console.log(error.response);
           reject({msg: 'Response error', error: error.response});

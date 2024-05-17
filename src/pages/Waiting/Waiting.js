@@ -184,8 +184,8 @@ export default function Waiting() {
             setServiceList(argsResponse.services);
         })
         .catch(error => {
-            
-            setErrors('Error: ' + error.response.data.msg);
+            console.log(error);
+            //setErrors('Error: ' + error.data.msg);
         })
         .finally(() => {
             setLoading(false);

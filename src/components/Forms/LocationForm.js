@@ -36,6 +36,8 @@ const LocationForm = ({reloadPage}) => {
 
   const [errors, setErrors] = useState(null);
   
+
+  // Middleware NOT OK
   const handleSubmit = (values) => {
     setLoading(true);
     if (!checkValidString(values.locationUrl)){

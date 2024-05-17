@@ -9,11 +9,12 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 
-
 /**
  * 
  * @param {Object} payload
  * @returns Promise         Returns business with the newly created data.
+ * 
+ * Middleware OK
  *                  
  */
 export const addCustomerWaitlist = (payload) => {
@@ -25,14 +26,20 @@ export const addCustomerWaitlist = (payload) => {
       const b_id = business._id;
       const timezone = business.timezone;
       const timestamp = DateTime.local().setZone(business.timezone).toISO();
-      const data = { id, b_id, timezone, ...payload, timestamp };
-      axios
-        .post('/api/internal/create_client', data, headers)
+
+      
+      
+      const data = { id, b_id, timezone, payload: {...payload, timestamp}, email: user.email };
+      axios.post('/api/internal/create_client', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
           resolve(response.data);
         })
         .catch(error => {
+          if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+          } 
           reject(error);
+          
         });
     });
   };

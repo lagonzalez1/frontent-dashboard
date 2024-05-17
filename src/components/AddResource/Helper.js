@@ -30,6 +30,8 @@ export const getResourcesAvailable = () => {
   return resources;
 };
 
+
+// Middleware OK
 export const addResource = (payload) => {
     return new Promise((resolve, reject) => {
       const { user, business } = getStateData();
@@ -37,14 +39,17 @@ export const addResource = (payload) => {
       const headers = { headers: { 'x-access-token': accessToken } };
       const b_id = business._id;
       console.log(payload)
-      const data = { b_id, ...payload };
+      const data = { b_id, ...payload, email: user.email };
       axios
-        .post('/api/internal/create_resource', data, headers)
+        .post('/api/internal/create_resource', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
           resolve(response.data);
         })
         .catch(error => {
           console.log(error);
+          if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+        }
           if (error.response) {
               console.log(error.response);
               reject({msg: 'Response error', error: error.response});

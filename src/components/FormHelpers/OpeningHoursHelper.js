@@ -11,12 +11,15 @@ export const requestTimezoneChange = (timezone) => {
       const { user, business } = getStateData();
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
-      axios.put('/api/internal/update_timezone', {timezone, b_id: business._id}, headers)
+      axios.put('/api/internal/update_timezone', {timezone, b_id: business._id}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
       .then(response => {
         resolve(response.data);
       })
       .catch(error => {
         console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+      }
         if (error.response) {
             console.log(error.response);
             reject({msg: 'Response error', error: error.response});
@@ -39,12 +42,15 @@ export const requestRemoveCloseDate = (dateId) => {
       const { user, business } = getStateData();
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
-      axios.put('/api/internal/remove_close_date', {dateId, b_id: business._id}, headers)
+      axios.put('/api/internal/remove_close_date', {dateId, b_id: business._id}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
       .then(response => {
         resolve(response.data);
       })
       .catch(error => {
         console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+      }
         if (error.response) {
             console.log(error.response);
             reject({msg: 'Response error', error: error.response});
@@ -69,12 +75,15 @@ export const requestScheduleChange = (payload) => {
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       const schedule = {...payload}
-      axios.put('/api/internal/update_schedule', {schedule, b_id: business._id}, headers)
+      axios.put('/api/internal/update_schedule', {schedule, b_id: business._id}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
       .then(response => {
         resolve(response.data);
       })
       .catch(error => {
         console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+      }
         if (error.response) {
             console.log(error.response);
             reject({msg: 'Response error', error: error.response});
@@ -99,12 +108,15 @@ export const requestClosedDate = (date, employeeId, start, end) => {
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
       
-      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId, start, end}, headers)
+      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId, start, end}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         resolve(response.data);
       })
       .catch(error => {
         console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+      }
         if (error.response) {
             console.log(error.response);
             reject({msg: 'Response error', error: error.response});

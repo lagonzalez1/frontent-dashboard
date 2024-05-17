@@ -19,12 +19,15 @@ export const requestRemoveResource = (payload) => {
   return new Promise((resolve, reject) => {
     const { user, business} = getStateData();
     const headers = getHeaders();
-    const data = { ...payload, b_id: business._id }
-    axios.post('/api/internal/remove_resource', data, headers)
+    const data = { ...payload, b_id: business._id, email: user.email }
+    axios.post('/api/internal/remove_resource', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       reject(response.data.msg)
     })
     .catch(error => {
+      if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+        reject('Request timed out. Please try again later.'); // Handle timeout error
+    }
       reject(error)
     })
   })
@@ -34,12 +37,15 @@ export const requestRemoveService = (payload) => {
   return new Promise((resolve, reject) => {
     const { user, business} = getStateData();
     const headers = getHeaders();
-    const data = { ...payload, b_id: business._id }
-    axios.post('/api/internal/remove_service', data, headers)
+    const data = { ...payload, b_id: business._id, email: user.email }
+    axios.post('/api/internal/remove_service', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
     .then(response => {
       reject(response.data.msg)
     })
     .catch(error => {
+      if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+        reject('Request timed out. Please try again later.'); // Handle timeout error
+      }
       reject(error)
     })
   })
@@ -51,10 +57,10 @@ export const requestRemoveService = (payload) => {
 export const updateService = (data) => {
     const { user, business} = getStateData();
     const accessToken = getAccessToken();
-    const payload = { ...data, bid: business._id}
+    const payload = { ...data, bid: business._id, email: user.email}
     const headers = { headers: { 'x-access-token': accessToken } };
     return new Promise((resolve, reject) => {
-        axios.put('/api/internal/service_text', payload, headers)
+        axios.put('/api/internal/service_text', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
           if(response.status === 200) {
             resolve(response.data);
@@ -63,6 +69,9 @@ export const updateService = (data) => {
 
         })
         .catch(error => {
+          if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+        }
           reject(error)
         })
     })
@@ -73,10 +82,10 @@ export const updateService = (data) => {
 export const updateResource = (data) => {
     const { user, business} = getStateData();
     const accessToken = getAccessToken();
-    const payload = { ...data, bid: business._id}
+    const payload = { ...data, bid: business._id, email: user.email }
     const headers = { headers: { 'x-access-token': accessToken } };
     return new Promise((resolve, reject) => {
-        axios.put('/api/internal/resource_text', payload, headers)
+        axios.put('/api/internal/resource_text', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout, error'})
         .then(response => {
           if(response.status === 200) {
             resolve(response.data);
@@ -85,6 +94,9 @@ export const updateResource = (data) => {
 
         })
         .catch(error => {
+          if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+        }
           reject(error)
         })
     })

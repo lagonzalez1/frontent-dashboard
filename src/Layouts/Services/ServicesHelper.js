@@ -47,7 +47,6 @@ export const removeExistingEmployees = (employeeIds) => {
           continue;
         }
         result.push(employee);
-        break;
       }  
     }
 
@@ -60,7 +59,7 @@ export const updateService = (data) => {
   const payload = { ...data, bid: business._id}
   const headers = { headers: { 'x-access-token': accessToken } };
   return new Promise((resolve, reject) => {
-      axios.put('/api/internal/update_service', payload, headers)
+      axios.put('/api/internal/update_service', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         if(response.status === 200) {
           resolve(response.data.msg);
@@ -68,6 +67,9 @@ export const updateService = (data) => {
       })
       .catch(error => {
         console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+      }
         if (error.response) {
             console.log(error.response);
             reject({msg: 'Response error', error: error.response});
@@ -92,7 +94,7 @@ export const removeEmployeeTag = (data) => {
   const payload = { ...data, bid: business._id}
   const headers = { headers: { 'x-access-token': accessToken } };
   return new Promise((resolve, reject) => {
-    axios.post('/api/internal/service_remove_tag',payload, headers)
+    axios.post('/api/internal/service_remove_tag',payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         if(response.status === 200) {
           resolve(response.data.msg);
@@ -100,6 +102,9 @@ export const removeEmployeeTag = (data) => {
       })
       .catch(error => {
         console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+      }
         if (error.response) {
             console.log(error.response);
             reject({msg: 'Response error', error: error.response});

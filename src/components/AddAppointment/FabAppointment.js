@@ -98,7 +98,7 @@ export default function FabAppointment () {
         })
         .finally(() => {
             setApp_loader(false);
-            dispatch(setReload(true));
+            //dispatch(setReload(true));
             handleClose();
         })
     }

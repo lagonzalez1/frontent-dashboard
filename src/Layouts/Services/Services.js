@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, CardActionArea, TextField
     , Modal, Dialog, DialogTitle, DialogContent, DialogActions, Button, IconButton, Select, TableContainer, Table, TableCell,
-Paper, Switch, TableBody, FormControl, MenuItem, TableRow, TableHead, FormControlLabel, InputLabel, Divider, Box, Tooltip, CircularProgress } from '@mui/material';
+Paper, Switch, TableBody, FormControl, MenuItem, TableRow, TableHead, FormControlLabel, InputLabel, Divider, Box, Tooltip, CircularProgress, 
+Slide} from '@mui/material';
 import AddService from "../../components/AddService/AddService.js";
 import CloseIcon from "@mui/icons-material/Close"
 import {  StyledCardService, stringAvatar, getServicesTotal, getEmployeeTags, removeExistingEmployees, removeEmployeeTag, updateService } from "./ServicesHelper.js"; 
@@ -107,6 +108,10 @@ export default function Services() {
         } 
     },[reloadPage])
 
+    const Transition = React.forwardRef(function Transition(props, ref) {
+        return <Slide direction="down" ref={ref} {...props} />;
+    });
+
     return(
         <>
         <Grid 
@@ -163,7 +168,7 @@ export default function Services() {
             )): null}
         </Grid>
 
-        <Dialog  maxWidth={'xs'} fullWidth={'xs'}  open={dialog} onClose={handleClose}>
+        <Dialog  maxWidth={'xs'} fullWidth={'xs'} TransitionComponent={Transition}  open={dialog} onClose={handleClose}>
         <DialogTitle>
             <IconButton
                     aria-label="close"
@@ -219,6 +224,7 @@ export default function Services() {
 
                         <Typography variant={"subtitle2"} fontWeight={'bold'} textAlign={'left'}>Add a new employee to service</Typography>
                         <Select labelId="select-employee-tag" value={form.employeeId} onChange={(e) => setForm((prev) => ({...prev, employeeId: e.target.value}))}>
+                            
                         {
                             service.employeeTags && removeExistingEmployees(service.employeeTags).map((employee, index) => (
                             <MenuItem key={index} value={employee._id}>

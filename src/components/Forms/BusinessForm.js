@@ -36,8 +36,8 @@ const BusinessForm = ({reloadPage}) => {
     setLoading(true);
     const accessToken = getAccessToken();
     const headers = { headers: {'x-access-token': accessToken}}
-    const payload = { ...values, b_id: business._id}
-    axios.put('/api/internal/update_business', payload, headers)
+    const payload = { ...values, b_id: business._id, email: user.email}
+    axios.put('/api/internal/update_business', payload, {headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
     })

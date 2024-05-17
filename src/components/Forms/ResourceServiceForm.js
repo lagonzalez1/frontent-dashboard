@@ -11,8 +11,7 @@ import { usePermission } from "../../auth/Permissions";
 import { LoadingButton } from "@mui/lab";
 
 
-export default function ResourceServiceForm ({reloadPage}) {
-
+export default function ResourceServiceForm ({ reloadPage }) {
 
     const { checkPermission } = usePermission();
     const [resourceDialog, setResourceDialog] = useState(false)

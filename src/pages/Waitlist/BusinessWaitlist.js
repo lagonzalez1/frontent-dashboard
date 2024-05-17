@@ -96,17 +96,17 @@ export default function BusinessWaitlist () {
                                                 <React.Fragment key={index}>
                                                     <TableRow>
                                                     <TableCell>
-                                                        <Typography variant="body2" textAlign={'left'}>
-                                                        {index + 1}
+                                                        <Typography variant="subtitle2" textAlign={'left'}>
+                                                            {index + 1}
                                                         </Typography>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Typography variant="body2" textAlign={'center'}>
+                                                        <Typography variant="subtitle2" textAlign={'center'}>
                                                         {item.fullname}
                                                         </Typography>
                                                     </TableCell>
                                                     <TableCell>
-                                                        <Typography variant="body2" textAlign={'center'}>
+                                                        <Typography variant="subtitle2" textAlign={'center'}>
                                                         {item.partySize}
                                                         </Typography>
                                                     </TableCell>

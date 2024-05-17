@@ -3,9 +3,22 @@ import axios from "axios";
 import { DateTime } from "luxon";
 import { getStateData, getAccessToken, getHeaders } from "../auth/Auth";
 import { setBusiness } from "../reducers/business";
-import { useDispatch, useSelector } from "react-redux";
-let GET_BUSINESS = '/api/internal/reload_business/';
 
+
+let POST_NOSHOW = '/api/internal/noShow';
+let POST_ANALYTICS_DATA = '/api/internal/analytics_data';
+let POST_UNDOSERVING = '/api/internal/undo_serving';
+let POST_CLIENTTOSERVING = '/api/internal/client_to_serving';
+let POST_APPOINTMENTCOMPLETE = '/api/internal/complete_appointment';
+let POST_AVAILABLEAPPOINTMENTS = '/api/internal/available_appointments';
+let POST_NOTIFYCLIENT = '/api/internal/notify_client';
+
+let GET_WAITTIME = '/api/internal/waittime';
+let GET_BUSINESS = '/api/internal/reload_business/';
+let GET_SERVINGTABLE = '/api/internal/serving_table';
+let GET_APPOINTMENTDATA = '/api/internal/appointment_data';
+let GET_NOSHOW = '/api/internal/no_show';
+let GET_WAITLIST = '/api/internal/get_waitlist';
 
 
 export const reloadBusinessData = (dispatch) => {
@@ -58,8 +71,8 @@ export const requestNoShow = (clientId, type) => {
       const { user, business } = getStateData();
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
-      const payload = { bId: business._id, clientId, type}
-      axios.post('/api/internal/noShow', payload, headers)
+      const payload = { bId: business._id, clientId, type, email: user.email}
+      axios.post(POST_NOSHOW, payload, {...headers, timeout: 900000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         if(response.status === 200){
           resolve(response.data.client)
@@ -68,49 +81,29 @@ export const requestNoShow = (clientId, type) => {
         }
       })
       .catch(error => {
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+        }
         reject(error);
       })
   
     })
-  }
+}
 
-  // Allow employees that sign in to change their availability.
-  // Also allow managment and root edit.
-  export function allowEmployeeEdit(permissionLevel, signOnEmail, employeeFromList) {
-
-    let allow = false;
-    if (signOnEmail === employeeFromList.employeeUsername) {
-        allow = false;
-    }
-    else {
-        if (permissionLevel === 0 || permissionLevel === 1 || permissionLevel === 2){
-            allow = false
-        }
-        else {
-            allow = true;
-        }
-    }
-    return allow;
-    
-  }
-
-
-    // No longer do i need to create a new Analytic, we can assume it exist since regisstration handles that.
-    // Analytics has changed so now this need to reflect the new strcuture.
-    // Mongodb Service doc: {businessId, name, email, ...waitlist[], ...appointments[]}
-    // Nov 12 2023
-
-  export const getAnalyticsClients = (payload) => {
+export const getAnalyticsClients = (payload) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
         const data = { ...payload, bid: business._id, email: user.email}
-        axios.post('/api/internal/analytics_data', data, header)
+        axios.post(POST_ANALYTICS_DATA, data, {...header, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -126,20 +119,20 @@ export const requestNoShow = (clientId, type) => {
         })
         
     })
-  } 
-
- 
-
-  export const getWaitlistWaittime = (accessToken) => {
+} 
+export const getWaitlistWaittime = (accessToken) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const date = DateTime.local().setZone(business.timezone).toISO();
-        axios.get(`/api/internal/waittime`, {headers: {'x-access-token': accessToken}, params: {date, bid: business._id, email: user.email}})
+        axios.get(GET_WAITTIME, {headers: {'x-access-token': accessToken}, params: {date, bid: business._id, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
         .then(response => {
           resolve(response.data);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -155,20 +148,23 @@ export const requestNoShow = (clientId, type) => {
         })
         
       })
-  }
+}
 
-
-  export const undoClientServing = (payload) => {
+// Middleware OK
+export const undoClientServing = (payload) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const headers = getHeaders();
-        const data = { ...payload, b_id: business._id}
-        axios.post('/api/internal/undo_serving', data, headers)
+        const data = { ...payload, b_id: business._id, email: user.email}
+        axios.post(POST_UNDOSERVING, data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout errors'})
         .then(response => {
           resolve(response.data);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -182,49 +178,55 @@ export const requestNoShow = (clientId, type) => {
             }        }) 
         
       })
-  }
+}
 
-
-  // Type: Appointment type can be either appointment, waitlist
-  export const moveClientServing = (clientId, type, employeeId) => {
-    return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const headers = getHeaders();
-      const currentTime = new DateTime.local().setZone(business.timezone).toISO();
-      const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type, employeeId }
-      axios.post('/api/internal/client_to_serving', payload, headers)
-      .then(response => {
-        resolve(response.data);
-      })
-      .catch(error => {
-        console.log(error);
-        if (error.response) {
-            console.log(error.response);
-            reject({msg: 'Response error', error: error.response});
-        }
-        else if (error.request){
-            console.log(error.request);
-            reject({msg: 'No response from server', error: error.request})
-        }
-        else {
-            reject({msg: 'Request setup error', error: error.message})
-        }      }) 
-      
+export const moveClientServing = (clientId, type, employeeId) => {
+return new Promise((resolve, reject) => {
+    const { user, business } = getStateData();
+    const headers = getHeaders();
+    const currentTime = new DateTime.local().setZone(business.timezone).toISO();
+    const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type, employeeId, email: user.email }
+    axios.post(POST_CLIENTTOSERVING, payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    .then(response => {
+    resolve(response.data);
     })
-  }
+    .catch(error => {
+    console.log(error);
+    if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+        reject('Request timed out. Please try again later.'); // Handle timeout error
+    }
+    if (error.response) {
+        console.log(error.response);
+        reject({msg: 'Response error', error: error.response});
+    }
+    else if (error.request){
+        console.log(error.request);
+        reject({msg: 'No response from server', error: error.request})
+    }
+    else {
+        reject({msg: 'Request setup error', error: error.message})
+    }      
+}) 
+    
+})
+}
 
-  export const completeClientAppointment = (client) => {
+// Middleware OK
+export const completeClientAppointment = (client) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
         const currentTime = DateTime.local().setZone(business.timezone).toISO();
-        const payload = {client: {...client}, b_id: business._id, currentTime, saveClient: true, clientNotes: ''}
-        axios.post('/api/internal/complete_appointment', payload, header)
+        const payload = {client: {...client}, b_id: business._id, currentTime, saveClient: true, clientNotes: '', email: user.email}
+        axios.post(POST_APPOINTMENTCOMPLETE, payload, {...header, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -241,52 +243,49 @@ export const requestNoShow = (clientId, type) => {
     })
 }
 
-
 export const getAvailableAppointments = (payload) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
-        const data = { ...payload, bid: business._id}
-        axios.post('/api/internal/available_appointments',data,header)
+        const data = { ...payload, bid: business._id, email: user.email}
+        axios.post(POST_AVAILABLEAPPOINTMENTS,data,{...header, timeout: 90000, timeoutErrorMessage: 'Timeout Error'})
         .then(response => {
             resolve(response.data);
         })
         .catch(error => {
-            reject(error);
+            console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }  
 
         })
     })
 }
 
-
-
-/*
-    Handle all error codes and route to correct destination.
-                            REJECTS:    
- *                              400 -> Bad Request, missing tokens.
- *                              401 -> Unauthenticated try again.
- *                              403 -> Reject sign out.
-*/
-export const handleErrorCodes = (error) => {  
-    //
-}
-
-
-
-// This can be made into a backend request.
-
-
-
 export const getServingClients = (accessToken) => {
     const { user, business } = getStateData();
     const bid = business._id;
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/serving_table`,{headers: {'x-access-token': accessToken}, params: {bid}})
+        axios.get(GET_SERVINGTABLE,{headers: {'x-access-token': accessToken}, params: {bid, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data.result);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -300,20 +299,21 @@ export const getServingClients = (accessToken) => {
             }        })  
     }) 
 }
-
-
-
+// Middleware OK
 export const sendNotification = (payload) => {
     return new Promise((resolve, reject) => {
         const { user, business } = getStateData();
         const header = getHeaders();
-        const data = { ...payload, bid: business._id}
-        axios.post('/api/internal/notify_client', data, header)
+        const data = { ...payload, bid: business._id, email: user.email}
+        axios.post(POST_NOTIFYCLIENT, data, {...header, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -381,12 +381,15 @@ export const getAppointmentTable = (date, accessToken) => {
     return new Promise((resolve, reject) => {
         const { user,  business} = getStateData();
         const bid = business._id;
-        axios.get(`/api/internal/appointment_data`, {headers: {'x-access-token': accessToken} , params: {bid, appointmentDate: date, email: user.email}})
+        axios.get(GET_APPOINTMENTDATA, {headers: {'x-access-token': accessToken} , params: {bid, appointmentDate: date, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -403,16 +406,18 @@ export const getAppointmentTable = (date, accessToken) => {
     })
 }
 
-
 export const getNoShowClients = (accessToken) => {
     const { user, business } = getStateData();
     return new Promise((resolve, reject) => {
-        axios.get(`/api/internal/no_show`, {headers: {'x-access-token' : accessToken}, params: {bid: business._id}})
+        axios.get(GET_NOSHOW, {headers: {'x-access-token' : accessToken}, params: {bid: business._id, user: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -428,7 +433,6 @@ export const getNoShowClients = (accessToken) => {
         })
     })
 }
-
 
 // Need to complete, this is the waitlist on Dashboard
 export function getWaitlistTable (accessToken) {
@@ -437,13 +441,17 @@ export function getWaitlistTable (accessToken) {
     const email = user.email;
     const bid = business._id;
     const time = DateTime.local().setZone(business.timezone).toISO();
+    
     return new Promise((resolve, reject) => {   
-        axios.get(`/api/internal/get_waitlist`,{headers: {'x-access-token': accessToken}, params: {time, bid, email}})
+        axios.get(GET_WAITLIST,{headers: {'x-access-token': accessToken}, params: {time, bid, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
         .then(response => {
             resolve(response.data.result);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});
@@ -459,9 +467,6 @@ export function getWaitlistTable (accessToken) {
         })
     })
 }
-
-
-
 
 /**
  * 
@@ -478,18 +483,6 @@ export function getWaitlistTable (accessToken) {
     const timestampA = DateTime.fromISO(a.timestamp);
     const timestampB = DateTime.fromISO(b.timestamp);
   
-    if (timestampA < timestampB) {
-      return -1;
-    }
-    if (timestampA > timestampB) {
-      return 1;
-    }
-    return 0;
-  }
-
-  function sortAppointmentTime (a,b) {
-    const timestampA = DateTime.fromISO(a.appointmentDate);
-    const timestampB = DateTime.fromISO(b.appointmentDate);
     if (timestampA < timestampB) {
       return -1;
     }

@@ -56,7 +56,7 @@ export default function Settings() {
                                     <Typography variant="subtitle2">
                                         Your location name <strong>{business && business.publicLink }</strong> is displayed across many areas including on your online pages and messages to clients
                                     </Typography>
-                                    <Typography fontWeight='bold' variant="subtitle2">
+                                    <Typography fontWeight='bold' variant="subtitle1">
                                         waitonline.us/welcome/{business && business.publicLink}
                                     </Typography>
                                 </Stack>

@@ -12,7 +12,7 @@ import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone,
   requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate,validateTimerange, DAYOFWEEK } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
-import { allowEmployeeEdit, findEmployee, getEmployeeList } from '../../hooks/hooks';
+import {  findEmployee, getEmployeeList } from '../../hooks/hooks';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
@@ -294,7 +294,7 @@ const OpeningHoursForm = ({reloadPage}) => {
                     >
                     <CloseIcon />
                 </IconButton> 
-                <Typography variant='h6'>
+                <Typography fontWeight={'bold'} variant='h6'>
                   Hours of operation
                 </Typography>
 

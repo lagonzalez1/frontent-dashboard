@@ -1,7 +1,18 @@
 import axios from "axios";
 export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;    
-
 import { NumberOne, NumberTwo, NumberThree, NumberFour, NumberFive, NumberSix, NumberSeven, NumberEight, NumberNine } from "phosphor-react";
+let GET_IDENTIFIER = '/api/external/identifierRequest';
+let GET_EMPLOYEELIST = '/api/external/employeeList';
+let GET_BUSINES_ARGS = `/api/external/businessArgs`;
+
+
+let POST_AVAILABLE_APPOINTMENTS = '/api/external/available_appointments';
+let POST_EDITAPPOINTMENT = '/api/external/editAppointment';
+let POST_CLIENTREIVEW = `/api/external/create_review`;
+let POST_UPDATESTATUS = '/api/external/updateClientStatus';
+let POST_REMOVE_REQUEST = '/api/external/removeRequest';
+
+
 
 export const iconsList = (position) => {
     let iconLi = [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10]
@@ -10,7 +21,7 @@ export const iconsList = (position) => {
 
 export const getIdentifierData = (link, unid, timestamp) => {
     return new Promise((resolve, reject) => {
-        axios.get('/api/external/identifierRequest',{ params: {link, unid, timestamp} } )
+        axios.get(GET_IDENTIFIER,{ params: {link, unid, timestamp} } )
         .then(response => {
             resolve(response);
         })
@@ -23,7 +34,7 @@ export const getIdentifierData = (link, unid, timestamp) => {
 export const getEmployeeList = (date,link) => {
     return new Promise((resolve, reject) => {
       axios
-        .get('/api/external/employeeList', { params: { link, date } })
+        .get(GET_EMPLOYEELIST, { params: { link, date } })
         .then((response) => {
           if (response.status === 200){
             resolve(response.data.employees);
@@ -38,7 +49,7 @@ export const getEmployeeList = (date,link) => {
 
 export const requestClientEditApp = (payload) => {
     return new Promise((resolve, reject) => {
-        axios.post(`/api/external/editAppointment`, payload)
+        axios.post(POST_EDITAPPOINTMENT, payload)
         .then(response => {
             resolve(response.data.msg);
         })
@@ -50,7 +61,7 @@ export const requestClientEditApp = (payload) => {
 
 export const requestClientReview = (payload) => {
     return new Promise((resolve, reject) => {
-        axios.post(`/api/external/create_review`, payload)
+        axios.post(POST_CLIENTREIVEW, payload)
         .then(response => {
             resolve(response.data);
         })
@@ -63,7 +74,7 @@ export const requestClientReview = (payload) => {
 export const getAvailableAppointments = (payload) => {
     return new Promise((resolve, reject) => {
         const data = { ...payload}
-        axios.post('/api/external/available_appointments',data)
+        axios.post(POST_AVAILABLE_APPOINTMENTS,data)
         .then(response => {
             resolve(response.data);
         })
@@ -77,7 +88,7 @@ export const getAvailableAppointments = (payload) => {
 
 export const requestClientStatus = (payload) => {
     return new Promise ((resolve, reject) => {
-        axios.post('/api/external/updateClientStatus', payload)
+        axios.post(POST_UPDATESTATUS, payload)
         .then(response => {
             resolve(response.data.msg);
         })
@@ -89,7 +100,7 @@ export const requestClientStatus = (payload) => {
 
 export const leaveWaitlistRequest = (link, unid, type) => {
     return new Promise((resolve, reject) => {
-        axios.post('/api/external/removeRequest', { link, unid, type})
+        axios.post(POST_REMOVE_REQUEST, { link, unid, type})
         .then(response => {
             resolve(response);
         }) 
@@ -101,7 +112,7 @@ export const leaveWaitlistRequest = (link, unid, type) => {
 
 export const requestBusinessArguments = (link) => {
     return new Promise((resolve, reject) => {
-        axios.get(`/api/external/businessArgs`, {params: {link}})
+        axios.get(GET_BUSINES_ARGS, {params: {link}})
         .then(response => {
             resolve(response.data.payload);
         }) 

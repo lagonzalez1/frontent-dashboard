@@ -116,6 +116,8 @@ export default function WelcomeSize() {
             }
             else {
                 setErrors({title: 'Error', body: 'Business is currently not accepting request.'});
+                setDisable(true);
+                return;
             }
         })
         .finally(() => {

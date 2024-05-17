@@ -11,7 +11,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch, useSelector } from 'react-redux';
 import { columns, convertTo_CSV, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword} from './CustomerHelper';
 import { findEmployee, findService, getAnalyticsClients } from '../../hooks/hooks';
-import { setSnackbar } from '../../reducers/user';
+import { setReload, setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
 import AlertMessageGeneral from '../../components/AlertMessage/AlertMessageGeneral';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -40,7 +40,7 @@ const Customers = () => {
   const [data, setData] = useState(null);
   const [sort, setSort] = useState();
   const [stateSort, setStateSort] = useState();
-  const [employeeSort, setEmployeeSort] = useState();
+  const [reload, setReload] = useState(false);
   const [client, setClient] = useState(null);
   const [clientNotes, setClientNotes] = useState(false);
   const [notes, setNotes] = useState({timestamp: null, notes: null});
@@ -176,13 +176,18 @@ const Customers = () => {
     })
     .finally(() => {
       setLoading(false);
+      setReload(true);
       cancelDeleteClient();
+      
     })
   }
 
   useEffect(() => {
     loadCustomers(sort, stateSort);
-  }, [ sort, stateSort])
+    return () => {
+      setReload(false);
+    }
+  }, [ sort, stateSort, reload])
 
 
 
@@ -483,11 +488,10 @@ const Customers = () => {
                             (
                               <TableRow>
                                   <TableCell colSpan={3}/>
-                                  
                                   <TableCell>
                                   <CircularProgress size={15} />
                                   </TableCell>
-                                  <TableCell colSpan={1}/>
+                                  <TableCell colSpan={3}/>
                               </TableRow>
                             ):
                             data && data.map((client, index) => (

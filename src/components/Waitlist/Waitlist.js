@@ -413,7 +413,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                             <TableCell>
                             <CircularProgress size={15} />
                             </TableCell>
-                            <TableCell colSpan={1}/>
+                            <TableCell colSpan={3}/>
                         </TableRow>
                     ) : 
                         ( tableData && tableData.length > 0 ? 

@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { IANAZone, DateTime } from "luxon";
-
+let GET_UNIQUE_LINK = '/api/external/unique_link/';
 /**
  * 
  * @returns The current timezone by the user browser. 
@@ -74,7 +74,7 @@ export function checkObjectData (object) {
 export const checkPublicLink = (publicLink) => {
   return new Promise((resolve, reject) => {
     axios
-      .get('/api/external/unique_link/' + publicLink)
+      .get(GET_UNIQUE_LINK + publicLink)
       .then((response) => {
         resolve(response); // Return response data instead of the entire response
       })

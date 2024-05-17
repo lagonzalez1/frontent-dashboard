@@ -1,6 +1,6 @@
 
 import * as Yup from 'yup';
-import { getAccessToken } from '../../auth/Auth';
+import { getAccessToken, getStateData } from '../../auth/Auth';
 import axios from 'axios';
 
 
@@ -36,19 +36,20 @@ export const TITLE = {
     waittime: 'Show est wait time',
 }
 
-
+// Middleware OK
 export const requestExtraChanges = (payload) => {
+    const { user, business } = getStateData();
     return new Promise((resolve, reject) => {
         const accessToken = getAccessToken();  
         const headers = { headers: { 'x-access-token': accessToken}} 
-        axios.put('/api/internal/update_extras', payload, headers)
+        axios.put('/api/internal/update_extras', {payload, email: user.email}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
-            if(response.status === 200){
-                resolve(response.data);
-            }
-            reject(response.data.msg);
+            resolve(response.data);
         })
         .catch(error => {
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             reject(error);
         })
     })

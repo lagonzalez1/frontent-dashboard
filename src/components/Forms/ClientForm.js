@@ -11,14 +11,12 @@ import { LoadingButton } from "@mui/lab";
 
 export default function ClientForm({reloadPage}) {
     
-
     const { checkPermission } = usePermission();
     const { cancelledSubscription } = useSubscription();
     const settings = useSelector((state) => state.business.settings.inputFields);
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
     const [loading, setLoading ] = useState(false);
-
 
     const initialValues = {
         email: settings.email,

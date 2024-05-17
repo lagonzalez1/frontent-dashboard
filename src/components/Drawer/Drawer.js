@@ -9,7 +9,7 @@ import { DateTime } from "luxon";
 import { useDispatch, useSelector } from "react-redux";
 import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow, sendNotification, undoClientServing } from "../../hooks/hooks";
 import axios from "axios";
-import { getHeaders } from "../../auth/Auth";
+import { getHeaders, getStateData } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { WAITLIST, SERVING, APPOINTMENT, NOSHOW } from "../../static/static";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
@@ -78,14 +78,14 @@ const Drawer = ({client, setClient}) => {
             return;
         }
         if (!payload) { return; }
+        const { user, business } = getStateData();
         const bid = business._id;
         const email = payload.email;
         const phone = payload.phone;
-        const data = { bid, email, phone }
+        const data = { bid, email: user.email, payload: {email, phone}}
         const headers = getHeaders();
         axios.post('/api/internal/analytics_search', data, headers)
         .then(response => {
-            console.log(response);
             setAnalytics(response.data.result);
         }) 
         .catch(error => {
@@ -95,7 +95,6 @@ const Drawer = ({client, setClient}) => {
 
     const [serveDialog, setServeDialog] = useState(false);
     const [clientId, setClientId] = useState(null);
-    const [serveType, setServeType] = useState(null);
 
     const sendClientServing = (clientId) => {
         setServeDialog(true);
@@ -179,7 +178,7 @@ const Drawer = ({client, setClient}) => {
             closeDrawer();
             dispatch(setReload(true));
           });
-      };
+    };
       
 
     return(

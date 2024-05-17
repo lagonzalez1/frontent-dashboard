@@ -158,11 +158,11 @@ export default function Serving({setClient}) {
                 {
                     loading === true ? (
                         <TableRow>
-                            <TableCell colSpan={3}/>
+                            <TableCell colSpan={4}/>
                             <TableCell>
                             <CircularProgress size={15} />
                             </TableCell>
-                            <TableCell colSpan={1}/>
+                            <TableCell colSpan={2}/>
                         </TableRow>
                     ): 
                     servingList && servingList.length > 0 ?
@@ -227,7 +227,7 @@ export default function Serving({setClient}) {
                         })): 
                         (
                         <TableRow>
-                            <TableCell colSpan={6} align="center">
+                            <TableCell colSpan={7} align="center">
                                 No data available
                             </TableCell>
                         </TableRow>

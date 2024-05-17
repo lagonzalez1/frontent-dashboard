@@ -4,7 +4,7 @@ import { Switch, FormControlLabel, Grid, Button, Container, Typography, TextFiel
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import { getAccessToken } from '../../auth/Auth';
+import { getAccessToken, getStateData } from '../../auth/Auth';
 import { setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
 import { usePermission } from '../../auth/Permissions';
@@ -41,7 +41,8 @@ export default function SystemForm({reloadPage}) {
 
     const handleSubmit = (values) => {
         const accessToken = getAccessToken();
-        const payload = { ...values, b_id: business._id}
+        const { user, business } = getStateData();
+        const payload = { ...values, b_id: business._id, email: user.email}
         const headers = { headers: { 'x-access-token': accessToken } };
         setLoading(true);
         axios.put('/api/internal/update_system', payload, headers)
@@ -59,7 +60,6 @@ export default function SystemForm({reloadPage}) {
             else {
                 dispatch(setSnackbar({msg: 'Request setup error', error: error.message}));
             }
-            
         })
         .finally(() => {
             setLoading(false);

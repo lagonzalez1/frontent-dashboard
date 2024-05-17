@@ -58,12 +58,15 @@ function formatEmployeeSchedule (ins){
 export const requestScheduleChange = (payload) => {
     return new Promise((resolve, reject) => {
         const headers = getHeaders();
-        axios.post('/api/internal/update_employee_breaks', payload, headers)
+        axios.post('/api/internal/update_employee_breaks', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(resonse => {
             resolve(resonse.data.msg);
         })
         .catch(error => {
             console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
             if (error.response) {
                 console.log(error.response);
                 reject({msg: 'Response error', error: error.response});

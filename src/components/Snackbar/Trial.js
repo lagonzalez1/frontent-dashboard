@@ -27,7 +27,7 @@ export default function Trial() {
         const term = DateTime.fromJSDate(new Date(termDate)).setZone(tz);
         const current = DateTime.local();
         const difference = term.diff(current, 'day').toObject();
-        setDaysLeft(Math.ceil(difference.days) * 10);
+        setDaysLeft(Math.floor(difference.days) * 10);
       }
     }
 

@@ -1,16 +1,18 @@
 import axios from "axios";
 import { getHeaders, getStateData } from "../../auth/Auth";
 
+let GET_BUSINESS_ANALYTICS = '/api/internal/business_analytics/'
+let GET_EMPLOYEE_ANALYTICS = `/api/internal/employee_analytics/`;
 
+let POST_EMPLOYEE_ANALYTICS_RANGE = '/api/internal/employee_analytics_range';
 
 
 // Get Totals
 export function getEmployeeAnalytics (id, accessToken) {
     return new Promise((resolve, reject) => {
        const { user, business} = getStateData();
-       const headers = getHeaders();
        const params = { bid: business._id, eid: id}
-       axios.get(`/api/internal/employee_analytics/${business._id}/${id}`, {headers: {'x-access-token': accessToken}})
+       axios.get(GET_EMPLOYEE_ANALYTICS+`${business._id}/${id}`, {headers: {'x-access-token': accessToken}})
        .then(response => {
             resolve(response.data.data);
        }) 
@@ -39,7 +41,7 @@ export function getEmployeeAnalyticsRange (payload) {
         const { user, business} = getStateData();
         const headers = getHeaders();
         const data = { bid: business._id, ...payload}
-        axios.post('/api/internal/employee_analytics_range', data,headers)
+        axios.post(POST_EMPLOYEE_ANALYTICS_RANGE, data,headers)
         .then(response => {
              resolve(response.data.data);
         }) 
@@ -66,7 +68,7 @@ export function getEmployeeAnalyticsRange (payload) {
      return new Promise((resolve, reject) => {
         const { user, business} = getStateData();
         const headers = getHeaders();
-        axios.get(`/api/internal/business_analytics/${business._id}`,{headers: {'x-access-token': accessToken}})
+        axios.get(GET_BUSINESS_ANALYTICS+`${business._id}`,{headers: {'x-access-token': accessToken}})
         .then(response => {
              resolve(response.data.data);
         }) 

@@ -4,6 +4,10 @@ import { Slide } from "@mui/material";
 import React from "react";
 import axios from "axios";
 
+let POST_ANALYTICS_SEARCH_KEYWORD = '/api/internal/analytics_search_keyword';
+let POST_CLIENT_CSV = '/api/internal/client_csv';
+let POST_ANALYTIC_REMOVE = '/api/internal/analytics_remove';
+
 export const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -14,7 +18,7 @@ export function searchAnalyticsKeyword (word) {
        const { user, business} = getStateData();
        const headers = getHeaders();
        const payload = {b_id: business._id, keyword: word}
-       axios.post('/api/internal/analytics_search_keyword', payload, headers)
+       axios.post(POST_ANALYTICS_SEARCH_KEYWORD, payload, headers)
        .then(response => {
         resolve(response.data.payload)
        }) 
@@ -40,7 +44,7 @@ export function convertTo_CSV (payload) {
     return new Promise((resolve, reject) => {
         const headers = getHeaders();
         const csv_data = JSON.stringify(payload)
-        axios.post('/api/internal/client_csv', {payload:csv_data}, headers)
+        axios.post(POST_CLIENT_CSV, {payload:csv_data}, headers)
         .then(response => {
             resolve(response);
         })
@@ -67,7 +71,7 @@ export function removeFromAnalytics (id) {
        const { user, business} = getStateData();
        const headers = getHeaders();
        const payload = {b_id: business._id, eid: id}
-       axios.post('/api/internal/analytics_remove', payload, headers)
+       axios.post(POST_ANALYTIC_REMOVE, payload, headers)
        .then(response => {
         resolve(response.data.msg);
        }) 

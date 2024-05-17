@@ -63,10 +63,10 @@ export const updateResources = async (form) => {
   return new Promise((resolve, rejects) => {
     const { user, business} = getStateData();
     const accessToken = getAccessToken();
-    const headers = { headers: { 'x-access-token': accessToken } };
+    const headers = { headers: { 'x-access-token': accessToken }};
     const bId = business._id;
     const data = { ...form, bId};
-    axios.put('/api/internal/update_resources', data, headers)
+    axios.put('/api/internal/update_resources', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       if (response.status === 200){
         resolve(response.data.msg)

@@ -17,7 +17,7 @@ import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
 import { DateTime } from "luxon";
-import { allowEmployeeEdit, findEmployee, getTimeZone } from "../../hooks/hooks";
+import { findEmployee, getTimeZone } from "../../hooks/hooks";
 import { usePermission } from "../../auth/Permissions";
 import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";

@@ -9,11 +9,13 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 
 export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;    
 
+
+// Middleware OK
 export const rerquestClientContactEdit = (payload) => {
     return new Promise((resolve, reject) => {
-        const { _ , business} = getStateData();
+        const { user , business} = getStateData();
         const headers = getHeaders();
-        const data = {...payload, b_id: business._id}
+        const data = {payload: {...payload}, b_id: business._id, email: user.email}
         axios.post(`/api/internal/update_client_contact`, data, headers)
         .then(response => {
             resolve(response.data.msg);
@@ -36,12 +38,12 @@ export const rerquestClientContactEdit = (payload) => {
     })
 }
 
-
+// Middleware OK
 export const requestClientEditApp = (payload) => {
     return new Promise((resolve, reject) => {
         const {user, business} = getStateData();
         const headers = getHeaders();
-        const data = {payload: {...payload}, b_id: business._id, client_id: payload._id}
+        const data = {payload: {...payload}, b_id: business._id, client_id: payload._id, email: user.email}
         axios.post(`/api/internal/update_client_appointment`, data, headers)
         .then(response => {
             resolve(response.data.msg);
@@ -63,12 +65,12 @@ export const requestClientEditApp = (payload) => {
         })     
     })
 }
-
+// Middleware OK
 export const requestClientEditWait = (payload) => {
     return new Promise((resolve, reject) => {
         const {user, business} = getStateData();
         const headers = getHeaders();
-        const data = {payload: {...payload}, b_id: business._id, client_id: payload._id}
+        const data = {payload: {...payload}, b_id: business._id, client_id: payload._id, email: user.email}
         axios.post(`/api/internal/update_client_waitlist`, data, headers)
         .then(response => {
             resolve(response.data.msg);

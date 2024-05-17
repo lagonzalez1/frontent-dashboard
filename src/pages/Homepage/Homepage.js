@@ -45,7 +45,7 @@ export default function Homepage() {
                 <Grid sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} item xs={12} sm={12} md={6} lg={6}>
                         <Slide in={true} direction="right" mountOnEnter>
                         <Stack>
-                            <Typography gutterBottom textAlign='left' variant="h2">Lightweight waitlist</Typography>
+                            <Typography fontWeight={'bold'} gutterBottom textAlign='left' variant="h2">Lightweight waitlist</Typography>
                             <Typography textAlign='left' variant="subtitle1" fontWeight='normal'>Your clients are busy, have them wait in a virtual line.</Typography>
                             <Typography textAlign='left' variant="subtitle1" fontWeight={'normal'}>Boost your sales with customer flow.</Typography>
                             <Typography textAlign='left' variant="subtitle1" fontWeight={'normal'}>Advertise, analyze your business trends.</Typography>

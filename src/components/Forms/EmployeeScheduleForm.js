@@ -98,7 +98,7 @@ export default function EmployeeScheduleForm({employee}) {
             setLoading(false);
             return;
         }
-        const payload = {breaks: {...employeeSchedule},  originalUsername: employee.employeeUsername , b_id: business._id}
+        const payload = {breaks: {...employeeSchedule},  originalUsername: employee.employeeUsername , b_id: business._id, email: user.email}
         requestScheduleChange(payload)
         .then(res => {
             dispatch(setSnackbar({requestMessage: res, requestStatus: true}))

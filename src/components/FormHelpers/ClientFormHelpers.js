@@ -1,5 +1,5 @@
 import * as Yup from "yup";
-import { getAccessToken } from "../../auth/Auth";
+import { getAccessToken, getStateData } from "../../auth/Auth";
 import axios from "axios";
 
 
@@ -21,12 +21,14 @@ export const TITLE = {
 }
 
 
-
+// Middleware OK
 export const requestInputFieldChange = (payload) => {
     return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
         const accessToken = getAccessToken();
         const headers = { headers: {'x-access-token': accessToken}}
-        axios.put('/api/internal/update_input_fields', payload, headers)
+        const data = { ...payload, email: user.email}
+        axios.put('/api/internal/update_input_fields', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             if(response.status === 200){
                 resolve(response.data);
@@ -34,7 +36,21 @@ export const requestInputFieldChange = (payload) => {
             reject(response.data)
         })
         .catch(error => {
-            reject(error.response.data.msg)
+            console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
 
         })
     })

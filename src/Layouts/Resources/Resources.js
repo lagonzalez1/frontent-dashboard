@@ -74,7 +74,13 @@ export default function Resources() {
         return () => {
             setReloadPage(false);
         }
-      }, [reloadPage])
+      }, [reloadPage]);
+
+    const Transition = React.forwardRef(function Transition(props, ref) {
+        return <Slide direction="down" ref={ref} {...props} />;
+    });
+
+      
 
 
     const RenderResourceInUse = ({id}) => {
@@ -146,7 +152,7 @@ export default function Resources() {
         </Grid>
 
 
-        <Dialog maxWidth={'xs'} fullWidth={true} open={dialog} onClose={handleCloseDialog}>
+        <Dialog maxWidth={'xs'} TransitionComponent={Transition} fullWidth={true} open={dialog} onClose={handleCloseDialog}>
         <DialogTitle>
             <IconButton
                     aria-label="close"
