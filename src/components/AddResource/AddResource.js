@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import LoadingButton from '@mui/lab/LoadingButton';
+import makeStyles from "@emotion/styled"
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Title is required').max(20),
@@ -22,6 +23,26 @@ const validationSchema = Yup.object().shape({
   publicValue:  Yup.boolean(),
 });
 
+const useStyles = makeStyles((theme) => ({
+  fab: {
+    position: 'fixed',
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
+  },
+  modal: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalContent: {
+    backgroundColor: theme.palette.background.paper,
+    padding: theme.spacing(2),
+  },
+  submitButton: {
+    marginTop: theme.spacing(2),
+  },
+}));
+
 
 export default function AddResource({reloadParent}) {
   const { checkPermission } = usePermission();
@@ -31,6 +52,7 @@ export default function AddResource({reloadParent}) {
   const business = useSelector((state) => state.business);
   const serviceList = getServicesAvailable();
   const dispatch = useDispatch();
+  const classes = useStyles();
 
 
   const handleOpen = () => {
@@ -67,14 +89,12 @@ export default function AddResource({reloadParent}) {
 
 
   
-  const TextFieldEdit = () => { return <TextField multiline={true} rows={3} label="Description" />}
-
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-      <Fab color="secondary" onClick={handleOpen}>
+      <Fab color="secondary" className={classes.fab} onClick={handleOpen}>
         <AddIcon/>
       </Fab>
-      <Dialog open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="xs" TransitionComponent={Transition}>
+      <Dialog className={classes.modal} open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="xs" TransitionComponent={Transition}>
         <DialogTitle>
           <IconButton
                     aria-label="close"
@@ -202,10 +222,7 @@ export default function AddResource({reloadParent}) {
             )}
           </Formik>
         </DialogContent>
-      </Dialog>
-
-
-      
+      </Dialog>      
     </Box>
   );
 };

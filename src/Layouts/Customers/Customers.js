@@ -218,7 +218,7 @@ const Customers = () => {
 
           <TableCell align="left">{row.email}</TableCell>
           <TableCell align="left">{getLastVisit(row.waitlist_summary, row.appointment_summary)}</TableCell>
-          <TableCell align="left">{row.status.flag ? "True": "False"}</TableCell>
+          <TableCell align="left">{row.status.flag === true ? "Flag": "Ok"}</TableCell>
           <TableCell align="left">
             <IconButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} aria-label="delete row" onClick={() => confirmDeleteClient(row)}>
               <BackspaceRoundedIcon fontSize='small' />

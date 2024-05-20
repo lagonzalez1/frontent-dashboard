@@ -415,7 +415,7 @@ export default function Waiting() {
                     </div>
                 </Container>
                     <Typography textAlign={'center'} variant="h4" fontWeight="bold" > {'Thanks for choosing us!'} </Typography>
-                    <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> {'Enjoy your service'} </Typography>
+                    <Typography textAlign={'center'} variant="body2" fontWeight={'bold'}> {'Enjoy your service, write us a review here once your service is complete!'} </Typography>
                 </Stack>
             )
         }

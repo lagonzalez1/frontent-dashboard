@@ -402,7 +402,7 @@ export default function WelcomeSelector() {
                                 Type
                             </Typography>
                             <Typography variant="body2" fontWeight="normal" textAlign={'center'}>
-                                Choose which suits your schedule!
+                                Choose which suits your schedule
                             </Typography>
                             </Box>
                             
@@ -647,7 +647,7 @@ export default function WelcomeSelector() {
                                 <Container sx={{paddingLeft: 0, paddingRight: 0}}>
                                     
                                     <Stack sx={{ pt: 1 }} direction="column" spacing={1.5} textAlign="left">
-                                        <Typography textAlign={'center'} variant="body1" fontWeight={'bold'}>Choose from the following</Typography>
+                                        <Typography textAlign={'center'} variant="body1" fontWeight={'bold'}>We have options available</Typography>
                                         {businessPresent && businessPresent.employees === true ? (
                                             <>
                                                 <Typography  fontWeight={'bold'} id="employee" variant="subtitle2">Employee preference</Typography>

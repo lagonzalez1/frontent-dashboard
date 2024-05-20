@@ -25,7 +25,7 @@ import FabButton from "../Add/FabButton";
 import { usePermission } from "../../auth/Permissions";
 import { DateTime } from "luxon";
 import ServingClient from "../Dialog/ServingClient";
-
+import LockRoundedIcon from '@mui/icons-material/LockRounded';
 
 
 const Waitlist = ({setClient, setEditClient}) => {
@@ -339,7 +339,8 @@ const Waitlist = ({setClient, setEditClient}) => {
                             key={1}
                             onClick={(event) => handleMenuItemClick(event, 1)}
                             >
-                            {options[1]}
+                            {options[1]} 
+                            
                             </MenuItem>
                         }
                         <MenuItem

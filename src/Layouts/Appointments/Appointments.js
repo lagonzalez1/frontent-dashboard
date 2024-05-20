@@ -18,6 +18,7 @@ import { DateTime } from "luxon";
 import FabAppointment from "../../components/AddAppointment/FabAppointment";
 import { usePermission } from "../../auth/Permissions";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
+import SortRoundedIcon from '@mui/icons-material/SortRounded';
 
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
@@ -54,7 +55,6 @@ const Appointments = ({setClient, setEditClient}) => {
             setSelectedDate(lastDate)
             getAppointmentTable(lastDate, accessToken)
             .then(response => {
-                console.log(response)
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
             })
@@ -181,12 +181,19 @@ const Appointments = ({setClient, setEditClient}) => {
                 </Grid>
 
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
+                    <Stack direction={'row'} spacing={1}>
                     <Tooltip title="Your current location." placement="bottom">
                         <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SouthAmericaIcon />}>
                             <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? (business.timezone): <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>
-                        
+
+                    <Tooltip title="Sort your appointment list by employee" placement="bottom">
+                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SortRoundedIcon />}>
+                            <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? 'Sort by employee': <Skeleton/> }</Typography>
+                        </Button>
+                    </Tooltip>
+                    </Stack>
                 </Grid>
                 {/** Is this where the error is?, once a new component  */}
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'right '}}>

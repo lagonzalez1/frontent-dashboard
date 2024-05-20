@@ -292,13 +292,13 @@ export default function Welcome() {
                         <Typography variant="caption" fontWeight={'bold'}>Social</Typography>
                         <Stack direction={'row'} spacing={3} justifyContent={'center'}>
                             <IconButton disabled={disable} onClick={() => openSocial('INSTA')}>
-                                <InstagramLogo size={20} />
+                                <InstagramLogo size={25} />
                             </IconButton>
                             <IconButton disabled={disable} onClick={() => openSocial('TWIT')}>
-                                <TwitterLogo size={20} />
+                                <TwitterLogo size={25} />
                             </IconButton>
                             <IconButton disabled={disable} onClick={() => openSocial('FACE')}>
-                                <FacebookLogo size={20} />
+                                <FacebookLogo size={25} />
                             </IconButton>
                         </Stack>
                     </Stack>

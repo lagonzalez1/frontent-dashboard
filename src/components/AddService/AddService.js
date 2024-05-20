@@ -111,7 +111,7 @@ const AddService = ({reloadParent}) => {
                 </IconButton>
 
                 <Typography variant='h5' fontWeight={'bold'}>Add a service</Typography>
-            </DialogTitle>
+        </DialogTitle>
             <Divider/>
         <DialogContent>
           <Formik
