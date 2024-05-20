@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef} from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogActions, DialogTitle, DialogContent, Switch, Button,
 Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel, Divider, Slide, Box, CircularProgress } from '@mui/material';
 import { getResourcesTotal, StyledCardService, stringAvatar,
- findResourceTag, findResourceServing, updateResources, removeResourceTag } from "./ResourcesHelper"; 
+ findResourceTag, findResourceServing, updateResources, Transition } from "./ResourcesHelper"; 
 import { findClient, reloadBusinessData } from "../../hooks/hooks";
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
@@ -54,14 +54,14 @@ export default function Resources() {
         updateResources(form)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
-            handleCloseDialog();
         })
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {
             setLoading(false)
-            setReloadPage(true);
+            reloadCurrentPage();
+            handleCloseDialog();
         })
       };
 
@@ -76,11 +76,8 @@ export default function Resources() {
         }
       }, [reloadPage]);
 
-    const Transition = React.forwardRef(function Transition(props, ref) {
-        return <Slide direction="down" ref={ref} {...props} />;
-    });
 
-      
+
 
 
     const RenderResourceInUse = ({id}) => {

@@ -152,7 +152,7 @@ export const moveClientUp = (clientId, currentClients) => {
         const client = list[index];
         if (client._id === clientId) {
             const next = index - 1;
-            clientTimestamp = DateTime.fromISO(client.timestamp).setZone(timezone);
+            clientTimestamp = DateTime.fromISO(client.timestamp).setZone(timezone).toISO()
             // Ensure there is a client below
             if (list[next] !== undefined || list[next] !== null) {
                 clientAbove = list[next];
@@ -166,7 +166,7 @@ export const moveClientUp = (clientId, currentClients) => {
       return resolve('No changes made');
     }
     if (clientAbove !== null && clientTimestamp !== null) {
-      const clientAboveTimestamp = DateTime.fromISO(clientAbove.timestamp).setZone(timezone);
+      const clientAboveTimestamp = DateTime.fromISO(clientAbove.timestamp).setZone(timezone).toISO()
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
 
@@ -228,7 +228,7 @@ export const moveClientDown = (clientId, currentClients) => {
         const client = list[index];
         if (client._id === clientId) {
             const next = index + 1;
-            clientTimestamp = DateTime.fromISO(client.timestamp).setZone(timezone);
+            clientTimestamp = DateTime.fromISO(client.timestamp).setZone(timezone).toISO();
             // Ensure there is a client below
             if (list[next] !== undefined || list[next] !== null) {
                 clientBelow = list[next];
@@ -242,7 +242,7 @@ export const moveClientDown = (clientId, currentClients) => {
       return resolve('No changes made');
     }
     if (clientBelow !== null && clientTimestamp !== null) {
-      const clientSwapTimestamp = DateTime.fromISO(clientBelow.timestamp).setZone(timezone);
+      const clientSwapTimestamp = DateTime.fromISO(clientBelow.timestamp).setZone(timezone).toISO();
 
       const accessToken = getAccessToken();
       const headers = { headers: { 'x-access-token': accessToken } };
@@ -365,7 +365,7 @@ export const columns = [
     { id: 'size', label: 'Party size', minWidth: 50 },
     { id: 'resource', label: 'Resource', minWidth: 50 },
     { id: 'wait', label: 'Time waited', minWidth: 40 },
-    { id: 'actions', label: '', minWidth: 160 },
+    { id: 'actions', label: 'Actions', minWidth: 160 },
 ];
 
 export const noShowColumns = [

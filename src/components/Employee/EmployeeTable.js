@@ -23,6 +23,7 @@ import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";
 import { Eye, EyeClosed } from "phosphor-react";
 import CheckCircle from "@mui/icons-material/CheckCircle";
+import { Transition } from "../FormHelpers/OpeningHoursHelper";
 // Show table of employees
 // Allow to delete and add employees
 export default function EmployeeTable({reloadPage}) {
@@ -316,6 +317,7 @@ export default function EmployeeTable({reloadPage}) {
                 onClose={closeEmployeeModal}
                 maxWidth="sm"
                 fullWidth={false}
+                TransitionComponent={Transition}
             >
             <DialogTitle>
             <IconButton

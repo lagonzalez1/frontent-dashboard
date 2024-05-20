@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
 import { TextField, Button, Grid, Stack, Checkbox, Typography, Card, Container, Box, CircularProgress, Select, MenuItem, Accordion, AccordionSummary, AccordionDetails, InputLabel, Tooltip, Alert, AlertTitle } from '@mui/material';
 import { Formik, Form, Field } from 'formik';
-import {permissionLevel, requestEmployeeAdd, requestEmployeeChange, requestEmployeeEdit } from "../FormHelpers/AddNewEmployeeFormHelper";
+import {permissionLevel, requestEmployeeAdd, Transition, requestEmployeeEdit } from "../FormHelpers/AddNewEmployeeFormHelper";
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { setReload, setSnackbar } from '../../reducers/user';
@@ -165,14 +165,14 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
                 aria-controls="panel1a-content"
                 id="panel1a-header"
                 >
-                <Typography variant='subtitle2'><LockIcon fontSize='small' /> Permission levels</Typography>
+                <Typography variant='subtitle1' fontWeight={'bold'}><LockIcon fontSize='small' /> Permission levels</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                   <Stack>
-                    <Typography variant='caption'>Level 0: Root user, complete access to make changes.</Typography>
-                    <Typography variant='caption'>Level 1: Allow user to edit, resources, services and all below.</Typography>
-                    <Typography variant='caption'>Level 2: Allow user to create appointments and serve clients and all below.</Typography>
-                    <Typography variant='caption'>Level 3: Allow user to serve clients.</Typography>
+                    <Typography variant='subtitle2'>Level 0: Root user, complete access to make changes.</Typography>
+                    <Typography variant='subtitle2'>Level 1: Allow user to edit, resources, services and all below.</Typography>
+                    <Typography variant='subtitle2'>Level 2: Allow user to create appointments and serve clients and all below.</Typography>
+                    <Typography variant='subtitle2'>Level 3: Allow user to serve clients.</Typography>
                   </Stack>
                 </AccordionDetails>
             </Accordion>
@@ -198,7 +198,7 @@ export default function AddEmployeeForm ({ employee, closeModal }) {
                   
               </Field>
 
-                <Typography variant='body2' fontWeight={'bold'}>Select your availability.</Typography>
+                <Typography variant='body2' fontWeight={'bold'}>Select your availability</Typography>
                 <Grid container
                     sx={{ pt: 2}}
                     direction="row"

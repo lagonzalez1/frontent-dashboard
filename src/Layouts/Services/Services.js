@@ -5,7 +5,7 @@ Paper, Switch, TableBody, FormControl, MenuItem, TableRow, TableHead, FormContro
 Slide} from '@mui/material';
 import AddService from "../../components/AddService/AddService.js";
 import CloseIcon from "@mui/icons-material/Close"
-import {  StyledCardService, stringAvatar, getServicesTotal, getEmployeeTags, removeExistingEmployees, removeEmployeeTag, updateService } from "./ServicesHelper.js"; 
+import {  StyledCardService, stringAvatar, getServicesTotal, getEmployeeTags, removeExistingEmployees, removeEmployeeTag, updateService, Transition } from "./ServicesHelper.js"; 
 import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks.js";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,29 +34,18 @@ export default function Services() {
         active: null,
         public: null
     })    
-    const styles = {
-        container: {
-          display: 'flex', // Set the container's display to flex
-          flexDirection: 'row', // Set the main axis to be horizontal
-          flexWrap: 'wrap-reversed', // Allow the items to wrap to the next row if there's not enough space
-          justifyContent: 'flex-start', // Start the items from the left (you can adjust this to center or space-between if needed)
-        }
-    };
-
+    
     const handleClick = (service) => {
         setDialog(true);
         setService(service);
         setForm((prev) =>({...prev, serviceId: service._id, active: service.active, public: service.public}));
 
     }
-    const handleClose = () =>{
-        setService({});
+    const handleClose = () => {
         setDialog(false);
-        setForm({serviceId: null,
-            employeeId: null,
-            active: null,
-            public: null
-        })
+        setService({});
+        setForm((prev) =>({...prev, serviceId: null, active: null, public: null, employeeId: null}));
+
     }
 
 
@@ -65,14 +54,14 @@ export default function Services() {
         updateService(form)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
-            handleClose();
         })
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
         })
         .finally(() =>{
             setLoading(false);
-            reloadCurrentPage()
+            reloadCurrentPage();
+            handleClose();
         })
 
     }
@@ -90,7 +79,7 @@ export default function Services() {
         .finally(() =>{
             setLoading(false)
             handleClose();
-            reloadCurrentPage()
+            reloadCurrentPage();
         })
     }
 
@@ -99,8 +88,6 @@ export default function Services() {
         setReloadPage(true);
     }
 
-    
-
     useEffect(() => {  
         reloadBusinessData(dispatch);     
         return () => {
@@ -108,9 +95,7 @@ export default function Services() {
         } 
     },[reloadPage])
 
-    const Transition = React.forwardRef(function Transition(props, ref) {
-        return <Slide direction="down" ref={ref} {...props} />;
-    });
+    
 
     return(
         <>
@@ -168,7 +153,7 @@ export default function Services() {
             )): null}
         </Grid>
 
-        <Dialog  maxWidth={'xs'} fullWidth={'xs'} TransitionComponent={Transition}  open={dialog} onClose={handleClose}>
+        <Dialog keepMounted={true} maxWidth={'xs'} fullWidth={'xs'} TransitionComponent={Transition} open={dialog} onClose={handleClose}>
         <DialogTitle>
             <IconButton
                     aria-label="close"
@@ -182,20 +167,11 @@ export default function Services() {
                     >
                     <CloseIcon />
                 </IconButton> 
-                
-
                 <Typography variant="h5" fontWeight={'bold'}>{ "Service -" + service ? service.title: null } </Typography>
             </DialogTitle>
 
 
-            {loading ? (
-                <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <CircularProgress />
-              </DialogContent>
-              
-            ): (
             <DialogContent>
-
                 <Stack spacing={1}>
                         <Divider />
                         <Grid container>
@@ -218,8 +194,7 @@ export default function Services() {
                                 /> 
                             </Grid>
                         </Grid>
-                        
-                        
+                    
                         <Divider />
 
                         <Typography variant={"subtitle2"} fontWeight={'bold'} textAlign={'left'}>Add a new employee to service</Typography>
@@ -228,7 +203,7 @@ export default function Services() {
                         {
                             service.employeeTags && removeExistingEmployees(service.employeeTags).map((employee, index) => (
                             <MenuItem key={index} value={employee._id}>
-                                {employee.fullname}
+                                <Typography variant="subtitle1">{employee.fullname}</Typography>
                             </MenuItem>
                             ))
                         }
@@ -236,30 +211,28 @@ export default function Services() {
                         { service.employeeTags ? (
                             <>
                         <Divider />
-                        <Typography variant={"body2"} textAlign={'left'}>Current employees assigned to this service.</Typography>
+                        <Typography variant={"body2"} fontWeight={'bold'} textAlign={'left'}>Current employees assigned to this service.</Typography>
                             <TableContainer component={Paper}>
                                 <Table size="small">
-                                
                                     <TableHead>
-                                        
                                         <TableRow>
                                             <TableCell>
-                                                #
+                                                <Typography variant="body2">#</Typography>
                                             </TableCell>
                                             <TableCell>
-                                                Employee
+                                            <Typography variant="body2">Fullname</Typography>
                                             </TableCell>
                                             <TableCell>
-                                                Actions
+                                            <Typography variant="body2">Delete</Typography>
                                             </TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {
-                                        service && getEmployeeTags(service.employeeTags).map((employee, index) => {
+                                        service ? getEmployeeTags(service.employeeTags).map((employee, index) => {
                                             
                                             return (
-                                                <TableRow>
+                                                <TableRow key={index}>
                                                     <TableCell><Typography variant="caption">{++index}</Typography></TableCell>
                                                     <TableCell> <Typography variant="body2">{employee.fullname}</Typography> </TableCell>
                                                     <TableCell>
@@ -272,7 +245,7 @@ export default function Services() {
                                                     
                                                 </TableRow>
                                             )
-                                        })
+                                        }): null
                                             
                                         }
                                     </TableBody>
@@ -286,11 +259,10 @@ export default function Services() {
                     </Stack>
 
             </DialogContent>
-            )}
 
-                <DialogActions>
-                    <LoadingButton loading={loading} sx={{ borderRadius: 10}} disabled={!checkPermission('SERV_CHANGE')} variant="contained" onClick={() => handleUpdateService()} > Submit</LoadingButton>
-                </DialogActions> 
+            <DialogActions>
+                <LoadingButton loading={loading} sx={{ borderRadius: 7}} disabled={!checkPermission('SERV_CHANGE')} variant="contained" onClick={() => handleUpdateService()}> Submit</LoadingButton>
+            </DialogActions> 
         </Dialog>
 
       

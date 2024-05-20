@@ -1,8 +1,10 @@
 import axios from 'axios';
 import { styled } from '@mui/system';
-import { Card } from '@mui/material';
+import { Card, Slide } from '@mui/material';
 import { getAccessToken, getStateData } from '../../auth/Auth';
 import { findEmployee, getEmployeeList } from '../../hooks/hooks';
+import React from 'react';
+
 
 export const getServicesTotal  = () => {
     const { _, business} = getStateData();
@@ -40,17 +42,7 @@ export const getEmployeeTags = (employeeTags) => {
 export const removeExistingEmployees = (employeeIds) => {
     let currentEmployees = getEmployeeList();
     if (employeeIds.length === 0) { return currentEmployees;}
-    let result = [];
-    for (var id of employeeIds) {
-      for (var employee of currentEmployees) {
-        if (id === employee._id) {
-          continue;
-        }
-        result.push(employee);
-      }  
-    }
-
-    return result;
+    return currentEmployees.filter(obj => !employeeIds.includes(obj._id));
 }
 
 export const updateService = (data) => {
@@ -177,3 +169,8 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
       children: initials,
     };
   }
+
+
+  export const Transition = React.forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});

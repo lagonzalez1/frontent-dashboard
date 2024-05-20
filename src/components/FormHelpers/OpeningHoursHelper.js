@@ -1,10 +1,14 @@
 import * as Yup from 'yup';
 import { getAccessToken, getStateData } from '../../auth/Auth';
 import axios from 'axios';
+import React from 'react';
+import { Slide } from '@mui/material';
+
+export const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const DAYOFWEEK = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
-
-
 
 export const requestTimezoneChange = (timezone) => {
   return new Promise((resolve, reject) => {

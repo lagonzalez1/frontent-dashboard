@@ -127,10 +127,10 @@ export default function Serving({setClient}) {
 
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
                     <Tooltip title="How many people are in the establishment." placement="right">
-                                <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{business ? (groupCount + ` Party ( ${groupTotalCount} People)` ): <Skeleton/> }</Typography>
-                                </Button>
-                            </Tooltip>
+                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
+                            <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{business ? (groupCount + ` Party ( ${groupTotalCount} People)` ): <Skeleton/> }</Typography>
+                        </Button>
+                    </Tooltip>
                         
                 </Grid>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
@@ -242,7 +242,7 @@ export default function Serving({setClient}) {
                             </Table>
                         </TableContainer>
                     </Paper>
-                    </div>
+                </div>
                     <Dialog
                         id="updateClientNotes"
                         open={notesDialog}

@@ -4,7 +4,10 @@ import { Container, Box, Typography, Table, TableCell, TableBody, TableRow, Butt
 import { requestBusinessArguments, requestBusinessWaitlist } from "./WaitlistHelper";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+
 import { DateTime } from "luxon";
+import '../../css/TableAnimations.css'; // Import the CSS file for animations
 
 export default function BusinessWaitlist () {
 
@@ -62,7 +65,7 @@ export default function BusinessWaitlist () {
             if (args.waitlist === false){
                 return (
                     <>
-                        <Typography variant="h6" fontWeight='bold'>
+                        <Typography variant="h5" fontWeight='bold'>
                             This waitlist is not enabled by the business owner.
                         </Typography>
                     </>
@@ -70,61 +73,65 @@ export default function BusinessWaitlist () {
             } else {
                 return (
                     <>
-                        <Typography variant="h6" fontWeight='bold'>
+                        <Typography variant="h5" fontWeight='bold'>
                             Current waitlist..
                         </Typography>
                         <br/>
-                    <Table container>
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>
-                                            <Typography variant="body2" fontWeight={'bold'}>#</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                        <Typography variant="body2" fontWeight={'bold'}>Full name</Typography>
-                                        </TableCell>
-                                        <TableCell>
-                                        <Typography variant="body2" fontWeight={'bold'}>Party size</Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-
-                                <TableBody>
-                                    {
-                                        waitlist ? waitlist.map((item, index) => {
-                                            return (
-                                                <React.Fragment key={index}>
-                                                    <TableRow>
-                                                    <TableCell>
-                                                        <Typography variant="subtitle2" textAlign={'left'}>
-                                                            {index + 1}
-                                                        </Typography>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Typography variant="subtitle2" textAlign={'center'}>
-                                                        {item.fullname}
-                                                        </Typography>
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Typography variant="subtitle2" textAlign={'center'}>
-                                                        {item.partySize}
-                                                        </Typography>
-                                                    </TableCell>
-                                                    </TableRow>
-                                                    
-                                                </React.Fragment>
-                                            )
-                                        }) : null
-                                    }
-                                </TableBody>
-                                
-                            </Table>
+                        <AnimatedTable waitlist={waitlist} />
 
                     </>
                 )
             }
         }
     }
+
+    const AnimatedTable = ({ waitlist }) => {
+        return (
+          <Table container>
+            <TableHead>
+              <TableRow>
+                <TableCell>
+                  <Typography variant="subtitle2" fontWeight={'bold'}>#</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle2" fontWeight={'bold'}>Full name</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle2" fontWeight={'bold'}>Party size</Typography>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+      
+            <TableBody>
+              <TransitionGroup component={null}>
+                {waitlist
+                  ? waitlist.map((item, index) => (
+                      <CSSTransition key={index} timeout={500} classNames="fade">
+                        <TableRow>
+                          <TableCell>
+                            <Typography variant="subtitle1" textAlign={'left'}>
+                              {index + 1}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="subtitle1" textAlign={'center'}>
+                              {item.fullname}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="subtitle1" textAlign={'center'}>
+                              {item.partySize}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </CSSTransition>
+                    ))
+                  : null}
+              </TransitionGroup>
+            </TableBody>
+          </Table>
+        );
+      };
 
 
     return(

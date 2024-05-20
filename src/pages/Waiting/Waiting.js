@@ -1060,13 +1060,13 @@ export default function Waiting() {
                                 <Divider />
                                 <Typography sx={{pt: 1}} fontWeight={'bolder'} textAlign={'center'} variant="h5">Your service</Typography>
                                 <Typography variant="caption">Title</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].title}</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service ? service[0].title: null}</Typography>
                                 <Typography variant="caption">Duration</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].duration + "min"}</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service ? service[0].duration + "min": null}</Typography>
                                 <Typography variant="caption">Cost</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].cost}</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service ? service[0].cost: null}</Typography>
                                 <Typography variant="caption">Description</Typography>
-                                <Typography fontWeight={'bold'} variant="subtitle1">{service && service[0].description}</Typography>
+                                <Typography fontWeight={'bold'} variant="subtitle1">{service ? service[0].description: null}</Typography>
                             </Container>
                         ): null
                     }
@@ -1166,7 +1166,7 @@ export default function Waiting() {
                     severity="success"
                     variant="standard"
                 >
-                    <Typography variant="body1">Copied! now paste it anywhere</Typography>
+                    <Typography variant="body1">Copied!</Typography>
                 </Alert>
             </Snackbar>
             

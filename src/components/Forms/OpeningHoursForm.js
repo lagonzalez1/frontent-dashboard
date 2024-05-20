@@ -9,7 +9,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone, 
-  requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate,validateTimerange, DAYOFWEEK } from "../FormHelpers/OpeningHoursHelper";
+  requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate,validateTimerange, DAYOFWEEK, Transition } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
 import {  findEmployee, getEmployeeList } from '../../hooks/hooks';
@@ -279,6 +279,7 @@ const OpeningHoursForm = ({reloadPage}) => {
         id="scheduelDialog"
         open={scheduleDialog}
         onClose={closeScheduleDialog}
+        TransitionComponent={Transition}
         keepMounted={true}
       >
         <DialogTitle>
@@ -302,8 +303,8 @@ const OpeningHoursForm = ({reloadPage}) => {
             <DialogContent>
             <Divider />
             <Box sx={{textAlign: 'left'}}>
-            <Typography variant='body2' gutterBottom>- This timerange will be used to open and close your external waitlist request.</Typography>
-            <Typography variant='body2'>- <u>important</u> Submit your 
+            <Typography variant='subtitle2' gutterBottom>Timerange will be used to open and close your external waitlist request.</Typography>
+            <Typography variant='subtitle2'><u>important</u> submit your 
               time based on 24 hour time <strong> (Ex. 08:00~8AM, 18:00~6PM.)</strong></Typography>
             <br/>
             <Divider />
@@ -369,6 +370,7 @@ const OpeningHoursForm = ({reloadPage}) => {
       <Dialog
         id="closedOnDates"
         open={closedDialog}
+        TransitionComponent={Transition}
         onClose={closeClosedDialog}
         maxWidth={'sm'}
         fullWidth={'sm'}

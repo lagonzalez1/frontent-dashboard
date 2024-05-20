@@ -296,7 +296,8 @@ export const getServingClients = (accessToken) => {
             }
             else {
                 reject({msg: 'Request setup error', error: error.message})
-            }        })  
+            }        
+        })  
     }) 
 }
 // Middleware OK

@@ -65,13 +65,13 @@ export default function FabButton () {
         setLoading(true);
         addCustomerWaitlist(payload)
         .then(response => {
-            setLoading(false);
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
         })
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
         })
         .finally(() => {
+            setLoading(false);
             dispatch(setReload(true));
             handleClose();
         })

@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { styled } from '@mui/system';
-import { Card } from '@mui/material';
+import { Card, Slide } from '@mui/material';
 import { getAccessToken, getStateData } from '../../auth/Auth';
+import React from 'react';
 
 
 export const getServicesAvailable = () => {
@@ -11,6 +12,10 @@ export const getServicesAvailable = () => {
   if ( !services ) { return []; }
   return services;
 }
+
+export const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 
 

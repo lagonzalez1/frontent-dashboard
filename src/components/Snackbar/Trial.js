@@ -44,13 +44,14 @@ export default function Trial() {
           >
             <Alert
             severity="error"
+            sx={{p: 1}}
             icon={<ClockCounterClockwise size={32} />}
             variant="filled">
-              {console.log(tz)}
-                <Typography variant='body2'>{'You account is active until ' + DateTime.fromJSDate( new Date(termDate)).setZone(tz).toLocaleString() + "." }</Typography>
-                <LinearProgress color="secondary" variant="determinate" value={daysLeft} />
+              
+                <Typography variant='body1'>{'You account is active until ' + DateTime.fromJSDate( new Date(termDate)).setZone(tz).toLocaleString() + "." }</Typography>
+                <LinearProgress color="inherit" variant="determinate" value={daysLeft} />
                 <Box sx={{ minWidth: 35 }}>
-                  <Typography variant="body2" color="text.secondary">{`Days left ${daysLeft/10}`}</Typography>
+                  <Typography variant="body2" color="text.white">{`Days left ${daysLeft/10}`}</Typography>
                 </Box>
           </Alert>    
         </Snackbar>

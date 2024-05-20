@@ -97,7 +97,6 @@ const AddService = ({reloadParent}) => {
         fullWidth={true}
       >
         <DialogTitle>
-            
             <IconButton
                     aria-label="close"
                     onClick={handleClose}
@@ -130,7 +129,7 @@ const AddService = ({reloadParent}) => {
           >
             {({handleChange ,touched, errors}) => (
               <Form>
-              <Stack spacing={1}>
+              <Stack spacing={1} sx={{mt: 0}}>
               <Field
                 as={TextField}
                 name="title"

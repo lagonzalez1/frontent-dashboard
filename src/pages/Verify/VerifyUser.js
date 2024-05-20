@@ -91,6 +91,11 @@ export default function VerifyUser () {
         // This is null
     }
 
+    const closeCurrentTab = () => {
+        window.open("about:blank", "_self");
+        window.close();
+    }
+
     useEffect(() => {
         isVerified();
     }, [])
@@ -102,12 +107,12 @@ export default function VerifyUser () {
             <Typography variant="h5" fontWeight={'bold'}>
                 Verify your account
             </Typography>
-            <Typography variant="subtitle2">Is this email associated with your account? If so go ahead and verify!</Typography>
+            <Typography variant="subtitle1">Is this email associated with your account? If so go ahead and verify!</Typography>
             <TextField defaultValue={email} disabled={true} variant="outlined" />
             {success.title === "Success" ? (
                 <>
-                    <Button variant="contained" startIcon={<CheckBoxRounded />} color="success"> Completed</Button> 
-                    <Typography variant="subtitle2">Please re-visit your dashboard and start booking!</Typography>
+                    <Button variant="contained" startIcon={<CheckBoxRounded />} color="success" onClick={() => closeCurrentTab()}> Completed</Button> 
+                    <Typography variant="subtitle1">Please re-visit your dashboard and start booking!</Typography>
                 </>
             ):
             <LoadingButton loading={loading} variant="contained" onClick={() => verifyAccount()}>Verify now</LoadingButton> 
