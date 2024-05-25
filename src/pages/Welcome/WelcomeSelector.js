@@ -217,7 +217,7 @@ export default function WelcomeSelector() {
             setBusinessExtras(extrasResponse);
         })
         .catch(error => {
-            if (error.error.status === 404) {
+            if (error.status === 404) {
                 navigate(`/welcome/${link}`);
             }
             handleErrorRefChange();
@@ -339,7 +339,7 @@ export default function WelcomeSelector() {
         .then(response => {
             if(response.data.length === 0){
                 setAlertAppointment(true);
-                setAppointmentSearchErrors({title: 'Error',body: 'No available appointments.'})
+                setAppointmentSearchErrors({title: 'Error',body: 'No available appointments'})
                 return;
             }
             setSlots(response.data);

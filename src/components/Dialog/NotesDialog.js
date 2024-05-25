@@ -1,7 +1,13 @@
 import React, { memo} from "react";
-import { Dialog, Button, IconButton, DialogActions, Typography, DialogContent, DialogTitle} from "@mui/material";
+import { Dialog, Button, IconButton, DialogActions, Typography, DialogContent, DialogTitle, Slide} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close"
 import { DateTime } from "luxon";
+
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 
 
 const NotesDialog = ({open, onClose, payload}) => {
@@ -14,7 +20,9 @@ const NotesDialog = ({open, onClose, payload}) => {
         id="clientSummary"
         open={open}
         onClose={onClose}
-        
+        TransitionComponent={Transition}
+        maxWidth={'sm'}
+        fullWidth={true}      
       >
         <DialogTitle>
             <IconButton

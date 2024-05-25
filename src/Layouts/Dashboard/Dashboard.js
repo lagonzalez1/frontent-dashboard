@@ -26,6 +26,8 @@ import Analytics from "../Analytics/Analytics";
 import Trial from "../../components/Snackbar/Trial";
 import { setLocation } from "../../reducers/user";
 import StripeCompletion from "../../components/Dialog/StripeCompletion";
+import HelpDialog from "../Help/HelpDialog";
+import { DateTime } from "luxon";
 
 /**
  * 
@@ -45,9 +47,12 @@ export default function Dashboard () {
     const dispatch = useDispatch();
     const signOut = useSignOut();
     const reload = useSelector((state) => state.user.reload);
+    const DAYONE = useSelector((state) => state.business.timestamp);
+    const timezone = useSelector((state) => state.business.timezone);
     const [loading, setLoading] = useState(false);
     const [openCompletion, openStripeCompletion] = useState(false);
     const [stripeSession, setStripeSession] = useState({sessionId: '', status: '', title: ''})
+    const [gettingStarted, setGettingStarted] = useState(true);
 
     const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
     const [openNav, setOpenNav] = useState(false);
@@ -58,7 +63,8 @@ export default function Dashboard () {
     async function checkAuthStatus() {
         setLoading(true);
         try {
-            const isAuth = await isAuthenticated(dispatch);     
+            const isAuth = await isAuthenticated(dispatch);   
+            showDayOneGuide();  
             if (isAuth === false) {
                 removeUserState();
                 signOut();
@@ -91,6 +97,13 @@ export default function Dashboard () {
             clearInterval(intervalId);
         };
     }, []);
+
+
+    const showDayOneGuide = () => {
+        const businessDate = DateTime.fromJSDate(new Date(DAYONE)).startOf('day');
+        const currentDate = DateTime.local().setZone(timezone).startOf('day');
+        currentDate.hasSame(businessDate, 'day') ? setGettingStarted(true) : setGettingStarted(false);
+    }
 
     //** User completes the subscrtiption cycle. */
     const closeStripeCompletion = () => {
@@ -167,6 +180,7 @@ export default function Dashboard () {
                             </Backdrop>)
                             : <MemoizedRenderLocation />}
                             <Success />
+                            <HelpDialog open={gettingStarted} onClose={() => setGettingStarted(false)}  />
                       </PermissionProvider>
                  </Box>
                  <Trial />

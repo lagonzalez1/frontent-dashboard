@@ -11,6 +11,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions.js";
 import LoadingButton from '@mui/lab/LoadingButton';
+import { PersonRounded } from "@mui/icons-material";
+import { User, Article } from "phosphor-react";
 
 
 export default function Resources() {
@@ -122,22 +124,25 @@ export default function Resources() {
                         <CardContent>
                             <Stack direction="row" spacing={1} sx={{ alignItems: 'center', pt: 1, pb: 1}}>
                             <Avatar {...stringAvatar(resource.title)} />
-                            <Box sx={{ paddingLeft: 1, paddingRight: 1}}>    
-                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
-                            {resource.active ? (<FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/>):
-                             (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
-                                { ' ' + resource.title}
-                            </Typography>
-                            <Typography variant="body2" component="p">
-                                    <strong>Assigned: </strong> { findResourceTag(resource.employeeTag) }
-                            </Typography>
-                            <Typography variant="body2" component="p">
-                                    <strong>Serving max: </strong> {resource.size}
-                            </Typography> 
-                            <Typography variant="body2" component="p">
-                                    <strong>Description: </strong> {resource.description}
-                            </Typography>     
-                            </Box>
+                                <Box sx={{ paddingLeft: 1, paddingRight: 1}}>    
+                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
+                                {resource.active ? (<FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/>):
+                                (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
+                                    { ' ' + resource.title}
+                                </Typography>
+                                <Stack spacing={0.5}>
+                                <Typography variant="body2" component="p">
+                                        <User size={18} weight="duotone" />
+                                        <strong>Assigned: </strong> { findResourceTag(resource.employeeTag) }
+                                </Typography>
+                                <Typography variant="body2" component="p">
+                                        <strong>Serving max: </strong> {resource.size}
+                                </Typography> 
+                                <Typography variant="body2" component="p">
+                                        <strong>Desc: </strong> {resource.description}
+                                </Typography>    
+                                </Stack> 
+                                </Box>
                             </Stack>
                             <RenderResourceInUse id={resource._id} />
                         </CardContent>   

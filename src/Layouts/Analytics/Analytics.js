@@ -14,16 +14,16 @@ import CachedIcon from '@mui/icons-material/Cached';
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import BarGraphWait from "../../components/Vizual/BarGraphWait";
 import BarGraphApp from "../../components/Vizual/BarGraphApp";
-import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle, Database, FireSimple, Drop,Waves , Campfire , FlowerLotus, Tree, Coffee  } from "phosphor-react"; 
+import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle, Database, FireSimple, Drop,Waves , Campfire , FlowerLotus, Tree, Coffee, User  } from "phosphor-react"; 
 import Collapse from '@mui/material/Collapse';
 
 
 
 const Analytics = () => {
 
-    const iconsList = [<Package alignmentBaseline="center" size={22}/>,<FireSimple alignmentBaseline="center" size={22}/>, <Drop alignmentBaseline="center" size={22}/>,
-     <Waves  alignmentBaseline="center" size={22}/>, <Campfire  alignmentBaseline="center" size={22}/>, <FlowerLotus  alignmentBaseline="center" size={22}/>, <Tree alignmentBaseline="center" size={22}/>,
-     <Coffee alignmentBaseline="center" size={22}/>  ]
+    const iconsList = [<Package alignmentBaseline="center" weight="duotone" size={22}/>,<FireSimple alignmentBaseline="center" weight="duotone" size={22}/>, <Drop alignmentBaseline="center" weight="duotone" size={22}/>,
+     <Waves  alignmentBaseline="center" weight="duotone" size={22}/>, <Campfire  alignmentBaseline="center" weight="duotone" size={22}/>, <FlowerLotus  alignmentBaseline="center" weight="duotone" size={22}/>, <Tree alignmentBaseline="center" weight="duotone" size={22}/>,
+     <Coffee alignmentBaseline="center" weight="duotone" size={22}/>  ]
     const business = useSelector((state) => state.business);
     const employeeList = getEmployeeList();
     const [range, setRange] = useState({ start: DateTime.local().setZone(business.timezone), end: DateTime.local().setZone(business.timezone)});
@@ -193,7 +193,7 @@ const Analytics = () => {
                                         onClick={(event) => handleEmployeeClick(event, item._id)}
                                         >
                                         <ListItemIcon>
-                                            <PersonIcon />
+                                            <User size={18} weight="duotone"/>
                                         </ListItemIcon>
                                         <ListItemText primary={item.fullname} />
                                     </ListItemButton>

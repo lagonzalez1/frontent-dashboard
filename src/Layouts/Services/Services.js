@@ -13,6 +13,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions.js";
 import LoadingButton from '@mui/lab/LoadingButton';
+import { AttachCurrencyDollarOutlined, AttachCurrencyDollarTwoTone, AvTimerOutlined, AvTimerTwoTone, PublicOffOutlined, PublicOffTwoTone, PublicRounded, PublicTwoTone } from "@mui/icons-material";
+import { ClockClockwise, ClockCountdown, Globe, LockSimple, LockSimpleOpen, CurrencyDollar } from "phosphor-react";
+import { Global } from "@emotion/react";
 
 
 export default function Services() {
@@ -131,15 +134,19 @@ export default function Services() {
                              (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
                                 { ' ' + service.title}
                             </Typography>
-                            <Stack>
+                            <Stack spacing={0.5}>
                                 <Typography variant="body2" component="p">
-                                    <strong>Duration: </strong> {service.duration}
+                                    
+                                <ClockClockwise size={18} weight="duotone" />
+                                <strong> Duration: </strong> {service.duration}
                                 </Typography>
                                 <Typography  variant="body2" component="p">
-                                    <strong>Cost: </strong> {service.cost}
+                                    <CurrencyDollar size={18} weight="duotone" />
+                                    <strong> Cost: </strong> {service.cost}
                                 </Typography>
                                 <Typography  variant="body2" component="p">
-                                    <strong>Public: </strong> {service.public ? 'True': 'False'}
+                                    {service.public ? <LockSimple size={18} weight="duotone" />: <LockSimpleOpen size={18} weight="duotone" /> }
+                                    <strong> Public: </strong> {service.public ? 'True': 'False'}
                                 </Typography>
                             </Stack>
                             </Box>

@@ -4,8 +4,8 @@
   "private": true,
   "proxy": "http://localhost:2222",
   "dependencies": {
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
     "@fortawesome/free-regular-svg-icons": "^6.5.1",
@@ -14,7 +14,8 @@
     "@mui/base": "^5.0.0-beta.40",
     "@mui/icons-material": "^5.11.16",
     "@mui/lab": "^5.0.0-alpha.134",
-    "@mui/material": "^5.13.5",
+    "@mui/material": "^5.15.18",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.18",
     "@mui/x-date-pickers": "^6.10.2",
     "@mui/x-date-pickers-pro": "^6.17.0",
     "@reduxjs/toolkit": "^1.9.5",
@@ -42,6 +43,7 @@
     "react-redux": "^8.1.0",
     "react-router-dom": "^6.11.2",
     "react-scripts": "^4.0.3",
+    "styled-components": "^6.1.11",
     "unsplash-js": "^7.0.18",
     "web-vitals": "^2.1.4",
     "webfontloader": "^1.6.28",
@@ -73,5 +75,11 @@
   },
   "overrides": {
     "react-error-overlay": "6.0.9"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.24.5",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
+    "@babel/plugin-transform-private-property-in-object": "^7.24.5",
+    "@babel/preset-env": "^7.24.5"
   }
 }

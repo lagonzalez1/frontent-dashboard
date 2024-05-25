@@ -16,6 +16,7 @@ const StartSubscription = ({open, onClose, plan}) => {
     // My page is from origin: localhost:3000 -> stripe.com/...
 
     const testingSubscription = () => {
+        console.log("Cllicked")
         // Hard coded price of item in stripe
         if (plan !== "" || plan !== undefined || plan !== null) {
             startSubscriptionTest(plan)

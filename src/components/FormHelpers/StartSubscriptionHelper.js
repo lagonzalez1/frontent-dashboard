@@ -7,6 +7,7 @@ import { getHeaders, getStateData } from "../../auth/Auth"
 export const startSubscriptionTest = (priceId) => {
     const header = getHeaders();
     const { _, business} = getStateData();
+    const headers = getHeaders();
     return new Promise((resolve, reject) => {
         axios.post('/api/internal/create-checkout-session', {priceId, bid: business._id}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
         .then(response => {

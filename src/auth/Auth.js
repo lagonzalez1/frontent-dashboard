@@ -118,9 +118,7 @@ const USER = 'user';
       const { user } = getStateData();
       const id = user.id;
       const email = user.email;
-  
       const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: { 'x-access-token': token } });
-      console.log(response)
       if (response.status === 200) {
         return response.data;
       } else {

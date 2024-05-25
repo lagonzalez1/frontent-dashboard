@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import '../../css/Customers.css';
 import { Stack, Grid, Menu, MenuItem, IconButton, TextField, Typography,
    Skeleton, Table, TableCell, TableBody, TableHead, TableContainer, TableRow,Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip,
@@ -21,6 +21,9 @@ import BackspaceRoundedIcon from '@mui/icons-material/BackspaceRounded';
 import NotesIcon from '@mui/icons-material/Notes';
 import CloseIcon from "@mui/icons-material/Close"
 import NotesDialog from '../../components/Dialog/NotesDialog';
+import ReviewDialog from '../../components/Dialog/ReviewDialog';
+import RateReviewRoundedIcon from '@mui/icons-material/RateReviewRounded';
+
 import { usePermission } from '../../auth/Permissions';
 import CheckCircle from '@mui/icons-material/CheckCircle';
 import { FileCsv } from "phosphor-react"
@@ -43,7 +46,9 @@ const Customers = () => {
   const [reload, setReload] = useState(false);
   const [client, setClient] = useState(null);
   const [clientNotes, setClientNotes] = useState(false);
+  const [clientReview, setclientReview] = useState(false);
   const [notes, setNotes] = useState({timestamp: null, notes: null});
+  const [review, setReview] = useState({timestamp: null, comment: null, rate: null})
   const [alert, setAlert] = useState(false); 
   const [alertMessage, setAlertMessage] = useState({title: null, body: null});
 
@@ -52,6 +57,11 @@ const Customers = () => {
   const closeClientNotes = useCallback(() => {
     setClientNotes(false);
     setNotes({timestamp: null, notes: null});
+  }, [])
+
+  const closeReview = useCallback(() => {
+      setReview({timestamp: null, comment: null, rate: null})
+      setclientReview(false);
   }, [])
 
   const handleSearch = () => {
@@ -69,7 +79,6 @@ const Customers = () => {
     .finally(() => {
       setLoading(false);
     })
-
   };
 
   const handleKeyPress = (event) => {
@@ -142,6 +151,13 @@ const Customers = () => {
     .finally(() => {
       setLoading(false)
     })
+  }
+
+
+  const showReview = (payload) => {
+    console.log(payload)
+    setReview({timestamp: payload.timestamp, rate: payload.rate, comment: payload.comment});
+    setclientReview(true);
   }
 
   const showNotes = (payload) => {
@@ -217,7 +233,7 @@ const Customers = () => {
           </TableCell>
 
           <TableCell align="left">{row.email}</TableCell>
-          <TableCell align="left">{getLastVisit(row.waitlist_summary, row.appointment_summary)}</TableCell>
+          <TableCell align="left">{ getLastVisit(row.waitlist_summary, row.appointment_summary)}</TableCell>
           <TableCell align="left">{row.status.flag === true ? "Flag": "Ok"}</TableCell>
           <TableCell align="left">
             <IconButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} aria-label="delete row" onClick={() => confirmDeleteClient(row)}>
@@ -244,6 +260,7 @@ const Customers = () => {
                   
                   <TableHead>
                     <TableRow>
+                      <TableCell align="left">Review</TableCell>
                       <TableCell align="left">Notes</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Service</TableCell>
@@ -283,6 +300,13 @@ const Customers = () => {
                         }
                         return (
                           <TableRow>
+                            <TableCell>
+                                <Tooltip followCursor title={review.comment ? review.comment : 'No review.'}>
+                                  <IconButton onClick={() => showReview({timestamp: review.timestamp, comment: review.comment, rate: review.rate }) }>
+                                    <RateReviewRoundedIcon fontSize="small"/>
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
                               <TableCell>
                                 <Tooltip followCursor title={summary.notes}>
                                   <IconButton onClick={() => showNotes({timestamp: summary.timestamp, notes: summary.notes}) }>
@@ -329,8 +353,8 @@ const Customers = () => {
                   
                   <TableHead>
                     <TableRow>
-                      <TableCell align="left">Notes</TableCell>
-
+                      <TableCell align="left">Review</TableCell>
+                      <TableCell align='left'>Notes</TableCell>
                       <TableCell>Date</TableCell>
                       <TableCell>Service</TableCell>
                       <TableCell align="left">Employee</TableCell>
@@ -371,6 +395,13 @@ const Customers = () => {
 
                         return (
                           <TableRow>
+                            <TableCell>
+                                <Tooltip followCursor title={review.comment ? review.comment : 'No review.'}>
+                                  <IconButton onClick={() => showReview({timestamp: review.timestamp, comment: review.comment, rate: review.rate }) }>
+                                    <RateReviewRoundedIcon fontSize="small"/>
+                                  </IconButton>
+                                </Tooltip>
+                              </TableCell>
                               <TableCell>
                                 <Tooltip title={summary.notes}>
                                 <IconButton onClick={() => showNotes({timestamp: summary.timestamp, notes: summary.notes}) }>
@@ -415,16 +446,17 @@ const Customers = () => {
             </Collapse>
           </TableCell>
         </TableRow>
-
       </React.Fragment>
     );
   }
+
+  const MemoizedRow = useMemo(() => Row, []);
+
 
   return (
     <>
       <div className='customerContainer'>
         <Grid container>
-
           <Grid item xs={12} md={6} sm={12} lg={6}>
           <Stack>
               <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
@@ -495,7 +527,7 @@ const Customers = () => {
                               </TableRow>
                             ):
                             data && data.map((client, index) => (
-                              <Row key={index} row={client} />
+                              <MemoizedRow key={index} row={client} />
                             ))
                             }
                         </TableBody>
@@ -531,14 +563,15 @@ const Customers = () => {
               <Typography variant='body2'>Please confirm if you wish to remove client.</Typography>
             </DialogContent>
             <DialogActions>
-              <Button sx={{borderRadius: 10}} disabled={!checkPermission('CUST_REMOVAL')} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
-              <Button sx={{borderRadius: 10}} onClick={cancelDeleteClient} variant='contained' color='primary'>Cancel</Button>
+              <Button sx={{borderRadius: 7}} disabled={!checkPermission('CUST_REMOVAL')} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
+              <Button sx={{borderRadius: 7}} onClick={cancelDeleteClient} variant='contained' color='primary'>Cancel</Button>
             </DialogActions>
 
       </Dialog>
 
 
       <NotesDialog payload={notes} onClose={closeClientNotes} open={clientNotes} />
+      <ReviewDialog payload={review} onClose={closeReview} open={clientReview} />
 
       
     </>

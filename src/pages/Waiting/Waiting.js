@@ -773,7 +773,7 @@ export default function Waiting() {
                             }
                             sx={{ mb: 2 }}
                             >
-                                <AlertTitle textAlign="center"><strong>{alert.title}</strong></AlertTitle>
+                                <AlertTitle textAlign="left"><strong>{alert.title}</strong></AlertTitle>
                                 <Typography textAlign={'left'}>{alert.message}</Typography>
                             </Alert>
                         </Collapse>

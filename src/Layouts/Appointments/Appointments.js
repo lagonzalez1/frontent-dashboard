@@ -124,6 +124,11 @@ const Appointments = ({setClient, setEditClient}) => {
         })
     }
 
+    const sortByEmployees = () => {
+        if (data.length === 0) { return ; }
+
+    }
+
     const handelMonthChage = (date) => {
         setHighlightedDays([]);
         const dates = getHighlightedDays(date)
@@ -189,8 +194,8 @@ const Appointments = ({setClient, setEditClient}) => {
                     </Tooltip>
 
                     <Tooltip title="Sort your appointment list by employee" placement="bottom">
-                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SortRoundedIcon />}>
-                            <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? 'Sort by employee': <Skeleton/> }</Typography>
+                        <Button onClick={() => sortByEmployees()} sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SortRoundedIcon />}>
+                            <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? 'Group by employee': <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>
                     </Stack>
@@ -203,6 +208,7 @@ const Appointments = ({setClient, setEditClient}) => {
                             sx={{
                                 width: '100%'
                             }}
+                            
                             fontSize="sm"
                             value={selectedDate}
                             onMonthChange={handelMonthChage}
