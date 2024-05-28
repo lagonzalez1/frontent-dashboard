@@ -23,7 +23,7 @@ import { LoadingButton } from '@mui/lab';
 
 export default function EmployeeScheduleForm({employee}) {
 
-    const business = useSelector((state) => state.business);
+    const schedule = useSelector((state) => state.business.schedule);
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
     const [errors, setErrors] = useState(null);
@@ -40,42 +40,57 @@ export default function EmployeeScheduleForm({employee}) {
 
     let initialValues = { 
         Sunday: {
-            start: employee ? DateTime.fromFormat(employee.breaks.Sunday.start,'HH:mm').toFormat('hh:mm a') : '',
-            duration: employee ? employee.breaks.Sunday.duration : 0,
+            start: employee ? DateTime.fromFormat(employee.schedule_alternative.Sunday.start,'HH:mm').toFormat('hh:mm a') : '',
+            end: employee ? DateTime.fromFormat(employee.schedule_alternative.Sunday.end,'HH:mm').toFormat('hh:mm a') : '',
+            break: employee ? employee.schedule_alternative.Sunday.break : '',
+            duration: employee ? employee.schedule_alternative.Sunday.duration : 0,
         },
         Monday: {
-            start: employee ? DateTime.fromFormat(employee.breaks.Monday.start, 'HH:mm').toFormat('hh:mm a') : '',
-            duration: employee ? employee.breaks.Monday.duration : 0,
+            start: employee ? DateTime.fromFormat(employee.schedule_alternative.Monday.start, 'HH:mm').toFormat('hh:mm a') : '',
+            end: employee ? DateTime.fromFormat(employee.schedule_alternative.Monday.end, 'HH:mm').toFormat('hh:mm a') : '',
+            break: employee ? DateTime.fromFormat(employee.schedule_alternative.Monday.break, 'HH:mm').toFormat('hh:mm a') : '',
+            duration: employee ? employee.schedule_alternative.Monday.duration : 0,
         },
         Tuesday: {
-            start: employee ? DateTime.fromFormat(employee.breaks.Tuesday.start, 'HH:mm').toFormat('hh:mm a') : '',
-            duration: employee ? employee.breaks.Tuesday.duration : 0,
+            start: employee ? DateTime.fromFormat(employee.schedule_alternative.Tuesday.start, 'HH:mm').toFormat('hh:mm a') : '',
+            end: employee ? DateTime.fromFormat(employee.schedule_alternative.Tuesday.end, 'HH:mm').toFormat('hh:mm a') : '',
+            break: employee ? DateTime.fromFormat(employee.schedule_alternative.Tuesday.break, 'HH:mm').toFormat('hh:mm a') : '',
+            duration: employee ? employee.schedule_alternative.Tuesday.duration : 0,
         },
         Wednesday: {
-            start: employee ? DateTime.fromFormat(employee.breaks.Wednesday.start,'HH:mm').toFormat('hh:mm a') : '',
-            duration: employee ? employee.breaks.Wednesday.duration : 0,
+            start: employee ? DateTime.fromFormat(employee.schedule_alternative.Wednesday.start,'HH:mm').toFormat('hh:mm a') : '',
+            end: employee ? DateTime.fromFormat(employee.schedule_alternative.Wednesday.end,'HH:mm').toFormat('hh:mm a') : '',
+            break: employee ? DateTime.fromFormat(employee.schedule_alternative.Wednesday.break,'HH:mm').toFormat('hh:mm a') : '',
+            duration: employee ? employee.schedule_alternative.Wednesday.duration : 0,
         },
         Thursday: {
-            start: employee ? DateTime.fromFormat(employee.breaks.Thursday.start,'HH:mm').toFormat('hh:mm a') : '',
-            duration: employee ? employee.breaks.Thursday.duration : 0,
+            start: employee ? DateTime.fromFormat(employee.schedule_alternative.Thursday.start,'HH:mm').toFormat('hh:mm a') : '',
+            end: employee ? DateTime.fromFormat(employee.schedule_alternative.Thursday.end,'HH:mm').toFormat('hh:mm a') : '',
+            break: employee ? DateTime.fromFormat(employee.schedule_alternative.Thursday.break,'HH:mm').toFormat('hh:mm a') : '',
+            duration: employee ? employee.schedule_alternative.Thursday.duration : 0,
         },
         Friday: {
-            start: employee ? DateTime.fromFormat(employee.breaks.Friday.start,'HH:mm').toFormat('hh:mm a') : '',
-            duration: employee ? employee.breaks.Friday.duration : 0,
+            start: employee ? DateTime.fromFormat(employee.schedule_alternative.Friday.start,'HH:mm').toFormat('hh:mm a') : '',
+            end: employee ? DateTime.fromFormat(employee.schedule_alternative.Friday.end,'HH:mm').toFormat('hh:mm a') : '',
+            break: employee ? DateTime.fromFormat(employee.schedule_alternative.Friday.break,'HH:mm').toFormat('hh:mm a') : '',
+            duration: employee ? employee.schedule_alternative.Friday.duration : 0,
         },
         Saturday: {
-            start: employee ? DateTime.fromFormat(employee.breaks.Saturday.start,'HH:mm').toFormat('hh:mm a') : '',
-            duration: employee ? employee.breaks.Saturday.duration : 0,
-
-        },
+            start: employee ? DateTime.fromFormat(employee.schedule_alternative.Saturday.start,'HH:mm').toFormat('hh:mm a') : '',
+            end: employee ? DateTime.fromFormat(employee.schedule_alternative.Saturday.end,'HH:mm').toFormat('hh:mm a') : '',
+            break: employee ? DateTime.fromFormat(employee.schedule_alternative.Saturday.break,'HH:mm').toFormat('hh:mm a') : '',
+            duration: employee ? employee.schedule_alternative.Saturday.duration : 0,
+        }
     }
     const daySchema = Yup.object().shape({
         start: Yup.string().notRequired(),
-        duration: Yup.number()
-          .integer('Duration must be an integer')
-      });
+        end: Yup.string().notRequired(),
+        break: Yup.string().notRequired(),
+        duration: Yup.number().notRequired()
+            .integer('Duration must be an integer')
+    });
       
-      const validationSchema = Yup.object().shape({
+    const validationSchema = Yup.object().shape({
         Sunday: daySchema,
         Monday: daySchema,
         Tuesday: daySchema,
@@ -83,13 +98,13 @@ export default function EmployeeScheduleForm({employee}) {
         Thursday: daySchema,
         Friday: daySchema,
         Saturday: daySchema,
-      });
+    });
 
 
-    // Two potential submits, EDIT and NEW
     const handleSubmit = (values) => {
         setLoading(true);
-        const businessSchedule = business.schedule;
+        const businessSchedule = business.schedule; // No loger will need this if start and end time are inputed.
+        console.log(values);
         const {validated, employeeSchedule} = validateBreak(values, businessSchedule);
         if (!validated) { 
             console.log("Error");
@@ -98,8 +113,10 @@ export default function EmployeeScheduleForm({employee}) {
             setLoading(false);
             return;
         }
-        const payload = {breaks: {...employeeSchedule},  originalUsername: employee.employeeUsername , b_id: business._id, email: user.email}
-        requestScheduleChange(payload)
+        const payload = {schedule_alternative: {...employeeSchedule},  originalUsername: employee.employeeUsername , b_id: business._id, email: user.email}
+        console.log(payload)
+        /**
+         * requestScheduleChange(payload)
         .then(res => {
             dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
         })
@@ -110,6 +127,9 @@ export default function EmployeeScheduleForm({employee}) {
             setLoading(false);
             dispatch(setReload(true))
         })
+         * 
+         */
+        
         
     }
 
@@ -119,10 +139,18 @@ export default function EmployeeScheduleForm({employee}) {
         onSubmit: handleSubmit
       })
 
-    const handleScheduleChange = (e, day) => {
+    const handleScheduleChangeStart = (e, day) => {
         const newValue = e;
         formik.setFieldValue(`${day}.start`, newValue);
-      };
+    };
+    const handleScheduleChangeEnd = (e, day) => {
+        const newValue = e;
+        formik.setFieldValue(`${day}.end`, newValue);
+    };
+    const handleScheduleChangeBreak = (e, day) => {
+        const newValue = e;
+        formik.setFieldValue(`${day}.break`, newValue);
+    };
     
     return (
     <Box sx={{ pt: 2}}>
@@ -137,16 +165,19 @@ export default function EmployeeScheduleForm({employee}) {
                 </AccordionSummary>
                 <AccordionDetails>
                 
-                    <Typography variant='body1' fontWeight={'bold'}>Sunday </Typography><Typography variant='body2'>{ employee && employee.breaks.Sunday.start ? DateTime.fromFormat(employee.breaks.Sunday.start,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.breaks.Sunday.start,'HH:mm').plus({minutes: employee.breaks.Sunday.duration}).toFormat('h:mm a'): 'None' }</Typography>
-                    <Typography variant='body1' fontWeight={'bold'}>Monday </Typography> <Typography variant='body2'>{ employee && employee.breaks.Monday.start ? DateTime.fromFormat(employee.breaks.Monday.start,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.breaks.Monday.start,'HH:mm').plus({minutes: employee.breaks.Monday.duration}).toFormat('h:mm a'): 'None'}</Typography>
-                    <Typography variant='body1' fontWeight={'bold'}>Tuesday </Typography> <Typography variant='body2'>{ employee && employee.breaks.Tuesday.start ? DateTime.fromFormat(employee.breaks.Tuesday.start,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.breaks.Tuesday.start,'HH:mm').plus({minutes: employee.breaks.Tuesday.duration}).toFormat('h:mm a') : 'None'}</Typography>
-                    <Typography variant='body1' fontWeight={'bold'}>Wednesday </Typography> <Typography variant='body2'>{ employee && employee.breaks.Wednesday.start ? DateTime.fromFormat(employee.breaks.Wednesday.start,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.breaks.Wednesday.start,'HH:mm').plus({minutes: employee.breaks.Wednesday.duration}).toFormat('h:mm a'): 'None'}</Typography>
-                    <Typography variant='body1' fontWeight={'bold'}>Thursday </Typography> <Typography variant='body2'>{ employee && employee.breaks.Thursday.start ? DateTime.fromFormat(employee.breaks.Thursday.start,'HH:mm').toFormat('h:mm a')  + "-" +DateTime.fromFormat(employee.breaks.Thursday.start,'HH:mm').plus({minutes: employee.breaks.Thursday.duration}).toFormat('h:mm a'): 'None'}</Typography>
-                    <Typography variant='body1' fontWeight={'bold'}>Friday </Typography> <Typography variant='body2'>{ employee && employee.breaks.Friday.start ? DateTime.fromFormat(employee.breaks.Friday.start,'HH:mm').toFormat('h:mm a') + "-" + DateTime.fromFormat(employee.breaks.Friday.start,'HH:mm').plus({minutes: employee.breaks.Friday.duration}).toFormat('h:mm a'): 'None'}</Typography>
-                    <Typography variant='body1' fontWeight={'bold'}>Saturday </Typography> <Typography variant='body2'>{ employee && employee.breaks.Saturday.start ? DateTime.fromFormat(employee.breaks.Saturday.start,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.breaks.Saturday.start,'HH:mm').plus({minutes: employee.breaks.Saturday.duration}).toFormat('h:mm a'): 'None'}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Sunday </Typography><Typography variant='body2'>{ employee && employee.schedule_alternative.Sunday.break ? DateTime.fromFormat(employee.schedule_alternative.Sunday.break,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.schedule_alternative.Sunday.break,'HH:mm').plus({minutes: employee.schedule_alternative.Sunday.duration}).toFormat('h:mm a'): 'None' }</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Monday </Typography> <Typography variant='body2'>{ employee && employee.schedule_alternative.Monday.break ? DateTime.fromFormat(employee.schedule_alternative.Monday.break,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.schedule_alternative.Monday.break,'HH:mm').plus({minutes: employee.schedule_alternative.Monday.duration}).toFormat('h:mm a'): 'None'}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Tuesday </Typography> <Typography variant='body2'>{ employee && employee.schedule_alternative.Tuesday.break ? DateTime.fromFormat(employee.schedule_alternative.Tuesday.break,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.schedule_alternative.Tuesday.break,'HH:mm').plus({minutes: employee.schedule_alternative.Tuesday.duration}).toFormat('h:mm a') : 'None'}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Wednesday </Typography> <Typography variant='body2'>{ employee && employee.schedule_alternative.Wednesday.break ? DateTime.fromFormat(employee.schedule_alternative.Wednesday.break,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.schedule_alternative.Wednesday.break,'HH:mm').plus({minutes: employee.schedule_alternative.Wednesday.duration}).toFormat('h:mm a'): 'None'}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Thursday </Typography> <Typography variant='body2'>{ employee && employee.schedule_alternative.Thursday.break ? DateTime.fromFormat(employee.schedule_alternative.Thursday.break,'HH:mm').toFormat('h:mm a')  + "-" +DateTime.fromFormat(employee.schedule_alternative.Thursday.break,'HH:mm').plus({minutes: employee.schedule_alternative.Thursday.duration}).toFormat('h:mm a'): 'None'}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Friday </Typography> <Typography variant='body2'>{ employee && employee.schedule_alternative.Friday.break ? DateTime.fromFormat(employee.schedule_alternative.Friday.break,'HH:mm').toFormat('h:mm a') + "-" + DateTime.fromFormat(employee.schedule_alternative.Friday.break,'HH:mm').plus({minutes: employee.schedule_alternative.Friday.duration}).toFormat('h:mm a'): 'None'}</Typography>
+                    <Typography variant='body1' fontWeight={'bold'}>Saturday </Typography> <Typography variant='body2'>{ employee && employee.schedule_alternative.Saturday.break ? DateTime.fromFormat(employee.schedule_alternative.Saturday.break,'HH:mm').toFormat('h:mm a')  + "-" + DateTime.fromFormat(employee.schedule_alternative.Saturday.break,'HH:mm').plus({minutes: employee.schedule_alternative.Saturday.duration}).toFormat('h:mm a'): 'None'}</Typography>
                 </AccordionDetails>
             </Accordion>
-        <Typography variant='caption'>Ex. Monday break starts at 12:00 and 60 min break.</Typography>
+        <Typography variant='caption'>Please fill all workdays, otherwise empty start times will be considered <strong>OFF</strong>.</Typography> 
+        <br />
+        <Typography variant='caption'>Non workdays are blocked off.</Typography>
+
         { errors ? (
             <Collapse in={alert}>
             <Alert
@@ -175,27 +206,44 @@ export default function EmployeeScheduleForm({employee}) {
                 {Object.keys(initialValues).map((day) => (
                     <div key={day}>
                         <Grid container spacing={2}>
-                            <Grid item xs={6}>
+                            <Grid item xs={3}>
+                                <TimeField
+                                    fullWidth
+                                    label={`${day} start-shift`}
+                                    variant="outlined"
+                                    margin="dense"
+                                    type="text"
+                                    color={'secondary'}
+                                    onChange={(e) => handleScheduleChangeStart(e, day)}
+                                    disabled={employee && !employee.schedule[day]}
+                                    error={formik.touched[day]?.start && Boolean(formik.errors[day]?.start)}
+                                />
+                                <Typography variant='caption' fontWeight={'bold'}>{schedule[day].start ? DateTime.fromFormat(schedule[day].start, 'HH:mm').toFormat('hh:mm a') : ''}</Typography>                            
+                            </Grid>
+                            <Grid item xs={3}>
                                 <TimeField
                                     fullWidth
                                     label={`${day} break start`}
-                                    variant="standard"
+                                    variant="outlined"
                                     margin="dense"
                                     type="text"
-                                    onChange={(e) => handleScheduleChange(e, day)}
-                                    disabled={business ? (!business.schedule[day]) :null}
+                                    color={'secondary'}
+                                    onChange={(e) => handleScheduleChangeBreak(e, day)}
+                                    disabled={employee && !employee.schedule[day]}
                                     error={formik.touched[day]?.start && Boolean(formik.errors[day]?.start)}
                                 />
-                            
                             </Grid>
-                            <Grid item xs={6}>
+                            <Grid item xs={3}>
                             <FormControl fullWidth variant="standard" margin="dense">
                             <InputLabel>Duration ({day})</InputLabel>
                                 <Select
+                                    color={'secondary'}
                                     name={`${day}.duration`}
+                                    variant="outlined"
                                     value={formik.values[day]?.duration} 
                                     onChange={formik.handleChange}
                                     error={formik.touched[day]?.duration && Boolean(formik.errors[day]?.duration)}
+                                    disabled={employee && !employee.schedule[day]}
                                 >
                                 <MenuItem value={0}>None</MenuItem>
                                 <MenuItem value={15}>15 minutes</MenuItem>
@@ -204,6 +252,21 @@ export default function EmployeeScheduleForm({employee}) {
                                 <MenuItem value={60}>60 minutes</MenuItem>
                                 </Select>
                             </FormControl>
+                            </Grid>
+                            <Grid item xs={3}>
+                                <TimeField
+                                    fullWidth
+                                    label={`${day} end-shift`}
+                                    variant="outlined"
+                                    margin="dense"
+                                    type="text"
+                                    color={'secondary'}
+                                    onChange={(e) => handleScheduleChangeEnd(e, day)}
+                                    disabled={employee && !employee.schedule[day]}
+                                    error={formik.touched[day]?.start && Boolean(formik.errors[day]?.start)}
+                                />
+                                <Typography  fontWeight={'bold'} variant='caption'>{schedule[day].end ? DateTime.fromFormat(schedule[day].end, 'HH:mm').toFormat('hh:mm a') : ''}</Typography>                            
+
                             </Grid>
                         </Grid>              
                     </div>

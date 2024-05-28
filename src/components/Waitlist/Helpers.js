@@ -94,7 +94,7 @@ export const requestChangeAccept = (accepting) => {
     const email = user.email;
     const b_id = business._id;
     const headers = { headers: { 'x-access-token': accessToken } };
-    const currentDate = DateTime.local().toISO();
+    const currentDate = DateTime.local().setZone(business.timezone).toISO();
     const requestBody = {
       currentDate,
       accessToken,

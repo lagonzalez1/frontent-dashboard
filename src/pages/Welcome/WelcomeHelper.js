@@ -9,6 +9,7 @@ let GET_BUSINESS_ARGS = `/api/external/businessArgs`
 let GET_BUSINESS_SCHEDULE = `/api/external/businessSchedule`;
 let GET_SERVE_MAX = '/api/external/serveMax'
 let GET_BUSINESS_FORM = '/api/external/businessForm';
+let GET_TIMEZONE = '/api/external/businessTimezone';
 
 let POST_WAITLIST_REQUEST = '/api/external/waitlistRequest';
 let POST_CHECK_DUP = '/api/external/checkDuplicates';
@@ -300,6 +301,33 @@ export const getBusinessForm = (link) => {
     .get(GET_BUSINESS_FORM, { params: {link}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then((response) => {
       resolve(response.data);
+    })
+    .catch(error => {
+      console.log(error);
+      if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+        reject('Request timed out. Please try again later.'); // Handle timeout error
+    }
+      if (error.response) {
+          console.log(error.response);
+          reject({msg: 'Response error', error: error.response});
+      }
+      else if (error.request){
+          console.log(error.request);
+          reject({msg: 'No response from server', error: error.request})
+      }
+      else {
+          reject({msg: 'Request setup error', error: error.message})
+      }
+      
+  })
+  })
+}
+
+export const getBusinessTimezone = (link) => {
+  return new Promise((resolve, reject) => {
+    axios.get(GET_TIMEZONE, { params: {link}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    .then((res) => {
+      resolve(res.data);
     })
     .catch(error => {
       console.log(error);

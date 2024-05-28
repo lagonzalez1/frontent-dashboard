@@ -308,7 +308,7 @@ export default function FabButton () {
                             error={formik.touched.notes && !!formik.errors.notes}
                             onChange={formik.handleChange}
                             />
-                            <LoadingButton loading={loading} disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" type="submit">Submit</LoadingButton>
+                            <LoadingButton loading={loading} disabled={cancelledSubscription()} sx={{borderRadius: 7}} variant="contained" type="submit">Submit</LoadingButton>
                         </Stack>
                     
                     </form>

@@ -14,6 +14,7 @@ const ServingClient = ({open, onClose, clientId, type}) => {
     const [employeeId, setEmployeeId] = useState('');
 
     const sendClientServing = (clientId, type) => {
+        console.log(`Sending client ${clientId} from ${type} to serving`)
         moveClientServing(clientId, type, employeeId)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))

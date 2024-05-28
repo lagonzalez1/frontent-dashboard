@@ -179,6 +179,9 @@ export default function Serving({setClient}) {
                                 <Typography variant="subtitle2" fontWeight="bolder">
                                     {item.fullname}
                                 </Typography>
+                                <Typography variant="caption">
+                                    {item.serviceTag ? findService(item.serviceTag).title : null}
+                                </Typography>
                                 </TableCell>
                                 <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.partySize}</Typography>
@@ -188,10 +191,6 @@ export default function Serving({setClient}) {
                                     
                                 </TableCell>
                                 <TableCell align="left"> 
-                                    <Typography variant="subtitle2" fontWeight="bolder">
-                                        {'Service: '+ findService(item.serviceTag).title }
-                                    </Typography>
-    
                                     <Typography variant="subtitle2" fontWeight="bolder">
                                         {'Resource: ' + findResource(item.resourceTag).title }
                                     </Typography>

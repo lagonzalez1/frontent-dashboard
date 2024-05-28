@@ -24,8 +24,9 @@ export default function Personalization ({reloadPage}) {
 
     const [error, setError] = useState(null);
     const [image, setImage] = useState(null);
-    const [currentTheme, setTheme] = useState(theme);
     const [profileImage, setProfileImage] = useState(null);
+
+    const [currentTheme, setTheme] = useState(theme);
 
 
     const [checked, setChecked] = useState(false);
@@ -108,7 +109,7 @@ export default function Personalization ({reloadPage}) {
         const token = getAccessToken();
         const config = {
             headers : {
-                'x-access-token': token,
+                'X-Access-token': token,
                 'Content-type': 'multipart/form-data'
             }
         }
@@ -212,7 +213,7 @@ export default function Personalization ({reloadPage}) {
                     )}
                 </Stack>
                 
-                    <input
+                <input
                     accept="image/*"
                     style={{ display: 'none' }}
                     id="image-input"
@@ -223,8 +224,9 @@ export default function Personalization ({reloadPage}) {
                     <Button
                     variant="contained"
                     size="small"
-                    component="span"
-                    sx={{ borderRadius: 15}}
+                    component="span" 
+
+                    sx={{ borderRadius: 5}}
                     startIcon={<UploadIcon />}
                     disabled={!checkPermission('PERS_IMG') ? true: false}
                     >

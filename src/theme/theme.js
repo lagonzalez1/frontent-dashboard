@@ -130,7 +130,7 @@ export const DashboardThemeLight = createTheme({
     palette: {
         mode: 'light',
         primary: {
-          main: '#455a64',
+          main: '#0a394e',
         },
         secondary: {
           main: '#ff6d00',
@@ -155,7 +155,7 @@ export const DashboardThemeDark = createTheme({
     palette: {
         mode: 'dark',
         primary: {
-          main: '#455a64',
+          main: '#0a394e',
         },
         secondary: {
           main: '#ff6d00',

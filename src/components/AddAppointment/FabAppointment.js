@@ -28,6 +28,7 @@ export default function FabAppointment () {
     const [errors, setError] = useState();
     const [success, setSuccess] = useState();
     const [nextStep, setNextStep] = useState(false);
+    
 
 
     const [loading, setLoading] = useState(false);
@@ -86,8 +87,8 @@ export default function FabAppointment () {
             return;
         }
         setApp_loader(true);
-        const timestamp = DateTime.local().setZone(business.timezone).toUTC().toISO();
-        const date = DateTime.fromISO(selectedDate, {zone: 'utc'}).toUTC().toISO();
+        const timestamp = DateTime.local().setZone(business.timezone).toISO();
+        const date = DateTime.fromISO(selectedDate).toISO()
         const data = { ...payload, appointmentDate: date, appointment: selectedAppointment, timestamp};
         createAppointmentPretense(data)
         .then(response => {

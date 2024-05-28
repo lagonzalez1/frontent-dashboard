@@ -4,19 +4,48 @@ import { NumberOne, NumberTwo, NumberThree, NumberFour, NumberFive, NumberSix, N
 let GET_IDENTIFIER = '/api/external/identifierRequest';
 let GET_EMPLOYEELIST = '/api/external/employeeList';
 let GET_BUSINES_ARGS = `/api/external/businessArgs`;
-
+let GET_TIMEZONE = `/api/external/businessTimezone`;
 
 let POST_AVAILABLE_APPOINTMENTS = '/api/external/available_appointments';
 let POST_EDITAPPOINTMENT = '/api/external/editAppointment';
 let POST_CLIENTREIVEW = `/api/external/create_review`;
 let POST_UPDATESTATUS = '/api/external/updateClientStatus';
 let POST_REMOVE_REQUEST = '/api/external/removeRequest';
+let POST_ACK_CHAT = '/api/external/ack_chat'
 
 
 
 export const iconsList = (position) => {
     let iconLi = [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10]
     return iconLi[position - 1];
+}
+
+
+export const acknowledgeChat = (clientId, link, type) => {
+    return new Promise((resolve, reject) => {
+        const data = { clientId, link , type}
+        axios.post(POST_ACK_CHAT, data)
+        .then(response => {
+            resolve(response.data.msg)
+        })
+        .catch(error => {
+            console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+        })
+    })
 }
 
 export const getIdentifierData = (link, unid, timestamp) => {
@@ -46,6 +75,34 @@ export const getEmployeeList = (date,link) => {
         });
     });
   };
+
+
+  export const getBusinessTimezone = (link) => {
+    return new Promise((resolve, reject) => {
+      axios.get(GET_TIMEZONE, { params: {link}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch(error => {
+        console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+        }
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
+    })
+  }
 
 export const requestClientEditApp = (payload) => {
     return new Promise((resolve, reject) => {

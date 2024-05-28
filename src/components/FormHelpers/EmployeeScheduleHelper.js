@@ -11,9 +11,14 @@ import { getHeaders, getStateData } from '../../auth/Auth';
  * @returns If false that means the break time is not within the start and end time.
  */
 export const validateBreak = (incomingSchedule, schedule) => {
-    console.log("ENTER")
+
+    // 1. Check if start time is valid with business
+    // 2. Check if break is within the valid start and end of business and/or employee
+    // OK.
+
     let employeeSchedule = formatEmployeeSchedule(incomingSchedule);
-    console.log("Formated", employeeSchedule);
+    console.log(employeeSchedule);
+    // Validate here.
     for (var key in employeeSchedule){
         if (employeeSchedule[key].start === '' || employeeSchedule[key].start === undefined || employeeSchedule[key].start === null){
             continue;
@@ -34,21 +39,22 @@ export const validateBreak = (incomingSchedule, schedule) => {
 
 function formatEmployeeSchedule (ins){
     let schedule = {...ins};
-    console.log("enter function formatEmployeeSchedule(d)")
     for(var key in schedule){
-        if (DateTime.isDateTime(schedule[key].start)) {
-            const convert = schedule[key].start.toFormat('HH:mm');
+        console.log(DateTime.isDateTime(schedule[key].start))
+        if(DateTime.isDateTime(schedule[key].start) && DateTime.isDateTime(schedule[key].end) ) {
+            const convert_start = schedule[key].start.toFormat('HH:mm');
+            const convert_end = schedule[key].end.toFormat('HH:mm');
+            schedule[key] = { ...schedule[key], start: convert_start, end: convert_end }
+        }else {
             schedule[key] = {
-                ...schedule[key],
-                start: convert,
-            };
-        }else{
-            schedule[key] = {
-                ...schedule[key],
-                start: '',
-            };
+                ...schedule[key], start: '', end: ''} 
         }
-        
+        if (DateTime.isDateTime(schedule[key].break)) {
+            const convert_break = schedule[key].break.toFormat('HH:mm');
+            schedule[key] = { ...schedule[key], break: convert_break }
+        }else {
+            schedule[key] = { ...schedule[key], break: '' } 
+        }
     }
     return schedule;
 }

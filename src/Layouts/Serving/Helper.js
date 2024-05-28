@@ -17,7 +17,7 @@ export const completeClientAppointment = (client, clientNotes, saveClient) => {
         const { user, business } = getStateData();
         const header = getHeaders();
         const currentTime = DateTime.local().setZone(business.timezone).toISO();
-        const payload = {client: {...client}, b_id: business._id, currentTime, clientNotes, saveClient}
+        const payload = {client: {...client}, b_id: business._id, currentTime, clientNotes, saveClient, email: user.email}
         axios.post('/api/internal/complete_appointment', payload, header)
         .then(response => {
             resolve(response.data);

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating, IconButton, Select, MenuItem, Card, CardContent, CircularProgress, Divider } from "@mui/material";
+import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating, IconButton, Select, MenuItem, Card, CardContent, CircularProgress, Divider, Avatar, ListItemAvatar } from "@mui/material";
 import { useSelector } from "react-redux";
-import { findEmployee, findResource, findService, getEmployeeList } from "../../hooks/hooks";
+import { findEmployee, findResource, findService, getEmployeeList, getEmployees } from "../../hooks/hooks";
 import PersonIcon from '@mui/icons-material/Person';
 import StarIcon from '@mui/icons-material/Star';
 import ProgressBar from 'react-bootstrap/ProgressBar';
@@ -25,7 +25,7 @@ const Analytics = () => {
      <Waves  alignmentBaseline="center" weight="duotone" size={22}/>, <Campfire  alignmentBaseline="center" weight="duotone" size={22}/>, <FlowerLotus  alignmentBaseline="center" weight="duotone" size={22}/>, <Tree alignmentBaseline="center" weight="duotone" size={22}/>,
      <Coffee alignmentBaseline="center" weight="duotone" size={22}/>  ]
     const business = useSelector((state) => state.business);
-    const employeeList = getEmployeeList();
+    //const employeeList = getEmployeeList();
     const [range, setRange] = useState({ start: DateTime.local().setZone(business.timezone), end: DateTime.local().setZone(business.timezone)});
 
     const [mock, setMock] = useState({
@@ -37,7 +37,7 @@ const Analytics = () => {
     const [employeeId, setEmployeeSelect] = useState('');
     const [employeeData, setEmployeeData] = useState(null);
     const [businessData, setBusinessData] = useState(null);
-
+    const [employeeList, setEmployeeList] = useState();
     const [loading, setLoading] = useState(false);
 
     const [loadBusiness, setLoadBusiness] = useState(false);
@@ -55,7 +55,18 @@ const Analytics = () => {
         setMock({waittime: Math.random(100), serve_time: Math.random(100)})
     };
 
+    const getEmployeeList = () => {
+        getEmployees()
+        .then(response => {
+            setEmployeeList(response.employees);
+        })
+        .catch(error => {
+            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+        })
+    }
+
     useEffect(() => {
+        getEmployeeList()
         getEmployeeData();
     }, [employeeId])
 
@@ -186,19 +197,19 @@ const Analytics = () => {
                         <Typography variant="h6" fontWeight={'bold'}>Current employees</Typography>
                         <List component="nav" aria-label="employeeSelect" sx={{maxHeight: 250}}>
 
-                            {employeeList && employeeList.map((item, index) => {
+                            {employeeList ? employeeList.map((employee, index) => {
                                 return (
                                     <ListItemButton
-                                        selected={employeeId === item._id}
-                                        onClick={(event) => handleEmployeeClick(event, item._id)}
+                                        selected={employeeId === employee._id}
+                                        onClick={(event) => handleEmployeeClick(event, employee._id)}
                                         >
-                                        <ListItemIcon>
-                                            <User size={18} weight="duotone"/>
-                                        </ListItemIcon>
-                                        <ListItemText primary={item.fullname} />
+                                        <ListItemAvatar>
+                                            <Avatar sx={{ width: 40, height: 40 }} src={employee.image !== null ? employee.image : null} variant="rounded" />
+                                        </ListItemAvatar>
+                                        <ListItemText primary={employee.fullname} />
                                     </ListItemButton>
                                 )
-                            })}            
+                            }): null}            
                         </List>
                         </Box>
                     

@@ -358,8 +358,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
                 <Grid container
                     spacing={2}
-                    sx={{ pb: 2}}
-                    
+                    sx={{ pb: 2}}  
                 >
                     <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack direction={"row"} spacing={1}>

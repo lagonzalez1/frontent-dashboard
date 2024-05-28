@@ -12,6 +12,7 @@ let POST_CLIENTTOSERVING = '/api/internal/client_to_serving';
 let POST_APPOINTMENTCOMPLETE = '/api/internal/complete_appointment';
 let POST_AVAILABLEAPPOINTMENTS = '/api/internal/available_appointments';
 let POST_NOTIFYCLIENT = '/api/internal/notify_client';
+let POST_SEND_CHAT = '/api/internal/send_chat'
 
 let GET_WAITTIME = '/api/internal/waittime';
 let GET_BUSINESS = '/api/internal/reload_business/';
@@ -19,7 +20,7 @@ let GET_SERVINGTABLE = '/api/internal/serving_table';
 let GET_APPOINTMENTDATA = '/api/internal/appointment_data';
 let GET_NOSHOW = '/api/internal/no_show';
 let GET_WAITLIST = '/api/internal/get_waitlist';
-
+let GET_EMPLOYEES = '/api/internal/get_employees'
 
 export const reloadBusinessData = (dispatch) => {
     const { _, business } = getStateData();
@@ -51,6 +52,68 @@ export const getEmployeeList = () => {
     const employees = business.employees;
     if (!employees){ return new Error('No employees found.'); }
     return employees;
+}
+
+
+export const sendChatToClient = (chat, id, type) => {
+    const { user, business } = getStateData();
+    const headers = getHeaders();
+    const timestamp = DateTime.local().setZone(business.timezone).toISO();
+    const data = {b_id: business._id, email: user.email, payload: {chat, clientId: id, type, timestamp}}
+    return new Promise((resolve, reject) => {
+        axios.post(POST_SEND_CHAT, data, {...headers, timeout: 900000, timeoutErrorMessage: 'Timeout error'})
+        .then(response => {
+            resolve(response.data.msg);
+        })
+        .catch(error => {
+            console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+                reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+        })
+    })
+}
+
+
+export const getEmployees = () => {
+    const { user, business} = getStateData();
+    const headers = getHeaders();
+    return new Promise((resolve, reject) => {
+    axios.get(GET_EMPLOYEES, {...headers, params: { b_id: business._id, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+    .then(response => {
+        resolve(response.data);
+    })
+    .catch(error => {
+        console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+        }
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }
+        
+    })
+    })
+    
 }
 
 export const findEmployee = (id) => {
@@ -435,13 +498,16 @@ export const getNoShowClients = (accessToken) => {
     })
 }
 
+
+
 // Need to complete, this is the waitlist on Dashboard
 export function getWaitlistTable (accessToken) {
     const { user , business } = getStateData();
     const headers = getHeaders();
     const email = user.email;
     const bid = business._id;
-    const time = DateTime.local().setZone(business.timezone).toISO();
+    const time = DateTime.local().setZone(business.timezone).toISO()
+    console.log(time)
     
     return new Promise((resolve, reject) => {   
         axios.get(GET_WAITLIST,{headers: {'x-access-token': accessToken}, params: {time, bid, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})

@@ -6,7 +6,7 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent,
      Zoom} from "@mui/material";
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { useParams } from "react-router-dom";
-import { waitlistRequest,checkDuplicatesRequest, isBusinesssOpen, getBusinessForm } from "./WelcomeHelper";
+import { waitlistRequest,checkDuplicatesRequest, isBusinesssOpen, getBusinessForm, getBusinessTimezone} from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import { useNavigate } from "react-router-dom";
 import { useFormik } from 'formik';
@@ -57,6 +57,19 @@ export default function WelcomeDetails() {
     const [zoomIntoView, setZoomIntoView] = useState(false);
     const [disable, setDisable] = useState(false);
     const [seconds, setSeconds] = useState(120);
+    const [timezone, setTimezone] = useState(null);
+    
+    
+    const getTimezone = () => {
+        getBusinessTimezone(link)
+        .then(response => {
+            setTimezone(response.timezone)
+        })
+        .catch(error => {
+            setErrors({title: 'Error', body: error.msg});
+            setDisable(true); 
+        })
+    }
 
     const [formFields, setFormFields] = useState({
         fullname: null,
@@ -68,16 +81,20 @@ export default function WelcomeDetails() {
 
     useEffect(() => {
         setZoomIntoView(true);
-        getbusinessFormDetails()
+        getTimezone();
+        getbusinessFormDetails();
         getPreview();
+        
         return() => {
             setLoading(false)
         }
     }, []);
 
 
+    
+
     const getbusinessFormDetails = () => {
-        const time = DateTime.local().toISO();
+        const time = DateTime.local().setZone(timezone).toISO()
         Promise.all([
             isBusinesssOpen(link, time),
             getBusinessForm(link)
@@ -128,7 +145,7 @@ export default function WelcomeDetails() {
         // This might be causing my issues
         const clientStorage = JSON.parse(clientPayload);
         let timestamp = DateTime.local().toISO();
-        let payload = { link, timestamp, timestampOrigin: timestamp, ...clientStorage, ...values}
+        let payload = { link, timestamp, timestampOrigin: timestamp, ...clientStorage, ...values, timezone}
         let duplicatePayload = { ...clientStorage, link, values}
         checkDuplicatesRequest(duplicatePayload)
         .then((response) => {

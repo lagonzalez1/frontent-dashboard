@@ -1,5 +1,5 @@
 import React, {memo, useEffect, useState} from "react";
-import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled, Chip } from "@mui/material";
+import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled, Chip, TextField } from "@mui/material";
 import { Container, Box, Stack, Drawer as SIDEBAR, Typography, Button, Paper, Tab} from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -7,7 +7,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import CloseIcon from "@mui/icons-material/Close"
 import { DateTime } from "luxon";
 import { useDispatch, useSelector } from "react-redux";
-import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow, sendNotification, undoClientServing } from "../../hooks/hooks";
+import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow, sendNotification, undoClientServing, sendChatToClient } from "../../hooks/hooks";
 import axios from "axios";
 import { getHeaders, getStateData } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -28,6 +28,7 @@ import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import { useSubscription } from '../../auth/Subscription';
 import ServingClient from "../Dialog/ServingClient";
 import { removeClient } from "../Waitlist/Helpers";
+import { LoadingButton } from "@mui/lab";
 
 
 
@@ -41,9 +42,12 @@ const Drawer = ({client, setClient}) => {
     const [payload, setPayload] = useState(null);
     const [loading, setLoading] = useState(true);
     const [analytics, setAnalytics] = useState({});
+    const [chat, setChat] = useState({title: null, body: null, acknowledge: false})
+    const [chatLoading, setChatLoading] = useState(false);
 
     useEffect(() => {
         setPayload(client.payload);
+        setChat(client.payload.chat);
         getAnalytics(client.payload);
         return() => {
             setLoading(false);
@@ -71,7 +75,6 @@ const Drawer = ({client, setClient}) => {
         })
     }
 
-
     const getAnalytics = (payload) => {
         if (!checkSubscription('APPOINTMENTS')){
             // Reject a lookup
@@ -90,6 +93,24 @@ const Drawer = ({client, setClient}) => {
         }) 
         .catch(error => {
             console.log(error)
+        })
+    }
+
+    const sendChatClient = () => {
+        setChatLoading(true)
+        sendChatToClient(chat, payload._id, payload.type)
+        .then(response => {
+            dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
+            setLoading(false)
+
+        })
+        .catch(error => {
+            console.log(error);
+            dispatch(setSnackbar({requestMessage: error.data, requestStatus: true}))
+            setLoading(false)
+        })
+        .finally(() => {
+            setChatLoading(false);
         })
     }
 
@@ -151,7 +172,6 @@ const Drawer = ({client, setClient}) => {
         .finally(() => {
             dispatch(setReload(true));
             closeDrawer()
-
         })
     }
 
@@ -239,6 +259,26 @@ const Drawer = ({client, setClient}) => {
                                     </Grid>
                                     <Grid sx={{ justifyContent: 'right'}} item>
                                         <Typography variant="body2">{payload && ( DateTime.fromISO(payload.timestamp).toFormat("LLL dd yyyy")) }</Typography>
+                                    </Grid>
+                                </Grid>
+                                <br/>
+                                </>
+                            ):
+                            null
+                        }
+                        {
+                            client.fromComponent === WAITLIST ? 
+                            (   
+                                <>
+                                <Grid container
+                                    direction="row"
+                                    justifyContent="space-between"
+                                    alignItems="center">
+                                    <Grid item>
+                                        <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Created on</Typography>
+                                    </Grid>
+                                    <Grid sx={{ justifyContent: 'right'}} item>
+                                        <Typography variant="body2">{payload && ( DateTime.fromISO(payload.timestamp).toFormat("LLL dd yyyy hh:mm a")) }</Typography>
                                     </Grid>
                                 </Grid>
                                 <br/>
@@ -354,7 +394,6 @@ const Drawer = ({client, setClient}) => {
                             </Grid>
                         </Grid>
                         <br/>
-
                         <Grid 
                             container
                             direction="row"
@@ -367,8 +406,35 @@ const Drawer = ({client, setClient}) => {
                             {payload && (payload.status.notified) ? (<Chip variant="outlined" icon={<NotificationsActiveRoundedIcon />} label="Notified" />) : null }
                             </Grid>
                         </Grid>
+                        <br/> 
+                        <Grid 
+                            container
+                            direction="row"
+                            justifyContent="space-between"
+                            alignItems="center">
+                            <Grid item>
+                                <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Acknowledged</Typography>
+                            </Grid>
+                            <Grid sx={{ justifyContent: 'right'}} item>
+                            {payload && (payload.chat.acknowledge) ? (<Chip variant="outlined" icon={<CheckCircleRoundedIcon />} label="Acknowledged" />) : <Chip variant="outlined" icon={<DoNotDisturbAltRoundedIcon />} label=" Not acknowledged" /> }
+                            </Grid>
+                        </Grid>
+                        <br/>  
+                        <Stack>
+                            <TextField
+                            id="outlined-multiline-static"
+                            label="Personalize message"
+                            multiline
+                            rows={4}
+                            placeholder="Chat"
+                            value={chat.body}
+                            maxRows={4}
+                            inputProps={{ maxLength: 140 }}
+                            onChange={(e) => setChat((prev) => ({...prev, body: e.target.value})) }
+                            />
+                        <LoadingButton onClick={() => sendChatClient()} loading={chatLoading}>Send</LoadingButton>
+                        </Stack>                    
                         </>
-
                     </TabPanel>
                     <TabPanel value="2">
                         <List dense={true}>

@@ -35,11 +35,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
 
 import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
-    getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle, requestClientReview } from "./WaitingHelper.js";
+    getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle, requestClientReview, getBusinessTimezone, 
+    acknowledgeChat} from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ClientWaitingTheme } from "../../theme/theme.js";
-import { checkDuplicatesRequest, waitlistRequest } from "../Welcome/WelcomeHelper.js";
-
+import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
+import { LoadingButton } from "@mui/lab";
 
 
 export default function Waiting() {
@@ -71,6 +72,8 @@ export default function Waiting() {
     const [review, setReview] = useState(false);
     const [completed, setCompleted] = useState(false);
     const [business, setBusinessInfo] = useState(null);
+    const [employeeName, setEmployeeName] = useState(null);
+    const [acknowledgeLoading, setAcknowledgeLoading] = useState(false);
 
     const [service, setService] = useState(null);
     const [loader, setLoader] = useState(false);
@@ -145,12 +148,30 @@ export default function Waiting() {
         })
     }
 
+    const [timezone, setTimezone] = useState(null);
+    
+    
+    const getTimezone = () => {
+        getBusinessTimezone(link)
+        .then(response => {
+            setTimezone(response.timezone)
+        })
+        .catch(error => {
+            setErrors({title: 'Error', body: error.msg});
+            setDisabled(true); 
+        })
+    }
+
     useEffect(() => {
+        getTimezone();
         loadUserAndBusinessArgs();
+        return () => {
+            setLoading(false)
+        }
     }, []);
     
     const loadUserAndBusinessArgs = () => {
-        const timestamp = DateTime.local().toISO();
+        const timestamp = DateTime.local().setZone(timezone).toISO();
         setLoading(true);
         Promise.all([
             getIdentifierData(link, unid, timestamp),
@@ -167,6 +188,7 @@ export default function Waiting() {
             }  
             if (userResponse.status === 200) {
                 const user = userResponse.data.client;
+                setEmployeeName(userResponse.data.employeeName);
                 setService(userResponse.data.service);
                 setServing(user.status.serving);
                 setPosition(userResponse.data.clientPosition);
@@ -307,7 +329,7 @@ export default function Waiting() {
             setLoading(false);
             return; 
         }
-        requestClientEditApp({...payload, selectedDate, link, unid})
+        requestClientEditApp({...payload, selectedDate : selectedDate.setZone(timezone).toISO(), link, unid})
         .then(response => {
             setAlert({title: 'Status', message: response, open: true, color: 'warning'});
             setEditClient(false);
@@ -341,6 +363,44 @@ export default function Waiting() {
     );
     };
 
+
+    const ChatBox = ({chat}) => {
+        if (chat.body) {
+            return (
+                <Alert
+                    severity='success'
+                    sx={{ mb: 2 }}
+                    icon={<ChatRoundedIcon />}
+                    >
+                        <AlertTitle textAlign="left"><strong>Message from establishment</strong></AlertTitle>
+                        <Stack>
+                        <Typography textAlign={'left'} variant="body2">{chat ? chat.body: null}</Typography>
+                        <Typography textAlign={'left'} variant="caption">{chat ? "updated: " + DateTime.fromJSDate(new Date(chat.timestamp)).toFormat('LLL dd hh:mm a'): null}</Typography>
+                       </Stack>
+                       {chat && chat.acknowledge === true ? <Button endIcon={<CheckCircle/>}>acknowledged</Button> : <LoadingButton loading={acknowledgeLoading} onClick={() => updateChatAcknowledge()}>acknowledge</LoadingButton>}
+
+                </Alert>
+            )
+        }else {
+            return null;
+        }
+    }
+
+    const updateChatAcknowledge = () => {
+        setAcknowledgeLoading(true);
+        acknowledgeChat(user._id, link, user.type)
+        .then(response => {
+            console.log(response)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+        .finally(() => {
+            setLoading(false);
+            setAcknowledgeLoading(false);
+        })
+    }
+
       
     const handleDateChange = (date) => {
         getAvailableEmployees(date);
@@ -370,9 +430,9 @@ export default function Waiting() {
             return;
         }
         setLoader(true)
-        const currentDate = DateTime.local();
         setErrors(null);
-        const payload = { employeeId: employee_id, serviceId: service_id , appointmentDate: selectedDate, currentDate, link}
+        const currentDate = DateTime.local().setZone(timezone).toISO()
+        const payload = { employeeId: employee_id, serviceId: service_id , appointmentDate: selectedDate.setZone(timezone).toISO(), currentDate, link}
         getAvailableAppointments(payload)
         .then(response => {
             setAppointments(response.data)
@@ -436,6 +496,7 @@ export default function Waiting() {
                     <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
                     </Typography>
                 </Button>
+                <ChatBox chat={user.chat} />
             </Stack>
             );
         }
@@ -496,6 +557,8 @@ export default function Waiting() {
                             <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
                             </Typography>
                         </Button>
+                        <ChatBox chat={user.chat} />
+
                         </>
                     )
                     }
@@ -571,6 +634,9 @@ export default function Waiting() {
 
                     <Typography variant="caption" sx={{ color: "gray"}}> Date </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? DateTime.fromISO(user.appointmentDate).toFormat('LLL dd yyyy') : ''}</Typography>
+
+                    <Typography variant="caption" sx={{ color: "gray"}}> Employee </Typography>
+                    <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{employeeName ? employeeName : ''}</Typography>
 
                     <Typography variant="caption" sx={{ color: "gray"}}> Unique identifier </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
@@ -1029,8 +1095,6 @@ export default function Waiting() {
                     </Box>)
                     :(   
                     <Stack sx={{ pt: 2}} spacing={3}>
-
-
                         {errors && <LoadErrorHeader />}
 
                         {review ? <ReviewHeader /> : null }
@@ -1055,7 +1119,7 @@ export default function Waiting() {
                     </CardActions>
 
                     {
-                        service ? (
+                        service && service[0] ? (
                             <Container>
                                 <Divider />
                                 <Typography sx={{pt: 1}} fontWeight={'bolder'} textAlign={'center'} variant="h5">Your service</Typography>

@@ -9,7 +9,7 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent, Ale
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { allowClientJoin, getBusinessPresent, isBusinesssOpen, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
+import { allowClientJoin, getBusinessPresent, getBusinessTimezone, isBusinesssOpen, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 import { ThemeProvider } from "@emotion/react";
@@ -68,6 +68,22 @@ export default function Welcome() {
     const [nextDate, setNextAvailableDate] = useState(null);
     const [zoomIntoView, setZoomIntoView] = useState(false);
 
+
+    const [timezone, setTimezone] = useState(null);
+    
+    
+    const getTimezone = () => {
+        getBusinessTimezone(link)
+        .then(response => {
+            setTimezone(response.timezone)
+        })
+        .catch(error => {
+            setErrors({title: 'Error', body: error.msg});
+            setDisabled(true); 
+        })
+    }
+
+
     const navigate = useNavigate();
 
 
@@ -78,6 +94,7 @@ export default function Welcome() {
 
 
     useEffect(() => {
+        getTimezone()
         getBusinessData();
     }, [])
 
@@ -87,7 +104,7 @@ export default function Welcome() {
     // 3. If open or closed. {appointment, waitlist}
     const getBusinessData = () => {
         setLoading(true);
-        const currentTime = DateTime.local().toISO();
+        const currentTime = DateTime.local().setZone(timezone).toISO();
         Promise.all([
             isBusinesssOpen(link, currentTime),
             getBusinessPresent(link, currentTime)
