@@ -633,3 +633,10 @@ export const getResourcesAvailable = () => {
     if ( !resources ) { return []; }
     return resources;
 }
+
+
+export const findPossibleOverride = () => {
+    const { _ , business } = getStateData();
+    const closedDates = business.closedDates;
+    
+}

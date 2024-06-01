@@ -186,10 +186,14 @@ export default function EmployeeTable({reloadPage}) {
 
 
     const getEmployeeCurrentSchedule = (schedule) => {
-        const currentTime = DateTime.local().setZone(business.timezone).weekdayLong;
-        if (business.schedule[currentTime].start === "" && business.schedule[currentTime].end === "") { return `Todays shift: Off`}
-        let startTime = DateTime.fromFormat(business.schedule[currentTime].start, "HH:mm a");
-        let endTime = DateTime.fromFormat(business.schedule[currentTime].end, "HH:mm a");
+        const DAY = DateTime.local().setZone(business.timezone).weekdayLong;
+        if (schedule[DAY].start === "" && schedule[DAY].end === "") { return `Todays shift: Off`}
+        let startTime = DateTime.fromFormat(schedule[currentTime].start, "HH:mm a");
+        let endTime = DateTime.fromFormat(schedule[currentTime].end, "HH:mm a");
+
+        
+
+        
         let s = `Todays shift: ${startTime}-${endTime}`;
         return s
     }
@@ -239,7 +243,7 @@ export default function EmployeeTable({reloadPage}) {
 
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
                 {employees ? employees.map((employee, index) => {
-                    let sstring = getEmployeeCurrentSchedule(employee.schedule);
+                    let sstring = getEmployeeCurrentSchedule(employee.schedule_alternative);
                     return (
                         <>
                         <ListItem  

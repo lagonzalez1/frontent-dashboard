@@ -47,7 +47,7 @@ export default function NavBar({ navState, openNav }) {
     }
 
     return (
-      <AppBar position="fixed" open={navState}>
+      <AppBar position="fixed" open={navState} sx={{ boxShadow: 'none'}}>
         <CssBaseline />
           <Toolbar>
             <IconButton

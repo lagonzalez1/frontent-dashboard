@@ -159,7 +159,7 @@ export default function Login() {
                     alignItems: 'center',
                     }}
                 >
-                <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
+                <Avatar sx={{ m: 1, bgcolor: 'primary.main' }} variant="rounded">
                 </Avatar>
                 <Typography component="h1" variant="h4" fontWeight={'bold'}>
                     Sign in
@@ -263,7 +263,7 @@ export default function Login() {
                 alignItems: 'center',
                 }}
                 >
-                <Avatar sx={{ m: 1, bgcolor: 'secondary' }}>
+                <Avatar sx={{ m: 1, bgcolor: 'secondary' }} variant="rounded">
                 </Avatar>
                 <Typography component="h1" variant="h4" fontWeight={'bold'}>
                     Sign in

@@ -10,12 +10,11 @@ import { getHeaders, getStateData } from '../../auth/Auth';
  * @param {Object} schedule 
  * @returns If false that means the break time is not within the start and end time.
  */
-export const validateBreak = (incomingSchedule, schedule) => {
-
+export const validateBreak = (incomingSchedule, businessSchedule) => {
+    // Assume each day must be filled.
     // 1. Check if start time is valid with business
     // 2. Check if break is within the valid start and end of business and/or employee
     // OK.
-
     let employeeSchedule = formatEmployeeSchedule(incomingSchedule);
     console.log(employeeSchedule);
     // Validate here.
@@ -23,24 +22,45 @@ export const validateBreak = (incomingSchedule, schedule) => {
         if (employeeSchedule[key].start === '' || employeeSchedule[key].start === undefined || employeeSchedule[key].start === null){
             continue;
         }else {
-            const employeeBreakStart = DateTime.fromFormat(employeeSchedule[key].start, 'HH:mm').toFormat('HH:mm a');
-            const scheduleStartTime = DateTime.fromFormat(schedule[key].start, 'HH:mm').toFormat('HH:mm a');
-            const scheduleEndTime = DateTime.fromFormat(schedule[key].end, 'HH:mm').toFormat('HH:mm a');
-            const isBetween = employeeBreakStart >= scheduleStartTime && employeeBreakStart <= scheduleEndTime;
-            if (!isBetween) {
-                return {validated: false, employeeSchedule};
+            const businessStart = DateTime.fromFormat(businessSchedule[key].start, "HH:mm");
+            const businessEnd = DateTime.fromFormat(businessSchedule[key].end, "HH:mm");
+
+            const employeeBreakStart = DateTime.fromFormat(employeeSchedule[key].break, 'HH:mm')
+            const employeeStart = DateTime.fromFormat(employeeSchedule[key].start, 'HH:mm')
+            const employeeEnd = DateTime.fromFormat(employeeSchedule[key].end, 'HH:mm')
+            
+            // Check if start and end times are within business start times
+            // This should return a result even if left empty.
+            const isValidForBusiness = employeeStart >= businessStart && employeeEnd <= businessEnd;
+            
+            if (isValidForBusiness) {
+                if(employeeSchedule[key].duration === 0) { 
+                    employeeSchedule[key] = {...employeeSchedule[key], break: ''};     
+                    continue; 
+                } // Valid start and end time, with no break specified.
+                const breakEnd = DateTime.fromFormat(employeeSchedule[key].break, "HH:mm").plus({'minutes': employeeSchedule[key].duration})
+                if (breakEnd === employeeBreakStart) { return {validated: false, employeeSchedule, reason: 'You have a specified a break start time with no duration.'}} // Duration is zero
+                
+                let validBreak = employeeBreakStart >= employeeStart && breakEnd <= employeeEnd;
+                if (!validBreak) { return {validated: false, employeeSchedule, reason: 'Your break times do not align with your start time and end time.'};}
+            }            
+            if (!isValidForBusiness) {
+                console.log("employee start", employeeStart)
+            console.log("Business start", businessStart)
+            console.log("employee end ", employeeEnd)
+            console.log("Business end", businessEnd)
+                return {validated: false, employeeSchedule, reason: 'Your start time and end time do not align with business hours.'};
             }
             continue;
         }
     }
-    return {validated: true, employeeSchedule};
+    return {validated: true, employeeSchedule, reason: 'OK'};
 }
 
 
 function formatEmployeeSchedule (ins){
     let schedule = {...ins};
     for(var key in schedule){
-        console.log(DateTime.isDateTime(schedule[key].start))
         if(DateTime.isDateTime(schedule[key].start) && DateTime.isDateTime(schedule[key].end) ) {
             const convert_start = schedule[key].start.toFormat('HH:mm');
             const convert_end = schedule[key].end.toFormat('HH:mm');

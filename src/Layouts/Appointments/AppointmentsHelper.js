@@ -3,7 +3,6 @@ import { getStateData } from "../../auth/Auth";
 
 
 
-
 export const columns = [
     { id: 'position', label: '#', minWidth: 10 },
     { id: 'name', label: 'Name', minWidth: 150 },
