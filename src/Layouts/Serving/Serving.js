@@ -30,8 +30,11 @@ export default function Serving({setClient}) {
     const [clientNotes, setClientNotes] = useState(null);
     const [saveClient, setSaveClient] = useState(false);
     const [notesDialog, setUpdateNotesDialog] = useState(false);
-    let { groupCount, groupTotalCount } = getServingCount();
-
+    const [totals, setTotals] = useState({
+        totalPartys: 0,
+        personCount: 0
+    })
+    
     const closeNotesDialog = () => {
         setClientNotes(null);
         setUpdateNotesDialog(false);
@@ -50,7 +53,8 @@ export default function Serving({setClient}) {
         if (accessToken === undefined) { return; }
         getServingClients(accessToken)
         .then(response => {
-            setServingList(response);
+            setServingList(response.result);
+            setTotals((prev) => ({...prev, totalPartys: response.totalPartys, personCount: response.personCount}))
         })
         .catch(error => {
             setOpenErrors(true);
@@ -128,7 +132,7 @@ export default function Serving({setClient}) {
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
                     <Tooltip title="How many people are in the establishment." placement="right">
                         <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
-                            <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{business ? (groupCount + ` Party ( ${groupTotalCount} People)` ): <Skeleton/> }</Typography>
+                            <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{business ? (totals.totalPartys + ` Party ( ${totals.personCount} Peoples)` ): <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>
                         

@@ -19,6 +19,7 @@ import { ClientWelcomeTheme } from "../../theme/theme";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import LoadingButton from '@mui/lab/LoadingButton';
 import "../../css/Welcome.css";
+import { CloudDone } from "@mui/icons-material";
 
 
 export default function WelcomeDetails() {
@@ -327,7 +328,7 @@ export default function WelcomeDetails() {
                                     preview ? (
                                         <>
                                             <Box sx={{ pt: 2, display: 'block', width: '100%', maxWidth: '100%'}}>
-                                                <Alert variant="outlined" severity='success' sx={{ textAlign: 'left'}}>
+                                                <Alert icon={<CloudDone />} severity='warning' sx={{ textAlign: 'left'}}>
                                                     <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
 
                                                     {

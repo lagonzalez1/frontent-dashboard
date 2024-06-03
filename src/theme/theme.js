@@ -44,6 +44,44 @@ export const ClientWelcomeTheme = createTheme({
   palette: {
     type: 'light',
     primary: {
+      main: '#000000',
+    },
+    secondary: {
+      main: '#001f7d',
+    },
+    info: {
+      main: '#00b3b3',
+    },
+    error: {
+      main: '#f44336',
+    },
+    warning: {
+      main: '#3c00b3',
+    },
+    success: {
+      main: '#00b3b3',
+    }
+  },
+  typography: {
+    fontFamily: "Poppins",
+  },
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          color: 'white'
+        }
+      }
+    }
+  }
+})
+
+
+// Poppins ,sans-serif
+export const ClientWelcomeThemeDark = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
       main: '#2196f3',
     },
     secondary: {
@@ -65,34 +103,42 @@ export const ClientWelcomeTheme = createTheme({
   typography: {
     fontFamily: "Poppins",
   },
- 
 })
 
 export const ClientWaitingTheme = createTheme({
   palette: {
     type: 'light',
     primary: {
-      main: '#2196f3',
+      main: '#000000',
     },
     secondary: {
-      main: '#ff5722',
+      main: '#001f7d',
     },
     info: {
-      main: '#424242',
+      main: '#FF9800',
     },
     error: {
-      main: '#f44336',
+      main: '#FF0015',
     },
     warning: {
-      main: '#ff9800',
+      main: '#FFC107',
     },
     success: {
       main: '#4caf50',
-    },
+    }
   },
   typography: {
     fontFamily: "Poppins",
   },
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          color: 'white'
+        }
+      }
+    }
+  }
 });
 
 

@@ -1,8 +1,8 @@
 import axios from "axios";
-import { getHeaders, getStateData } from "../../auth/Auth";
+import { getAccessToken, getHeaders, getStateData } from "../../auth/Auth";
 
 let GET_BUSINESS_ANALYTICS = '/api/internal/business_analytics/'
-let GET_EMPLOYEE_ANALYTICS = `/api/internal/employee_analytics/`;
+let GET_EMPLOYEE_ANALYTICS = `/api/internal/employee_analytics`;
 
 let POST_EMPLOYEE_ANALYTICS_RANGE = '/api/internal/employee_analytics_range';
 
@@ -11,8 +11,8 @@ let POST_EMPLOYEE_ANALYTICS_RANGE = '/api/internal/employee_analytics_range';
 export function getEmployeeAnalytics (id, accessToken) {
     return new Promise((resolve, reject) => {
        const { user, business} = getStateData();
-       const params = { bid: business._id, eid: id}
-       axios.get(GET_EMPLOYEE_ANALYTICS+`${business._id}/${id}`, {headers: {'x-access-token': accessToken}})
+       const params = { bid: business._id, eid: id, email: user.email}
+       axios.get(GET_EMPLOYEE_ANALYTICS, {headers: {'x-access-token': accessToken}, params, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
        .then(response => {
             resolve(response.data.data);
        }) 
@@ -40,8 +40,8 @@ export function getEmployeeAnalyticsRange (payload) {
      return new Promise((resolve, reject) => {
         const { user, business} = getStateData();
         const headers = getHeaders();
-        const data = { bid: business._id, ...payload}
-        axios.post(POST_EMPLOYEE_ANALYTICS_RANGE, data,headers)
+        const params = { bid: business._id, ...payload, email: user.email}
+        axios.get(POST_EMPLOYEE_ANALYTICS_RANGE, {headers, params, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
              resolve(response.data.data);
         }) 
@@ -68,7 +68,7 @@ export function getEmployeeAnalyticsRange (payload) {
      return new Promise((resolve, reject) => {
         const { user, business} = getStateData();
         const headers = getHeaders();
-        axios.get(GET_BUSINESS_ANALYTICS+`${business._id}`,{headers: {'x-access-token': accessToken}})
+        axios.get(GET_BUSINESS_ANALYTICS,{headers, params: {bid: business._id, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
              resolve(response.data.data);
         }) 

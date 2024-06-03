@@ -188,12 +188,8 @@ export default function EmployeeTable({reloadPage}) {
     const getEmployeeCurrentSchedule = (schedule) => {
         const DAY = DateTime.local().setZone(business.timezone).weekdayLong;
         if (schedule[DAY].start === "" && schedule[DAY].end === "") { return `Todays shift: Off`}
-        let startTime = DateTime.fromFormat(schedule[currentTime].start, "HH:mm a");
-        let endTime = DateTime.fromFormat(schedule[currentTime].end, "HH:mm a");
-
-        
-
-        
+        let startTime = DateTime.fromFormat(schedule[DAY].start, "HH:mm").toFormat("hh:mm a");
+        let endTime = DateTime.fromFormat(schedule[DAY].end, "HH:mm").toFormat("hh:mm a");
         let s = `Todays shift: ${startTime}-${endTime}`;
         return s
     }

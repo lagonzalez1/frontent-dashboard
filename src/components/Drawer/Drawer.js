@@ -320,7 +320,7 @@ const Drawer = ({client, setClient}) => {
                                 {payload && (payload.status.parking) ? (<Chip variant="outlined" icon={<DirectionsCarFilledIcon />} label="Parking" />) : null }
                                 {payload && (payload.status.here) ? (<Chip variant="outlined" icon={<EmojiPeopleIcon />} label="Here" />) : null }
                                 {payload && (payload.status.cancelled) ? (<Chip variant="outlined" icon={<DoNotDisturbAltRoundedIcon />} label="Cancelled" />) : null }
-                                {payload && (payload.status.noShow) ? (<Chip variant="outlined" icon={<RuleRoundedIcon />} label="No show" />) : null }
+                                {payload && (payload.status.noShow) ? (<Chip color="error" icon={<RuleRoundedIcon />} label="No show" />) : null }
                                 {payload && (payload.status.serving) ? (<Chip variant="outlined" icon={<NavigateNextRoundedIcon />} label="Serving" />) : null }
                                 </Stack>
                             </Grid>
@@ -403,7 +403,7 @@ const Drawer = ({client, setClient}) => {
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Notified</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                            {payload && (payload.status.notified) ? (<Chip variant="outlined" icon={<NotificationsActiveRoundedIcon />} label="Notified" />) : null }
+                            {payload && (payload.status.notified) ? (<Chip color="success" icon={<NotificationsActiveRoundedIcon />} label="Second notification" />) : (<Chip color={'info'} icon={<NotificationsActiveRoundedIcon />} label="First notification sent" />) }
                             </Grid>
                         </Grid>
                         <br/> 
@@ -416,7 +416,7 @@ const Drawer = ({client, setClient}) => {
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Acknowledged</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                            {payload && (payload.chat.acknowledge) ? (<Chip variant="outlined" icon={<CheckCircleRoundedIcon />} label="Acknowledged" />) : <Chip variant="outlined" icon={<DoNotDisturbAltRoundedIcon />} label=" Not acknowledged" /> }
+                            {payload && (payload.chat.acknowledge) ? (<Chip color="success" icon={<CheckCircleRoundedIcon />} label="Acknowledged" />) : <Chip color="warning" icon={<DoNotDisturbAltRoundedIcon />} label=" Not acknowledged" /> }
                             </Grid>
                         </Grid>
                         <br/>  

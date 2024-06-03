@@ -24,7 +24,7 @@ import { ClientWelcomeTheme } from "../../theme/theme";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import { AttachMoney, AttachMoneyOutlined, CloudDone, CloudDoneOutlined, CloudQueue, FiberManualRecord, SetMeal, SettingsEthernetRounded } from "@mui/icons-material";
 import AvTimerIcon from '@mui/icons-material/AvTimer';
-import { CurrencyCircleDollar } from "phosphor-react";
+import { CurrencyCircleDollar, ClockClockwise } from "phosphor-react";
 
 export default function WelcomeSelector() {
 
@@ -185,6 +185,7 @@ export default function WelcomeSelector() {
             }
             if (previousData.TYPE === WAITLIST){
                 setWaitlistData({...previousData});
+                console.log({...previousData})
                 setSystem(WAITLIST);
                 setOpenWaitlistSummary(true);
             }
@@ -448,11 +449,15 @@ export default function WelcomeSelector() {
                         <br/>
                         <ButtonGroup size="large" fullWidth={true} variant="outlined">
                             <Tooltip title="Waitlist - Wait in a general line.">
-                                <Button disabled={acceptingStatus && (acceptingStatus.waitlist === true && open === true) ? false : true} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}> Waitlist</Button>
+                                <Button color="primary" disabled={acceptingStatus && (acceptingStatus.waitlist === true && open === true) ? false : true} variant={systemTypeSelected === WAITLIST ? 'contained': 'outlined'} onClick={() => typeChange(WAITLIST)}>
+                                    <Typography variant="body2" fontWeight={'bold'}>Waitlist</Typography>
+                                </Button>
 
                             </Tooltip>
                             <Tooltip title="Appointment - Schedule an appointment that best suits your schedule.">
-                                <Button disabled={acceptingStatus && !acceptingStatus.appointments } variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> Appointment</Button>
+                                <Button color="primary" disabled={acceptingStatus && !acceptingStatus.appointments } variant={systemTypeSelected === APPOINTMENT ? 'contained': 'outlined'} onClick={() => typeChange(APPOINTMENT)}> 
+                                    <Typography variant="body2" fontWeight={'bold'}>Appointment</Typography>
+                                </Button>
                             </Tooltip>
                             
                         </ButtonGroup>
@@ -549,8 +554,8 @@ export default function WelcomeSelector() {
                                                                         </Stack>
                                                                         <Divider variant="middle" />                                                                    
                                                                         <Stack sx={{m: 1}} spacing={0.5}>
-                                                                            <Chip color="info" variant="outlined" label={"Duration: " + service.duration + " min" } avatar={<AvTimerIcon fontSize="small" />} />
-                                                                            <Chip color="success" variant="outlined" label={"Cost: " + service.cost} avatar={<CurrencyCircleDollar fontSize="small" />} />
+                                                                            <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} avatar={<ClockClockwise sx={{ backgroundColor: 'transparent' }} color={'white'} size={14} />} />
+                                                                            <Chip color="success" variant="contained" label={"Cost: " + service.cost} avatar={<CurrencyCircleDollar sx={{ backgroundColor: 'transparent' }} color={'white'} size={14} />} />
                                                                         </Stack>
                                                                         </CardContent>
                                                                     </CardActionArea>
@@ -596,7 +601,7 @@ export default function WelcomeSelector() {
                                                                         variant={appointmentData.start === appointment.start ? "contained": "outlined"}
                                                                         size="sm"
                                                                         onClick={() => appointmentSlotSelect(appointment)} 
-                                                                        color={appointmentData.start === appointment.start ? 'secondary': 'secondary'}
+                                                                        color={appointmentData.start === appointment.start ? 'primary': 'primary'}
                                                                         id="appointmentButtons">
                                                                         {appointment.start ? (<Typography variant="body2" sx={{ pl: 1, pr: 1}}>{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>) : null}
                                                                         
@@ -624,6 +629,7 @@ export default function WelcomeSelector() {
                                                 name="notes"
                                                 label="Anything we need to know?"
                                                 fullWidth
+                                                color="secondary"
                                                 size="small"
                                                 placeholder="Additional notes"
                                                 value={appointmentData.notes}
@@ -640,7 +646,7 @@ export default function WelcomeSelector() {
                                         {
                                             (openSummary && systemTypeSelected === APPOINTMENT) ? (
                                                 <Box sx={{ pt: 2, display: openSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
-                                                    <Alert icon={<CloudDone />} variant="outlined" severity='warning' sx={{ textAlign: 'left'}}>
+                                                    <Alert icon={<CloudDone />} severity='warning' sx={{ textAlign: 'left'}}>
                                                         <AlertTitle><Typography variant="body1"><strong>Details saved</strong></Typography></AlertTitle>
                                                         {appointmentData.date ? (<Typography variant="caption">Date assigned — <strong>{appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>) : null}
                                                         <br/>
@@ -706,7 +712,7 @@ export default function WelcomeSelector() {
                                         <Select
                                         id="services"
                                         name="service_id"
-                                        color="primary"
+                                        color="secondary"
                                         value={waitlistData.service_id}
                                         >
                                         { Array.isArray(businessExtras.services) ? businessExtras.services.map((service) => {
@@ -733,7 +739,7 @@ export default function WelcomeSelector() {
                                         as={Select}
                                         id="resources"
                                         name="resource_id"
-                                        color="primary"
+                                        color="secondary"
                                         value={waitlistData.resource_id}
                                         >
                                         {Array.isArray(businessExtras.resources) ? businessExtras.resources.map((resource) => {
@@ -756,7 +762,7 @@ export default function WelcomeSelector() {
                                                 id="notes"
                                                 name="notes"
                                                 label="Notes"
-                                                color="primary"
+                                                color="secondary"
                                                 placeholder="Additional notes"
                                                 value={waitlistData.notes}
                                             onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }
@@ -770,7 +776,7 @@ export default function WelcomeSelector() {
                                 {
                                     (openWaitlistSummary && systemTypeSelected === WAITLIST) ? (
                                         <Box sx={{ pt: 1, display: openWaitlistSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
-                                            <Alert icon={<CloudDone />} variant="outlined" severity='warning' sx={{ textAlign: 'left'}}>
+                                            <Alert icon={<CloudDone />} severity='warning' sx={{ textAlign: 'left'}}>
                                                 <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
                                                 { (waitlistData && waitlistData.fullname === true) ? (
                                                 <>

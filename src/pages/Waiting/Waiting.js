@@ -29,7 +29,7 @@ import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
 import { Field, Formik,Form, ErrorMessage, useFormik } from "formik";
-import { CheckCircle, Check, Star, Calendar, NavigationArrow, Share, Copy, Flag  } from "phosphor-react";
+import { CheckCircle, Check, Star, Calendar, NavigationArrow, Share, Copy, Flag, ClockClockwise, CurrencyCircleDollar  } from "phosphor-react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
@@ -38,7 +38,7 @@ import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requ
     getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle, requestClientReview, getBusinessTimezone, 
     acknowledgeChat} from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";
-import { ClientWaitingTheme } from "../../theme/theme.js";
+import { ClientWaitingTheme, ClientWelcomeTheme } from "../../theme/theme.js";
 import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
 import { LoadingButton } from "@mui/lab";
 
@@ -510,7 +510,6 @@ export default function Waiting() {
                     { presentArgs.position === true ? (
                         <>
                         { position <= 9 ? placementTitle[position].icon : <Check size={88} color="#40932a" weight="bold" />}
-
                         </>
                     ): 
                         <>
@@ -587,9 +586,21 @@ export default function Waiting() {
                 {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
-                        <Button disabled={errors ? true: false} size="small" variant="text" color="info" startIcon={<IosShareRoundedIcon fontSize="small" />} onClick={() => copyToClipboardHandler()}>Share</Button>
-                        <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<FormatListNumberedRoundedIcon  fontSize="small"/>} onClick={() => navigateToWaitlist() }> Waitlist</Button>
-                        <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}> Cancel</Button>
+                        <Button disabled={errors ? true: false} size="small" color="primary" variant="contained" startIcon={<IosShareRoundedIcon fontSize="small" />} onClick={() => copyToClipboardHandler()}>
+                            <Typography variant="caption" sx={{color: 'white' }}>
+                                Share
+                            </Typography>
+                        </Button>
+                        <Button disabled={errors ? true: false} size="small" color="primary" variant="contained"  startIcon={<FormatListNumberedRoundedIcon  fontSize="small"/>} onClick={() => navigateToWaitlist() }> 
+                        <Typography variant="caption" sx={{color: 'white' }}>
+                            wailist
+                        </Typography>
+                        </Button>
+                        <Button disabled={errors ? true: false} size="small" color="primary" variant="contained"  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}> 
+                            <Typography variant="caption" sx={{color: 'white' }}>
+                            cancel
+                            </Typography>
+                        </Button>
                     </Stack>
                 </Container>}
                 </>
@@ -645,9 +656,21 @@ export default function Waiting() {
                 {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
-                        <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<NotificationsActiveRoundedIcon  fontSize="small"/>} onClick={() => setUpdateClient(true)}>Status</Button>
-                        <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<BorderColorRoundedIcon  fontSize="small"/>} onClick={() => setEditClient(true)}>Edit</Button>
-                        <Button disabled={errors ? true: false} size="small" variant="text" color="info"  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}>Cancel</Button>
+                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}} startIcon={<NotificationsActiveRoundedIcon  fontSize="small"/>} onClick={() => setUpdateClient(true)}>
+                            <Typography variant="caption" sx={{color: 'white' }}>
+                                {'Status'}
+                            </Typography>
+                        </Button>
+                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BorderColorRoundedIcon  fontSize="small"/>} onClick={() => setEditClient(true)}>
+                            <Typography variant="caption" sx={{color: 'white' }}>
+                                {'edit'}
+                            </Typography>
+                        </Button>
+                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}>
+                            <Typography variant="caption" sx={{color: 'white' }}>
+                                {'cancel'}
+                            </Typography>
+                        </Button>
                     </Stack>
                 </Container>}
                 </>
@@ -978,7 +1001,6 @@ export default function Waiting() {
                                                             <Card variant="outlined" className="card-style" sx={{backgroundColor: values.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service, setFieldValue, values)}>
                                                                 <CardActionArea>
                                                                     <CardContent>
-
                                                                     <Grid container alignItems="center">
                                                                         <Grid item xs>
                                                                             <Typography component="div" variant="subtitle2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
@@ -991,8 +1013,8 @@ export default function Waiting() {
                                                                     </Typography>
                                                                     <Divider variant="middle" />                                                                    
                                                                     <Stack sx={{m: 1}} spacing={0.5}>
-                                                                        <Chip size="small" label={"Duration: " + service.duration + " min" } avatar={<AvTimerRoundedIcon fontSize="small" />} />
-                                                                        <Chip size="small" label={"Cost: " + service.cost} avatar={<PaidRoundedIcon fontSize="small" />} />
+                                                                        <Chip color="secondary"  variant="contained" size="small" label={"Length: " + service.duration + " min" } avatar={<ClockClockwise sx={{ backgroundColor: 'transparent' }} color={'white'} size={14} />} />
+                                                                        <Chip color="success"  variant="contained" size="small" label={"Cost: " + service.cost} avatar={<CurrencyCircleDollar sx={{ backgroundColor: 'transparent' }} color={'white'} size={14} />} />
                                                                     </Stack>
                                                                     </CardContent>
                                                                 </CardActionArea>
@@ -1206,9 +1228,9 @@ export default function Waiting() {
                 <Typography gutterBottom variant="body2" textAlign={'left'}>Please keep us updated on your current status <br/> <strong>Thank you!</strong></Typography>  
                 <Container sx={{ width: '100%', mt: 1}}>
                 <Stack spacing={1}>
-                    <Button size="large" fullWidth color="primary"sx={{ borderRadius: 10}} variant={clientStatus.here ? "contained" : "outlined"}  startIcon={<EmojiPeopleIcon /> } onClick={() => setClientStatus((prev) => ({...prev, here: !clientStatus.here})) }>Here 1-2 min</Button>
-                    <Button size="large" fullWidth color="warning" sx={{ borderRadius: 10}} variant={clientStatus.parking ? "contained" : "outlined"}  startIcon={<DirectionsCarFilledIcon /> } onClick={() => setClientStatus((prev) => ({...prev, parking: !clientStatus.parking})) }>Parking 3-5 min</Button>
-                    <Button size="large" fullWidth color="error" sx={{ borderRadius: 10}} variant={clientStatus.late ? "contained" : "outlined"} startIcon={<WatchLaterIcon /> } onClick={() => setClientStatus((prev) => ({...prev, late: !clientStatus.late})) }>Late 7-15 min</Button>
+                    <Button size="large" fullWidth color="success"sx={{ borderRadius: 5}} variant={clientStatus.here ? "contained" : "outlined"}  startIcon={<EmojiPeopleIcon /> } onClick={() => setClientStatus((prev) => ({...prev, here: !clientStatus.here})) }>Here 1-2 min</Button>
+                    <Button size="large" fullWidth color="warning" sx={{ borderRadius: 5}} variant={clientStatus.parking ? "contained" : "outlined"}  startIcon={<DirectionsCarFilledIcon /> } onClick={() => setClientStatus((prev) => ({...prev, parking: !clientStatus.parking})) }>Parking 3-5 min</Button>
+                    <Button size="large" fullWidth color="error" sx={{ borderRadius: 5}} variant={clientStatus.late ? "contained" : "outlined"} startIcon={<WatchLaterIcon /> } onClick={() => setClientStatus((prev) => ({...prev, late: !clientStatus.late})) }>Late 7-15 min</Button>
                 </Stack>
                 </Container>
             </DialogContent>

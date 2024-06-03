@@ -20,6 +20,7 @@ const ServingClient = ({open, onClose, clientId, type}) => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
         .catch(error => {
+            console.log(error)
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
         })
         .finally(() => {

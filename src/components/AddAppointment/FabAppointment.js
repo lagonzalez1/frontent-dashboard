@@ -184,8 +184,11 @@ export default function FabAppointment () {
 
     return(
         <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-            <Fab onClick={ () =>  handleClickOpen()} color="secondary" aria-label="add">
+            <Fab  variant="extended" onClick={ () =>  handleClickOpen()} color="secondary" aria-label="add">
                 <AddIcon />
+                <Typography variant="body2" fontWeight={'bold'}>
+                    Add to appointments
+                </Typography>
             </Fab>
 
             <Dialog

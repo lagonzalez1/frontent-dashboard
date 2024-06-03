@@ -26,6 +26,7 @@ import { usePermission } from "../../auth/Permissions";
 import { DateTime } from "luxon";
 import ServingClient from "../Dialog/ServingClient";
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
+import { ArrowSquareOut, Lock, LockOpen } from "phosphor-react";
 
 
 const Waitlist = ({setClient, setEditClient}) => {
@@ -331,15 +332,27 @@ const Waitlist = ({setClient, setEditClient}) => {
                         (<MenuItem
                             key={0}
                             onClick={(event) => handleMenuItemClick(event, 0)}
-                        >
+                            
+                        >   
+                            <ListItemIcon>
+                                <Lock weight="bold" size={20}/>
+                            </ListItemIcon>
+                            <ListItemText>
                             {options[0]}
+                            </ListItemText>
+                            
                             </MenuItem>
                         ): 
                             <MenuItem
                             key={1}
                             onClick={(event) => handleMenuItemClick(event, 1)}
                             >
-                            {options[1]} 
+                            <ListItemIcon>
+                                <LockOpen weight="bold" size={20} />
+                            </ListItemIcon>
+                            <ListItemText>
+                                {options[1]} 
+                            </ListItemText>
                             
                             </MenuItem>
                         }
@@ -347,10 +360,14 @@ const Waitlist = ({setClient, setEditClient}) => {
                             key={2}
                             onClick={(event) => handleMenuItemClick(event, 2)}
                         >
-                            {options[2]} 
+                             
                             <ListItemIcon>
-                                <LaunchIcon fontSize="small"/>
+                                <ArrowSquareOut weight="bold" size={20}/>
                             </ListItemIcon>
+                            <ListItemText>
+                                {options[2]}    
+                            </ListItemText>
+                        
                         </MenuItem>
                     </Menu>
                     </Grid>
@@ -364,18 +381,18 @@ const Waitlist = ({setClient, setEditClient}) => {
                         <Stack direction={"row"} spacing={1}>
 
                             {user.permissions === 3 || user.permissions === 2 ? (<Tooltip title="Logged in as employee" placement="bottom">
-                                <Button color="error" variant="outlined" startIcon={<BadgeIcon />}>
+                                <Button color="error" variant="contained" startIcon={<BadgeIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{ user.email }</Typography>
                                 </Button>
                             </Tooltip>): null}
                             
                             <Tooltip title="Your current location." placement="bottom">
-                                <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SouthAmericaIcon />}>
+                                <Button variant="contained" startIcon={<SouthAmericaIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? (business.timezone): <Skeleton/> }</Typography>
                                 </Button>
                             </Tooltip>
                             <Tooltip title="The estimated time for the next person that joins your line." placement="right">
-                                <Button sx={{ backgroundColor: 'white'}}  variant="outlined" startIcon={<AccessAlarmsIcon />}>
+                                <Button variant="contained" startIcon={<AccessAlarmsIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>{waittime ? waittime: (<CircularProgress size={10} />)}</strong> min wait.</Typography>
                                 </Button>
                             </Tooltip>

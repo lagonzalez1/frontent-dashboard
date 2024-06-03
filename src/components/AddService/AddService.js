@@ -151,6 +151,8 @@ const AddService = ({reloadParent}) => {
                 onChange={handleChange}
                 margin="normal"
                 variant="outlined"
+                multiline
+                rows={2}
                 error={touched.description && !!errors.description}
                 helperText={<ErrorMessage name="description" />}
               />

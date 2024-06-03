@@ -244,34 +244,35 @@ export const undoClientServing = (payload) => {
 }
 
 export const moveClientServing = (clientId, type, employeeId) => {
-return new Promise((resolve, reject) => {
-    const { user, business } = getStateData();
-    const headers = getHeaders();
-    const currentTime = new DateTime.local().setZone(business.timezone).toISO();
-    const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type, employeeId, email: user.email }
-    axios.post(POST_CLIENTTOSERVING, payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
-    .then(response => {
-    resolve(response.data);
+    return new Promise((resolve, reject) => {
+        const { user, business } = getStateData();
+        const headers = getHeaders();
+        const currentTime = DateTime.local().setZone(business.timezone).toISO();
+        const payload = { clientId, currentTime, b_id: business._id, isServing: true, type: type, employeeId, email: user.email }
+        console.log(payload);
+        console.log(POST_CLIENTTOSERVING)
+        axios.post(POST_CLIENTTOSERVING, payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        .then(response => {
+            resolve(response.data);
+        })
+        .catch(error => {
+        console.log(error);
+        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+        }
+        if (error.response) {
+            console.log(error.response);
+            reject({msg: 'Response error', error: error.response});
+        }
+        else if (error.request){
+            console.log(error.request);
+            reject({msg: 'No response from server', error: error.request})
+        }
+        else {
+            reject({msg: 'Request setup error', error: error.message})
+        }      
+    }) 
     })
-    .catch(error => {
-    console.log(error);
-    if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
-        reject('Request timed out. Please try again later.'); // Handle timeout error
-    }
-    if (error.response) {
-        console.log(error.response);
-        reject({msg: 'Response error', error: error.response});
-    }
-    else if (error.request){
-        console.log(error.request);
-        reject({msg: 'No response from server', error: error.request})
-    }
-    else {
-        reject({msg: 'Request setup error', error: error.message})
-    }      
-}) 
-    
-})
 }
 
 // Middleware OK
@@ -342,7 +343,7 @@ export const getServingClients = (accessToken) => {
     return new Promise((resolve, reject) => {
         axios.get(GET_SERVINGTABLE,{headers: {'x-access-token': accessToken}, params: {bid, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
-            resolve(response.data.result);
+            resolve(response.data);
         })
         .catch(error => {
             console.log(error);
