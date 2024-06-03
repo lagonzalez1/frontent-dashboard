@@ -17,7 +17,8 @@ let POST_AVAILABLE_APPOINTMENTS = '/api/external/available_appointments'
 
 // Return the acceptance of both waittime and appointments
 // Also checks for closedDate range {start and end} for waitlist
-export const isBusinesssOpen = (link, time) => {   
+export const isBusinesssOpen = (link, time) => {  
+   
   return new Promise((resolve, reject) => {
     axios.get(GET_BUSINESS_OPEN, { params: {link, time}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then((response) => {

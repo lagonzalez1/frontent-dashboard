@@ -104,7 +104,7 @@ export default function Welcome() {
     // 3. If open or closed. {appointment, waitlist}
     const getBusinessData = () => {
         setLoading(true);
-        const currentTime = DateTime.local().setZone(timezone).toISO();
+        const currentTime = DateTime.local().toISO();
         Promise.all([
             isBusinesssOpen(link, currentTime),
             getBusinessPresent(link, currentTime)

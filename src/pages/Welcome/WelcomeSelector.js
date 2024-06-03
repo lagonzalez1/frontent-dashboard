@@ -219,7 +219,7 @@ export default function WelcomeSelector() {
 
     const getBusinessData = () => {
         // Local timezone applied.
-        const time = DateTime.local().setZone(timezone).toISO();
+        const time = DateTime.local().toISO();
         Promise.all([
             isBusinesssOpen(link, time),
             getBusinessPresent(link, time),
