@@ -165,9 +165,13 @@ export default function WelcomeSize() {
                         </IconButton>
                     </Container>
                     {errors.title ? (
-                        <Alert variant="filled" color={errors.title === "Error" ? 'error': 'warning'}>
-                            <AlertTitle>{errors.title}</AlertTitle>
-                            - {errors.body}
+                        <Alert variant="standard" color={errors.title === "Error" ? 'error': 'warning'}>
+                            <AlertTitle>
+                                <Typography variant="subtitle1">{errors.title}</Typography>
+                            </AlertTitle>
+                            <Typography variant="subtitle2">
+                                - {errors.body}
+                            </Typography>
                         </Alert>
                     ) : null}
                     <CardContent>

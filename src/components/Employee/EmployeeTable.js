@@ -186,6 +186,7 @@ export default function EmployeeTable({reloadPage}) {
 
 
     const getEmployeeCurrentSchedule = (schedule) => {
+        const closedDates = business.closedDates;
         const DAY = DateTime.local().setZone(business.timezone).weekdayLong;
         if (schedule[DAY].start === "" && schedule[DAY].end === "") { return `Todays shift: Off`}
         let startTime = DateTime.fromFormat(schedule[DAY].start, "HH:mm").toFormat("hh:mm a");
@@ -308,7 +309,7 @@ export default function EmployeeTable({reloadPage}) {
                 
             </Stack>
             <br/>
-            <Button disabled={!checkPermission('EMPL_ADD') || cancelledSubscription()} onClick={() => showEmployeeModal()} sx={{borderRadius: 7}} variant="contained">
+            <Button disabled={!checkPermission('EMPL_ADD') || cancelledSubscription()} onClick={() => showEmployeeModal()} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}}variant="contained">
                 Add
             </Button>
 
@@ -483,7 +484,7 @@ export default function EmployeeTable({reloadPage}) {
                     </FormControl>
             </DialogContent>
             <DialogActions>
-                <LoadingButton loading={loading} disabled={cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" onClick={() => changevisibility(employee)}>Save</LoadingButton>
+                <LoadingButton loading={loading} disabled={cancelledSubscription()} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} variant="contained" onClick={() => changevisibility(employee)}>Save</LoadingButton>
             </DialogActions>
             </Dialog>
 

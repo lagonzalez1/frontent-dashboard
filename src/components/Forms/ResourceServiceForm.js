@@ -290,7 +290,7 @@ export default function ResourceServiceForm ({ reloadPage }) {
                             
                             </Box>
                                 
-                        <Button disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit" sx={{borderRadius: 10}}>
+                        <Button disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit" sx={{borderRadius: 5}}>
                             submit
                         </Button>
                         </Stack>
@@ -397,7 +397,7 @@ export default function ResourceServiceForm ({ reloadPage }) {
                             </Stack>
                         </Box>
                         
-                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit" sx={{borderRadius: 10}}>
+                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_DEL', 'SERV_DEL')} variant='contained' type="submit" sx={{borderRadius: 5}}>
                         submit
                     </LoadingButton>
                     </Stack>

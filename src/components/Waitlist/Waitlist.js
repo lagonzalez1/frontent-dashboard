@@ -387,12 +387,12 @@ const Waitlist = ({setClient, setEditClient}) => {
                             </Tooltip>): null}
                             
                             <Tooltip title="Your current location." placement="bottom">
-                                <Button variant="contained" startIcon={<SouthAmericaIcon />}>
+                                <Button sx={{borderRadius: 5}} color="warning" variant="contained" startIcon={<SouthAmericaIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? (business.timezone): <Skeleton/> }</Typography>
                                 </Button>
                             </Tooltip>
                             <Tooltip title="The estimated time for the next person that joins your line." placement="right">
-                                <Button variant="contained" startIcon={<AccessAlarmsIcon />}>
+                                <Button sx={{borderRadius: 5}}  color="warning" variant="contained" startIcon={<AccessAlarmsIcon />}>
                                     <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>{waittime ? waittime: (<CircularProgress size={10} />)}</strong> min wait.</Typography>
                                 </Button>
                             </Tooltip>
@@ -415,7 +415,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                                         {
                                            columns.map((col) => (
                                             <TableCell key={col.id} align='left'>
-                                                <Typography variant="subtitle2">{ col.label }</Typography>
+                                                <Typography variant="body2">{ col.label }</Typography>
                                             </TableCell>
                                            )) 
                                         }

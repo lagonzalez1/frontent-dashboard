@@ -91,8 +91,9 @@ export default function AddResource({reloadParent}) {
   
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-      <Fab color="secondary" className={classes.fab} onClick={handleOpen}>
-        <AddIcon/>
+      <Fab variant="extended" color="secondary" sx={{color : 'white'}} className={classes.fab} onClick={handleOpen}>
+        <AddIcon htmlColor="#FFFFFF" />
+        to resource
       </Fab>
       <Dialog className={classes.modal} open={isOpen} onClose={handleClose} fullWidth={true} maxWidth="xs" TransitionComponent={Transition}>
         <DialogTitle>

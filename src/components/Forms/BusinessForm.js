@@ -178,7 +178,7 @@ const BusinessForm = ({reloadPage}) => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <LoadingButton loading={loading} disabled={!checkPermission('BUSI_INFO') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <LoadingButton loading={loading} disabled={!checkPermission('BUSI_INFO') || cancelledSubscription()} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} type="submit" variant="contained" color="primary">
                 Save
               </LoadingButton>
             </Grid>

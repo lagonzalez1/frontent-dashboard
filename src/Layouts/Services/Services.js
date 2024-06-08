@@ -187,7 +187,7 @@ export default function Services() {
                                 <Typography variant="body2">Allow your staff to use</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                                    control={<Switch color="warning" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
                                     label={ form && form.active ? 'On' : 'Off'}
                                 /> 
                             </Grid>
@@ -196,7 +196,7 @@ export default function Services() {
                                 <Typography variant="body2">Allow the public to view</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
+                                    control={<Switch color="warning" inputProps={{ 'aria-label': 'controlled' }} checked={form.public} onChange={e => setForm((item) => ({...item, public: e.target.checked}) ) } />}
                                     label={ form && form.public ? 'On' : 'Off'}
                                 /> 
                             </Grid>
@@ -268,7 +268,7 @@ export default function Services() {
             </DialogContent>
 
             <DialogActions>
-                <LoadingButton loading={loading} sx={{ borderRadius: 7}} disabled={!checkPermission('SERV_CHANGE')} variant="contained" onClick={() => handleUpdateService()}> Submit</LoadingButton>
+                <LoadingButton loading={loading} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} disabled={!checkPermission('SERV_CHANGE')} variant="contained" onClick={() => handleUpdateService()}> Submit</LoadingButton>
             </DialogActions> 
         </Dialog>
 

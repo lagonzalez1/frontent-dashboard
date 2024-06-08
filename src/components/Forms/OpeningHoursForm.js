@@ -16,6 +16,7 @@ import {  findEmployee, getEmployeeList } from '../../hooks/hooks';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
+import { BellZ, CheckSquare, ClockCounterClockwise } from 'phosphor-react';
 
 
 
@@ -35,6 +36,7 @@ const OpeningHoursForm = ({reloadPage}) => {
   ]);
   const employeeList = getEmployeeList();
 
+  const [scheduledDaysOff, setScheduledDaysOff] = useState(false);
   const [employeeTag, setEmployeeTag] = useState('');
   const [partialDay, setPartialDay] = useState(false);
   const [scheduleDialog, setScheduleDialog] = useState(false);
@@ -255,14 +257,18 @@ const OpeningHoursForm = ({reloadPage}) => {
             </Grid>
             <Grid item xs={12}>
                 <Stack spacing={1}>
-                    <Button dis sx={{ borderRadius: 15}} onClick={() => setScheduleDialog(true)} fullWidth={false} variant="outlined" color="primary">
+                    <Button endIcon={<ClockCounterClockwise size={17} />} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} onClick={() => setScheduleDialog(true)} fullWidth={false} variant="outlined" color="primary">
                       Set Opening Hours
                     </Button>
-                    <Button sx={{ borderRadius: 15}} variant="outlined" onClick={() => setClosedDialog(true)} fullWidth={false}  color="primary">
-                      Closed on Days
+                    <Button endIcon={<BellZ size={17} />} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} variant="outlined" onClick={() => setClosedDialog(true)} fullWidth={false} color="primary">
+                      Call off
+                    </Button>
+
+                    <Button endIcon={<CheckSquare size={17}/>} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} variant="outlined" onClick={() => setScheduledDaysOff(true)} color={'primary'}>
+                      scheduled days off
                     </Button>
                   
-                    <LoadingButton disabled={!checkPermission('HOUR_TZ')} loading={loading} type="submit" variant='contained' sx={{borderRadius: 10}}>
+                    <LoadingButton disabled={!checkPermission('HOUR_TZ')} loading={loading} type="submit" variant='contained' sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}}>
                       {'save timezone'}
                     </LoadingButton>
 
@@ -390,7 +396,7 @@ const OpeningHoursForm = ({reloadPage}) => {
                     <CloseIcon />
                 </IconButton> 
                 <strong>
-                  Closed dates
+                  Call off
                 </strong>
 
             </DialogTitle>
@@ -419,19 +425,16 @@ const OpeningHoursForm = ({reloadPage}) => {
               <Divider />
               <Grid container spacing={1} rowSpacing={1} sx={{ pt: 1}}>
                   <Grid item xs={12}>
-                    <Typography variant='body2'>Specify the dates you wish to not be available from either waitlist and appointments.</Typography>
-                    <Typography variant='body2'>Note: for partial dates please enter the times you <strong>WILL</strong> be available to work.</Typography>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>When will you be off?</Typography>
                     <Divider/>
-
                   </Grid>
                   <Grid item xs={12}>
                     <Stack spacing={1}> 
                       <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
-                      <InputLabel id="employeeTag">Attach employee?</InputLabel>
+                      <Typography variant='subtitle2' fontWeight={'bold'}>Employee call off?</Typography>
                       <Select 
                         sx={{ pt: 1}}
                         id="employeeTag"
-                        size="small"
                         value={employeeTag}
                         onChange={handleEmployeeChange}
                         fullWidth={true}
@@ -445,7 +448,7 @@ const OpeningHoursForm = ({reloadPage}) => {
                       {
                         selectedDate && <FormControlLabel 
                         control={<Switch
-                          color="secondary"
+                          color="warning"
                           disabled={timerange[0] === null ? true: false}
                           checked={partialDay}
                           onChange={(e) => setPartialDayPretense(e) }
@@ -465,7 +468,6 @@ const OpeningHoursForm = ({reloadPage}) => {
                                 value={timerange}
                                 fullWidth={true}
                                 disabled={timerange[0] === null ? true: false}
-                                size={'small'}
                                 onChange={(newValue) => setTimerange(newValue)}
                                 />
                               <br/>
@@ -481,65 +483,7 @@ const OpeningHoursForm = ({reloadPage}) => {
                     </Stack>
                   </Grid>
                   <Grid item xs={12}>
-                  <TableContainer style={{ maxHeight: '350px', overflowY: 'auto' }}>
-                    <Table size='small'>
-                      { closedDays ?
-                      <TableHead>
-                        <TableRow>
-                        <TableCell>
-                            #
-                        </TableCell>
-                        <TableCell>
-                            Date
-                        </TableCell>
-                        <TableCell>
-                          Employee
-                        </TableCell>
-                        <TableCell>
-                            Action
-                        </TableCell>
-                        </TableRow>
-                      </TableHead>
-                      : null
-                      }
-
-                      <TableBody>
-                        {closedDays ? closedDays.map((item, index) => {
-                          return(
-                            <TableRow>
-                            
-                              <TableCell>
-                                  {index + 1}
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant='caption'>
-                                  { DateTime.fromJSDate(new Date(item.date)).toLocaleString() }
-                                  <br/>
-                                  {
-                                  item.range.start ? (
-                                    <>
-                                      { DateTime.fromFormat(item.range.start, 'hh:mm').toFormat('h:mm a') + " - " +  DateTime.fromFormat(item.range.end, 'hh:mm').toFormat('HH:mm a') }
-                                    </>
-                                  ) : 'Fullday'
-                                }
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant='caption'>
-                                  { findEmployee(item.employeeTag).fullname }
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                  <Button disabled={ !canEmployeeEdit(item.employeeTag, 'HOUR_CLOSE_DEL')} size="small" onClick={() => removeClosedDate(item._id) }>
-                                    delete
-                                  </Button>
-                              </TableCell>
-                            </TableRow>
-                          )
-                        }): null}
-                      </TableBody>
-                    </Table>
-                    </TableContainer>
+                  
                   </Grid>
 
 
@@ -552,6 +496,94 @@ const OpeningHoursForm = ({reloadPage}) => {
             <Button disabled={!canEmployeeEdit(employeeTag, 'EMPL_ATTACH')} sx={{ borderRadius: 10}} variant='contained' onClick={() => saveCloseDate()}>save</Button>
           </DialogActions>
         
+      </Dialog>
+
+
+      <Dialog
+        open={scheduledDaysOff}
+        onClose={() => setScheduledDaysOff(false)}
+        TransitionComponent={Transition}
+        id="scheduledDaysOff"
+      >
+        <DialogTitle>
+            <IconButton
+                    aria-label="close"
+                    onClick={() => setScheduledDaysOff(false)}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton> 
+                <strong>
+                  Scheduled days off
+                </strong>
+
+            </DialogTitle>
+        <DialogContent>
+        <TableContainer style={{ maxHeight: '350px', overflowY: 'auto' }}>
+            <Table size='small'>
+              { closedDays ?
+              <TableHead>
+                <TableRow>
+                <TableCell>
+                    #
+                </TableCell>
+                <TableCell>
+                    Date
+                </TableCell>
+                <TableCell>
+                  Employee
+                </TableCell>
+                <TableCell>
+                    Action
+                </TableCell>
+                </TableRow>
+              </TableHead>
+              : null
+              }
+
+              <TableBody>
+                {closedDays ? closedDays.map((item, index) => {
+                  return(
+                    <TableRow>
+                    
+                      <TableCell>
+                          {index + 1}
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption'>
+                          { DateTime.fromJSDate(new Date(item.date)).toLocaleString() }
+                          <br/>
+                          {
+                          item.range.start ? (
+                            <>
+                              { DateTime.fromFormat(item.range.start, 'HH:mm').toFormat('hh:mm a') + " - " +  DateTime.fromFormat(item.range.end, 'HH:mm').toFormat('hh:mm a') }
+                            </>
+                          ) : 'Fullday'
+                        }
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant='caption'>
+                          { findEmployee(item.employeeTag).fullname }
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                          <Button disabled={ !canEmployeeEdit(item.employeeTag, 'HOUR_CLOSE_DEL')} size="small" onClick={() => removeClosedDate(item._id) }>
+                            delete
+                          </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                }): null}
+              </TableBody>
+            </Table>
+        </TableContainer>
+        </DialogContent>
       </Dialog>
 
     </>

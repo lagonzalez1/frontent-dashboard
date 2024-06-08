@@ -70,7 +70,7 @@ export const getUserStripeInformation = (stripe_ref) => {
         const { user, business } = getStateData();
         axios.post('/api/internal/stripe_info_user', {ref: stripe_ref, email: user.email}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
         .then(response => {
-            resolve(response.data.payload);
+            resolve(response.data);
         })
         .catch(error => {
             console.log(error);

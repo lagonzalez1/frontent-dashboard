@@ -166,8 +166,8 @@ export default function Welcome() {
     const PresentWaitlineInformation = ({present, acceptingStatus}) => {
         return (
             <Stack spacing={0.2} mb={0.5}>
-                { present.position === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="caption">currently <strong>{position}</strong> in line</Typography>}     
-                { present.waittime === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="caption">est wait <strong>{waittimeRange}</strong></Typography>}                
+                { present.position === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="caption">Currently <strong>{position}</strong> in line..</Typography>}     
+                { present.waittime === true && acceptingStatus.waitlist === true && <Typography textAlign={'center'}  variant="caption">Est wait <strong>{waittimeRange}</strong></Typography>}                
             </Stack>
         )
     }
@@ -223,7 +223,7 @@ export default function Welcome() {
         // Open for at least on option.
         return (
             <>
-            <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bolder" gutterBottom sx={{ pt: 2}}>Welcome!</Typography>
+            <Typography textAlign={'center'} variant="h4" component="div" fontWeight="bolder" gutterBottom sx={{ pt: 1}}>Welcome!</Typography>
             <br/>
             {businessPresent ? <PresentWaitlineInformation present={businessPresent} acceptingStatus={acceptingStatus}/> : <CircularProgress  size={20}/> }
             <Button fullWidth={true} sx={{p: 1, borderRadius: 10}} variant="contained" color="primary" onClick={() => startJoinList()}>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Box, Typography, Button, TextField, CircularProgress, Stack, Container, Grid, Card, Alert } from "@mui/material";
 import axios from "axios";
 import { LoadingButton } from "@mui/lab";
@@ -9,6 +9,7 @@ import { CheckBoxRounded, PunchClockTwoTone } from "@mui/icons-material";
 
 export default function VerifyUser () {
     const { idd, email } = useParams();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({title: '', body: ''});
     const [success, setSuccess] = useState({title: '', body: ''});
@@ -92,8 +93,7 @@ export default function VerifyUser () {
     }
 
     const closeCurrentTab = () => {
-        window.open("about:blank", "_self");
-        window.close();
+        navigate('https://waitonline.us/Dashboard?quick_start=true')
     }
 
     useEffect(() => {
@@ -111,11 +111,11 @@ export default function VerifyUser () {
             <TextField defaultValue={email} disabled={true} variant="outlined" />
             {success.title === "Success" ? (
                 <>
-                    <Button variant="contained" startIcon={<CheckBoxRounded />} color="success" onClick={() => closeCurrentTab()}> Completed</Button> 
-                    <Typography variant="subtitle1">Please re-visit your dashboard and start booking!</Typography>
+                    <Button sx={{borderRadius: 5}} variant="contained" startIcon={<CheckBoxRounded />} color="success" onClick={() => closeCurrentTab()}>Visit dashboard</Button> 
+                    <Typography variant="subtitle1">Start booking!</Typography>
                 </>
             ):
-            <LoadingButton loading={loading} variant="contained" onClick={() => verifyAccount()}>Verify now</LoadingButton> 
+            <LoadingButton sx={{borderRadius: 5}} loading={loading} variant="contained" onClick={() => verifyAccount()}>Verify now</LoadingButton> 
             }
             <Box sx={{display: 'flex', justifyContent: 'center', pt: 1}}>
                 <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoTone fontSize="small"/> </Typography>

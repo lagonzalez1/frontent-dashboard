@@ -271,7 +271,6 @@ export default function WelcomeDetails() {
                                         <TextField
                                             id="fullname"
                                             name="fullname"
-                                            label="Name"
                                             value={formik.values.fullname}
                                             onChange={formik.handleChange}
                                             error={formik.touched.fullname && Boolean(formik.errors.fullname)}
@@ -286,7 +285,6 @@ export default function WelcomeDetails() {
                                         <TextField
                                             id="phoneNumber"
                                             name="phoneNumber"
-                                            label="Phone Number"
                                             placeholder="xxx-xxx-xxxx"
                                             value={phoneNumber}
                                             onChange={(event) => phoneNumberChange(event)}
@@ -303,7 +301,6 @@ export default function WelcomeDetails() {
                                         <TextField
                                         id="email"
                                         name="email"
-                                        label="Email"
                                         value={formik.values.email}
                                         onChange={formik.handleChange}
                                         error={formik.touched.email && Boolean(formik.errors.email)}
@@ -328,7 +325,7 @@ export default function WelcomeDetails() {
                                     preview ? (
                                         <>
                                             <Box sx={{ pt: 2, display: 'block', width: '100%', maxWidth: '100%'}}>
-                                                <Alert icon={<CloudDone />} severity='warning' sx={{ textAlign: 'left'}}>
+                                                <Alert icon={<CloudDone />} severity='secondary' sx={{ textAlign: 'left'}}>
                                                     <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
 
                                                     {

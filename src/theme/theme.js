@@ -47,7 +47,7 @@ export const ClientWelcomeTheme = createTheme({
       main: '#000000',
     },
     secondary: {
-      main: '#001f7d',
+      main: '#0077B6',
     },
     info: {
       main: '#00b3b3',
@@ -59,7 +59,7 @@ export const ClientWelcomeTheme = createTheme({
       main: '#3c00b3',
     },
     success: {
-      main: '#00b3b3',
+      main: '#14591D',
     }
   },
   typography: {
@@ -176,14 +176,28 @@ export const DashboardThemeLight = createTheme({
     palette: {
         mode: 'light',
         primary: {
-          main: '#0a394e',
+          main: '#0077B6',
+          light: '#0098E9'
         },
         secondary: {
-          main: '#ff6d00',
+          main: '#04080f',
         },
         error: {
-          main: '#d50000',
+          main: '#E71D36',
         },
+        info: {
+          main: '#FFFFFF'
+        },
+        success: {
+          main: '#14591d'
+        },
+        warning: {
+          main: '#F46036',
+          light: '#EA3E0D'
+        },
+        complementary: {
+          main: '#6036F4'
+        }
       },
       typography: {
         h3: {
@@ -195,6 +209,15 @@ export const DashboardThemeLight = createTheme({
       typography: {
         fontFamily: "Poppins",
       },
+      components: {
+        MuiListItemText: {
+          styleOverrides: {
+            root:{
+              fontWeight: 500,
+            }
+          }
+        }
+      }
 })
 
 export const DashboardThemeDark = createTheme({

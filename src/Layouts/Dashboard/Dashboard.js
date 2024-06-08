@@ -52,7 +52,7 @@ export default function Dashboard () {
     const [loading, setLoading] = useState(false);
     const [openCompletion, openStripeCompletion] = useState(false);
     const [stripeSession, setStripeSession] = useState({sessionId: '', status: '', title: ''})
-    const [gettingStarted, setGettingStarted] = useState(true);
+    const [gettingStarted, setGettingStarted] = useState(false);
 
     const [authCompleted, setAuthCompleted] = useState(false); // Add a state variable for the completion status of authentication check.
     const [openNav, setOpenNav] = useState(false);
@@ -63,8 +63,7 @@ export default function Dashboard () {
     async function checkAuthStatus() {
         setLoading(true);
         try {
-            const isAuth = await isAuthenticated(dispatch);   
-            showDayOneGuide();  
+            const isAuth = await isAuthenticated(dispatch);
             if (isAuth === false) {
                 removeUserState();
                 signOut();
@@ -90,6 +89,10 @@ export default function Dashboard () {
         const myFunction = () => {
             reloadBusinessData(dispatch);
         };
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('quick_start')) {
+            setGettingStarted(true);
+        }
         // Reload after 1.5 min
         const intervalId = setInterval(myFunction, 90000);
         return () => {
@@ -97,13 +100,6 @@ export default function Dashboard () {
             clearInterval(intervalId);
         };
     }, []);
-
-
-    const showDayOneGuide = () => {
-        const businessDate = DateTime.fromJSDate(new Date(DAYONE)).startOf('day');
-        const currentDate = DateTime.local().setZone(timezone).startOf('day');
-        currentDate.hasSame(businessDate, 'day') ? setGettingStarted(true) : setGettingStarted(false);
-    }
 
     //** User completes the subscrtiption cycle. */
     const closeStripeCompletion = () => {
@@ -117,6 +113,15 @@ export default function Dashboard () {
         window.history.replaceState({}, document.title, currentUrl.href);
     }
 
+    const closeQuickStart = () => {
+        const query = new URLSearchParams(window.location.search);
+        const currentUrl = new URL(window.location.href);
+        query.delete('quick_start');
+        currentUrl.search = query.toString();
+        window.history.replaceState({}, document.title, currentUrl.href);
+        setGettingStarted(false);
+    }
+
     useEffect(() => {
         // Check to see if this is a redirect back from Checkout
         const query = new URLSearchParams(window.location.search);
@@ -124,11 +129,9 @@ export default function Dashboard () {
         openStripeCompletion(true);
         setStripeSession({sessionId: query.get('session_id'), status: 'Thank you for your support! Your account is active and ready to use.', title: 'Success', icon: 'okay'})
         }
-
         if (query.get('cancelled')) {
         openStripeCompletion(true);
-        setStripeSession({sessionId: query.get('session_id'), status: 'Order canceled -- continue to shop around and checkout when you are ready.', title: 'Incomplete', icon:'cancelled'})
-
+        setStripeSession({sessionId: query.get('session_id'), status: 'Order canceled -- continue to shop around and checkout when you are ready.', title: 'Incomplete', icon:'cancelled'})        
     }
   }, [stripeSession.sessionId]);
 
@@ -180,12 +183,12 @@ export default function Dashboard () {
                             </Backdrop>)
                             : <MemoizedRenderLocation />}
                             <Success />
-                            <HelpDialog open={gettingStarted} onClose={() => setGettingStarted(false)}  />
                       </PermissionProvider>
                  </Box>
                  <Trial />
                  { client.open ? <Drawer setClient={setClient} client={client} />  : null}
                  { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }
+                 { gettingStarted ? <HelpDialog open={gettingStarted} onClose={() => closeQuickStart()}  /> : null}
                  <StripeCompletion payload={stripeSession} open={openCompletion} onClose={closeStripeCompletion}/>
 
                  </SubscriptionProvider>

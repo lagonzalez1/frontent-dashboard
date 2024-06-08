@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip, Typography, Badge} from "@mui/material";
+import { IconButton, List, ListItemIcon, ListItemButton, Divider, ListItem, ListItemText, useTheme, Tooltip, Typography, Badge, Box, Container} from "@mui/material";
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
@@ -39,15 +39,20 @@ const SideBar = ({navState, openNav}) => {
 
     return (
         <>
-        <Drawer variant="permanent" open={navState}>
+        <Drawer color="primary" variant="permanent" open={navState}>
           <DrawerHeader>
           <IconButton onClick={() => openNav(false)}>
             {theme.direction === 'rtl' ? <ChevronRightIcon /> : <ChevronLeftIcon />}
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <List>
+        <Container>
+          <Box sx={{ display: 'flex', justifyContent: 'center'}}>
+              
+          </Box>
+        </Container>
 
+        <List>
             <ListItem disablePadding sx={{ display: 'block' }}>
             <BootstrapTooltip title="Dashboard" placement="right">
               <ListItemButton
@@ -68,7 +73,7 @@ const SideBar = ({navState, openNav}) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <AccessTimeOutlinedIcon htmlColor={ currentLocation === 0 ? '#ff6d00' : '' } />
+                  <AccessTimeOutlinedIcon htmlColor={ currentLocation === 0 ? '#F46036' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Waitlist"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -93,7 +98,7 @@ const SideBar = ({navState, openNav}) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <ListIcon htmlColor={ currentLocation === 1 ? '#ff6d00' : '' } />
+                  <ListIcon htmlColor={ currentLocation === 1 ? '#F46036' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Appointments"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -118,7 +123,7 @@ const SideBar = ({navState, openNav}) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <CheckBoxOutlinedIcon htmlColor={ currentLocation === 2 ? '#ff6d00' : '' } />
+                  <CheckBoxOutlinedIcon htmlColor={ currentLocation === 2 ? '#F46036' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Serving"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -143,7 +148,7 @@ const SideBar = ({navState, openNav}) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <WidgetsOutlinedIcon htmlColor={ currentLocation === 3 ? '#ff6d00' : '' } />
+                  <WidgetsOutlinedIcon htmlColor={ currentLocation === 3 ? '#F46036' : '' } />
                 </ListItemIcon>
                 <ListItemText primary={"Resources"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -167,7 +172,7 @@ const SideBar = ({navState, openNav}) => {
                       justifyContent: 'center',
                     }}
                   >
-                    <FactCheckOutlinedIcon  htmlColor={ currentLocation === 4 ? '#ff6d00' : '' } />
+                    <FactCheckOutlinedIcon  htmlColor={ currentLocation === 4 ? '#F46036' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Services "} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
@@ -192,7 +197,7 @@ const SideBar = ({navState, openNav}) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 5 ? '#ff6d00' : '' }/>
+                  <PeopleAltOutlinedIcon  htmlColor={ currentLocation === 5 ? '#F46036' : '' }/>
                 </ListItemIcon>
                 <ListItemText primary={"Customers"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -221,7 +226,7 @@ const SideBar = ({navState, openNav}) => {
                       justifyContent: 'center',
                     }}
                   >
-                    <BarChartIcon  htmlColor={ currentLocation === 6 ? '#ff6d00' : '' } />
+                    <BarChartIcon  htmlColor={ currentLocation === 6 ? '#F46036' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Analytics"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>
@@ -249,7 +254,7 @@ const SideBar = ({navState, openNav}) => {
                     justifyContent: 'center',
                   }}
                 >
-                  <SettingsOutlinedIcon htmlColor={ currentLocation === 7 ? '#ff6d00' : '' }/>
+                  <SettingsOutlinedIcon htmlColor={ currentLocation === 7 ? '#F46036' : '' }/>
                 </ListItemIcon>
                 <ListItemText primary={"Settings"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
               </ListItemButton>
@@ -279,7 +284,7 @@ const SideBar = ({navState, openNav}) => {
                       justifyContent: 'center',
                     }}
                   >
-                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 8 ? '#ff6d00' : '' } />
+                    <HelpOutlineOutlinedIcon  htmlColor={ currentLocation === 8 ? '#F46036' : '' } />
                   </ListItemIcon>
                   <ListItemText primary={"Help"} sx={{ opacity: navState ? 1 : 0, fontWeight: 'bold' }} />
                 </ListItemButton>

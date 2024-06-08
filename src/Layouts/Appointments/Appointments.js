@@ -188,13 +188,13 @@ const Appointments = ({setClient, setEditClient}) => {
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
                     <Stack direction={'row'} spacing={1}>
                     <Tooltip title="Your current location." placement="bottom">
-                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SouthAmericaIcon />}>
+                        <Button sx={{borderRadius: 5}} color="warning" variant="contained" startIcon={<SouthAmericaIcon />}>
                             <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? (business.timezone): <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>
 
                     <Tooltip title="Sort your appointment list by employee" placement="bottom">
-                        <Button onClick={() => sortByEmployees()} sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={<SortRoundedIcon />}>
+                        <Button onClick={() => sortByEmployees()} sx={{borderRadius: 5}} color="warning" variant="contained" startIcon={<SortRoundedIcon />}>
                             <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? 'Group by employee': <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>

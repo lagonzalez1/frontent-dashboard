@@ -131,7 +131,7 @@ export default function Serving({setClient}) {
 
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
                     <Tooltip title="How many people are in the establishment." placement="right">
-                        <Button sx={{ backgroundColor: 'white'}} variant="outlined" startIcon={null}>
+                        <Button sx={{borderRadius: 5}} color="warning" variant="contained" startIcon={null}>
                             <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{business ? (totals.totalPartys + ` Party ( ${totals.personCount} Peoples)` ): <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>

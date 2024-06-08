@@ -22,9 +22,9 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord"
 import { ThemeProvider, useTheme } from "@emotion/react";
 import { ClientWelcomeTheme } from "../../theme/theme";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
-import { AttachMoney, AttachMoneyOutlined, CloudDone, CloudDoneOutlined, CloudQueue, FiberManualRecord, SetMeal, SettingsEthernetRounded } from "@mui/icons-material";
+import { AttachMoney, AttachMoneyOutlined, AttachMoneyRounded, CloudDone, CloudDoneOutlined, CloudQueue, FiberManualRecord, Restore, RestoreRounded, SetMeal, SettingsEthernetRounded } from "@mui/icons-material";
 import AvTimerIcon from '@mui/icons-material/AvTimer';
-import { CurrencyCircleDollar, ClockClockwise } from "phosphor-react";
+import { CurrencyCircleDollar, ClockClockwise, ClockCounterClockwise } from "phosphor-react";
 
 export default function WelcomeSelector() {
 
@@ -385,6 +385,100 @@ export default function WelcomeSelector() {
         })
     }
 
+
+    const GenerateServices = ({employee_id, services}) => {
+        if (employee_id) {
+            return (
+                <Container sx={{pt: 0, overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                <Grid
+                    maxHeight={1}
+                    container 
+                    wrap='nowrap'
+                    flexDirection={'row'}
+                    rowSpacing={2}
+                    spacing={.5}
+                    alignItems="stretch"
+                >
+
+                {
+                    services ? 
+                    services
+                    .filter((service) => service.employeeTags.includes(employee_id))
+                    .map((service) => (
+                        <Grid item key={service._id}>
+                            <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                <CardActionArea>
+                                    <CardContent>
+                                    <Stack spacing={0.2}>
+                                        <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                        <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
+                                            {service.description}
+                                        </Typography>
+                                    </Stack>
+                                    <Divider variant="middle" />                                                                    
+                                    <Stack sx={{m: 1}} spacing={0.5}>
+                                        <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
+                                        <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
+                                    </Stack>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
+                        </Grid>
+                    )):
+                    <Grid item>
+                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                    </Grid>
+                }
+                </Grid>
+            </Container>
+            )
+        }
+        else {
+            return (
+                <Container sx={{pt: 0, overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                <Grid
+                    maxHeight={1}
+                    container 
+                    wrap='nowrap'
+                    flexDirection={'row'}
+                    rowSpacing={2}
+                    spacing={.5}
+                    alignItems="stretch"
+                >
+
+                {
+                    services ? 
+                    services.map((service) => (
+                        <Grid item key={service._id}>
+                            <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                <CardActionArea>
+                                    <CardContent>
+                                    <Stack spacing={0.2}>
+                                        <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                        <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
+                                            {service.description}
+                                        </Typography>
+                                    </Stack>
+                                    <Divider variant="middle" />                                                                    
+                                    <Stack sx={{m: 1}} spacing={0.5}>
+                                        <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
+                                        <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
+                                    </Stack>
+                                    </CardContent>
+                                </CardActionArea>
+                            </Card>
+                        </Grid>
+                    )):
+                    <Grid item>
+                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                    </Grid>
+                }
+                </Grid>
+            </Container> 
+            )
+        }
+    }
+
     return (
         <>  
             <ThemeProvider theme={ClientWelcomeTheme}>
@@ -543,7 +637,7 @@ export default function WelcomeSelector() {
                                                         .filter((service) => service.employeeTags.includes(appointmentData.employee_id))
                                                         .map((service) => (
                                                             <Grid item key={service._id}>
-                                                                <Card variant="outlined" className="card-style" sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "" }} onClick={() => handleServiceChange(service)}>
+                                                                <Card variant="outlined" className="card-style" sx={{backgroundColor: appointmentData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => handleServiceChange(service)}>
                                                                     <CardActionArea>
                                                                         <CardContent>
                                                                         <Stack spacing={0.2}>
@@ -554,8 +648,8 @@ export default function WelcomeSelector() {
                                                                         </Stack>
                                                                         <Divider variant="middle" />                                                                    
                                                                         <Stack sx={{m: 1}} spacing={0.5}>
-                                                                            <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} avatar={<ClockClockwise sx={{ backgroundColor: 'transparent' }} color={'white'} size={14} />} />
-                                                                            <Chip color="success" variant="contained" label={"Cost: " + service.cost} avatar={<CurrencyCircleDollar sx={{ backgroundColor: 'transparent' }} color={'white'} size={14} />} />
+                                                                            <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
+                                                                            <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
                                                                         </Stack>
                                                                         </CardContent>
                                                                     </CardActionArea>
@@ -603,13 +697,11 @@ export default function WelcomeSelector() {
                                                                         onClick={() => appointmentSlotSelect(appointment)} 
                                                                         color={appointmentData.start === appointment.start ? 'primary': 'primary'}
                                                                         id="appointmentButtons">
-                                                                        {appointment.start ? (<Typography variant="body2" sx={{ pl: 1, pr: 1}}>{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>) : null}
-                                                                        
+                                                                        {appointment.start ? (<Typography variant="body2" sx={{ pl: 1, pr: 1}}>{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("h:mm a")}</Typography>) : null}          
                                                                     </Button>
                                                                     </Grid>
                                                                 )
                                                             })
-                                                        
                                                         ): null
                                                     }
                                                         <Grid item>
@@ -640,13 +732,10 @@ export default function WelcomeSelector() {
                                             ): null}
                                         </Box>
                                         
-                                        
-                                        
-
                                         {
                                             (openSummary && systemTypeSelected === APPOINTMENT) ? (
                                                 <Box sx={{ pt: 2, display: openSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
-                                                    <Alert icon={<CloudDone />} severity='warning' sx={{ textAlign: 'left'}}>
+                                                    <Alert icon={<CloudDone />} severity='secondary' sx={{ textAlign: 'left'}}>
                                                         <AlertTitle><Typography variant="body1"><strong>Details saved</strong></Typography></AlertTitle>
                                                         {appointmentData.date ? (<Typography variant="caption">Date assigned — <strong>{appointmentData.date.toFormat('LLL dd yyyy') }</strong></Typography>) : null}
                                                         <br/>
@@ -658,7 +747,7 @@ export default function WelcomeSelector() {
                                                         ): null}
                                                         <br/>
                                                         {appointmentData.serviceName ? (
-                                                            <Typography variant="caption">With — <strong>{appointmentData.serviceName}</strong></Typography>
+                                                            <Typography variant="caption">Doing — <strong>{appointmentData.serviceName}</strong></Typography>
                                                         ): null}                                                            
                                                     </Alert>
                                                 </Box>
@@ -709,26 +798,8 @@ export default function WelcomeSelector() {
                                     {businessPresent && businessPresent.services === true ? (
                                     <>
                                         <Typography fontWeight={'bold'} variant="subtitle2" id="services">Services</Typography>
-                                        <Select
-                                        id="services"
-                                        name="service_id"
-                                        color="secondary"
-                                        value={waitlistData.service_id}
-                                        >
-                                        { Array.isArray(businessExtras.services) ? businessExtras.services.map((service) => {
-                                            if (!service.public) { return null;}
-                                            return (
-                                            <MenuItem key={service._id} value={service._id} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
-                                            <Stack>
-                                            <Typography fontWeight={'bold'} variant="body2">{service.title} </Typography>
-                                            <Typography variant="caption">{`Duration: ${service.duration} min`}</Typography>
-                                            {service.cost ? (<Typography variant="caption">{businessPresent.servicePrice ? ("Cost: " + service.cost) : null}</Typography>): null}
-                                            </Stack>
-
-                                            </MenuItem>
-
-                                            )}):null }
-                                        </Select>
+                                        <GenerateServices services={businessExtras.services} employee_id={waitlistData.employee_id} />
+                                        
                                     </>
                                     ) : null}
 
@@ -778,26 +849,26 @@ export default function WelcomeSelector() {
                                         <Box sx={{ pt: 1, display: openWaitlistSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
                                             <Alert icon={<CloudDone />} severity='warning' sx={{ textAlign: 'left'}}>
                                                 <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
-                                                { (waitlistData && waitlistData.fullname === true) ? (
+                                                { waitlistData && waitlistData.fullname === true ? (
                                                 <>
                                                 <Typography variant="caption">Employee assigned — <strong>{waitlistData.fullname }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
                                                 
-                                                { (waitlistData && waitlistData.serviceTitle === true) ? (
+                                                { waitlistData && waitlistData.serviceTitle === true ? (
                                                 <>
                                                 <Typography variant="caption">Service — <strong>{waitlistData.serviceTitle }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
-                                                { (waitlistData && waitlistData.resourceTitle === true) ? (
+                                                { waitlistData && waitlistData.resourceTitle === true ? (
                                                 <>
                                                 <Typography variant="caption">Resource — <strong>{waitlistData.resourceTitle }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
-                                                { (waitlistData && waitlistData.notes) ? (
+                                                { waitlistData && waitlistData.notes ? (
                                                 <>
                                                 <Typography variant="caption">Notes — <strong>{waitlistData.notes }</strong></Typography>
                                                 <br/>

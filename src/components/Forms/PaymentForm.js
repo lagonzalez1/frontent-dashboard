@@ -58,13 +58,15 @@ const SubscriptionForm = () => {
 
   const retriveStripeInformation = () => {
     let stripeRef = ref;
+
     getUserStripeInformation(stripeRef)
     .then(response => {
       setStripe(response.payload);
-      setSelectedPlan(response.price_id);
-      setStripeMessage(response.message);
+      setSelectedPlan(response.payload.price_id);
+      setStripeMessage(response.payload.message);
     })
     .catch(error => {
+      console.log(error);
       dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
     })
     .finally(() => {

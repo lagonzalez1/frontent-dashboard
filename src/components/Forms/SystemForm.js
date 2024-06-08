@@ -96,7 +96,7 @@ export default function SystemForm({reloadPage}) {
                                     <Typography variant="body2">{LABELS[key]}</Typography>
                                     <Tooltip title="Please upgrade plan to access this field.">
                                     <FormControlLabel
-                                        control={<Switch color={"secondary"} disabled={true} checked={value} onChange={handleChange} name={key} />}
+                                        control={<Switch color={"warning"} disabled={true} checked={value} onChange={handleChange} name={key} />}
                                         label={value ? "On" : "Off"}
                                     />
                                     </Tooltip>
@@ -108,7 +108,7 @@ export default function SystemForm({reloadPage}) {
                             <Typography variant='subtitle2' fontWeight={'bold'}>{TITLE[key]}</Typography>
                             <Typography variant="body2">{LABELS[key]}</Typography>
                             <FormControlLabel
-                                control={<Switch color={"secondary"} checked={value} onChange={handleChange} name={key} />}
+                                control={<Switch color={"warning"} checked={value} onChange={handleChange} name={key} />}
                                 label={value ? "On" : "Off"}
                             />
                         </Grid>
@@ -168,7 +168,7 @@ export default function SystemForm({reloadPage}) {
                 </Grid>
             </Grid>
             <br/>
-                <LoadingButton loading={loading} variant='contained' type="submit" sx={{borderRadius: 10}} disabled={!checkPermission('SYSTEM') || cancelledSubscription()}>Save</LoadingButton>
+                <LoadingButton loading={loading} variant='contained' type="submit" sx={{borderRadius: 5, textTransform: 'lowercase' } } disabled={!checkPermission('SYSTEM') || cancelledSubscription()}>Save</LoadingButton>
             </Form>
         )}
         </Formik>

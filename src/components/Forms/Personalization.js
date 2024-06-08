@@ -167,13 +167,13 @@ export default function Personalization ({reloadPage}) {
 
                 <Typography variant="subtitle2" fontWeight={'bold'}>Dashboard theme</Typography>
                 <FormControlLabel
-                    control={<Switch color="secondary" checked={currentTheme === "light"? true: false} onChange={handleThemeChange} name={'Theme'} />}
+                    control={<Switch color="warning" checked={currentTheme === "light"? true: false} onChange={handleThemeChange} name={'Theme'} />}
                     label={currentTheme === "light" ? "Light" : "Dark"}
                 />
                 <br/>
 
                 <Typography variant="subtitle2" fontWeight={'bold'}>Generate QR code</Typography>
-                <Button startIcon={<QrCode size={20} />} size="small" sx={{ borderRadius: 15 }} variant="outlined" onClick={() => generateQRCode()}>QR code</Button>
+                <Button startIcon={<QrCode size={20} />} size="small" sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} variant="outlined" onClick={() => generateQRCode()}>QR code</Button>
                 <Box sx={{ display: 'flex' }}>
                     <Grow in={checked}>
                     <div id='QR_code' style={{ height: checked ? 'auto': 0,  maxWidth: 100, width: "100%" }}>
@@ -223,10 +223,8 @@ export default function Personalization ({reloadPage}) {
                 <label htmlFor="image-input">
                     <Button
                     variant="contained"
-                    size="small"
-                    component="span" 
-
-                    sx={{ borderRadius: 5}}
+                    component="span" ss
+                    sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}}
                     startIcon={<UploadIcon />}
                     disabled={!checkPermission('PERS_IMG') ? true: false}
                     >
@@ -237,7 +235,7 @@ export default function Personalization ({reloadPage}) {
                 {image ? 
                 (
                 <>
-                <LoadingButton fullWidth={false} loading={loading} disabled={!checkPermission('PERS_IMG') || cancelledSubscription()} size="small" sx={{ borderRadius: 10, mt: 1 }} variant="outlined" onClick={() => uploadImage()}>Save</LoadingButton>
+                <LoadingButton fullWidth={false} loading={loading} disabled={!checkPermission('PERS_IMG') || cancelledSubscription()} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} variant="outlined" onClick={() => uploadImage()}>Save</LoadingButton>
                 </>)
                 : null}
 

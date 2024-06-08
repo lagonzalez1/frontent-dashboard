@@ -183,7 +183,7 @@ export default function Resources() {
                                 <Typography variant="body2">Allow your staff to use</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
+                                    control={<Switch color="warning" inputProps={{ 'aria-label': 'controlled' }} checked={form.active} onChange={e => setForm((item) => ({...item, active: e.target.checked}) ) } />}
                                     label={ form && form.active ? 'On' : 'Off'}
                                 /> 
                             </Grid>
@@ -192,7 +192,7 @@ export default function Resources() {
                                 <Typography variant="body2">Allow the public to view</Typography>
                                 <FormControlLabel
                                     sx={{ marginLeft: 0}}
-                                    control={<Switch color="secondary" inputProps={{ 'aria-label': 'controlled' }} checked={form.publicValue} onChange={e => setForm((item) => ({...item, publicValue: e.target.checked}) ) } />}
+                                    control={<Switch color="warning" inputProps={{ 'aria-label': 'controlled' }} checked={form.publicValue} onChange={e => setForm((item) => ({...item, publicValue: e.target.checked}) ) } />}
                                     label={ form && form.public ? 'On' : 'Off'}
                                 /> 
                             </Grid>
@@ -219,7 +219,7 @@ export default function Resources() {
 
 
                 <DialogActions>
-                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_CHANGE','EMPL_ATTACH')} sx={{ borderRadius: 10}} variant="contained" onClick={() => handleUpdateResource()} > Submit</LoadingButton>
+                    <LoadingButton loading={loading} disabled={!checkPermission('RESO_CHANGE','EMPL_ATTACH')} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} variant="contained" onClick={() => handleUpdateResource()} > Submit</LoadingButton>
                 </DialogActions> 
         </Dialog>
 

@@ -37,7 +37,7 @@ const LocationForm = ({reloadPage}) => {
   const [errors, setErrors] = useState(null);
   
 
-  // Middleware NOT OK
+  // Middleware NOT OKShow 
   const handleSubmit = (values) => {
     setLoading(true);
     if (!checkValidString(values.locationUrl)){
@@ -163,13 +163,13 @@ const LocationForm = ({reloadPage}) => {
               />
             </Grid>
             <Grid item xs={12}>
-            <Button variant='outlined' size={'small'} onClick={() => navigateToWaitlist()} sx={{borderRadius: 7}} startIcon={<ArrowSquareOut size={20} />}>
+            <Button variant='outlined' color='primary' onClick={() => navigateToWaitlist()} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} startIcon={<ArrowSquareOut size={17} />}>
                 Show waitlist
             </Button>
             </Grid>
 
             <Grid item xs={12}>              
-            <LoadingButton loading={loading} disabled={ !checkPermission('LOC_URL') || cancelledSubscription()} variant='contained' size={'small'}  type="submit" sx={{borderRadius: 7}}>
+            <LoadingButton loading={loading} disabled={ !checkPermission('LOC_URL') || cancelledSubscription()} variant='contained' type="submit" sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}}>
                 save
             </LoadingButton>
             </Grid>

@@ -71,8 +71,8 @@ const NotificationForm = ({reloadPage}) => {
                   label="Message"
                   variant="outlined"
                   as={TextField}
-                  multiline={false}
-                  rows={2}
+                  multiline={true}
+                  rows={3}
                   fullWidth
                   defaultValue={initialValue.message}
                   error={touched.message && !!errors.message}
@@ -82,7 +82,7 @@ const NotificationForm = ({reloadPage}) => {
               </Stack>
             </Grid>
             <Grid item xs={12}>
-              <LoadingButton loading={loading} disabled={!checkPermission('NOTI_SETTINGS') || cancelledSubscription()} sx={{ borderRadius: 10}} type="submit" variant="contained" color="primary">
+              <LoadingButton loading={loading} disabled={!checkPermission('NOTI_SETTINGS') || cancelledSubscription()} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} type="submit" variant="contained" color="primary">
                 Save
               </LoadingButton>
             </Grid>

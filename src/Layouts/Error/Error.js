@@ -2,7 +2,8 @@ import React from 'react';
 import { Typography, TextField, Container, Box } from '@mui/material';
 import ServerError from "../../assets/errors/error-500.png";
 import LostError from "../../assets/errors/error-404.png";
-import AuthError from "../../assets/errors/u-auth3.png";
+import AuthError from "../../assets/images/email-confirm.jpg";
+
 
 
 const ErrorPage = ({ title, errorMessage, type }) => {
@@ -29,7 +30,7 @@ const ErrorPage = ({ title, errorMessage, type }) => {
         { parseErrorType() }
       </Box>
       <Box mt={4}>
-        <Typography fontWeight={'bold'} textAlign={'center'} variant='subtitle1'>
+        <Typography fontWeight={'bold'} textAlign={'center'} variant='h6'>
             {errorMessage}
         </Typography>
       </Box>

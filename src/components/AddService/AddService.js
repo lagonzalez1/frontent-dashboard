@@ -85,8 +85,9 @@ const AddService = ({reloadParent}) => {
 
   return (
     <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
-      <Fab color="secondary" className={classes.fab} onClick={handleOpen}>
-        <AddIcon />
+      <Fab variant='extended' color="secondary" sx={{ color: 'white'}} className={classes.fab} onClick={handleOpen}>
+        <AddIcon htmlColor="#FFFFFF"/>
+        to Service
       </Fab>
       <Dialog
         open={open}

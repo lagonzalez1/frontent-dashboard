@@ -54,7 +54,7 @@ export default function ClientSignForm({reloadPage}) {
                             <Typography fontWeight='bold' variant="subtitle2">{TITLE[key]}</Typography>
                             <Typography variant="body2">{LABELS[key]}</Typography>
                             <FormControlLabel
-                                control={<Switch color="secondary" checked={value} onChange={handleChange} name={key} />}
+                                control={<Switch color="warning" checked={value} onChange={handleChange} name={key} />}
                                 label={value ? "On" : "Off"}
                             />
                             </Box>
@@ -62,7 +62,7 @@ export default function ClientSignForm({reloadPage}) {
                         
                     </Stack>
                     <br/>
-                    <LoadingButton loading={loading} disabled={!checkPermission('CLIENT_SIGNU') || cancelledSubscription()} sx={{borderRadius: 10}} variant="contained" type="submit">Save</LoadingButton>
+                    <LoadingButton loading={loading} disabled={!checkPermission('CLIENT_SIGNU') || cancelledSubscription()} sx={{borderRadius: 5, textTransform: 'lowercase', fontWeight: 'bold'}} variant="contained" type="submit">Save</LoadingButton>
                     </Form>
                 )}
             </Formik>
