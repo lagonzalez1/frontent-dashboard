@@ -492,8 +492,8 @@ export default function WelcomeSelector() {
                 justifyContent="center"
                 alignItems="center" 
             >   
-                <Zoom in={zoomIntoView}>
-                <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
+                <Zoom in={zoomIntoView} mountOnEnter unmountOnExit>
+                <Grid className="grid-item" item xs={12} md={3} lg={3} xl={3}>
                     <Card className="wcard" variant="outlined" sx={{ borderRadius: 5, p: 2, pt: 1}}>
                     {loading ? (<Box sx={{display: 'flex', justifyContent: 'center', alignContent: 'center', pt: 2}}>
                         <CircularProgress size={15} />

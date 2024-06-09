@@ -224,13 +224,17 @@ export const DashboardThemeDark = createTheme({
     palette: {
         mode: 'dark',
         primary: {
-          main: '#0a394e',
+          main: '#0098E9',
         },
         secondary: {
           main: '#ff6d00',
         },
         error: {
           main: '#d50000',
+        },
+        warning: {
+          main: '#F46036',
+          light: '#EA3E0D'
         },
       },
       typography: {

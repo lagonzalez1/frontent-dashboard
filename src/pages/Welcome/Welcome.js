@@ -248,7 +248,7 @@ export default function Welcome() {
                     alignItems="center"                      
                 >   
                     <Slide direction="up" in={zoomIntoView} mountOnEnter unmountOnExit>
-                    <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
+                    <Grid className="grid-item" item xs={12} md={3} lg={3} xl={3}>
                     <Card raised variant="outlined" className="wcard" sx={{pt: 1, borderRadius: 5, p: 4}}>
                             { loading ? 
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
