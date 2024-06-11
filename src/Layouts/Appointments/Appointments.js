@@ -20,6 +20,8 @@ import { usePermission } from "../../auth/Permissions";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import SortRoundedIcon from '@mui/icons-material/SortRounded';
 
+import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
+
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
     const { checkPermission } = usePermission();
@@ -260,18 +262,26 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 <TableCell>
                                                     <Typography fontWeight={'bold'} variant="body2">
                                                         <IconButton onClick={() => openClientDrawer(client)}>
-                                                            <InfoOutlinedIcon fontSize="small" />
+                                                            <InfoOutlinedIcon />
                                                         </IconButton>
                                                         {++index}
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell>
+                                                    <Stack direction={'row'}>
+                                                    <Stack>
                                                     <Typography fontWeight={'bold'} variant="body2">
                                                         {client.fullname}
                                                     </Typography>
                                                     <Typography fontWeight="normal" variant="caption">
                                                         {client.serviceTag ? findService(client.serviceTag).title : null}
                                                     </Typography>
+                                                    </Stack>
+                                                    {client.status.cancelled && <IconButton disabled>
+                                                                <WarningRoundedIcon color="error" />
+                                                            </IconButton>}
+
+                                                    </Stack>
                                                 </TableCell>
                                                 <TableCell>
                                                     <Typography fontWeight={'bold'} variant="body2">
@@ -292,17 +302,17 @@ const Appointments = ({setClient, setEditClient}) => {
                                                     <Stack direction={'row'} spacing={1}>
                                                         <Tooltip title={'Serve client'} placement="left">
                                                         <IconButton onClick={() => sendClientServing(client._id)}>
-                                                            <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
+                                                            <CheckCircleIcon color={'success'}/>
                                                         </IconButton>
                                                         </Tooltip>
                                                         <Tooltip title={'Send notification'} placement="top">
                                                         <IconButton onClick={() => sendClientNotification(client._id)}>
-                                                            <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
+                                                            <NotificationsIcon color={'error'}/>                                           
                                                         </IconButton>
                                                         </Tooltip>
                                                         <Tooltip title={'Edit client'} placement="right">
                                                         <IconButton disabled={!edit} onClick={() => editClientInfo(client)}>
-                                                            <EditIcon fontSize="small" />
+                                                            <EditIcon  />
                                                         </IconButton>
                                                         </Tooltip>
                                                     </Stack>

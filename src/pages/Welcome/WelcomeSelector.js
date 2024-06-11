@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { Box, Container, Button, Typography, Card, CardActions, CardContent, 
     Fade, CircularProgress, Stack, IconButton, Select, ButtonGroup, InputLabel, MenuItem, TextField, Grid, CardActionArea, Paper, Grow, Alert, Chip, Divider, AlertTitle, Tooltip, 
     useMediaQuery,
@@ -49,7 +49,7 @@ export default function WelcomeSelector() {
 
     const [alertAppointments, setAlertAppointment] = useState(false);
     const [errorMessage, setErrorMessage] = useState({title: '', body: ''});
-    const [appointmentSearchErrors, setAppointmentSearchErrors] = useState({title: null, body: null});
+    const [appointmentSearchErrors, setAppointmentSearchErrors] = useState({title: null, body: null, type: null});
     const [timezone, setTimezone] = useState(null);
 
 
@@ -300,7 +300,6 @@ export default function WelcomeSelector() {
      *  
      */
     const handleDateChange = (date) => {
-        setAppointmentSearchErrors({title: null, body: null})
         setOpenEmployees(false);
         setOpenSummary(false);
         setAppEmployees(null);
@@ -308,7 +307,7 @@ export default function WelcomeSelector() {
         setSlots(null);
         setOpenServices(false);
         setAppointmentData((prev) => ({...prev, date: date, start: null, end: null}));
-        setAppointmentSearchErrors({title: null, body: null})
+        setAppointmentSearchErrors({title: null, body: null, type: null})
         getAvailableEmployees(date);
         handleEmployeeRefChange(); // Trigger focus on employee section
         
@@ -353,9 +352,9 @@ export default function WelcomeSelector() {
         setAppSlotLoader(true)
         getAvailableAppointments(payload)
         .then(response => {
-            if(response.data.length === 0){
+            if(Object.keys(response.data).length === 0){
                 setAlertAppointment(true);
-                setAppointmentSearchErrors({title: 'Error',body: 'No available appointments'})
+                setAppointmentSearchErrors({title: 'Error', body: response.msg, type: 'warning'})
                 return;
             }
             setSlots(response.data);
@@ -390,94 +389,95 @@ export default function WelcomeSelector() {
         if (employee_id) {
             return (
                 <Container sx={{pt: 0, overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
-                <Grid
-                    maxHeight={1}
-                    container 
-                    wrap='nowrap'
-                    flexDirection={'row'}
-                    rowSpacing={2}
-                    spacing={.5}
-                    alignItems="stretch"
-                >
+                    <Grid
+                        maxHeight={1}
+                        container 
+                        wrap='nowrap'
+                        flexDirection={'row'}
+                        rowSpacing={2}
+                        spacing={.5}
+                        alignItems="stretch"
+                    >
 
-                {
-                    services ? 
-                    services
-                    .filter((service) => service.employeeTags.includes(employee_id))
-                    .map((service) => (
-                        <Grid item key={service._id}>
-                            <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
-                                <CardActionArea>
-                                    <CardContent>
-                                    <Stack spacing={0.2}>
-                                        <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
-                                        <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
-                                            {service.description}
-                                        </Typography>
-                                    </Stack>
-                                    <Divider variant="middle" />                                                                    
-                                    <Stack sx={{m: 1}} spacing={0.5}>
-                                        <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
-                                        <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
-                                    </Stack>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
+                    {
+                        services ? 
+                        services
+                        .filter((service) => service.employeeTags.includes(employee_id))
+                        .map((service) => (
+                            <Grid item key={service._id}>
+                                <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                    <CardActionArea>
+                                        <CardContent>
+                                        <Stack spacing={0.2}>
+                                            <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                            <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
+                                                {service.description}
+                                            </Typography>
+                                        </Stack>
+                                        <Divider variant="middle" />                                                                    
+                                        <Stack sx={{m: 1}} spacing={0.5}>
+                                            <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
+                                            <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
+                                        </Stack>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </Grid>
+                        )):
+                        <Grid item>
+                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
                         </Grid>
-                    )):
-                    <Grid item>
-                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                    }
                     </Grid>
-                }
-                </Grid>
-            </Container>
+                </Container>
             )
         }
         else {
             return (
                 <Container sx={{pt: 0, overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
-                <Grid
-                    maxHeight={1}
-                    container 
-                    wrap='nowrap'
-                    flexDirection={'row'}
-                    rowSpacing={2}
-                    spacing={.5}
-                    alignItems="stretch"
-                >
+                    <Grid
+                        maxHeight={1}
+                        container 
+                        wrap='nowrap'
+                        flexDirection={'row'}
+                        rowSpacing={2}
+                        spacing={.5}
+                        alignItems="stretch"
+                    >
 
-                {
-                    services ? 
-                    services.map((service) => (
-                        <Grid item key={service._id}>
-                            <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
-                                <CardActionArea>
-                                    <CardContent>
-                                    <Stack spacing={0.2}>
-                                        <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
-                                        <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
-                                            {service.description}
-                                        </Typography>
-                                    </Stack>
-                                    <Divider variant="middle" />                                                                    
-                                    <Stack sx={{m: 1}} spacing={0.5}>
-                                        <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
-                                        <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
-                                    </Stack>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
+                    {
+                        services ? 
+                        services.map((service) => (
+                            <Grid item key={service._id}>
+                                <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                    <CardActionArea>
+                                        <CardContent>
+                                        <Stack spacing={0.2}>
+                                            <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                            <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
+                                                {service.description}
+                                            </Typography>
+                                        </Stack>
+                                        <Divider variant="middle" />                                                                    
+                                        <Stack sx={{m: 1}} spacing={0.5}>
+                                            <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
+                                            <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
+                                        </Stack>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </Grid>
+                        )):
+                        <Grid item>
+                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
                         </Grid>
-                    )):
-                    <Grid item>
-                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                    }
                     </Grid>
-                }
-                </Grid>
-            </Container> 
+                </Container> 
             )
         }
     }
+
 
     return (
         <>  
@@ -599,6 +599,9 @@ export default function WelcomeSelector() {
                                                                                     <Typography variant="body2" fontWeight={'bold'}>
                                                                                         {employee.fullname}
                                                                                     </Typography>
+                                                                                    <Typography variant="caption">
+                                                                                        {employee.message}
+                                                                                    </Typography>
                                                                                 </Stack>
 
                                                                             </CardContent>
@@ -705,7 +708,7 @@ export default function WelcomeSelector() {
                                                         ): null
                                                     }
                                                         <Grid item>
-                                                            <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={appointmentSearchErrors.title} body={appointmentSearchErrors.body} />
+                                                            <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={appointmentSearchErrors.title} body={appointmentSearchErrors.body} type={appointmentSearchErrors.type} />
                                                         </Grid>
                                                     </Grid>
                                                 </Box>
@@ -788,24 +791,115 @@ export default function WelcomeSelector() {
                                                             <Typography variant="body2" fontWeight={'bold'}>
                                                                 {employee.fullname}
                                                             </Typography>
+                                                            <Typography variant="caption">
+                                                                {employee.message}
+                                                            </Typography>
                                                         </Stack>
                                                     </MenuItem>
-                                                )) : null}
+                                                )) : 
+                                                    null
+                                                }
                                             </Select>
 
                                         </>
                                     ) : null}
                                     {businessPresent && businessPresent.services === true ? (
                                     <>
-                                        <Typography fontWeight={'bold'} variant="subtitle2" id="services">Services</Typography>
-                                        <GenerateServices services={businessExtras.services} employee_id={waitlistData.employee_id} />
+                                        <Typography fontWeight={'bold'} variant="subtitle2" id="services">Services available</Typography>
+                                        {
+                                            waitlistData && waitlistData.employee_id ? (
+                                                <Container sx={{pt: 0, overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                                                    <Grid
+                                                        maxHeight={1}
+                                                        container 
+                                                        wrap='nowrap'
+                                                        flexDirection={'row'}
+                                                        rowSpacing={2}
+                                                        spacing={.5}
+                                                        alignItems="stretch"
+                                                    >
+
+                                                    {
+                                                        businessExtras ? 
+                                                        businessExtras.services
+                                                        .filter((service) => service.employeeTags.includes(employee_id))
+                                                        .map((service) => (
+                                                            <Grid item key={service._id}>
+                                                                <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                                                    <CardActionArea>
+                                                                        <CardContent>
+                                                                        <Stack spacing={0.2}>
+                                                                            <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                                                            <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
+                                                                                {service.description}
+                                                                            </Typography>
+                                                                        </Stack>
+                                                                        <Divider variant="middle" />                                                                    
+                                                                        <Stack sx={{m: 1}} spacing={0.5}>
+                                                                            <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
+                                                                            <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
+                                                                        </Stack>
+                                                                        </CardContent>
+                                                                    </CardActionArea>
+                                                                </Card>
+                                                            </Grid>
+                                                        )):
+                                                        <Grid item>
+                                                            <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                                                        </Grid>
+                                                    }
+                                                    </Grid>
+                                                </Container>
+                                            ): (
+                                                <Container sx={{pt: 0, overflowX: 'auto', whiteSpace: 'nowrap', paddingLeft: 0, paddingRight: 0}}>
+                                                <Grid
+                                                    maxHeight={1}
+                                                    container 
+                                                    wrap='nowrap'
+                                                    flexDirection={'row'}
+                                                    rowSpacing={2}
+                                                    spacing={.5}
+                                                    alignItems="stretch"
+                                                >
+                            
+                                                {
+                                                    businessExtras ? 
+                                                    businessExtras.services.map((service) => (
+                                                        <Grid item key={service._id}>
+                                                            <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                                                <CardActionArea>
+                                                                    <CardContent>
+                                                                    <Stack spacing={0.2}>
+                                                                        <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
+                                                                        <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
+                                                                            {service.description}
+                                                                        </Typography>
+                                                                    </Stack>
+                                                                    <Divider variant="middle" />                                                                    
+                                                                    <Stack sx={{m: 1}} spacing={0.5}>
+                                                                        <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
+                                                                        <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
+                                                                    </Stack>
+                                                                    </CardContent>
+                                                                </CardActionArea>
+                                                            </Card>
+                                                        </Grid>
+                                                    )):
+                                                    <Grid item>
+                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
+                                                    </Grid>
+                                                }
+                                                </Grid>
+                                                </Container>  
+                                            )
+                                        }
                                         
                                     </>
                                     ) : null}
 
                                     {businessPresent && businessPresent.resources === true ? (
                                     <>
-                                        <Typography fontWeight={'bold'} variant="subtitle2" id="resources" textAlign="left">Resources</Typography>
+                                        <Typography fontWeight={'bold'} variant="subtitle2" id="resources" textAlign="left">Resources available</Typography>
                                         <Select
                                         as={Select}
                                         id="resources"
@@ -836,7 +930,7 @@ export default function WelcomeSelector() {
                                                 color="secondary"
                                                 placeholder="Additional notes"
                                                 value={waitlistData.notes}
-                                            onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }
+                                                onChange={(e) => setWaitlistData((prev) => ({...prev, notes: e.target.value})) }
                                             />
                                             </>
                                         ):null

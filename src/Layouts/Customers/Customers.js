@@ -2,14 +2,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import '../../css/Customers.css';
 import { Stack, Grid, Menu, MenuItem, IconButton, TextField, Typography,
    Skeleton, Table, TableCell, TableBody, TableHead, TableContainer, TableRow,Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip,
-   Box, Collapse, Tooltip, CircularProgress } from '@mui/material';
+   Box, Collapse, Tooltip, CircularProgress, 
+   Slide} from '@mui/material';
 import DateSelect from '../../components/Select/DateSelect';
 import StateSelect from '../../components/Select/StateSelect';
 import EmployeeSelect from '../../components/Select/EmployeeSelect';
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch, useSelector } from 'react-redux';
-import { columns, convertTo_CSV, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword} from './CustomerHelper';
+import { columns, convertTo_CSV, flagClientAccount, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword} from './CustomerHelper';
 import { findEmployee, findService, getAnalyticsClients } from '../../hooks/hooks';
 import { setReload, setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
@@ -28,9 +29,12 @@ import { usePermission } from '../../auth/Permissions';
 import CheckCircle from '@mui/icons-material/CheckCircle';
 import { FileCsv, Flag, Trash } from "phosphor-react"
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+
 const Customers = () => {
-
-
   const { checkPermission } = usePermission();
   const business = useSelector((state) => state.business);
   const permissionLevel = useSelector((state) => state.user.permissions);
@@ -103,7 +107,20 @@ const Customers = () => {
   };
 
   const submitFlagClient = () => {
-    
+      if (!client) { return ;}
+      console.log(client);
+      const flagStatus = client.status.flag;
+      flagClientAccount(client._id, flagStatus)
+      .then(response => {
+        dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
+      })
+      .catch(error => {
+        dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+      })
+      .finally(() => {
+        
+        closeFlagCustomer();
+      })
   }
 
   const convertDataToCsv = () => {
@@ -118,10 +135,8 @@ const Customers = () => {
       const csvData = response.data;
       // Create a Blob object from the CSV data
       const blob = new Blob([csvData], { type: 'text/csv' });
-      
       // Create a temporary URL for the Blob
       const url = window.URL.createObjectURL(blob);
-      
       // Create a link element and trigger the download
       const a = document.createElement('a');
       a.href = url;
@@ -160,7 +175,6 @@ const Customers = () => {
 
 
   const showReview = (payload) => {
-    console.log(payload)
     setReview({timestamp: payload.timestamp, rate: payload.rate, comment: payload.comment});
     setclientReview(true);
   }
@@ -181,7 +195,7 @@ const Customers = () => {
   }
 
   const closeFlagCustomer = (client) => {
-    setClient(client);
+    setClient(null);
     setFlagCustomer(false);
   }
 
@@ -209,7 +223,6 @@ const Customers = () => {
       setLoading(false);
       setReload(true);
       cancelDeleteClient();
-      
     })
   }
 
@@ -251,12 +264,18 @@ const Customers = () => {
           <TableCell align="left">{ getLastVisit(row.waitlist_summary, row.appointment_summary)}</TableCell>
           <TableCell align="left">{row.status.flag === true ? "Flag": "Ok"}</TableCell>
           <TableCell align="left">
-            <IconButton disabled={!checkPermission('CUST_REMOVAL')} aria-label="delete row" onClick={() => confirmDeleteClient(row)}>
-              <Trash size={17} />
-            </IconButton>
-            <IconButton aria-label="delete row" onClick={() => openFlagCustomer(row)}>
-              <Flag size={17} />
-            </IconButton>
+
+
+            <Stack direction={'row'} spacing={2}>
+              <IconButton disabled={!checkPermission('CUST_REMOVAL')} aria-label="delete row" onClick={() => confirmDeleteClient(row)}>
+                <Trash weight="duotone" size={17} />
+              </IconButton>
+              <IconButton aria-label="delete row" onClick={() => openFlagCustomer(row)}>
+                <Flag size={17} weight="duotone" />
+              </IconButton>
+            </Stack>
+
+
           </TableCell>
 
 
@@ -319,8 +338,8 @@ const Customers = () => {
                         return (
                           <TableRow>
                             <TableCell>
-                                <Tooltip followCursor title={review.comment ? review.comment : 'No review.'}>
-                                  <IconButton onClick={() => showReview({timestamp: review.timestamp, comment: review.comment, rate: review.rate }) }>
+                                <Tooltip followCursor title={review ? review.comment : 'No review.'}>
+                                  <IconButton onClick={() => showReview({timestamp: summary.review.timestamp, comment: summary.review.comment, rate: summary.review.rate }) }>
                                     <RateReviewRoundedIcon fontSize="small"/>
                                   </IconButton>
                                 </Tooltip>
@@ -415,7 +434,7 @@ const Customers = () => {
                           <TableRow>
                             <TableCell>
                                 <Tooltip followCursor title={review.comment ? review.comment : 'No review.'}>
-                                  <IconButton onClick={() => showReview({timestamp: review.timestamp, comment: review.comment, rate: review.rate }) }>
+                                  <IconButton onClick={() => showReview({timestamp: summary.review.timestamp, comment: summary.review.comment, rate: summary.review.rate }) }>
                                     <RateReviewRoundedIcon fontSize="small"/>
                                   </IconButton>
                                 </Tooltip>
@@ -560,6 +579,8 @@ const Customers = () => {
         id="confirmDelete"
         open={confirmDelete}
         onClose={cancelDeleteClient}
+        TransitionComponent={Transition}
+        keepMounted
       >
         <DialogTitle>
             <IconButton
@@ -582,7 +603,6 @@ const Customers = () => {
             </DialogContent>
             <DialogActions>
               <Button sx={{borderRadius: 5}} disabled={!checkPermission('CUST_REMOVAL')} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
-              <Button sx={{borderRadius: 5}} onClick={cancelDeleteClient} variant='contained' color='primary'>Cancel</Button>
             </DialogActions>
 
       </Dialog>
@@ -591,6 +611,8 @@ const Customers = () => {
         id="flagCustomer"
         open={flagCustomer}
         onClose={closeFlagCustomer}
+        TransitionComponent={Transition}
+        keepMounted
       >
         <DialogTitle>
             <IconButton
@@ -615,7 +637,6 @@ const Customers = () => {
             </DialogContent>
             <DialogActions>
               <Button sx={{borderRadius: 5}} variant='contained' color='warning' onClick={() => submitFlagClient()}>Flag</Button>
-              <Button sx={{borderRadius: 5}} onClick={closeFlagCustomer} variant='contained' color='primary'>Cancel</Button>
             </DialogActions>
 
       </Dialog>

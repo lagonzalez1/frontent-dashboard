@@ -316,12 +316,12 @@ const Drawer = ({client, setClient}) => {
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
                                 <Stack spacing={0.5}>
-                                {payload && payload.status.late === true ? (<Chip variant="outlined" icon={<WatchLaterIcon />} label="Running Late" />) : null }
-                                {payload && (payload.status.parking) ? (<Chip variant="outlined" icon={<DirectionsCarFilledIcon />} label="Parking" />) : null }
-                                {payload && (payload.status.here) ? (<Chip variant="outlined" icon={<EmojiPeopleIcon />} label="Here" />) : null }
-                                {payload && (payload.status.cancelled) ? (<Chip variant="outlined" icon={<DoNotDisturbAltRoundedIcon />} label="Cancelled" />) : null }
+                                {payload && payload.status.late === true ? (<Chip  icon={<WatchLaterIcon />} label="Running Late" />) : null }
+                                {payload && (payload.status.parking) ? (<Chip color={'success'}  icon={<DirectionsCarFilledIcon />} label="Parking" />) : null }
+                                {payload && (payload.status.here) ? (<Chip  icon={<EmojiPeopleIcon />} label="Here" />) : null }
+                                {payload && (payload.status.cancelled) ? (<Chip color={'error'}  icon={<DoNotDisturbAltRoundedIcon />} label="Cancelled" />) : null }
                                 {payload && (payload.status.noShow) ? (<Chip color="error" icon={<RuleRoundedIcon />} label="No show" />) : null }
-                                {payload && (payload.status.serving) ? (<Chip variant="outlined" icon={<NavigateNextRoundedIcon />} label="Serving" />) : null }
+                                {payload && (payload.status.serving) ? (<Chip  icon={<NavigateNextRoundedIcon />} label="Serving" />) : null }
                                 </Stack>
                             </Grid>
                         </Grid>

@@ -160,7 +160,11 @@ export default function WelcomeDetails() {
             }
         })
         .then(response => {
-            
+            // I need to work on this.
+            if (response.errorId === 1) {
+                setErrors({title: 'Something went wrong', body: response.msg});
+                return;
+            }
             navigate(`/welcome/${link}/visits/${response.unid}`);
         })
         .catch(error => {
@@ -168,7 +172,6 @@ export default function WelcomeDetails() {
             setErrors({title: 'Error', body: error.msg});
         })
         .finally(() => {
-            setZoomIntoView(false);
             setLoading(false);
         })
     }
@@ -246,9 +249,15 @@ export default function WelcomeDetails() {
                             </IconButton>
                         </Container>
                         <CardContent sx={{textAlign: 'center'}}>
-                            { errors.title === "Error" ? <Alert color={errors.title === "Errors" ? 'error': 'success'}>
-                                <AlertTitle>{errors.title}</AlertTitle>
+                            { errors.title === "Error" ? <Alert color={'error'}>
+                                <AlertTitle>
+                                    <Typography variant="subtitle1" textAlign={'left'}>
+                                        {errors.title}
+                                    </Typography>
+                                </AlertTitle>
+                                <Typography variant="body2" fontWeight={'bold'}>
                                 - {errors.body}
+                                </Typography>
                             </Alert>: null} 
                         
                             <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>

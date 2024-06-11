@@ -28,6 +28,10 @@ export default function ReviewDialog({open, payload, onClose}) {
         return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
     }
 
+    useState(() => {
+        console.log(payload)
+    }, [])
+
     return (
         <Dialog
             open={open}
@@ -49,18 +53,19 @@ export default function ReviewDialog({open, payload, onClose}) {
                     >
                     <CloseIcon />
                 </IconButton> 
-                <Typography variant="h5" fontWeight={'bold'}>Review:  {payload.timestamp ? DateTime.fromISO(payload.timestamp).toLocaleString() : ''} </Typography>
+                <Typography variant="h5" fontWeight={'bold'}>Review:  { payload && payload.timestamp ? DateTime.fromISO(payload.timestamp).toLocaleString() : ''} </Typography>
             </DialogTitle>
             <DialogContent>
             <Stack spacing={2}>
                 <Rating
                     name="hover-feedback"
-                    value={payload.rate ? payload.rate : 0}
+                    value={payload && payload.rate ? payload.rate : 0}
                     getLabelText={getLabelText}
                     disabled={true}
+                    size="large"
                     emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                 />
-                <TextField value={payload.comment ? payload.comment : 'No review has been made'} multiline rows={3} label={'Comment'} />
+                <TextField value={payload && payload.comment ? payload.comment : 'No review has been made'} multiline rows={4} label={'Comment'} />
             </Stack>
             </DialogContent>
         </Dialog>

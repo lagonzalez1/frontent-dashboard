@@ -3,7 +3,7 @@ import { Box, Container, Alert, AlertTitle, Typography, Collapse, IconButton} fr
 
 import CloseIcon from '@mui/icons-material/Close';
 
-export default function AlertMessageGeneral({open, onClose, title, body}) {
+export default function AlertMessageGeneral({open, onClose, title, body, type}) {
 
     const closeAlert = () => {
         onClose(false);
@@ -12,7 +12,7 @@ export default function AlertMessageGeneral({open, onClose, title, body}) {
         <>
         <Collapse in={open}>
             <Alert
-            severity="error"
+            severity={type ? type : "error"}
             action={
                 <IconButton
                 aria-label="close"

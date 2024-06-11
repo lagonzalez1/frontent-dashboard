@@ -56,7 +56,7 @@ export const ClientWelcomeTheme = createTheme({
       main: '#f44336',
     },
     warning: {
-      main: '#3c00b3',
+      main: '#F46036',
     },
     success: {
       main: '#14591D',
@@ -189,7 +189,7 @@ export const DashboardThemeLight = createTheme({
           main: '#FFFFFF'
         },
         success: {
-          main: '#14591d'
+          main: '#219130'
         },
         warning: {
           main: '#F46036',
@@ -236,6 +236,9 @@ export const DashboardThemeDark = createTheme({
           main: '#F46036',
           light: '#EA3E0D'
         },
+        success: {
+          main: '#219130'
+        }
       },
       typography: {
         h3: {
