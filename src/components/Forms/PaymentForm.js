@@ -38,10 +38,10 @@ const SubscriptionForm = () => {
 
 
   const [stripe, setStripe] = useState({
-    session_id: '',
-    customer_id: '',
-    price_id: '',
-    subscription_id: '',
+    session_id: null,
+    customer_id: null,
+    price_id: null,
+    subscription_id: null,
     active: false,
   });
 
@@ -169,7 +169,7 @@ const SubscriptionForm = () => {
         <Container sx={{ width: '100%', display: 'flex', justifyContent: 'center', pb: 2}}>
           <Stack direction={'row'} spacing={1} divider={<Divider orientation="vertical" flexItem />}>
           {
-            stripe && stripe.customer_id !== '' ? (
+            stripe && stripe.customer_id !== null ? (
               <>
                 <Button loading={loading} sx={{borderRadius: 10}} variant='contained' size='small' color='warning' onClick={() => setUpdateSubscription(true)} startIcon={<KeyboardArrowRightRoundedIcon/>}> Update subscription </Button>
               </>

@@ -26,7 +26,7 @@ import RateReviewRoundedIcon from '@mui/icons-material/RateReviewRounded';
 
 import { usePermission } from '../../auth/Permissions';
 import CheckCircle from '@mui/icons-material/CheckCircle';
-import { FileCsv } from "phosphor-react"
+import { FileCsv, Flag, Trash } from "phosphor-react"
 
 const Customers = () => {
 
@@ -51,6 +51,7 @@ const Customers = () => {
   const [review, setReview] = useState({timestamp: null, comment: null, rate: null})
   const [alert, setAlert] = useState(false); 
   const [alertMessage, setAlertMessage] = useState({title: null, body: null});
+  const [flagCustomer, setFlagCustomer ] = useState(false);
 
 
 
@@ -100,6 +101,10 @@ const Customers = () => {
     console.log(printThis)
     handleClose();
   };
+
+  const submitFlagClient = () => {
+    
+  }
 
   const convertDataToCsv = () => {
     if (!data) {
@@ -170,6 +175,16 @@ const Customers = () => {
     setConfirmDelete(true);
   }
 
+  const openFlagCustomer = (client) => {
+    setClient(client);
+    setFlagCustomer(true);
+  }
+
+  const closeFlagCustomer = (client) => {
+    setClient(client);
+    setFlagCustomer(false);
+  }
+
   const cancelDeleteClient = () => {
     setClient(null);
     setConfirmDelete(false);
@@ -236,8 +251,11 @@ const Customers = () => {
           <TableCell align="left">{ getLastVisit(row.waitlist_summary, row.appointment_summary)}</TableCell>
           <TableCell align="left">{row.status.flag === true ? "Flag": "Ok"}</TableCell>
           <TableCell align="left">
-            <IconButton disabled={(permissionLevel === 2|| permissionLevel === 3) ? true: false} aria-label="delete row" onClick={() => confirmDeleteClient(row)}>
-              <BackspaceRoundedIcon fontSize='small' />
+            <IconButton disabled={!checkPermission('CUST_REMOVAL')} aria-label="delete row" onClick={() => confirmDeleteClient(row)}>
+              <Trash size={17} />
+            </IconButton>
+            <IconButton aria-label="delete row" onClick={() => openFlagCustomer(row)}>
+              <Flag size={17} />
             </IconButton>
           </TableCell>
 
@@ -563,8 +581,41 @@ const Customers = () => {
               <Typography variant='body2'>Please confirm if you wish to remove client.</Typography>
             </DialogContent>
             <DialogActions>
-              <Button sx={{borderRadius: 7}} disabled={!checkPermission('CUST_REMOVAL')} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
-              <Button sx={{borderRadius: 7}} onClick={cancelDeleteClient} variant='contained' color='primary'>Cancel</Button>
+              <Button sx={{borderRadius: 5}} disabled={!checkPermission('CUST_REMOVAL')} variant='contained' color='warning' onClick={() => deleteClientAnalytics()}>Delete</Button>
+              <Button sx={{borderRadius: 5}} onClick={cancelDeleteClient} variant='contained' color='primary'>Cancel</Button>
+            </DialogActions>
+
+      </Dialog>
+
+      <Dialog
+        id="flagCustomer"
+        open={flagCustomer}
+        onClose={closeFlagCustomer}
+      >
+        <DialogTitle>
+            <IconButton
+                    aria-label="close"
+                    onClick={closeFlagCustomer}
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: (theme) => theme.palette.grey[500],
+                    }}
+                    >
+                    <CloseIcon />
+                </IconButton> 
+                <Typography variant="h5" fontWeight={'bold'}>Flag { client ? client.fullname : ''} </Typography>
+            </DialogTitle>
+
+            <DialogContent>
+              <Typography variant='body2'>Please confirm if you wish to flag client.</Typography>
+              <Typography variant='body2'>When a client is flagged they will not be able to make external request. </Typography>
+
+            </DialogContent>
+            <DialogActions>
+              <Button sx={{borderRadius: 5}} variant='contained' color='warning' onClick={() => submitFlagClient()}>Flag</Button>
+              <Button sx={{borderRadius: 5}} onClick={closeFlagCustomer} variant='contained' color='primary'>Cancel</Button>
             </DialogActions>
 
       </Dialog>

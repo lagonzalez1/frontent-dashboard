@@ -743,15 +743,11 @@ export default function Waiting() {
         const [reviewComment, setReviewComment] = useState('');
 
         const labels = {
-            0.5: 'Useless',
-            1: 'Useless+',
-            1.5: 'Poor',
-            2: 'Poor+',
-            2.5: 'Ok',
+            0: 'Poor',
+            1: 'Not great',
+            2: 'Neutral+',
             3: 'Ok+',
-            3.5: 'Good',
             4: 'Good+',
-            4.5: 'Excellent',
             5: 'Excellent+',
           };
           
@@ -771,7 +767,8 @@ export default function Waiting() {
                     <Rating
                         name="hover-feedback"
                         value={reviewValue}
-                        precision={0.5}
+                        size="large"
+                        precision={1}
                         getLabelText={getLabelText}
                         onChange={(event, newValue) => {
                             setReviewValue(newValue);
