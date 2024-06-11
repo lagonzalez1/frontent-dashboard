@@ -22,7 +22,7 @@ import { ArrowUp } from 'phosphor-react';
  handleCheckBoxChange This function will not trigger casuing the WEEK days to update.
 */
 
-export default function EmployeeScheduleForm({employee}) {
+export default function EmployeeScheduleForm({employee, reloadPage}) {
 
     const business = useSelector((state) => state.business);
     const schedule = useSelector((state) => state.business.schedule);
@@ -125,7 +125,8 @@ export default function EmployeeScheduleForm({employee}) {
         })
         .finally(() => {
             setLoading(false);
-            dispatch(setReload(true))
+            closeEditSchedule();
+            reloadPage();
         })  
     }
 
@@ -150,7 +151,7 @@ export default function EmployeeScheduleForm({employee}) {
     
     return (
     <Box sx={{ pt: 2}}>
-        <Box>
+        <Typography variant='subtitle1'>Please fill <strong>ALL</strong> business workdays, otherwise empty start/end times will be considered <strong>OFF</strong>.</Typography> 
         <Accordion variant='outlined'>
                 <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -198,7 +199,6 @@ export default function EmployeeScheduleForm({employee}) {
                    </Grid>
                 </AccordionDetails>
             </Accordion>
-        <Typography variant='caption'>Please fill <strong>ALL</strong> business workdays, otherwise empty start/end times will be considered <strong>OFF</strong>.</Typography> 
         <br />
         <Typography variant='caption'>Non workdays are blocked off by default.</Typography>
 
@@ -242,7 +242,7 @@ export default function EmployeeScheduleForm({employee}) {
                                     disabled={employee && !employee.schedule[day]}
                                     error={formik.touched[day]?.start && Boolean(formik.errors[day]?.start)}
                                 />
-                                <Typography variant='caption' fontWeight={'bold'}>{schedule[day].start ?  `${day} start time - `+ DateTime.fromFormat(schedule[day].start, 'HH:mm').toFormat('hh:mm a') : ''}</Typography>                            
+                                <Typography variant='caption' color={'primary'} fontWeight={'bold'}>{schedule[day].start ?  `${day} start time - `+ DateTime.fromFormat(schedule[day].start, 'HH:mm').toFormat('hh:mm a') : ''}</Typography>                            
                                 <ArrowUp size={12} />
                             </Grid>
                             <Grid item xs={3}>
@@ -290,7 +290,7 @@ export default function EmployeeScheduleForm({employee}) {
                                     disabled={employee && !employee.schedule[day]}
                                     error={formik.touched[day]?.end && Boolean(formik.errors[day]?.end)}
                                 />
-                                <Typography  fontWeight={'bold'} variant='caption'>{schedule[day].end ? `${day} end time - `+ DateTime.fromFormat(schedule[day].end, 'HH:mm').toFormat('hh:mm a') : ''}</Typography>                            
+                                <Typography color={'primary'} fontWeight={'bold'} variant='caption'>{schedule[day].end ? `${day} end time - `+ DateTime.fromFormat(schedule[day].end, 'HH:mm').toFormat('hh:mm a') : ''}</Typography>                            
                                 <ArrowUp size={12} />
                             </Grid>
                         </Grid>              
@@ -301,7 +301,6 @@ export default function EmployeeScheduleForm({employee}) {
                     submit
                 </LoadingButton>
                 </form>  
-        </Box>
     </Box>
     
     )

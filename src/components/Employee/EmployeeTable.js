@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AddEmployeeForm from "../Forms/AddEmployeeForm";
 import CloseIcon from "@mui/icons-material/Close"
 import { requestRemoveEmployee, requestBlockEmployee, requestProfileImages, getEmployeeImageRef } from "../FormHelpers/AddNewEmployeeFormHelper";
-import { setReload, setSnackbar } from "../../reducers/user";
+import { setSnackbar } from "../../reducers/user";
 import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
 import VisibilityRoundedIcon from '@mui/icons-material/VisibilityRounded';
@@ -184,17 +184,6 @@ export default function EmployeeTable({reloadPage}) {
         
     }
 
-
-    const getEmployeeCurrentSchedule = (schedule) => {
-        const closedDates = business.closedDates;
-        const DAY = DateTime.local().setZone(business.timezone).weekdayLong;
-        if (schedule[DAY].start === "" && schedule[DAY].end === "") { return `Todays shift: Off`}
-        let startTime = DateTime.fromFormat(schedule[DAY].start, "HH:mm").toFormat("hh:mm a");
-        let endTime = DateTime.fromFormat(schedule[DAY].end, "HH:mm").toFormat("hh:mm a");
-        let s = `Todays shift: ${startTime}-${endTime}`;
-        return s
-    }
-
     const ShowVisibilityOptions = ({employee}) => {
         if (employee.visibility.lastUpdate === null) {
             return (
@@ -240,7 +229,6 @@ export default function EmployeeTable({reloadPage}) {
 
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
                 {employees ? employees.map((employee, index) => {
-                    let sstring = getEmployeeCurrentSchedule(employee.schedule_alternative);
                     return (
                         <>
                         <ListItem  
@@ -290,7 +278,7 @@ export default function EmployeeTable({reloadPage}) {
                                     <React.Fragment>
                                     <Stack>
                                         <Typography variant="caption">{ `Permission level: ${employee.permissionLevel}` }</Typography>
-                                        <Typography variant="caption">{ sstring }</Typography>
+                                        <Typography variant="caption">{ employee.presentDaySchedule }</Typography>
                                     </Stack>
                                     </React.Fragment>
                                 }
@@ -376,7 +364,7 @@ export default function EmployeeTable({reloadPage}) {
            <Divider/>
 
             <DialogContent>
-                <AddEmployeeForm employee={employee} closeModal={closeEmployeeModal} reload={() => setReload(true)}/>
+                <AddEmployeeForm employee={employee} closeModal={closeEmployeeModal} reloadPage={reloadPage}/>
             </DialogContent>
             </Dialog>
 
@@ -406,7 +394,7 @@ export default function EmployeeTable({reloadPage}) {
            <Divider/>
 
             <DialogContent>
-                <AddEmployeeForm employee={employee} closeModal={closeEmployeeModal}/>
+                <AddEmployeeForm employee={employee} closeModal={closeEditEmployee} reloadPage={reloadPage}/>
             </DialogContent>
             </Dialog>
 
@@ -436,7 +424,7 @@ export default function EmployeeTable({reloadPage}) {
            </DialogTitle>
             <Divider />
             <DialogContent>
-                <EmployeeScheduleForm employee={employee}/>
+                <EmployeeScheduleForm employee={employee} closeEditSchedule={closeEditSchedule} reloadPage={reloadPage} />
             </DialogContent>
             </Dialog>
 

@@ -29,14 +29,15 @@ import * as Yup from 'yup';
 import "../../css/Waiting.css";
 import { DateTime } from "luxon";
 import { Field, Formik,Form, ErrorMessage, useFormik } from "formik";
-import { CheckCircle, Check, Star, Calendar, NavigationArrow, Share, Copy, Flag, ClockClockwise, CurrencyCircleDollar  } from "phosphor-react";
+import { CheckCircle, Check, Star, Calendar, NavigationArrow, Share, Copy, Flag, ClockClockwise, CurrencyCircleDollar, Warning  } from "phosphor-react";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
 
 import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
     getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle, requestClientReview, getBusinessTimezone, 
-    acknowledgeChat} from "./WaitingHelper.js";
+    acknowledgeChat,
+    isAppointmentEditable} from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";
 import { ClientWaitingTheme, ClientWelcomeTheme } from "../../theme/theme.js";
 import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
@@ -74,6 +75,7 @@ export default function Waiting() {
     const [business, setBusinessInfo] = useState(null);
     const [employeeName, setEmployeeName] = useState(null);
     const [acknowledgeLoading, setAcknowledgeLoading] = useState(false);
+    const [editPretenseLoader,setEditPretenseLoader] = useState(false);
 
     const [service, setService] = useState(null);
     const [loader, setLoader] = useState(false);
@@ -124,6 +126,29 @@ export default function Waiting() {
         setAppointments(null);
     }
 
+    const attemptEditAppointment = () => {
+        // Set loader
+        const timestamp = DateTime.local().toISO();
+        setEditPretenseLoader(true);
+        isAppointmentEditable(link, unid, type, timestamp)
+        .then(response => {
+            if (response.status === true) {
+                setEditClient(true);
+                return;
+            }
+            if (response.status === false) {
+                setAlert({title: 'Warning', message: response.msg, open: true, color: 'warning'});   
+                return;
+            }
+        })
+        .catch(error => {
+            setAlert({title: 'Error', message: error.msg, open: true, color: 'error'});
+        })
+        .finally(() =>{
+            setEditPretenseLoader(false);
+        })        
+    }
+
 
     function isOnlyOneTrue(obj) {
         const trueValues = Object.values(obj).filter(value => value === true);
@@ -158,7 +183,6 @@ export default function Waiting() {
         })
         .catch(error => {
             setErrors({title: 'Error', body: error.msg});
-            setDisabled(true); 
         })
     }
 
@@ -207,7 +231,7 @@ export default function Waiting() {
         })
         .catch(error => {
             console.log(error);
-            //setErrors('Error: ' + error.data.msg);
+            setAlert({title: 'Error', message: error.msg, open: true, color: 'error'});
         })
         .finally(() => {
             setLoading(false);
@@ -468,7 +492,6 @@ export default function Waiting() {
         if (serving === true) {
             return (
                 <Stack direction={'column'}>
-                    
                     <Container sx={{display: 'flex', justifyContent: 'center',  justifyItems: 'center'}}>
                     <div className="blob_appointment">
                         <Star size={88} color="white" weight="thin" />
@@ -651,8 +674,17 @@ export default function Waiting() {
 
                     <Typography variant="caption" sx={{ color: "gray"}}> Unique identifier </Typography>
                     <Typography variant="body1"  sx={{ fontWeight: 'bold'}} gutterBottom>{user ? user.identifier : ''}</Typography>
-                    
                 </Container>
+                
+                {
+                    editPretenseLoader ? (
+                        <Box sx={{ width: '100%' }}>
+                            <LinearProgress load />
+                        </Box>
+                    ): null
+                }
+                
+
                 {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
@@ -661,7 +693,7 @@ export default function Waiting() {
                                 {'Status'}
                             </Typography>
                         </Button>
-                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BorderColorRoundedIcon  fontSize="small"/>} onClick={() => setEditClient(true)}>
+                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BorderColorRoundedIcon  fontSize="small"/>} onClick={() => attemptEditAppointment()}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                 {'edit'}
                             </Typography>
@@ -672,7 +704,19 @@ export default function Waiting() {
                             </Typography>
                         </Button>
                     </Stack>
-                </Container>}
+                </Container>
+                }
+                <Divider />
+                    <Box sx={{textAlign: 'left'}}>
+                        <Alert severity="warning">
+                            <AlertTitle>
+                                <Typography fontWeight={'bold'}>{'Scheduled appointments'}</Typography>
+                            </AlertTitle>
+                            <Typography variant="caption">
+                                To protect scheduled appointments, changes on the appointment date are not allowed. Please <strong>cancel</strong> and reschedule if needed.
+                            </Typography>                            
+                        </Alert>
+                    </Box>
                 </>
             )
         }
@@ -827,7 +871,7 @@ export default function Waiting() {
                     direction={'column'}
                     alignItems={'center'}                    
                 >
-                <Grid className="grid-item" item xs={12} md={3} lg={4} xl={4}>
+                <Grid className="grid-item" item xs={12} md={3} lg={3} xl={3}>
                     <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 2}}>
                     <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
                         <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
@@ -888,7 +932,6 @@ export default function Waiting() {
                                 <Field
                                 as={TextField}
                                 id="fullname"
-                                size="small"
                                 name="fullname"
                                 label="Customer name"
                                 placeholder="Customer name"
@@ -901,7 +944,6 @@ export default function Waiting() {
                                 <Field
                                 as={TextField}
                                 id="email"
-                                size="small"
                                 name="email"
                                 disabled={true}
                                 label="Customer email"
@@ -911,12 +953,9 @@ export default function Waiting() {
                                 onBlur={handleBlur}
                                 />
                                 <ErrorMessage name="email" component="div" />
-
-
                                 <Field
                                 as={TextField}
                                 id="phone"
-                                size="small"
                                 name="phone"
                                 disabled={true}
                                 label="Phone"
@@ -1081,7 +1120,6 @@ export default function Waiting() {
                                 as={TextField}          
                                 id="size"
                                 name="size"
-                                size="small"
                                 label="Party size"
                                 error={touched.size && !!errors.size}
                                 onChange={handleChange}
@@ -1094,7 +1132,6 @@ export default function Waiting() {
                                 as={TextField}
                                 id="notes"
                                 name="notes"
-                                size="small"
                                 label="Notes"
                                 placeholder="Additional notes"
                                 error={touched.notes && !!errors.notes}
@@ -1133,7 +1170,7 @@ export default function Waiting() {
                     
                     </CardContent>
                     }
-                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 2}}>
+                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 3, pt: 2}}>
                         <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
                     </CardActions>
 
@@ -1153,6 +1190,9 @@ export default function Waiting() {
                             </Container>
                         ): null
                     }
+
+                    
+
                     </Card>
                 </Grid>
 

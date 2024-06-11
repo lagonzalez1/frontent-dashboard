@@ -5,19 +5,48 @@ let GET_IDENTIFIER = '/api/external/identifierRequest';
 let GET_EMPLOYEELIST = '/api/external/employeeList';
 let GET_BUSINES_ARGS = `/api/external/businessArgs`;
 let GET_TIMEZONE = `/api/external/businessTimezone`;
+let GET_IS_EDIT_AVAILABLE = '/api/external/isEditAvailable';
+
 
 let POST_AVAILABLE_APPOINTMENTS = '/api/external/available_appointments';
 let POST_EDITAPPOINTMENT = '/api/external/editAppointment';
 let POST_CLIENTREIVEW = `/api/external/create_review`;
 let POST_UPDATESTATUS = '/api/external/updateClientStatus';
 let POST_REMOVE_REQUEST = '/api/external/removeRequest';
-let POST_ACK_CHAT = '/api/external/ack_chat'
+let POST_ACK_CHAT = '/api/external/ack_chat';
 
 
 
 export const iconsList = (position) => {
     let iconLi = [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10]
     return iconLi[position - 1];
+}
+
+
+export const isAppointmentEditable = (link, clientId, type, timestamp) => {
+    return new Promise ((resolve, reject) => {
+        axios.get(GET_IS_EDIT_AVAILABLE,{ params: { clientId, link, type, timestamp}, timeout: 90000, timeoutErrorMessage: 'Timeout error'} )
+        .then(response => {
+            resolve(response.data)
+        })
+        .catch(error => {
+            console.log(error);
+            if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+            reject('Request timed out. Please try again later.'); // Handle timeout error
+            }
+            if (error.response) {
+                console.log(error.response);
+                reject({msg: 'Response error', error: error.response});
+            }
+            else if (error.request){
+                console.log(error.request);
+                reject({msg: 'No response from server', error: error.request})
+            }
+            else {
+                reject({msg: 'Request setup error', error: error.message})
+            }
+        })
+    })
 }
 
 

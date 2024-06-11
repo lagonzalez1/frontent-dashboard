@@ -20,7 +20,7 @@ import VpnKeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
  handleCheckBoxChange This function will not trigger casuing the WEEK days to update.
 */
 
-export default function AddEmployeeForm ({ employee, closeModal, reload }) {
+export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
 
     const { checkPermission } = usePermission();
     const { checkSubscription } = useSubscription();
@@ -113,7 +113,7 @@ export default function AddEmployeeForm ({ employee, closeModal, reload }) {
             })
           .finally(() => {
               closeModal();
-              reload();
+              reloadPage();
           })
         } else { 
           // Handle the edit request.
@@ -147,7 +147,7 @@ export default function AddEmployeeForm ({ employee, closeModal, reload }) {
             })
           .finally(() => {
               closeModal();
-              reload();
+              reloadPage();
           })
         }
     }
