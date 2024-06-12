@@ -398,7 +398,7 @@ export default function WelcomeDetails() {
 
                             <Stack alignContent={'center'} spacing={2}>
                                 <Chip 
-                                    sx={{ maxWidth: '80x'}} variant="outlined" size="small" clickable={true} 
+                                    sx={{ maxWidth: '80x', color:"black"}} variant="outlined" size="small" clickable={true} 
                                     onClick={() => setShowDisclosure(true)} icon={<InfoOutlinedIcon fontSize="small"/>} 
                                     label={'Disclosure'}> 
                                 </Chip> 

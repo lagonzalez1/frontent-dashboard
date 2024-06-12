@@ -50,6 +50,7 @@ export default function WelcomeSelector() {
     const [alertAppointments, setAlertAppointment] = useState(false);
     const [errorMessage, setErrorMessage] = useState({title: '', body: ''});
     const [appointmentSearchErrors, setAppointmentSearchErrors] = useState({title: null, body: null, type: null});
+    const [employeeSearchErrors, setEmployeeSearchErrors] = useState({open: false, title: null, body: null});
     const [timezone, setTimezone] = useState(null);
 
 
@@ -373,8 +374,10 @@ export default function WelcomeSelector() {
         getEmployeeList(incomingDate, link)
         .then(response => {
             if(Object.keys(response).length === 0){
-                
+                setEmployeeSearchErrors({open: true, title: 'Warning', body: 'No employees available for date.'});
+                return;
             }
+            setEmployeeSearchErrors({open: false, title: null, body: null});
             setAppEmployees(response);
         })
         .catch(error => {
@@ -614,10 +617,20 @@ export default function WelcomeSelector() {
                                                             
                                                             )
                                                         })
-                                                    : <Grid item>
-                                                        <Typography variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>No availability found</Typography>
-                                                    </Grid>
-                                                    }                                                    
+                                                    : null
+                                                    }     
+                                                    {
+                                                        employeeSearchErrors && employeeSearchErrors.open === true ? (
+                                                            <Box>
+                                                                <Alert severity="warning" onClose={() => setEmployeeSearchErrors({open: false, title: null, body: null})}>
+                                                                    <AlertTitle>
+                                                                        <Typography variant="body2">{employeeSearchErrors.title}</Typography>
+                                                                    </AlertTitle>
+                                                                    <Typography variant="caption">{employeeSearchErrors.body}</Typography>
+                                                                </Alert>
+                                                            </Box>
+                                                        ) : null
+                                                    }                                               
                                                 </Grid>
                                             </Fade>
                                         </Container>
@@ -944,22 +957,22 @@ export default function WelcomeSelector() {
                                 {
                                     (openWaitlistSummary && systemTypeSelected === WAITLIST) ? (
                                         <Box sx={{ pt: 1, display: openWaitlistSummary ? "block": 'none', width: '100%', maxWidth: '100%'}}>
-                                            <Alert icon={<CloudDone />} severity='warning' sx={{ textAlign: 'left'}}>
+                                            <Alert icon={<CloudDone />} severity='secondary' sx={{ textAlign: 'left'}}>
                                                 <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
-                                                { waitlistData && waitlistData.fullname === true ? (
+                                                { waitlistData && waitlistData.fullname ? (
                                                 <>
                                                 <Typography variant="caption">Employee assigned — <strong>{waitlistData.fullname }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
                                                 
-                                                { waitlistData && waitlistData.serviceTitle === true ? (
+                                                { waitlistData && waitlistData.serviceTitle ? (
                                                 <>
                                                 <Typography variant="caption">Service — <strong>{waitlistData.serviceTitle }</strong></Typography>
                                                 <br/>
                                                 </>
                                                 ) : null}
-                                                { waitlistData && waitlistData.resourceTitle === true ? (
+                                                { waitlistData && waitlistData.resourceTitle ? (
                                                 <>
                                                 <Typography variant="caption">Resource — <strong>{waitlistData.resourceTitle }</strong></Typography>
                                                 <br/>

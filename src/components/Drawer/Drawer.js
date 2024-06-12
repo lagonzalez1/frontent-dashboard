@@ -1,5 +1,5 @@
 import React, {memo, useEffect, useState} from "react";
-import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled, Chip, TextField } from "@mui/material";
+import { CircularProgress, Divider, Grid, IconButton, List, ListItem, ListItemAvatar, ThemeProvider, ListItemText, Toolbar, styled, Chip, TextField, Avatar } from "@mui/material";
 import { Container, Box, Stack, Drawer as SIDEBAR, Typography, Button, Paper, Tab} from "@mui/material";
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -29,6 +29,7 @@ import { useSubscription } from '../../auth/Subscription';
 import ServingClient from "../Dialog/ServingClient";
 import { removeClient } from "../Waitlist/Helpers";
 import { LoadingButton } from "@mui/lab";
+import { FactCheckOutlined } from "@mui/icons-material";
 
 
 
@@ -450,17 +451,21 @@ const Drawer = ({client, setClient}) => {
 
                         { analytics && analytics.waitlist_summmary ?
                         analytics.waitlist_summmary.map((object, index) => {
-                            
                             return (
                                 <>
                                     <ListItem>
                                         <ListItemAvatar>
-                                            <PlaylistAddRoundedIcon fontSize="small" />
+                                            <Avatar>
+                                            <FactCheckOutlined />
+                                            </Avatar>
                                         </ListItemAvatar>
                                         <ListItemText>
+                                            <Stack>
                                             <Typography variant="body2"> { "Last visit: " + DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
                                             <Typography variant="body2"> { "Employee: " + findEmployee(object.employee).fullname }</Typography>
-                                            <Typography variant="caption"> {"Notes: "} { object.notes ? object.notes: 'No notes.' }</Typography>
+                                            <Typography variant="body2"> {'Service: '} { findService(object.serviceTag).title }</Typography>
+                                            <Typography variant="body2"> {"Notes: "} { object.notes ? object.notes: 'No notes.' }</Typography>
+                                            </Stack>
                                         </ListItemText>
                                         
                                     </ListItem>
@@ -478,13 +483,17 @@ const Drawer = ({client, setClient}) => {
                                     <>
                                         <ListItem>
                                             <ListItemAvatar>
-                                                <CalendarMonthIcon fontSize="small" />
+                                                <Avatar>
+                                                <FactCheckOutlined  />
+                                                </Avatar>
                                             </ListItemAvatar>
                                             <ListItemText>
-                                                <Typography variant="body2"> <strong>{'Last visit: '}</strong>{DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
-                                                <Typography variant="body2"> <strong>{"Employee: "}</strong>{ findEmployee(object.employee).fullname }</Typography>
-                                                <Typography variant="body2"> <strong>{'Service: '}</strong> { findService(object.serviceTag).title }</Typography>
-                                                <Typography variant="caption"> <strong>{"Notes: "}</strong> { object.notes ? object.notes: 'No notes.' }</Typography>
+                                                <Stack>
+                                                <Typography variant="body2"> {'Last visit: '}{DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
+                                                <Typography variant="body2"> {"Employee: "}{ findEmployee(object.employee).fullname }</Typography>
+                                                <Typography variant="body2"> {'Service: '} { findService(object.serviceTag).title }</Typography>
+                                                <Typography variant="body2">{"Notes: "} { object.notes ? object.notes: 'No notes.' }</Typography>
+                                                </Stack>
                                             </ListItemText>
                                             
                                         </ListItem>
