@@ -45,6 +45,7 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
 
     let initialValues = { 
         fullname: employee ? employee.fullname: '',
+        message: employee ? employee.message : '',
         employeePassword: '',
         employeeUsername : employee ? employee.employeeUsername: '',
         permissionLevel: employee ? employee.permissionLevel: '',
@@ -62,6 +63,7 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
     }
     const validationSchema = Yup.object().shape({
         fullname: Yup.string().required("First last name required."),
+        message: Yup.string().max(120),
         employeeUsername: Yup.string().required("Username is required to login.").min(6),
         employeePassword: Yup.string().min(6).matches(
           /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
@@ -226,6 +228,16 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
                   error={touched.fullname && !!errors.fullname}
                   helperText={touched.fullname && errors.fullname}
                 />
+                <Field
+                  name="message"
+                  as={TextField}
+                  label="A little about yourself"
+                  variant="outlined"
+                  color={'secondary'}
+                  error={touched.message && !!errors.message}
+                  helperText={touched.message && errors.message}
+                />
+
                 <Field
                   name="employeeUsername"
                   label="Username"

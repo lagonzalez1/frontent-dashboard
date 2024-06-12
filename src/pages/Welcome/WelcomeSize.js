@@ -158,7 +158,7 @@ export default function WelcomeSize() {
                 >
                 <Zoom mountOnEnter unmountOnExit in={zoomIntoView}>
                 <Grid className="grid-item" item xs={12} md={4} lg={3} xl={3}>
-                <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
+                <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 3, p: 3}}>
                     <Container sx={{}}>
                         <IconButton onClick={ () => redirectBack() }>
                             <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>

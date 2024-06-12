@@ -101,7 +101,7 @@ export function flagClientAccount (id, flagStatus) {
        const payload = {b_id: business._id, eid: id, email: user.email, flagStatus}
        axios.post(POST_FLAG_CLIENT, payload, {...headers, timeout: 900000, timeoutErrorMessage: 'Timeout error'})
        .then(response => {
-        resolve(response.data.msg);
+        resolve(response.data);
        }) 
        .catch(error => {
         console.log(error);

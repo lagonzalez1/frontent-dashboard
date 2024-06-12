@@ -447,11 +447,16 @@ const Waitlist = ({setClient, setEditClient}) => {
                                     </Stack>
                                 </TableCell>
                                 <TableCell align="left">
+                                    <Stack direction={'row'}>
+                                    {item.status.cancelled ? <IconButton disabled> <WarningRoundedIcon color="error" /> </IconButton> : 
+                                                    <IconButton disabled><FmdGoodRounded color="success" /></IconButton> }
+                                    <Stack>
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
                                     <Typography fontWeight="normal" variant="caption">
                                         { item.serviceTag ? findService(item.serviceTag).title: null }
                                     </Typography>
-                            
+                                    </Stack>
+                                    </Stack>
                                 </TableCell>
                                 <TableCell align="left">
                                     <Typography variant="subtitle2" fontWeight="bold">{item.partySize}</Typography>

@@ -249,7 +249,7 @@ export default function Welcome() {
                 >   
                     <Slide direction="up" in={zoomIntoView} mountOnEnter unmountOnExit>
                     <Grid className="grid-item" item xs={12} md={3} lg={3} xl={3}>
-                    <Card raised variant="outlined" className="wcard" sx={{pt: 1, borderRadius: 5, p: 4}}>
+                    <Card raised variant="outlined" className="wcard" sx={{pt: 1, borderRadius: 3, p: 4}}>
                             { loading ? 
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
                                 <CircularProgress size={20}/>

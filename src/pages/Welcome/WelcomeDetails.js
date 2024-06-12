@@ -48,6 +48,7 @@ export default function WelcomeDetails() {
     const { link } = useParams();
     const navigate = useNavigate();
     const [errors, setErrors] = useState({title: null, body: null});
+    const [openErrors, setOpenErrors] = useState(false);
     const [loading, setLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(null);
     const [preview, setPreview] = useState(null);
@@ -57,7 +58,7 @@ export default function WelcomeDetails() {
     const [open, setOpen] = useState(false);
     const [zoomIntoView, setZoomIntoView] = useState(false);
     const [disable, setDisable] = useState(false);
-    const [seconds, setSeconds] = useState(120);
+    const [seconds, setSeconds] = useState(180);
     const [timezone, setTimezone] = useState(null);
     
     
@@ -113,6 +114,7 @@ export default function WelcomeDetails() {
             if (error.error.status === 404) {
                 navigate(`/welcome/${link}`);
             }
+            setOpenErrors(true);
             setErrors({title: 'Error', body: error.msg});
             setDisable(true); 
         })
@@ -150,9 +152,12 @@ export default function WelcomeDetails() {
         let duplicatePayload = { ...clientStorage, link, values}
         checkDuplicatesRequest(duplicatePayload)
         .then((response) => {
+            if (response.flag === true) {
+                setErrors({title: 'Issue found', body: response.msg});
+                return;
+            }
             if(response.duplicate === true) {
                 // This should allow the request to complete if less than 4
-                setLoading(false);
                 navigate(`/welcome/${link}/visits/${response.identifier}`);
             }else{
                 // Make the real request to backend.
@@ -160,15 +165,12 @@ export default function WelcomeDetails() {
             }
         })
         .then(response => {
-            // I need to work on this.
-            if (response.errorId === 1) {
-                setErrors({title: 'Something went wrong', body: response.msg});
-                return;
+            if (response) {
+                navigate(`/welcome/${link}/visits/${response.unid}`);
             }
-            navigate(`/welcome/${link}/visits/${response.unid}`);
         })
         .catch(error => {
-            setLoading(false);
+            setOpenErrors(true);
             setErrors({title: 'Error', body: error.msg});
         })
         .finally(() => {
@@ -242,23 +244,24 @@ export default function WelcomeDetails() {
                 >
                     <Zoom in={zoomIntoView} mountOnEnter unmountOnExit>
                         <Grid className="grid-item" item xs={12} md={4} lg={3} xl={3}>
-                        <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 5, p: 3}}>
+                        <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 3, p: 3}}>
                         <Container sx={{ textAlign: 'left'}}>
                             <IconButton onClick={ () => redirectBackPage() }>
                                 <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
                             </IconButton>
                         </Container>
                         <CardContent sx={{textAlign: 'center'}}>
-                            { errors.title === "Error" ? <Alert color={'error'}>
+                            
+                            {openErrors && <Alert color={'error'}>
                                 <AlertTitle>
-                                    <Typography variant="subtitle1" textAlign={'left'}>
+                                    <Typography variant="subtitle1" textAlign={'left'} fontWeight={'bold'}>
                                         {errors.title}
                                     </Typography>
                                 </AlertTitle>
-                                <Typography variant="body2" fontWeight={'bold'}>
+                                <Typography variant="body2" textAlign={'left'}>
                                 - {errors.body}
                                 </Typography>
-                            </Alert>: null} 
+                            </Alert>}
                         
                             <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
                                 {link}

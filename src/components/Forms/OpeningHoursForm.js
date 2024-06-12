@@ -5,7 +5,7 @@ import { Formik, Form, Field } from 'formik';
 import CloseIcon from "@mui/icons-material/Close";
 import * as Yup from 'yup';
 import { SingleInputTimeRangeField } from '@mui/x-date-pickers-pro/SingleInputTimeRangeField';
-import { DatePicker } from '@mui/x-date-pickers';
+//import { DatePicker } from '@mui/x-date-pickers';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone, 
@@ -17,6 +17,8 @@ import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
 import { BellZ, CheckSquare, ClockCounterClockwise } from 'phosphor-react';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+
 
 
 
@@ -37,11 +39,13 @@ const OpeningHoursForm = ({reloadPage}) => {
   const employeeList = getEmployeeList();
 
   const [scheduledDaysOff, setScheduledDaysOff] = useState(false);
+  const [tableLoader, setScheduleTableLoader] = useState(false);
   const [employeeTag, setEmployeeTag] = useState('');
   const [partialDay, setPartialDay] = useState(false);
   const [scheduleDialog, setScheduleDialog] = useState(false);
   const [closedDialog, setClosedDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [closeDateLoader,setCloseDateLoader] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -84,6 +88,10 @@ const OpeningHoursForm = ({reloadPage}) => {
 
   }
 
+  const closeScheduleTable = () => {
+    setScheduledDaysOff(false);
+  }
+
   const handleEmployeeChange = (event) => {
     setEmployeeTag(event.target.value)
   }
@@ -108,7 +116,7 @@ const OpeningHoursForm = ({reloadPage}) => {
         return;
       }
     }
-    setLoading(true);
+    setCloseDateLoader(true);
     requestClosedDate(selectedDate.toISO(), employeeTag, start, end)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
@@ -117,14 +125,15 @@ const OpeningHoursForm = ({reloadPage}) => {
       dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
+      setCloseDateLoader(false);
+      closeClosedDialog();
       reloadPage()
     })
 
   }
 
   const removeClosedDate = (dateId) => {
-    setLoading(true);
+    setScheduleTableLoader(true);
     requestRemoveCloseDate(dateId)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
@@ -134,8 +143,9 @@ const OpeningHoursForm = ({reloadPage}) => {
       dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
     })
     .finally(() => {
-      setLoading(false);
-      reloadPage()
+      setScheduleTableLoader(false);
+      closeScheduleTable();
+      reloadPage();
     })
   }
 
@@ -183,9 +193,10 @@ const OpeningHoursForm = ({reloadPage}) => {
     const currentDate = DateTime.local().setZone(business.timezone);
     return (
       <Box>
-      <DatePicker
+      <DesktopDatePicker
         label={label}
         value={value}
+        
         sx={{ width: '100%'}}
         onChange={onChange}
         renderInput={(params) => <TextField {...params} />}
@@ -281,13 +292,13 @@ const OpeningHoursForm = ({reloadPage}) => {
     </Formik>
 
 
-      <Dialog
-        id="scheduelDialog"
-        open={scheduleDialog}
-        onClose={closeScheduleDialog}
-        TransitionComponent={Transition}
-        keepMounted={true}
-      >
+        <Dialog
+          id="scheduelDialog"
+          open={scheduleDialog}
+          onClose={closeScheduleDialog}
+          TransitionComponent={Transition}
+          keepMounted={true}
+        >
         <DialogTitle>
             <IconButton
                     aria-label="close"
@@ -313,7 +324,7 @@ const OpeningHoursForm = ({reloadPage}) => {
             <Typography variant='subtitle2'><u>important</u> submit your 
               time based on 24 hour time <strong> (Ex. 08:00~8AM, 18:00~6PM.)</strong></Typography>
             <br/>
-            <Divider />
+              <Divider />
             </Box>
 
           <Formik initialValues={initialValuesSchedule} validationSchema={validationSchemaSchedule} onSubmit={scheduleSubmit}>
@@ -421,30 +432,13 @@ const OpeningHoursForm = ({reloadPage}) => {
                 {message}
                 </Alert>
             </Collapse>
-              
-              <Divider />
-              <Grid container spacing={1} rowSpacing={1} sx={{ pt: 1}}>
-                  <Grid item xs={12}>
+                <Divider />
+
+                <Grid container spacing={2}>
+                  <Grid item xs>
+                    <Box>
                     <Typography variant='subtitle2' fontWeight={'bold'}>When will you be off?</Typography>
-                    <Divider/>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Stack spacing={1}> 
-                      <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
-                      <Typography variant='subtitle2' fontWeight={'bold'}>Employee call off?</Typography>
-                      <Select 
-                        sx={{ pt: 1}}
-                        id="employeeTag"
-                        value={employeeTag}
-                        onChange={handleEmployeeChange}
-                        fullWidth={true}
-                      >
-                        {employeeList && employeeList.map((employee, index) => (
-                          <MenuItem key={index} disabled={!canEmployeeEdit(employee._id, 'HOUR_CLOSE_DEL')} value={employee._id}>
-                            <Typography variant='body2'>{employee.fullname}</Typography>
-                          </MenuItem>
-                        ))}
-                      </Select>
+                    <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
                       {
                         selectedDate && <FormControlLabel 
                         control={<Switch
@@ -454,46 +448,62 @@ const OpeningHoursForm = ({reloadPage}) => {
                           onChange={(e) => setPartialDayPretense(e) }
                           inputProps={{ 'aria-label': 'controlled' }}
                         />
-                      }
-                      label="Partial day?"
-                      />
-                      }
-                      
-                      {
+                            }
+                        label="Partial day?"
+                        />
+                  }
+                    </Box>
+                  </Grid>
+
+                  <Grid item xs>
+                    <Box>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>Employee call off?</Typography>
+                      <Select 
+                        sx={{ pt: 1}}
+                        id="employeeTag"
+                        variant='standard'
+                        size='medium'
+                        value={employeeTag}
+                        onChange={handleEmployeeChange}
+                        fullWidth={true}
+                      >
+                        <MenuItem key={'None'} value={''}>
+                            <Typography variant='body2'>None</Typography>
+                          </MenuItem>
+                        {employeeList && employeeList.map((employee, index) => (
+                          <MenuItem key={index} disabled={!canEmployeeEdit(employee._id, 'HOUR_CLOSE_DEL')} value={employee._id}>
+                            <Typography variant='body2'>{employee.fullname}</Typography>
+                          </MenuItem>
+                        ))}
+                      </Select>
+                        {
                         partialDay ? (
                           <Grow in={partialDay}>
-                            <Box>
+                            <Box sx={{ pt: 1.5}}>
                               <SingleInputTimeRangeField 
                                 label="Start and end"
                                 value={timerange}
+                                variant='standard'
                                 fullWidth={true}
                                 disabled={timerange[0] === null ? true: false}
                                 onChange={(newValue) => setTimerange(newValue)}
                                 />
                               <br/>
                             <Typography variant='caption' gutterBottom>Enter the time range you <strong>will</strong> be available.</Typography>
- 
+
                             </Box>
                           </Grow>
                         ):
                         null
                       }
-                      
-
-                    </Stack>
+                    </Box>
                   </Grid>
-                  <Grid item xs={12}>
-                  
-                  </Grid>
+                </Grid>
 
-
-                  
-
-              </Grid>
-
+                
           </DialogContent>
           <DialogActions>
-            <Button disabled={!canEmployeeEdit(employeeTag, 'EMPL_ATTACH')} sx={{ borderRadius: 10}} variant='contained' onClick={() => saveCloseDate()}>save</Button>
+            <LoadingButton loading={closeDateLoader} disabled={!canEmployeeEdit(employeeTag, 'EMPL_ATTACH')} sx={{ borderRadius: 5}} variant='contained' onClick={() => saveCloseDate()}>save</LoadingButton>
           </DialogActions>
         
       </Dialog>
@@ -501,14 +511,14 @@ const OpeningHoursForm = ({reloadPage}) => {
 
       <Dialog
         open={scheduledDaysOff}
-        onClose={() => setScheduledDaysOff(false)}
+        onClose={closeScheduleTable}
         TransitionComponent={Transition}
         id="scheduledDaysOff"
       >
         <DialogTitle>
             <IconButton
                     aria-label="close"
-                    onClick={() => setScheduledDaysOff(false)}
+                    onClick={closeScheduleTable}
                     sx={{
                         position: 'absolute',
                         right: 8,
@@ -524,7 +534,7 @@ const OpeningHoursForm = ({reloadPage}) => {
 
             </DialogTitle>
         <DialogContent>
-        <TableContainer style={{ maxHeight: '350px', overflowY: 'auto' }}>
+        <TableContainer style={{ maxHeight: '450px', overflowY: 'auto' }}>
             <Table size='small'>
               { closedDays ?
               <TableHead>
@@ -573,9 +583,9 @@ const OpeningHoursForm = ({reloadPage}) => {
                         </Typography>
                       </TableCell>
                       <TableCell>
-                          <Button disabled={ !canEmployeeEdit(item.employeeTag, 'HOUR_CLOSE_DEL')} size="small" onClick={() => removeClosedDate(item._id) }>
+                          <LoadingButton loading={tableLoader} disabled={ !canEmployeeEdit(item.employeeTag, 'HOUR_CLOSE_DEL')} size="small" onClick={() => removeClosedDate(item._id) }>
                             delete
-                          </Button>
+                          </LoadingButton>
                       </TableCell>
                     </TableRow>
                   )

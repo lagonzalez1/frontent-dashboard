@@ -872,7 +872,7 @@ export default function Waiting() {
                     alignItems={'center'}                    
                 >
                 <Grid className="grid-item" item xs={12} md={3} lg={3} xl={3}>
-                    <Card variant="outlined" sx={{pt: 1, borderRadius: 5, p: 2}}>
+                    <Card variant="outlined" sx={{pt: 1, borderRadius: 3, p: 2}}>
                     <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
                         <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                     </Typography>
@@ -1140,7 +1140,7 @@ export default function Waiting() {
                                 />
                                 <ErrorMessage name="notes" component="div" />
 
-                                <Button disabled={isSubmitting} type="submit" sx={{ borderRadius: 10}} variant="contained">Submit</Button>
+                                <Button disabled={isSubmitting} type="submit" sx={{ borderRadius: 5}} variant="contained">Submit</Button>
 
                             </Stack>
                             </Form>
@@ -1233,7 +1233,7 @@ export default function Waiting() {
                     {type === WAITLIST && (<Typography variant="body2">This means that you will no longer receive notifications or updates regarding your position in line.</Typography> )}
             </DialogContent>
             <DialogActions>
-                <Button sx={{ borderRadius: 7}} variant="contained" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
+                <Button sx={{ borderRadius: 5}} variant="contained" color="error" onClick={() => leaveWaitlist()}>Yes</Button>
             </DialogActions>
             </Dialog>
 

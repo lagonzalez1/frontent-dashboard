@@ -403,7 +403,7 @@ const Drawer = ({client, setClient}) => {
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Notified</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                            {payload && (payload.status.notified) ? (<Chip color="success" icon={<NotificationsActiveRoundedIcon />} label="Second notification" />) : (<Chip color={'info'} icon={<NotificationsActiveRoundedIcon />} label="First notification sent" />) }
+                            {payload && (payload.status.notified) ? (<Chip color="success" icon={<NotificationsActiveRoundedIcon />} label="Second notification" />) : (<Chip color={'primary'} icon={<NotificationsActiveRoundedIcon />} label="First notification sent" />) }
                             </Grid>
                         </Grid>
                         <br/> 

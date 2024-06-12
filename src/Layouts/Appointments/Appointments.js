@@ -1,4 +1,4 @@
-import React, { useState, useEffect, memo} from "react";
+import React, { useState, useEffect} from "react";
 import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, Table, 
     TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton, Badge, Collapse } from "@mui/material";
 
@@ -21,6 +21,7 @@ import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGener
 import SortRoundedIcon from '@mui/icons-material/SortRounded';
 
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
+import { FmdGoodRounded } from "@mui/icons-material";
 
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
@@ -269,6 +270,9 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Stack direction={'row'}>
+                                                    {client.status.cancelled ? <IconButton disabled> <WarningRoundedIcon color="error" /> </IconButton> : 
+                                                    <IconButton disabled><FmdGoodRounded color="success" /></IconButton> }
+                                                    
                                                     <Stack>
                                                     <Typography fontWeight={'bold'} variant="body2">
                                                         {client.fullname}
@@ -277,10 +281,6 @@ const Appointments = ({setClient, setEditClient}) => {
                                                         {client.serviceTag ? findService(client.serviceTag).title : null}
                                                     </Typography>
                                                     </Stack>
-                                                    {client.status.cancelled && <IconButton disabled>
-                                                                <WarningRoundedIcon color="error" />
-                                                            </IconButton>}
-
                                                     </Stack>
                                                 </TableCell>
                                                 <TableCell>

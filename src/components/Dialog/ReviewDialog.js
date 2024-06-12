@@ -61,7 +61,7 @@ export default function ReviewDialog({open, payload, onClose}) {
                     name="hover-feedback"
                     value={payload && payload.rate ? payload.rate : 0}
                     getLabelText={getLabelText}
-                    disabled={true}
+                    readOnly 
                     size="large"
                     emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
                 />

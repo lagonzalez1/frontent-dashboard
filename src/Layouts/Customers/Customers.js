@@ -27,7 +27,7 @@ import RateReviewRoundedIcon from '@mui/icons-material/RateReviewRounded';
 
 import { usePermission } from '../../auth/Permissions';
 import CheckCircle from '@mui/icons-material/CheckCircle';
-import { FileCsv, Flag, Trash } from "phosphor-react"
+import { Check, FileCsv, Flag, Trash } from "phosphor-react"
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -262,7 +262,9 @@ const Customers = () => {
 
           <TableCell align="left">{row.email}</TableCell>
           <TableCell align="left">{ getLastVisit(row.waitlist_summary, row.appointment_summary)}</TableCell>
-          <TableCell align="left">{row.status.flag === true ? "Flag": "Ok"}</TableCell>
+          <TableCell align="left">
+            { row.status.flag === true ? <Chip color={'error'}  icon={<Flag size={17} />} label="Flagged"/> : <Chip color={'success'} icon={<Check size={17}/>} label="Ok" /> }
+          </TableCell>
           <TableCell align="left">
 
 
@@ -627,16 +629,25 @@ const Customers = () => {
                     >
                     <CloseIcon />
                 </IconButton> 
-                <Typography variant="h5" fontWeight={'bold'}>Flag { client ? client.fullname : ''} </Typography>
+                <Typography variant="h5" fontWeight={'bold'}>Flag: { client ? client.fullname : ''} </Typography>
             </DialogTitle>
 
             <DialogContent>
-              <Typography variant='body2'>Please confirm if you wish to flag client.</Typography>
-              <Typography variant='body2'>When a client is flagged they will not be able to make external request. </Typography>
+              <Typography variant='body2'>Flagged customers are unable to make external request, serves the purpose of protecting your appointment/waitlist slots. </Typography>
+              <Typography variant='body2'>Blocked based on phone numbers </Typography>
+              <br/>
+              <Stack direction={'row'} alignItems={'center'} spacing={2}>
+              <Typography variant='body2' fontWeight={'bold'}>Current status </Typography>
+              {client && client.status.flag === true ? <Chip color={'error'}  icon={<Flag size={17} />} label="Flagged"/> : <Chip color={'success'} icon={<Check size={17}/>} label="Ok" /> }
+              </Stack>
+              
+
 
             </DialogContent>
             <DialogActions>
-              <Button sx={{borderRadius: 5}} variant='contained' color='warning' onClick={() => submitFlagClient()}>Flag</Button>
+              <Button sx={{borderRadius: 5}} variant='contained' color={ client && client.status.flag === true ? "primary": "error"} onClick={() => submitFlagClient()}>
+                {client && client.status.flag === true ? "unflag": "flag"}
+              </Button>
             </DialogActions>
 
       </Dialog>

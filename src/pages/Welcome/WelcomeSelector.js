@@ -372,6 +372,9 @@ export default function WelcomeSelector() {
         const incomingDate = date.toISO();
         getEmployeeList(incomingDate, link)
         .then(response => {
+            if(Object.keys(response).length === 0){
+                
+            }
             setAppEmployees(response);
         })
         .catch(error => {
@@ -494,7 +497,7 @@ export default function WelcomeSelector() {
             >   
                 <Zoom in={zoomIntoView} mountOnEnter unmountOnExit>
                 <Grid className="grid-item" item xs={12} md={3} lg={3} xl={3}>
-                    <Card className="wcard" variant="outlined" sx={{ borderRadius: 5, p: 2, pt: 1}}>
+                    <Card className="wcard" variant="outlined" sx={{ borderRadius: 3, p: 2, pt: 1}}>
                     {loading ? (<Box sx={{display: 'flex', justifyContent: 'center', alignContent: 'center', pt: 2}}>
                         <CircularProgress size={15} />
                     </Box>): 
@@ -822,7 +825,7 @@ export default function WelcomeSelector() {
                                                     {
                                                         businessExtras ? 
                                                         businessExtras.services
-                                                        .filter((service) => service.employeeTags.includes(employee_id))
+                                                        .filter((service) => service.employeeTags.includes(waitlistData.employee_id))
                                                         .map((service) => (
                                                             <Grid item key={service._id}>
                                                                 <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
