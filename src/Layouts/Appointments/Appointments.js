@@ -1,6 +1,10 @@
 import React, { useState, useEffect} from "react";
 import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, Table, 
-    TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton, Badge, Collapse } from "@mui/material";
+    TableContainer, TableBody, Tooltip, Skeleton, CircularProgress, Box, IconButton, Badge, Collapse, 
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText} from "@mui/material";
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -12,7 +16,7 @@ import { findEmployee, moveClientServing, findService, getAppointmentTable, send
 import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
-import { columns, getHighlightedDays } from "./AppointmentsHelper";
+import { columns, getAllSlotsAppointments, getHighlightedDays } from "./AppointmentsHelper";
 import { DatePicker, PickersDay } from "@mui/x-date-pickers";
 import { DateTime } from "luxon";
 import FabAppointment from "../../components/AddAppointment/FabAppointment";
@@ -21,7 +25,10 @@ import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGener
 import SortRoundedIcon from '@mui/icons-material/SortRounded';
 
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import { FmdGoodRounded } from "@mui/icons-material";
+import { FmdGoodRounded, KeyboardArrowLeft, KeyboardArrowLeftRounded, KeyboardArrowRightRounded } from "@mui/icons-material";
+import { useFormik } from "formik";
+import * as Yup from 'yup';
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
@@ -30,14 +37,26 @@ const Appointments = ({setClient, setEditClient}) => {
     const accessToken = useSelector((state) => state.tokens.access_token);
     const reload = useSelector((state) => state.reload);
     const business = useSelector((state) => state.business);
+    const employeeList = useSelector((state) => state.business.employees);
+    const serviceList = useSelector((state) => state.business.services);
+
 
     const [loading, setLoading] = useState(false);
     const [reloadPage, setReloadPage] = useState(false);
     const [error, setError] = useState(false);
     const [alert, setAlert] = useState({title: null, body: null});
+    const [quickView, setQuickView] = useState(false);
+    const [slots, setSlots] = useState([]);
+    
+
+    const baseLineDate = DateTime.local().setZone(business.timezone);
 
     const currentDate = DateTime.local().setZone(business.timezone);
     const [selectedDate, setSelectedDate] = useState();
+
+    const [selectedAppointment, setSelectedAppointment] = useState(null);
+    const [quickViewDate, setQuickViewDate] = useState(currentDate);
+
     const [highlightedDays, setHighlightedDays] = useState([]);
     const [data, setData] = useState([]);
 
@@ -135,9 +154,15 @@ const Appointments = ({setClient, setEditClient}) => {
     const handelMonthChage = (date) => {
         setHighlightedDays([]);
         const dates = getHighlightedDays(date)
-        setHighlightedDays(dates);
-    
+        setHighlightedDays(dates);    
     }
+
+
+
+    
+
+
+
     //**
      /* 
      /* @param {Array} props array of dates that will be highlighted.
@@ -159,12 +184,97 @@ const Appointments = ({setClient, setEditClient}) => {
             <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
           </Badge>
         );
-      }
+    }
+
+    const handleSubmit = (values) => {
+        console.log(values);
+    }
+
+    const initialValues = {
+        fullname: 'Luis gonzalez',
+        email: 'otfgonzalez@gmail.com',
+        phone: '909-928-3837',
+        size: 1,
+        service_id: '',
+        resource_id: '',
+        employee_id: '',
+        notes: '',
+      };
+      
+      const phoneRegex = /^\d{3}-\d{3}-\d{4}$/;    
+      const validationSchema = Yup.object({
+        fullname: Yup.string().required('Full name is required'),
+        phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format XXX-XXX-XXXX')
+        .required('Phone number is required'),
+        email: Yup.string().required(),
+        size: Yup.number().default(1),
+        service_id: Yup.string(),
+        employee_id: Yup.string(),
+        resource_id: Yup.string(),
+        notes: Yup.string(),
+      });
+
+      const formik = useFormik({
+        initialValues: initialValues,
+        validationSchema: validationSchema,
+        onSubmit: handleSubmit
+      })
 
     const closeAlert = () => {
         setError(false);
         setAlert({title: null, body: null});
     }
+
+    const openQuickView = () => {
+        let prev = quickView;
+        setQuickView(!prev);
+    }
+
+    const handleEmployeeClick = (e) => {
+        formik.setFieldValue('employee_id', e)
+    }
+
+    const handleServiceClick = (e) => {
+        formik.setFieldValue('service_id', e)
+    }
+
+
+    const addDate = () => {
+        const nextDate = quickViewDate.plus({days: 1});
+        setQuickViewDate(nextDate);
+    }
+
+    const subtractDate = () => {
+        const nextDate = quickViewDate.minus({days: 1});
+        setQuickViewDate(nextDate);
+    }
+
+
+    useEffect(() => {
+        console.log("Date", quickViewDate)
+        loadAllAvailableSlots()
+        // IF  employee_id, service_id are ok reload the available slots
+        // AXIOS
+    } ,[quickViewDate])
+
+    const loadAllAvailableSlots = () => {
+        if (formik.values.employee_id && formik.values.service_id) {
+            getAllSlotsAppointments(formik.values.employee_id, quickViewDate.toISO(), formik.values.service_id)
+            .then(response => {
+                setSlots(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+                dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+            })
+            .finally(() => {
+                // Loaders
+            })
+        }
+        console.log("Cannot make request");
+        
+    }
+    
 
     
 
@@ -201,17 +311,39 @@ const Appointments = ({setClient, setEditClient}) => {
                             <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? 'Group by employee': <Skeleton/> }</Typography>
                         </Button>
                     </Tooltip>
+
+                    <Tooltip title="Check avaialability per employee" placement="bottom">
+                        <Button onClick={() => openQuickView()} sx={{borderRadius: 5}} color="warning" variant={quickView ? "outlined": "contained"} startIcon={<SortRoundedIcon />}>
+                            <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? 'Show availability': <Skeleton/> }</Typography>
+                        </Button>
+                    </Tooltip>
                     </Stack>
                 </Grid>
                 {/** Is this where the error is?, once a new component  */}
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'right '}}>
+                    {quickView ? (
+                       <Box>
+                        <Stack direction={'row'}>
+                            <IconButton onClick={() => subtractDate()}>
+                                <KeyboardArrowLeftRounded />
+                            </IconButton>
+                            <DatePicker
+                                label="Date"
+                                value={quickViewDate}
+                            />
+                            <IconButton onClick={() => addDate()}>
+                                <KeyboardArrowRightRounded />
+                            </IconButton>
+                        </Stack>
+                        
+                       </Box>
+                    ):
                     <Box>
                         <DatePicker
                             label={"Date"}
                             sx={{
                                 width: '100%'
                             }}
-                            
                             fontSize="sm"
                             value={selectedDate}
                             onMonthChange={handelMonthChage}
@@ -228,11 +360,92 @@ const Appointments = ({setClient, setEditClient}) => {
                                 },
                             }}
                         />
-                        </Box>
+                    </Box>
+                    }
+                    
                 </Grid>
             </Grid>
-            
-                <div className="servingTable">
+                            
+                {
+                    quickView ? (
+                        <form onSubmit={formik.handleSubmit}>
+                        <Grid container spacing={0}>
+                            {
+                                // lg 2 m
+                            }
+                            <Grid item xl={3} lg={3} md={3} sm={12} xs={12}>
+                                { 
+                                    // Employee list
+                                    <List>
+                                        {
+                                            employeeList && employeeList.map((employee, index) => {
+                                                return (
+                                                    <ListItem key={index}>
+                                                        <ListItemButton
+                                                            id="employeeList"
+                                                            name="employee_id"
+                                                            selected={formik.values.employee_id === employee._id}
+                                                            value={employee._id}
+                                                            onClick={() => handleEmployeeClick(employee._id)}
+                                                        >
+                                                            <ListItemText>
+                                                                {employee.fullname}
+                                                            </ListItemText>
+                                                        </ListItemButton>
+                                                    </ListItem>
+                                                )
+                                            })
+                                        }
+                                    </List>
+                                }
+                            </Grid>
+                            <Grid item xl={3} lg={3} md={3} sm={12} xs={12}>
+                                {
+                                    // Services available List
+                                    <List>
+                                        { Array.isArray(serviceList) ?
+                                            serviceList
+                                            .filter((service) => service.employeeTags.includes(formik.values.employee_id))
+                                            .map((service) => (
+                                                <ListItem key={service._id}>
+                                                    <ListItemButton 
+                                                    selected={formik.values.service_id === service._id}
+                                                    id="serviceList"
+                                                    name="service_id"
+                                                    value={service._id}
+                                                    onClick={() => handleServiceClick(service._id)}
+                                                    >
+                                                    <Stack>
+                                                        <Typography variant="body2">{service.title}</Typography>
+                                                        <Typography variant="caption">{'Duration: ' + service.duration + ", Cost: " + service.cost }</Typography>
+                                                    </Stack>
+                                                    </ListItemButton>
+                                                </ListItem>
+                                            )):null }
+                                    </List>
+                                }
+                                
+                                <Button type="submit">
+                                    submit
+                                </Button>
+                                
+                            </Grid>
+                            <Grid item xl={3} lg={3} md={4} sm={12} xs={12}>
+                                {
+                                    // Show availability
+                                    // Create list
+                                    console.log(slots)
+                                }
+                            </Grid>
+                            <Grid item xl={3} lg={3} md={4} sm={12} xs={12}>
+                                {
+                                    // Make request ?
+                                }
+                            </Grid>
+                        </Grid>
+                        </form>
+                    ):
+                    <div className="servingTable">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
                             <Table stickyHeader aria-label='main_table'>
@@ -332,7 +545,11 @@ const Appointments = ({setClient, setEditClient}) => {
                             </Table>
                         </TableContainer>
                     </Paper>
-                </div>
+                    </div>
+                        
+                
+                }
+                
 
                 {
                     /**

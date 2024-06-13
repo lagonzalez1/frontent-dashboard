@@ -384,7 +384,7 @@ export default function FabAppointment () {
                             (
                             <>
                             <Button variant="outlined" sx={{ borderRadius: 10}} onClick={() => setNextStep(false)}> back</Button>
-                            <LoadingButton loading={app_loader} disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 10}} type="submit">Submit</LoadingButton>
+                            <LoadingButton loading={app_loader} disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 5}} type="submit">Submit</LoadingButton>
                             </>
                             ): 
                             <Button disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>
