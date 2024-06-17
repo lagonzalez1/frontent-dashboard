@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Skeleton ,Typography, Stack, Tooltip, Button, Table, 
-    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, IconButton, Dialog, DialogContent, DialogTitle, TextField, Divider, Checkbox, DialogActions, FormControl, FormControlLabel, FormGroup, Alert, Box, CircularProgress } from "@mui/material";
+    TableRow, Paper, TableContainer, TableHead, TableBody, TableCell, IconButton, Dialog, DialogContent, DialogTitle, TextField, Divider, Checkbox, DialogActions, FormControl, FormControlLabel, FormGroup, Alert, Box, CircularProgress, 
+    Chip} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useSelector, useDispatch } from "react-redux";
@@ -12,7 +13,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import { useSubscription } from "../../auth/Subscription";
 import Collapse from '@mui/material/Collapse';
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
-
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
 export default function Serving({setClient}) {
     const { checkSubscription } = useSubscription();
@@ -109,6 +110,13 @@ export default function Serving({setClient}) {
         setOpenErrors(false);
     }
 
+
+    const formatTime = (time) => {
+        const minutes = Math.floor(time / 60);
+        const remainingSeconds = time % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+    };
+
     return(
         <div className="servingContainer">
             <Box sx={{ width: '100%'}}>
@@ -118,24 +126,19 @@ export default function Serving({setClient}) {
             </Box>
             
             <Grid container>
-                <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
+                <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack>
                             <Typography variant="body2">{business ? business.businessName: <Skeleton/> }</Typography>
                             <Typography variant="h5"><strong>Serving</strong></Typography>
                         </Stack>
                         
                 </Grid>
-                <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
+                <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
 
                 </Grid>
 
-                <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
-                    <Tooltip title="How many people are in the establishment." placement="right">
-                        <Button sx={{borderRadius: 5}} color="warning" variant="contained" startIcon={null}>
-                            <Typography variant="button" sx={{ textTransform: 'lowercase', fontWeight: 'normal'}}>{business ? (totals.totalPartys + ` Party ( ${totals.personCount} Peoples)` ): <Skeleton/> }</Typography>
-                        </Button>
-                    </Tooltip>
-                        
+                <Grid item xs={12} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left', pt: 2}}>
+                    <Chip color="warning" icon={<PeopleAltIcon size="small" />} label={business ? (totals.totalPartys + ` Party ( ${totals.personCount} Peoples)` ): <Skeleton/> } />
                 </Grid>
                 <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                 
@@ -201,8 +204,7 @@ export default function Serving({setClient}) {
                                 </TableCell>
                                 <TableCell align="left">
                                 <Typography variant="subtitle2" fontWeight="bolder">
-                                    {item.waittime ? ( item.waittime.hours >= 1 ? (`${item.waittime.hours} Hr ${item.waittime.minutes} Min.`): (`${item.waittime.minutes} Min.`)): (null) } 
-    
+                                    {item.waittime ? ( item.waittime.hours >= 1 ? (`${item.waittime.hours} Hr ${item.waittime.minutes} Min`): (`${item.waittime.minutes} Min`)): (null) } 
                                 </Typography>
     
                                 </TableCell>

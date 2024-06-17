@@ -23,9 +23,7 @@ import GuagePercentages from "../../components/Vizual/GuagePercentages";
 
 const Analytics = () => {
 
-    const iconsList = [<Package alignmentBaseline="center" weight="duotone" size={22}/>,<FireSimple alignmentBaseline="center" weight="duotone" size={22}/>, <Drop alignmentBaseline="center" weight="duotone" size={22}/>,
-     <Waves  alignmentBaseline="center" weight="duotone" size={22}/>, <Campfire  alignmentBaseline="center" weight="duotone" size={22}/>, <FlowerLotus  alignmentBaseline="center" weight="duotone" size={22}/>, <Tree alignmentBaseline="center" weight="duotone" size={22}/>,
-     <Coffee alignmentBaseline="center" weight="duotone" size={22}/>  ]
+    
     const business = useSelector((state) => state.business);
     //const employeeList = getEmployeeList();
     const [range, setRange] = useState({ start: DateTime.local().setZone(business.timezone), end: DateTime.local().setZone(business.timezone)});
@@ -282,11 +280,12 @@ const Analytics = () => {
                     {
                         employeeData && 
                         (
-                        <Stack direction="row"
-                        sx={{ whiteSpace: 'nowrap' }} 
-                        justifyContent="space-evenly"
-                        alignItems="center"
-                        spacing={2}>
+                        <Stack 
+                            direction="row"
+                            sx={{ whiteSpace: 'nowrap' }} 
+                            justifyContent="space-evenly"
+                            alignItems="center"
+                            spacing={2}>
                             <Card elevation={0} sx={{ maxWidth: 200}}>
                                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                     <GuageService value={Math.floor(employeeData.wait_time)}  />
@@ -334,16 +333,18 @@ const Analytics = () => {
 
             { /** END OF EMPLOYEES Serve_time, Wait_time, No_show, Party_size */}
             <Divider />
-            <Grid container sx={{ pt: 1}}
+            <Grid 
+                container sx={{ pt: 1}}
                 direction="row"
             >
                 <Grid item lg={6} md={6} xs={12} sm={12}>
                     { /** Business metrics as of total, Waittime, servve_time, noshow, resorce/service average  */ }
-                    <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                        <Typography variant="h6" fontWeight={'bold'}>Business metrics</Typography>
+                    <Box sx={{ width: '100%', bgcolor: 'background.paper', overflowX: 'auto'}}>
+                            <Typography variant="h6" fontWeight={'bold'}>Business metrics</Typography>
                             <Typography variant="subtitle1" fontWeight={'bold'}  sx={{ pt: 0.5}}>In line metrics</Typography>
                             {businessData ? ( 
-                            <Stack direction={'row'} spacing={0.5} justifyContent={'center'} divider={<Divider orientation="vertical" flexItem />}>
+                            <Grid container direction={'row'} spacing={1} columnSpacing={1}>
+                                <Grid item xs={12} sm={6} md={3} lg={3}>
                                 <Card elevation={0} sx={{ maxWidth: 200}}>
                                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                             <GuageService value={Math.ceil(businessData.wait_time)} />
@@ -352,41 +353,45 @@ const Analytics = () => {
                                                 {'Wait time average (min)'}
                                             </Typography>
                                         </CardContent>
-                                    </Card>
+                                </Card>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3} lg={3}>
+                                <Card elevation={0} sx={{ maxWidth: 200}}>
+                                    <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                        <GuageService value={Math.ceil(businessData.serve_time)} />
+                                        <UserSwitch alignmentBaseline="center" size={20}  />
+                                        <Typography fontWeight={'bold'} textAlign={'center'}  gutterBottom variant="body2">
+                                            {'Serve time average (min)'}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3} lg={3}>
+                                <Card elevation={0} sx={{ maxWidth: 200}}>
+                                    <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
 
-                                    <Card elevation={0} sx={{ maxWidth: 200}}>
-                                        <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                            <GuageService value={Math.ceil(businessData.serve_time)} />
-                                            <UserSwitch alignmentBaseline="center" size={20}  />
-                                            <Typography fontWeight={'bold'} textAlign={'center'}  gutterBottom variant="body2">
-                                                {'Serve time average (min)'}
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
+                                        <GuageService value={Math.ceil(businessData.party_size)} />
 
-                                    <Card elevation={0} sx={{ maxWidth: 200}}>
-                                        <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
+                                        <UsersThree alignmentBaseline="center" size={20} />
+                                        <Typography fontWeight={'bold'} textAlign={'center'}  gutterBottom  variant="body2">
+                                            {'Party size average (persons)'}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={3} lg={3}>
+                                <Card elevation={0} sx={{ maxWidth: 200}}>
+                                    <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
 
-                                            <GuageService value={Math.ceil(businessData.party_size)} />
-
-                                            <UsersThree alignmentBaseline="center" size={20} />
-                                            <Typography fontWeight={'bold'} textAlign={'center'}  gutterBottom  variant="body2">
-                                                {'Party size average (persons)'}
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-                                    <Card elevation={0} sx={{ maxWidth: 200}}>
-                                        <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-
-                                            <GuageService value={Math.ceil(businessData.no_show)} />
-                                            <UsersThree alignmentBaseline="center" size={20} />
-                                            <Typography fontWeight={'bold'} textAlign={'center'}  gutterBottom  variant="body2">
-                                                {'No show'}
-                                            </Typography>
-                                        </CardContent>
-                                    </Card>
-
-                            </Stack>) : null }
+                                        <GuageService value={Math.ceil(businessData.no_show)} />
+                                        <UsersThree alignmentBaseline="center" size={20} />
+                                        <Typography fontWeight={'bold'} textAlign={'center'}  gutterBottom  variant="body2">
+                                            {'No show'}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                                </Grid>
+                            </Grid>) : null }
                             
                     </Box>
                 </Grid>
@@ -406,7 +411,7 @@ const Analytics = () => {
                                 const rating = Math.ceil(item.data);
                                 const count = item.count;
                                 return (
-                                    <ListItem alignItems="flex-start">
+                                    <ListItem key={index} alignItems="flex-start">
                                         
                                         <ListItemText primary={employeeResult.fullname}
                                             secondary={

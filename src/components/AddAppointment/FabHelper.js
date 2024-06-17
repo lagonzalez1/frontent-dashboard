@@ -6,10 +6,6 @@ import axios from "axios";
 let POST_CREATEAPPOINTMENT = '/api/internal/create_appointment';
 let POST_VALIDATE = '/api/internal/validate_appointment';
 
-
-
-
-
 // * Middleware OK
 function createAppointmentRequest(payload) {
     const { user, business } = getStateData();

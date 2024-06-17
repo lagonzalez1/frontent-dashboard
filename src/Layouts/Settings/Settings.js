@@ -41,10 +41,10 @@ export default function Settings() {
         <>
             <Box>
                 <Paper sx={{ p: 2}}>
-                    <Container>
-                        <Typography variant="h4">General settings</Typography>
-                        <Divider light={false} />
-                    </Container>
+                    <Box>
+                        <Typography variant="h4" textAlign={'left'}>General settings</Typography>
+                        <Divider />
+                    </Box>
 
                     <Stack sx={{ pt: 5}} direction={'column'} spacing={5}>
                         <Grid container id="location">

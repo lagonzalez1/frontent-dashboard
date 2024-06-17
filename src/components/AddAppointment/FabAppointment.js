@@ -59,26 +59,14 @@ export default function FabAppointment () {
 
     }, [])
 
-    const searchAppointments = (employeeId, serviceId) => {
-        if (!selectedDate || !serviceId || !employeeId) {
-            setError('Missing date and service.');
-            return;
+    
+
+    const generateObjectServices = (size, serviceId) => {
+        let object = {}
+        for (let i = 0 ; i < size; ++i) {
+            object[i] = serviceId
         }
-        setError(null);
-        setNextStep(true);
-        setLoading(true);
-        const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate }
-        getAvailableAppointments(payload)
-        .then(response => {
-            setAppointments(response.data)
-            setSuccess(response.msg)
-        })
-        .catch(error => {
-            setError(error);
-        })
-        .finally(() => {
-            setLoading(false);
-        })
+        return object;
     }
 
     const handleSubmit = (payload) => {
@@ -88,8 +76,10 @@ export default function FabAppointment () {
         }
         setApp_loader(true);
         const timestamp = DateTime.local().setZone(business.timezone).toISO();
-        const date = DateTime.fromISO(selectedDate).toISO()
-        const data = { ...payload, appointmentDate: date, appointment: selectedAppointment, timestamp};
+        const date = DateTime.fromISO(selectedDate).toISO();
+        // This need to include serviceTags with the party size as { 0: id, 1: id, ... partySize}
+        const serviceTags = generateObjectServices(payload.size, payload.service_id);
+        const data = { ...payload, appointmentDate: date, appointment: selectedAppointment, timestamp, serviceTags};
         createAppointmentPretense(data)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
@@ -137,7 +127,7 @@ export default function FabAppointment () {
         fullname: '',
         email: '',
         phone: '',
-        size: '',
+        size: 0,
         service_id: '',
         resource_id: '',
         employee_id: '',
@@ -150,7 +140,7 @@ export default function FabAppointment () {
         phone: Yup.string().required('Phone').matches(phoneRegex, 'Phone number must be in the format XXX-XXX-XXXX')
         .required('Phone number is required'),
         email: Yup.string().required(),
-        size: Yup.number().default(1),
+        size: Yup.number().default(0),
         service_id: Yup.string(),
         employee_id: Yup.string(),
         resource_id: Yup.string(),
@@ -162,6 +152,34 @@ export default function FabAppointment () {
         validationSchema: validationSchema,
         onSubmit: handleSubmit
       })
+
+      const searchAppointments = (employeeId, serviceId) => {
+        if (!selectedDate || !serviceId || !employeeId) {
+            setError('Missing date and service.');
+            return;
+        }
+
+        if (formik.values.size === 0) {
+            setError('Missing party size');
+            return;
+        }
+        setError(null);
+        setNextStep(true);
+        setLoading(true);
+        const serviceTags = generateObjectServices(formik.values.size, formik.values.service_id);
+        const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate, serviceTags }
+        getAvailableAppointments(payload)
+        .then(response => {
+            setAppointments(response.data)
+            setSuccess(response.msg)
+        })
+        .catch(error => {
+            setError(error);
+        })
+        .finally(() => {
+            setLoading(false);
+        })
+    }
 
       const FutureDatePicker = ({ label, value, onChange }) => {
         const currentDate = DateTime.local().setZone(business.timezone);
@@ -183,7 +201,7 @@ export default function FabAppointment () {
       };
 
     return(
-        <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
+        <Box sx={{ '& > :not(style)': { m: 1 }, position: 'fixed', bottom: '10px', right :'10px' } }>
             <Fab  variant="extended" onClick={ () =>  handleClickOpen()} color="secondary" aria-label="add">
                 <AddIcon htmlColor="#FFFFFF" />
                 <Typography variant="body2" fontWeight={'bold'} sx={{color: 'white'}}>
@@ -220,8 +238,10 @@ export default function FabAppointment () {
                     { employeeList && employeeList.length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order to use appointments, you must have employees with schedules ready to book. 
                     Check out settings page under <u> add employees!</u></Alert>): null}
                     { serviceList && serviceList
-                                .filter((service) => service.employeeTags.includes(formik.values.employee_id)).length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order for your customers to book appointments you need to attach your employees to your services! Check out the side bar <u>Services</u></Alert>): null}
-                    { errors ? <Alert severity="error">{errors}</Alert>: null }
+                                .filter((service) => service.employeeTags.includes(formik.values.employee_id)).length === 0 ?  
+                                (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong>
+                                </AlertTitle>In order for your customers to book appointments you need to attach your employees to your services! Check out the side bar <u>Services</u></Alert>): null}
+                    { errors ? <Alert severity="error">{'Error'}</Alert>: null }
                     <form onSubmit={formik.handleSubmit}>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                             {nextStep ? null : 
@@ -231,7 +251,7 @@ export default function FabAppointment () {
                             size="small"
                             label="Customer name"
                             placeholder="Customer name"
-                            error={formik.touched.fullname && !!errors.fullname}
+                            error={formik.touched.fullname && Boolean(formik.errors.fullname)}
                             onChange={formik.handleChange}
                             value={formik.values.fullname}
 
@@ -256,7 +276,7 @@ export default function FabAppointment () {
                             size="small"
                             label="Phone"
                             placeholder="xxx-xxx-xxxx"
-                            error={formik.touched.phone && !!errors.phone}
+                            error={formik.touched.phone && Boolean(formik.errors.phone)}
                             onChange={(event) => phoneNumberChange(event)}
                             value={phoneNumber}
                             />
@@ -270,7 +290,7 @@ export default function FabAppointment () {
                             label="Party size"
                             placeholder="1"
                             type="number"
-                            error={formik.touched.size && !!errors.size}
+                            error={formik.touched.size && Boolean(formik.errors.size)}
                             onChange={formik.handleChange}
                             value={formik.values.size}
                             />
@@ -383,11 +403,11 @@ export default function FabAppointment () {
                             {nextStep ? 
                             (
                             <>
-                            <Button variant="outlined" sx={{ borderRadius: 10}} onClick={() => setNextStep(false)}> back</Button>
+                            <Button variant="outlined" sx={{ borderRadius: 5}} onClick={() => setNextStep(false)}> back</Button>
                             <LoadingButton loading={app_loader} disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 5}} type="submit">Submit</LoadingButton>
                             </>
                             ): 
-                            <Button disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 15}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>
+                            <Button disabled={cancelledSubscription()} variant="contained" sx={{ borderRadius: 5}} onClick={() => searchAppointments(formik.values.employee_id, formik.values.service_id)}> search</Button>
                             }
                         </Stack>
                     </form>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, memo} from "react";
 import { Stack, Typography, Button, List, ListItem, Menu, MenuItem, ListItemText, Grid,
      IconButton, ListItemIcon, TableHead,TableRow, TableCell, Paper, Table, TableContainer,
-    TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton, Divider 
+    TableBody, Tooltip, Skeleton, CircularProgress, ListItemButton, Divider, 
+    Chip
 } from "@mui/material";     
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -27,7 +28,8 @@ import { DateTime } from "luxon";
 import ServingClient from "../Dialog/ServingClient";
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import { ArrowSquareOut, Lock, LockOpen } from "phosphor-react";
-
+import { FmdGoodRounded } from "@mui/icons-material";
+import useWebSocket from "../../hooks/webSocketHook";
 
 const Waitlist = ({setClient, setEditClient}) => {
     
@@ -51,6 +53,14 @@ const Waitlist = ({setClient, setEditClient}) => {
     const openVert = Boolean(anchorElVert);
 
     let accepting = acceptingRejecting();
+    const [documentId, setDocumentId] = useState('664a7f5da07f92ba557f8e9f');
+
+    const messages = useWebSocket('ws://localhost:3000/api/internal/socket', setDocumentId);
+
+
+    useEffect(() => {
+        console.log(messages)
+    }, [messages])
 
     useEffect(() => {
         setLoading(true)
@@ -381,20 +391,14 @@ const Waitlist = ({setClient, setEditClient}) => {
                         <Stack direction={"row"} spacing={1}>
 
                             {user.permissions === 3 || user.permissions === 2 ? (<Tooltip title="Logged in as employee" placement="bottom">
-                                <Button color="error" variant="contained" startIcon={<BadgeIcon />}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{ user.email }</Typography>
-                                </Button>
+                                <Chip color="error" icon={<BadgeIcon />} label={user.email} />
                             </Tooltip>): null}
                             
                             <Tooltip title="Your current location." placement="bottom">
-                                <Button sx={{borderRadius: 5}} color="warning" variant="contained" startIcon={<SouthAmericaIcon />}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>{business ? (business.timezone): <Skeleton/> }</Typography>
-                                </Button>
+                                <Chip color="warning" icon={<SouthAmericaIcon />} label={business ? (business.timezone): null } />
                             </Tooltip>
                             <Tooltip title="The estimated time for the next person that joins your line." placement="right">
-                                <Button sx={{borderRadius: 5}}  color="warning" variant="contained" startIcon={<AccessAlarmsIcon />}>
-                                    <Typography variant="button" sx={{ textTransform: 'lowercase'}}>Est. <strong>{waittime ? waittime: (<CircularProgress size={10} />)}</strong> min wait.</Typography>
-                                </Button>
+                                <Chip color="warning" icon={<AccessAlarmsIcon />} label={ waittime ? `Est. ${waittime} min wait` : (<CircularProgress size={10} />) } />
                             </Tooltip>
                         </Stack>
                         

@@ -133,7 +133,7 @@ export default function FabButton () {
 
 
     return(
-        <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
+        <Box sx={{ '& > :not(style)': { m: 1 }, position: 'fixed', bottom: '10px', right :'10px' } }>
             <Fab variant="extended" onClick={ () =>  handleClickOpen()} color="secondary" aria-label="add">
                 <AddIcon htmlColor="#FFFFFF" />
                 <Typography variant="body2" fontWeight={'bold'} sx={{color: 'white'}}>

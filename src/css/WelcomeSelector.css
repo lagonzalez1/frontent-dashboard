@@ -10,6 +10,15 @@
     margin-top: 0 !important;
   }
   
+  #appointmentSection {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  #waitlistSection {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
   .custom-card {
     width: 100%; /* Full width on smaller screens */
     max-width: 65vh; /* Adjust the maximum width for larger screens */
@@ -28,6 +37,60 @@
   .scroll-left {
     overflow-x: auto !important;
   }
+
+  
+
+@media (max-height: 667px) {
+  .grid-item {
+    padding-top: 10px;
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+}
+
+@media (min-width: 375px) {
+  .grid-item {
+    max-width: 95vw !important;
+    min-width: 90vw;
+  }
+}
+
+@media (min-width: 500px) {
+  .grid-item {
+    max-width: 85vw !important;
+  }
+}
+
+@media (min-width: 700px) {
+  .grid-item {
+    max-width: 65vw !important;
+    min-width: 55vw;  
+  }
+}
+
+
+@media (min-width: 900px) {
+  .grid-item {
+    max-width: 55vw !important;
+    min-width: 45vw;
+
+  }
+}
+
+@media (min-width: 1200px) {
+  .grid-item {
+    max-width: 35vw !important;
+    min-width: 35vw;
+
+  }
+}
+
+@media (min-width: 1600px) {
+  .grid-item {
+    max-width: 25vw !important;
+    min-width: 25vw;
+  }
+}
 
 
   

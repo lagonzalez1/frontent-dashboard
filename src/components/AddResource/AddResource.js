@@ -90,7 +90,7 @@ export default function AddResource({reloadParent}) {
 
   
   return (
-    <Box sx={{ '& > :not(style)': { m: 1 }, position: 'absolute', bottom: '10px', right :'10px' } }>
+    <Box sx={{ '& > :not(style)': { m: 1 }, position: 'fixed', bottom: '10px', right :'10px' } }>
       <Fab variant="extended" color="secondary" sx={{color : 'white'}} className={classes.fab} onClick={handleOpen}>
         <AddIcon htmlColor="#FFFFFF" />
         to resource

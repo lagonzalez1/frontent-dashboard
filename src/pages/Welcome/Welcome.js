@@ -9,7 +9,7 @@ import { Box, Container, Button, Typography, Card, CardActions, CardContent, Ale
 import { DateTime } from "luxon";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { allowClientJoin, getBusinessPresent, getBusinessTimezone, isBusinesssOpen, requestBusinessArguments, requestBusinessSchedule } from "./WelcomeHelper";
+import { getBusinessPresent, getBusinessTimezone, isBusinesssOpen } from "./WelcomeHelper";
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 import { ThemeProvider } from "@emotion/react";

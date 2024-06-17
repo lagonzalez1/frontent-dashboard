@@ -1,34 +1,37 @@
-import React, { useEffect, useState } from 'react';
+import React, { lazy, useEffect, useState, Suspense } from 'react';
 import './App.css';
 import WebFont from 'webfontloader';
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
-import Homepage from "./pages/Homepage/Homepage";
-import Register from './pages/Register/Register';
-import Dashboard from './Layouts/Dashboard/Dashboard';
-import Login from './pages/Login/Login';
-import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
-import Welcome from './pages/Welcome/Welcome';
-import WelcomeSize from "./pages/Welcome/WelcomeSize";
-import WelcomeDetails from './pages/Welcome/WelcomeDetails';
-import Waiting from './pages/Waiting/Waiting';
-import WelcomeExtras from './pages/Welcome/WelcomeExtras';
-import BusinessWaitlist from './pages/Waitlist/BusinessWaitlist';
-import WelcomeSelector from './pages/Welcome/WelcomeSelector';
-import LandingPage from './pages/Landing/LandingPage';
-import PasswordReset from './pages/PasswordReset/PasswordReset';
-import VerifyUser from "./pages/Verify/VerifyUser";
-
-import Resources from './pages/Resources/Resources';
-import Features from './pages/Features/Features';
-import Pricing from './pages/Pricing/Pricing';
 
 import { ThemeProvider } from '@emotion/react';
 import { DashboardThemeLight, DashboardThemeDark } from './theme/theme';
-import { useSelector } from 'react-redux';
 import { useTheme } from './theme/ThemeContext';
 import { RequireAuth } from "react-auth-kit";
 
 
+// Import only when needed to. 
+const Dashboard = lazy(() => import('./Layouts/Dashboard/Dashboard'));
+const Login = lazy(() => import('./pages/Login/Login'));
+const Register = lazy(() => import('./pages/Register/Register'));
+const Homepage = lazy(() => import('./pages/Homepage/Homepage'));
+
+const Welcome = lazy(() => import('./pages/Welcome/Welcome'));
+const WelcomeSize = lazy(() => import('./pages/Welcome/WelcomeSize'));
+const WelcomeDetails = lazy(() => import('./pages/Welcome/WelcomeDetails'));
+const WelcomeSelector = lazy(() => import('./pages/Welcome/WelcomeSelector'));
+const Waiting = lazy(() => import('./pages/Waiting/Waiting'));
+const BusinessWaitlist = lazy(() => import ('./pages/Waitlist/BusinessWaitlist'));
+const LandingPage = lazy(() => import('./pages/Landing/LandingPage'));
+const PasswordReset = lazy(() => import('./pages/PasswordReset/PasswordReset'));
+const VerifyUser = lazy(() => import("./pages/Verify/VerifyUser"));
+const WelcomeExtras = lazy(() => import('./pages/Welcome/WelcomeExtras'))
+
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword/ForgotPassword'))
+
+
+const Resources = lazy(() => import ('./pages/Resources/Resources'));
+const Features = lazy(() => import('./pages/Features/Features'));
+const Pricing = lazy(() => import ('./pages/Pricing/Pricing'));
 
 
 // Handle dark and light theme changes.
@@ -45,39 +48,40 @@ function App() {
   return (
     <Router>
       <div id="mainContainer">
-        <Routes>
-          <Route path='/' element={<Homepage />}></Route>
-          <Route path='/Register' element={<Register />}></Route>
-          <Route path='/Login' element={<Login />}></Route>
+        <Suspense fallback={<div><h6>Loading...</h6></div>}>
+          <Routes>
+            <Route path='/' element={<Homepage />}></Route>
+            <Route path='/Register' element={<Register />}></Route>
+            <Route path='/Login' element={<Login />}></Route>
 
 
-          <Route path='/Resources' element={<Resources />}></Route>
-          <Route path='/Features' element={<Features />}></Route>
-          <Route path='/Pricing' element={<Pricing />}></Route>
+            <Route path='/Resources' element={<Resources />}></Route>
+            <Route path='/Features' element={<Features />}></Route>
+            <Route path='/Pricing' element={<Pricing />}></Route>
 
-          <Route path='/PasswordReset/:token' element={<PasswordReset />}></Route>
-          <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
-          
-          <Route path={'/welcome/:link'} element={<Welcome />}></Route> { /** Check if business open. Advance if so. */}
-          <Route path={'/welcome/:link/selector'} element={<WelcomeSelector />}></Route> { /** Check if business open. Advance if so. */}
-          <Route path={'/welcome/:link/size'} element={<WelcomeSize />}></Route> { /** Check if business open. Advance if so. */}
-          <Route path={'/welcome/:link/details'} element={<WelcomeDetails />}></Route> { /** Check if business open. Advance if so. */}
-          <Route path={'/welcome/:link/extras'} element={<WelcomeExtras />}></Route> { /** Check if business open. Advance if so. */}
-          <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
-          <Route path={'/welcome/:link/waitlist'} element={<BusinessWaitlist />}></Route>
-          <Route path={'/welcome/:link/:status/landingPage'} element={<LandingPage />}></Route>
-          <Route path={'/verify/user/:idd/:email'} element={<VerifyUser />}></Route>
-          
+            <Route path='/PasswordReset/:token' element={<PasswordReset />}></Route>
+            <Route path='/ForgotPassword' element={<ForgotPassword />}></Route>
+            
+            <Route path={'/welcome/:link'} element={<Welcome />}></Route> { /** Check if business open. Advance if so. */}
+            <Route path={'/welcome/:link/selector'} element={<WelcomeSelector />}></Route> { /** Check if business open. Advance if so. */}
+            <Route path={'/welcome/:link/size'} element={<WelcomeSize />}></Route> { /** Check if business open. Advance if so. */}
+            <Route path={'/welcome/:link/details'} element={<WelcomeDetails />}></Route> { /** Check if business open. Advance if so. */}
+            <Route path={'/welcome/:link/extras'} element={<WelcomeExtras />}></Route> { /** Check if business open. Advance if so. */}
+            <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
+            <Route path={'/welcome/:link/waitlist'} element={<BusinessWaitlist />}></Route>
+            <Route path={'/welcome/:link/:status/landingPage'} element={<LandingPage />}></Route>
+            <Route path={'/verify/user/:idd/:email'} element={<VerifyUser />}></Route>
+            
 
-          <Route path={'/Dashboard'} element={
-              <RequireAuth loginPath='/Login'>
-                  <ThemeProvider theme={theme && theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
-                    <Dashboard/>                
-                  </ThemeProvider>
-              </RequireAuth>
-          }></Route>
-
-        </Routes>
+            <Route path={'/Dashboard'} element={
+                <RequireAuth loginPath='/Login'>
+                    <ThemeProvider theme={theme && theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
+                      <Dashboard/>                
+                    </ThemeProvider>
+                </RequireAuth>
+            }></Route>
+          </Routes>
+        </Suspense>
       </div>
     </Router>
   );

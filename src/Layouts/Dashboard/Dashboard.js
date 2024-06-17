@@ -1,5 +1,7 @@
-import React, { useEffect, useState, memo, useMemo } from "react";
+import React, { useEffect, useState, memo, useMemo, lazy, Suspense } from "react";
 import { Box, CircularProgress, Backdrop } from "@mui/material";
+
+
 import NavBar from "../NavBar/NavBar"
 import SideBar from "../SideBar/SideBar";
 import Waitlist from "../../components/Waitlist/Waitlist";
@@ -8,6 +10,7 @@ import Serving from "../Serving/Serving";
 import Settings from "../Settings/Settings";
 import Services from "../Services/Services";
 import Help from "../Help/Help";
+import useWebSocket from "../../hooks/webSocketHook";
 import Drawer from "../../components/Drawer/Drawer";
 
 import { useSignOut } from "react-auth-kit";
@@ -24,10 +27,8 @@ import { PermissionProvider } from "../../auth/Permissions";
 import { SubscriptionProvider } from "../../auth/Subscription";
 import Analytics from "../Analytics/Analytics";
 import Trial from "../../components/Snackbar/Trial";
-import { setLocation } from "../../reducers/user";
 import StripeCompletion from "../../components/Dialog/StripeCompletion";
 import HelpDialog from "../Help/HelpDialog";
-import { DateTime } from "luxon";
 
 /**
  * 
@@ -60,6 +61,7 @@ export default function Dashboard () {
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
     const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
 
+
     async function checkAuthStatus() {
         setLoading(true);
         try {
@@ -85,6 +87,7 @@ export default function Dashboard () {
     },[reload]);
 
 
+    /*
     useEffect(() => {
         const myFunction = () => {
             reloadBusinessData(dispatch);
@@ -100,6 +103,8 @@ export default function Dashboard () {
             clearInterval(intervalId);
         };
     }, []);
+   */ 
+   
 
     //** User completes the subscrtiption cycle. */
     const closeStripeCompletion = () => {
@@ -190,7 +195,7 @@ export default function Dashboard () {
                  { editClient.open ? <EditClient setEditClient={setEditClient} editClient={editClient} /> : null }
                  { gettingStarted ? <HelpDialog open={gettingStarted} onClose={() => closeQuickStart()}  /> : null}
                  <StripeCompletion payload={stripeSession} open={openCompletion} onClose={closeStripeCompletion}/>
-
+                 
                  </SubscriptionProvider>
             </Box>
 

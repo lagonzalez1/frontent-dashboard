@@ -29,12 +29,15 @@ export default function SystemForm({reloadPage}) {
         appointments: business.system.appointments,
         waitlist: business.system.waitlist,
         maxAppointmentDate: settings.maxAppointmentDate,
+        partySize: business.partySize,
+
       };
       
     const validationSchema = Yup.object().shape({
         equalDate: Yup.boolean(),
         serveMax: Yup.number().max(100),
         appointments: Yup.boolean(),
+        partySize: Yup.number().max(20),
         waitlist: Yup.boolean(),
         maxAppointmentDate: Yup.number().min(20).max(360)
     });
@@ -72,12 +75,14 @@ export default function SystemForm({reloadPage}) {
         waitlist: 'Waitlist',
         equalDate: 'Same day',
         autoDelete: 'Auto delete',
+        partySize: 'Party size'
     }
     const LABELS = {
         appointments: 'Use a appointment system to schedule future appointments using your business employees.',
         waitlist: 'Use a queue based waitlist system, allow clients to join a virtual.',
         equalDate: 'Waitlist will only accept same day request.',
         autoDelete: 'Automatically delete clients left unattended, otherwise will be marked as no-shows.',
+        partySize: 'Maximum party size per appointment/waitlist request.'
     }
 
     return (
@@ -132,6 +137,21 @@ export default function SystemForm({reloadPage}) {
                     />
                 </Grid>
 
+            
+                <Grid item xs={12}>
+                    <Typography variant='subtitle2' fontWeight={'bold'}>Maximum guest per appointment/waitlist request, currently {business && business.partySize} guest . </Typography>
+                    <br/>
+                    <Field
+                        as={TextField}
+                        name="partySize"
+                        label="Maximum party size"
+                        type="number"
+                        error={touched.partySize  && Boolean(errors.partySize)}
+                        helperText={touched.partySize && errors.partySize}
+                        fullWidth={false}
+                    />
+                </Grid>
+
                 <Grid item xs={12}>
                     <Typography variant='subtitle2' fontWeight={'bold'}>Maximum Open Dates Control - Appointments </Typography>
                     <Typography variant='body2'>Configure the number of open dates in your Date Calendar with precision. 
@@ -172,10 +192,7 @@ export default function SystemForm({reloadPage}) {
             </Form>
         )}
         </Formik>
-        <Container>
-            <Typography></Typography>
-        </Container>
-        
+    
         </>
     );
 };

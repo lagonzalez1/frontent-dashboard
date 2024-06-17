@@ -1,18 +1,21 @@
 import React, {useState, useEffect} from "react";
 import { useParams } from "react-router-dom";
-import { Container, Box, Typography, Table, TableCell, TableBody, TableRow, Button, Link, CardContent, TableHead, Card, CircularProgress, Alert, CardActions, Collapse } from "@mui/material";
+import { Container, Box, Typography, Table, TableCell, TableBody, TableRow, Button, Link, CardContent, TableHead, Card, CircularProgress, Alert, CardActions, Collapse, Stack } from "@mui/material";
 import { requestBusinessArguments, requestBusinessWaitlist } from "./WaitlistHelper";
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import { ThemeProvider } from "@emotion/react";
+import { BusinessWaitlistTheme } from "../../theme/theme";
 
 import { DateTime } from "luxon";
 import '../../css/TableAnimations.css'; // Import the CSS file for animations
+import QRCode from "react-qr-code";
 
 export default function BusinessWaitlist () {
 
     const { link } = useParams();
-
+    const fullLink = "https://waitonline.us/welcome/" + link;
     const [error, setErrors] = useState();
     const [loading, setLoading] = useState();
     const [args, setArgs] = useState(null);
@@ -87,7 +90,7 @@ export default function BusinessWaitlist () {
 
     const AnimatedTable = ({ waitlist }) => {
         return (
-          <Table container>
+          <Table container sx={{maxHeight: '80%'}}>
             <TableHead>
               <TableRow>
                 <TableCell>
@@ -95,6 +98,9 @@ export default function BusinessWaitlist () {
                 </TableCell>
                 <TableCell>
                   <Typography variant="subtitle2" fontWeight={'bold'}>Full name</Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="subtitle2" fontWeight={'bold'}>Wait time est</Typography>
                 </TableCell>
                 <TableCell>
                   <Typography variant="subtitle2" fontWeight={'bold'}>Party size</Typography>
@@ -120,6 +126,11 @@ export default function BusinessWaitlist () {
                           </TableCell>
                           <TableCell>
                             <Typography variant="subtitle1" textAlign={'center'}>
+                              {`${item.waittimeRange.min} - ${item.waittimeRange.max} min`}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Typography variant="subtitle1" textAlign={'center'}>
                               {item.partySize}
                             </Typography>
                           </TableCell>
@@ -135,7 +146,7 @@ export default function BusinessWaitlist () {
 
 
     return(
-        <>
+      <ThemeProvider theme={BusinessWaitlistTheme}>
 
             <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3, pl: 2, pr: 2 }}>
                 <Card sx={{ textAlign:'center', p: 3, borderRadius: 5, boxShadow: 0 }}>
@@ -145,11 +156,20 @@ export default function BusinessWaitlist () {
                     <DisplayWaitlist />
 
                     <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 5, pt: 2}}>
-                        <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                        <Stack>
+                          <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                          <Box>
+                            <QRCode 
+                              value={fullLink}
+                              size={256}
+                              style={{ height: 80, width: 80 }}
+                              viewBox={`0 0 256 256`}
+                          />
+                        </Box>
+                        </Stack>
                     </CardActions>
                 </Card>
-            </Box>
-        
-        </>
+            </Box>        
+        </ThemeProvider>
     )
 }

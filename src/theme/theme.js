@@ -141,6 +141,42 @@ export const ClientWaitingTheme = createTheme({
   }
 });
 
+export const BusinessWaitlistTheme = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
+      main: '#000000',
+    },
+    secondary: {
+      main: '#001f7d',
+    },
+    info: {
+      main: '#FF9800',
+    },
+    error: {
+      main: '#FF0015',
+    },
+    warning: {
+      main: '#FFC107',
+    },
+    success: {
+      main: '#4caf50',
+    }
+  },
+  typography: {
+    fontFamily: "Poppins",
+  },
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          color: 'white'
+        }
+      }
+    }
+  }
+});
+
 
 export const HomePageTheme = createTheme({
   palette: {

@@ -190,16 +190,16 @@
 
 @media (min-width: 1200px) {
   .grid-item {
-    max-width: 50vw !important;
-    min-width: 45vw;
+    max-width: 35vw !important;
+    min-width: 35vw;
 
   }
 }
 
 @media (min-width: 1600px) {
   .grid-item {
-    max-width: 45vw !important;
-    min-width: 45vw;
+    max-width: 25vw !important;
+    min-width: 25vw;
   }
 }
 

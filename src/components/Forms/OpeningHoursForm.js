@@ -437,7 +437,7 @@ const OpeningHoursForm = ({reloadPage}) => {
                 <Grid container spacing={2}>
                   <Grid item xs>
                     <Box>
-                    <Typography variant='subtitle2' fontWeight={'bold'}>When will you be off?</Typography>
+                    <Typography variant='subtitle2' fontWeight={'bold'} gutterBottom>When will you be off?</Typography>
                     <FutureDatePicker label="Date" value={selectedDate} onChange={handleDateChange} />
                       {
                         selectedDate && <FormControlLabel 
