@@ -8,7 +8,10 @@ const useWebSocket = (url, documentId) => {
   const ws = useRef(null);
 
   useEffect(() => {
+
+    console.log("Entered into useEffect", documentId)
     ws.current = new WebSocket(url);
+
 
     ws.current.onopen = () => {
       console.log('Connected to WebSocket server');
@@ -20,6 +23,10 @@ const useWebSocket = (url, documentId) => {
       console.log(data)
       setPayload((prev) => [...prev, data]);
     };
+
+    ws.current.onerror = (error) => {
+      console.log(error)
+    }
 
     ws.current.onclose = () => {
       console.log('Disconnected from WebSocket server');

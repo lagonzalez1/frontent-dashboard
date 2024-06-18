@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:2222",
+  "proxy": "http://127.0.0.1:2222",
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
@@ -44,6 +44,7 @@
     "react-redux": "^8.1.0",
     "react-router-dom": "^6.11.2",
     "react-scripts": "5.0.0",
+    "react-use-websocket": "^3.0.0",
     "styled-components": "^6.1.11",
     "unsplash-js": "^7.0.18",
     "web-vitals": "^2.1.4",

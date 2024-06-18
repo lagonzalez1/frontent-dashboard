@@ -48,7 +48,7 @@ function App() {
   return (
     <Router>
       <div id="mainContainer">
-        <Suspense fallback={<div><h6>Loading...</h6></div>}>
+        <Suspense fallback={<div style={{display: 'flex', justifyContent: 'center'}}><h6>Loading ...</h6></div>}>
           <Routes>
             <Route path='/' element={<Homepage />}></Route>
             <Route path='/Register' element={<Register />}></Route>
