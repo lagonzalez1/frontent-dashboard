@@ -27,8 +27,8 @@ import { DateTime } from "luxon";
 import ServingClient from "../Dialog/ServingClient";
 import { ArrowSquareOut, Lock, LockOpen } from "phosphor-react";
 import { FmdGoodRounded } from "@mui/icons-material";
-//import useWebSocket, { ReadyState } from "react-use-websocket"
-import useWebSocket from "../../hooks/webSocketHook";
+
+
 
 
 const Waitlist = ({setClient, setEditClient}) => {
@@ -48,51 +48,11 @@ const Waitlist = ({setClient, setEditClient}) => {
     const [waittime, setWaittime] = useState(null);
     const [tableData, setTableData] = useState([]);
     
-    const WS_URL = 'ws://127.0.0.1:443/api/internal/socket';
-
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
 
     let accepting = acceptingRejecting();
-    const [documentId, setDocumentId] = useState('664a7f5da07f92ba557f8e9f');
 
-    /*
-    const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
-        WS_URL,
-        {
-          share: false,
-          shouldReconnect: () => true,
-        },
-    )
-
-    useEffect(() => {
-        console.log("Connection state changed")
-        if (readyState === ReadyState.OPEN) {
-            sendJsonMessage({
-                action: "monitor",
-                data: {
-                    documentId: documentId,
-                },
-            })
-        }
-    }, [readyState])
-
-    const connectionStatus = {
-        [ReadyState.CONNECTING]: 'Connecting',
-        [ReadyState.OPEN]: 'Open',
-        [ReadyState.CLOSING]: 'Closing',
-        [ReadyState.CLOSED]: 'Closed',
-        [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-      }[readyState];
-
-    useEffect(() => {        
-        if (lastMessage !== null ) {
-            console.log(`Got a new message: ${lastMessage.data}`)
-        }
-    }, [lastMessage])
-    */
-
-    const messages = useWebSocket(WS_URL, documentId);
 
     useEffect(() => {
         setLoading(true)
@@ -105,9 +65,7 @@ const Waitlist = ({setClient, setEditClient}) => {
         }
     }, [reload])
 
-    useEffect(() => {
-        console.log(messages)
-    }, [messages])
+
 
     const getWaitlistData = () => {
         if (accessToken === undefined) { return ;}

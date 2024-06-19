@@ -10,7 +10,6 @@ import Serving from "../Serving/Serving";
 import Settings from "../Settings/Settings";
 import Services from "../Services/Services";
 import Help from "../Help/Help";
-import useWebSocket from "../../hooks/webSocketHook";
 import Drawer from "../../components/Drawer/Drawer";
 
 import { useSignOut } from "react-auth-kit";
@@ -29,6 +28,8 @@ import Analytics from "../Analytics/Analytics";
 import Trial from "../../components/Snackbar/Trial";
 import StripeCompletion from "../../components/Dialog/StripeCompletion";
 import HelpDialog from "../Help/HelpDialog";
+import useWebSocket, { ReadyState } from "react-use-websocket"
+import { DateTime } from "luxon";
 
 /**
  * 
@@ -48,6 +49,7 @@ export default function Dashboard () {
     const dispatch = useDispatch();
     const signOut = useSignOut();
     const reload = useSelector((state) => state.user.reload);
+    const business = useSelector((state) => state.business);
     const DAYONE = useSelector((state) => state.business.timestamp);
     const timezone = useSelector((state) => state.business.timezone);
     const [loading, setLoading] = useState(false);
@@ -60,6 +62,33 @@ export default function Dashboard () {
 
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
     const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
+
+    const WS_URL = 'ws://127.0.0.1:443/api/internal/socket';
+    const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
+        WS_URL,
+        {
+          share: false,
+          shouldReconnect: () => true,
+        },
+    )
+    useEffect(() => {
+        console.log("Connection state changed")
+        if (readyState === ReadyState.OPEN) {
+            sendJsonMessage({
+                action: "monitor",
+                data: {
+                    documentId: business._id,
+                    currentTime: DateTime.local().setZone(timezone).toISO()
+                },
+            });
+        }
+    }, [readyState])
+
+    useEffect(() => {        
+        if (lastMessage !== null ) {
+            console.log(`Got a new message: ${lastMessage.data}`)
+        }
+    }, [lastMessage])
 
 
     async function checkAuthStatus() {
