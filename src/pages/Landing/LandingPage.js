@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Container, Button, Typography, Box, Stack, CircularProgress, Card, CardActions, CardContent } from "@mui/material";
+import { Container, Button, Typography, Box, Stack, CircularProgress, Card, CardActions, CardContent, ThemeProvider } from "@mui/material";
 import "../../css/LandingPage.css";
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
 import { APPOINTMENT_REMOVE, WAITLIST_REMOVE, APPOINTMENT, WAITLIST } from "../../static/static";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { ClientWelcomeTheme } from "../../theme/theme";
 
 export default function LandingPage() {
 
@@ -74,24 +75,26 @@ export default function LandingPage() {
 
 
     return (
-        <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
-        <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
-            
-            { loading ? <CircularProgress/> : 
-            (<>
-            <CardContent sx={{ justifyContent: 'center'}}>
-                <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
-                    {link}
-                </Typography>
-                <ShowLandingStatus type={type} />
+        <ThemeProvider theme={ClientWelcomeTheme}>
+                <Box className="center-box" sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 3 }}>
+                <Card className="custom-card" sx={{ p: 2, borderRadius: 5, boxShadow: 0 }}>
+                    
+                    { loading ? <CircularProgress/> : 
+                    (<>
+                    <CardContent sx={{ justifyContent: 'center'}}>
+                        <Typography variant="body2" fontWeight="bold" color="gray" gutterBottom>
+                            {link}
+                        </Typography>
+                        <ShowLandingStatus type={type} />
 
-            </CardContent>
-            </>
-            )}
-            <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 2, pt: 7}}>
-                <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
-            </CardActions>
-        </Card>
-    </Box>
+                    </CardContent>
+                    </>
+                    )}
+                    <CardActions sx={{ justifyContent: 'center', alignItems: 'center', alignContent: 'baseline', marginBottom: 2, pt: 7}}>
+                        <Typography gutterBottom variant="caption" fontWeight="bold" color="gray">Powered by Waitlist <PunchClockTwoToneIcon fontSize="small"/> </Typography>
+                    </CardActions>
+                </Card>
+                </Box>
+        </ThemeProvider>
     )
 }

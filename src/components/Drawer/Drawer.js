@@ -429,7 +429,6 @@ const Drawer = ({client, setClient}) => {
                             rows={4}
                             placeholder="Chat"
                             value={chat.body}
-                            maxRows={4}
                             inputProps={{ maxLength: 140 }}
                             onChange={(e) => setChat((prev) => ({...prev, body: e.target.value})) }
                             />

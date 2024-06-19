@@ -26,7 +26,7 @@ import { usePermission } from "../../auth/Permissions";
 import { DateTime } from "luxon";
 import ServingClient from "../Dialog/ServingClient";
 import { ArrowSquareOut, Lock, LockOpen } from "phosphor-react";
-import { FmdGoodRounded } from "@mui/icons-material";
+import { FmdGoodRounded, WarningRounded } from "@mui/icons-material";
 
 
 
@@ -35,6 +35,7 @@ const Waitlist = ({setClient, setEditClient}) => {
     
     const { checkPermission } = usePermission();
     const dispatch = useDispatch();
+    const td = useSelector((state) => state.business.currentClients);
     const accessToken = useSelector((state) => state.tokens.access_token);
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
@@ -46,7 +47,7 @@ const Waitlist = ({setClient, setEditClient}) => {
     const [loading, setLoading] = useState(false);
     const [clientId, setClientId] = useState();
     const [waittime, setWaittime] = useState(null);
-    const [tableData, setTableData] = useState([]);
+    const [tableData, setTableData] = useState(td);
     
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
@@ -56,7 +57,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
     useEffect(() => {
         setLoading(true)
-        getWaitlistData();
+        //getWaitlistData();
         loadNoShowData() // No show table
         getWaittime(); // Waittime
         return () => {
@@ -446,7 +447,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                                 </TableCell>
                                 <TableCell align="left">
                                     <Stack direction={'row'}>
-                                    {item.status.cancelled ? <IconButton disabled> <WarningRoundedIcon color="error" /> </IconButton> : 
+                                    {item.status.cancelled ? <IconButton disabled> <WarningRounded color="error" /> </IconButton> : 
                                                     <IconButton disabled><FmdGoodRounded color="success" /></IconButton> }
                                     <Stack>
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>

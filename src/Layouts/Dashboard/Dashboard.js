@@ -30,6 +30,7 @@ import StripeCompletion from "../../components/Dialog/StripeCompletion";
 import HelpDialog from "../Help/HelpDialog";
 import useWebSocket, { ReadyState } from "react-use-websocket"
 import { DateTime } from "luxon";
+import { setWaitlistClients } from "../../reducers/business";
 
 /**
  * 
@@ -49,7 +50,7 @@ export default function Dashboard () {
     const dispatch = useDispatch();
     const signOut = useSignOut();
     const reload = useSelector((state) => state.user.reload);
-    const business = useSelector((state) => state.business);
+    const bid = useSelector((state) => { return state.business._id;});
     const DAYONE = useSelector((state) => state.business.timestamp);
     const timezone = useSelector((state) => state.business.timezone);
     const [loading, setLoading] = useState(false);
@@ -63,6 +64,8 @@ export default function Dashboard () {
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
     const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
 
+
+
     const WS_URL = 'ws://127.0.0.1:443/api/internal/socket';
     const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
         WS_URL,
@@ -72,23 +75,26 @@ export default function Dashboard () {
         },
     )
     useEffect(() => {
-        console.log("Connection state changed")
+        console.log("Connection state changed");
         if (readyState === ReadyState.OPEN) {
             sendJsonMessage({
                 action: "monitor",
                 data: {
-                    documentId: business._id,
+                    documentId: bid,
                     currentTime: DateTime.local().setZone(timezone).toISO()
                 },
             });
         }
-    }, [readyState])
+    }, [readyState, bid, timezone])
 
     useEffect(() => {        
-        if (lastMessage !== null ) {
-            console.log(`Got a new message: ${lastMessage.data}`)
+        if (lastJsonMessage !== null) {
+            const str = JSON.stringify(lastJsonMessage);
+            const parse = JSON.parse(str);
+            console.log(parse)
+            setWaitlistClients(parse);
         }
-    }, [lastMessage])
+    }, [lastMessage, lastJsonMessage])
 
 
     async function checkAuthStatus() {
