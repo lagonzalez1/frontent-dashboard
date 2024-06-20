@@ -2,9 +2,8 @@ import React, {useState, useEffect } from "react";
 import { Box, Swtich , Paper, Slide, Alert, Card, CardContent, Typography, Stack, Container, Button, Divider, CardActions,
     AlertTitle, Dialog, DialogContent, DialogTitle,DialogActions, ButtonBase, Snackbar, CircularProgress, Link, Rating ,
 Collapse, IconButton, DialogContentText, Grow, TextField, Select, Grid, Menu, MenuItem, CardActionArea, Chip, LinearProgress, ThemeProvider,
-Avatar} from "@mui/material";
-import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+Avatar,
+Drawer} from "@mui/material";
 
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import StarIcon from '@mui/icons-material/Star';
@@ -43,7 +42,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { ClientWaitingTheme, ClientWelcomeTheme } from "../../theme/theme.js";
 import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
 import { LoadingButton } from "@mui/lab";
-import { AttachMoneyRounded, RestoreRounded } from "@mui/icons-material";
+import { AttachMoneyRounded, AutoAwesomeRounded, RestoreRounded } from "@mui/icons-material";
 
 
 export default function Waiting() {
@@ -78,6 +77,7 @@ export default function Waiting() {
     const [employeeName, setEmployeeName] = useState(null);
     const [acknowledgeLoading, setAcknowledgeLoading] = useState(false);
     const [editPretenseLoader,setEditPretenseLoader] = useState(false);
+    const [openChat, setOpenChat] = useState(false); 
     const [serviceTags, setServiceTags] = useState({});
 
     const [reload, setReload] = useState(false);
@@ -469,6 +469,13 @@ export default function Waiting() {
         return true;
     }
 
+    const openChatContainer = () => {
+        setOpenChat(true);
+    }
+    const closeChatContainer = () => {
+        setOpenChat(false);
+    }
+
     const handleServiceChange = (service, setFieldValue, values, idx) => {
         setFieldValue('service_id', service._id);
         setServiceTags((prev) => ({...prev, [idx]: service._id }));
@@ -601,7 +608,7 @@ export default function Waiting() {
                     (
                         <>
                         <Divider />
-                        <Button endIcon={<NotificationsActiveRoundedIcon/>} onClick={() => setUpdateClient(true)} variant="outlined" color="primary" sx={{ borderRadius: 10}}>
+                        <Button endIcon={<NotificationsActiveRoundedIcon/>} onClick={() => setUpdateClient(true)} variant="outlined" color="warning" sx={{ borderRadius: 10}}>
                             <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>Status
                         </Typography>
                         </Button>
@@ -611,14 +618,15 @@ export default function Waiting() {
                     (
                         <>
                         <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
-                            <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
+                            <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not coming
                             </Typography>
                         </Button>
-                        <ChatBox chat={user.chat} />
 
                         </>
                     )
                     }
+                <ChatBox chat={user.chat} />
+
             </Stack>
             )
         }
@@ -644,17 +652,17 @@ export default function Waiting() {
                 {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
-                        <Button disabled={errors ? true: false} size="small" color="primary" variant="contained" startIcon={<IosShareRoundedIcon fontSize="small" />} onClick={() => copyToClipboardHandler()}>
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="primary" variant="contained" startIcon={<AutoAwesomeRounded />} onClick={() => openChatContainer()}>
                             <Typography variant="caption" sx={{color: 'white' }}>
-                                Share
+                                 Chat
                             </Typography>
                         </Button>
-                        <Button disabled={errors ? true: false} size="small" color="primary" variant="contained"  startIcon={<FormatListNumberedRoundedIcon  fontSize="small"/>} onClick={() => navigateToWaitlist() }> 
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="primary" variant="contained"  startIcon={<FormatListNumberedRoundedIcon />} onClick={() => navigateToWaitlist() }> 
                         <Typography variant="caption" sx={{color: 'white' }}>
                             wailist
                         </Typography>
                         </Button>
-                        <Button disabled={errors ? true: false} size="small" color="primary" variant="contained"  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}> 
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="primary" variant="contained"  startIcon={<BlockRoundedIcon/>} onClick={() => setOpen(true)}> 
                             <Typography variant="caption" sx={{color: 'white' }}>
                             cancel
                             </Typography>
@@ -682,10 +690,10 @@ export default function Waiting() {
 
                     <Grid item xs>
                     <Card variant="outlined">
-                        <CardActionArea onClick={() => copyToClipboardHandler()}>
+                        <CardActionArea onClick={() => openChatContainer()}>
                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                <Share alignmentBaseline="center" weight="duotone" size={24} />
-                                <Typography variant="caption">Share</Typography>
+                                <AutoAwesomeRounded />
+                                <Typography variant="caption">Chat</Typography>
                             </CardContent>
                             </CardActionArea>
                         </Card>
@@ -726,17 +734,17 @@ export default function Waiting() {
                 {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
-                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}} startIcon={<NotificationsActiveRoundedIcon  fontSize="small"/>} onClick={() => setUpdateClient(true)}>
+                        <Button disableElevation disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}} startIcon={<NotificationsActiveRoundedIcon />} onClick={() => setUpdateClient(true)}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                 {'Status'}
                             </Typography>
                         </Button>
-                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BorderColorRoundedIcon  fontSize="small"/>} onClick={() => attemptEditAppointment()}>
+                        <Button disableElevation disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BorderColorRoundedIcon/>} onClick={() => attemptEditAppointment()}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                 {'edit'}
                             </Typography>
                         </Button>
-                        <Button disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BlockRoundedIcon  fontSize="small"/>} onClick={() => setOpen(true)}>
+                        <Button disableElevation disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BlockRoundedIcon />} onClick={() => setOpen(true)}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                 {'cancel'}
                             </Typography>
@@ -1249,6 +1257,16 @@ export default function Waiting() {
 
                 </Grid>
             </Box>
+
+            <Drawer
+                anchor="bottom"
+                open={openChat}
+                onClose={closeChatContainer}
+            >
+                <Box minHeight={'50vh'}>
+                    Chat container here
+                </Box>
+            </Drawer>
 
             <Dialog
                 id="leave_dialog"

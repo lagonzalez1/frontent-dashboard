@@ -318,8 +318,8 @@ const Drawer = ({client, setClient}) => {
                             <Grid sx={{ justifyContent: 'right'}} item>
                                 <Stack spacing={0.5}>
                                 {payload && payload.status.late === true ? (<Chip  icon={<WatchLaterIcon />} label="Running Late" />) : null }
-                                {payload && (payload.status.parking) ? (<Chip color={'success'}  icon={<DirectionsCarFilledIcon />} label="Parking" />) : null }
-                                {payload && (payload.status.here) ? (<Chip  icon={<EmojiPeopleIcon />} label="Here" />) : null }
+                                {payload && (payload.status.parking) ? (<Chip color={'warining'}  icon={<DirectionsCarFilledIcon />} label="Parking" />) : null }
+                                {payload && (payload.status.here) ? (<Chip color={'success'} icon={<EmojiPeopleIcon />} label="Here" />) : null }
                                 {payload && (payload.status.cancelled) ? (<Chip color={'error'}  icon={<DoNotDisturbAltRoundedIcon />} label="Cancelled" />) : null }
                                 {payload && (payload.status.noShow) ? (<Chip color="error" icon={<RuleRoundedIcon />} label="No show" />) : null }
                                 {payload && (payload.status.serving) ? (<Chip  icon={<NavigateNextRoundedIcon />} label="Serving" />) : null }
@@ -452,7 +452,7 @@ const Drawer = ({client, setClient}) => {
                         analytics.waitlist_summmary.map((object, index) => {
                             return (
                                 <>
-                                    <ListItem>
+                                    <ListItem key={index}>
                                         <ListItemAvatar>
                                             <Avatar>
                                             <FactCheckOutlined />
@@ -480,7 +480,7 @@ const Drawer = ({client, setClient}) => {
                                 
                                 return (
                                     <>
-                                        <ListItem>
+                                        <ListItem key={index}>
                                             <ListItemAvatar>
                                                 <Avatar>
                                                 <FactCheckOutlined  />

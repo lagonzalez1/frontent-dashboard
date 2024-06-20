@@ -125,7 +125,6 @@ const Appointments = ({setClient, setEditClient}) => {
             .then(response => {
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
-                console.log(response)
 
             })
             .catch(error => {

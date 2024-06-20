@@ -30,7 +30,7 @@ import StripeCompletion from "../../components/Dialog/StripeCompletion";
 import HelpDialog from "../Help/HelpDialog";
 import useWebSocket, { ReadyState } from "react-use-websocket"
 import { DateTime } from "luxon";
-import { setWaitlistClients } from "../../reducers/business";
+import { setNoShowData, setWaitlistClients } from "../../reducers/business";
 
 /**
  * 
@@ -95,7 +95,8 @@ export default function Dashboard () {
             const str = JSON.stringify(lastJsonMessage);
             const parse = JSON.parse(str);
             console.log(parse)
-            dispatch(setWaitlistClients(parse))
+            dispatch(setWaitlistClients(parse.currentClients))
+            dispatch(setNoShowData(parse.noShowData))
         }
     }, [lastMessage, lastJsonMessage])
 

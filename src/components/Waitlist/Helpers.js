@@ -289,7 +289,6 @@ export const removeClient = (id, type) => {
     axios.post('/api/internal/remove_client', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then((response) => {
         resolve(response.data.msg);
-
       })
       .catch(error => {
         console.log(error);

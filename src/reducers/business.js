@@ -27,7 +27,8 @@ const initialState = {
   serveMax: null,
   _id: null,
   country: null,
-  schedule: null
+  schedule: null,
+  noShowData: null
 
 };
 
@@ -66,9 +67,13 @@ const businessSlice = createSlice({
     },
     setWaitlistClients: (state, action) => {
       state.currentClients = action.payload
+    },
+    setNoShowData: (state, action) => {
+      state.noShowData = action.payload
     }
+  
   },
 });
 
-export const { setBusiness, setWaitlistClients } = businessSlice.actions;
+export const { setBusiness, setWaitlistClients, setNoShowData} = businessSlice.actions;
 export default businessSlice.reducer;

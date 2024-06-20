@@ -27,6 +27,7 @@ import { DateTime } from "luxon";
 import ServingClient from "../Dialog/ServingClient";
 import { ArrowSquareOut, Lock, LockOpen } from "phosphor-react";
 import { FmdGoodRounded, WarningRounded } from "@mui/icons-material";
+import { setWaitlistClients, setNoShowData } from "../../reducers/business";
 
 
 
@@ -35,19 +36,21 @@ const Waitlist = ({setClient, setEditClient}) => {
     
     const { checkPermission } = usePermission();
     const dispatch = useDispatch();
-    const td = useSelector((state) => state.business.currentClients);
+    const tableData = useSelector((state) => state.business.currentClients);
+    const noShowData = useSelector((state) => state.business.noShowData);
     const accessToken = useSelector((state) => state.tokens.access_token);
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
 
     const [anchorElVert, setAnchorElVert] = useState(null);
-    const [noShowData, setNoShowData] = useState(null);
+    //const [noShowData, setNoShow] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [ns_loading, setNsLoading] = useState(false);
     const [clientId, setClientId] = useState();
     const [waittime, setWaittime] = useState(null);
-    const [tableData, setTableData] = useState(td);
+    //const [tableData, setTableData] = useState(td);
     
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
@@ -57,9 +60,9 @@ const Waitlist = ({setClient, setEditClient}) => {
 
     useEffect(() => {
         setLoading(true)
-        //getWaitlistData();
-        loadNoShowData() // No show table
-        getWaittime(); // Waittime
+        getWaitlistData(); // Load initially
+        loadNoShowData(); // Load initially
+        getWaittime(); 
         return () => {
             setLoading(false)
             dispatch(setReload(false));
@@ -67,22 +70,11 @@ const Waitlist = ({setClient, setEditClient}) => {
     }, [reload])
 
 
-    useEffect(() => {
-        if (!td) {
-            getWaitlistData();
-        }
-        return () => {
-            setTableData();
-        }
-    }, [td])
-
-
-
     const getWaitlistData = () => {
         if (accessToken === undefined) { return ;}
         getWaitlistTable(accessToken)
         .then(response => {
-            setTableData(response);
+            dispatch(setWaitlistClients(response));
         })
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
@@ -95,7 +87,7 @@ const Waitlist = ({setClient, setEditClient}) => {
         if (accessToken === undefined) { return ;}
         getNoShowClients(accessToken)
         .then(response => {
-            setNoShowData(response.data.result)
+            dispatch(setNoShowData(response.data.result))
         })
         .catch(error => {
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
@@ -457,8 +449,11 @@ const Waitlist = ({setClient, setEditClient}) => {
                                 </TableCell>
                                 <TableCell align="left">
                                     <Stack direction={'row'}>
-                                    {item.status.cancelled ? <IconButton disabled> <WarningRounded color="error" /> </IconButton> : 
-                                                    <IconButton disabled><FmdGoodRounded color="success" /></IconButton> }
+                                    
+                                    {(item.status.cancelled === true || item.status.late === true) && <IconButton disabled><WarningRounded color="error" /> </IconButton> }
+                                    {item.status.here === true ? <IconButton disabled><FmdGoodRounded color="success" /></IconButton>: <IconButton disabled><FmdGoodRounded color="text" /></IconButton>}
+                                    {item.status.late === true && <IconButton disabled><FmdGoodRounded color="warning" /></IconButton>}
+                                                    
                                     <Stack>
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
                                     <Typography fontWeight="normal" variant="caption">
@@ -559,9 +554,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
                 
 
-                {
-                    noShowData ? (
-                        <div className="table_content">
+                <div className="table_content">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
                             <Table stickyHeader aria-label='main_table'>
@@ -582,82 +575,97 @@ const Waitlist = ({setClient, setEditClient}) => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-
-                                { noShowData.map((item, index) => {
-                                    return (
-                                    <TableRow key={item._id}>
-                                            
-                                        <TableCell align="left">
-                                            <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'left'}>
-                                                <IconButton onClick={() => openClientDrawerNoShow(item)}>
-                                                    <InfoOutlinedIcon fontSize="small" /> 
-                                                </IconButton>
-                                                <Typography>{++index}</Typography>                                   
-                                            </Stack>
-                                        </TableCell>
-
-                                        <TableCell align="left">
-                                            <Stack>
-                                            <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
-                                            <Typography fontWeight="normal" variant="caption">
-                                                { item.serviceTag ? findService(item.serviceTag).title: null }
-                                            </Typography>
-                                            </Stack>
-                                        </TableCell>
-
-                                        <TableCell align="left">
-                                            <Typography variant="subtitle2" fontWeight="bold">{item.partySize}</Typography>
-                                        </TableCell>
-
-                                        <TableCell align="left">
-                                            <Typography fontWeight="bold" variant="body2">
-                                                { item.resourceTag ? findResource(item.resourceTag).title : null }
-                                            </Typography>
-                                        </TableCell>
-
-                                        <TableCell align="left">
-                                            <Stack>
-                                            <Typography variant="subtitle2" fontWeight="bold">
-                                                {DateTime.fromJSDate(new Date(item.timestampOrigin)).toFormat('LLL dd yyyy hh:mm a')}
-                                            </Typography>
-                                            <Typography fontWeight="normal" variant="caption">
-                                                { item.type ? item.type: null }
+                                { ns_loading === true ? (
+                                    <TableRow>
+                                    <TableCell colSpan={3}/>
+                                    <TableCell>
+                                    <CircularProgress size={15} />
+                                    </TableCell>
+                                    <TableCell colSpan={3}/>
+                                </TableRow>
+                                ):
+                                    (
+                                       noShowData && noShowData.length > 0 ?
+                                       (noShowData.map((item, index) => {
+                                        return (
+                                        <TableRow key={item._id}>
+                                            <TableCell align="left">
+                                                <Stack direction={'row'} spacing={1} alignItems={'center'} justifyContent={'left'}>
+                                                    <IconButton onClick={() => openClientDrawerNoShow(item)}>
+                                                        <InfoOutlinedIcon fontSize="small" /> 
+                                                    </IconButton>
+                                                    <Typography>{++index}</Typography>                                   
+                                                </Stack>
+                                            </TableCell>
+    
+                                            <TableCell align="left">
+                                                <Stack>
+                                                <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
+                                                <Typography fontWeight="normal" variant="caption">
+                                                    { item.serviceTag ? findService(item.serviceTag).title: null }
                                                 </Typography>
-                                            </Stack>
-                                        </TableCell>   
-
-                                        <TableCell align="right">
-                                            <Stack
-                                                direction="row"
-                                                spacing={1}
-                                            >   
-                                                <Tooltip title="Serve client" placement="left">
-                                                <IconButton onClick={() => sendClientServing(item)}>
-                                                    <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
-                                                </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title="Send notification" placement="top">
-                                                <IconButton onClick={() => sendClientNotification(item)}>
-                                                    <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
-                                                </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title="Edit client information" placement="right">
-                                                <IconButton onClick={() => editClientInfo(item)}>
-                                                    <EditIcon fontSize="small" />
-                                                </IconButton>      
-                                                </Tooltip>
-                                            </Stack>
-                                        </TableCell> 
-
-                                    </TableRow>
-                                )}) }
+                                                </Stack>
+                                            </TableCell>
+    
+                                            <TableCell align="left">
+                                                <Typography variant="subtitle2" fontWeight="bold">{item.partySize}</Typography>
+                                            </TableCell>
+    
+                                            <TableCell align="left">
+                                                <Typography fontWeight="bold" variant="body2">
+                                                    { item.resourceTag ? findResource(item.resourceTag).title : null }
+                                                </Typography>
+                                            </TableCell>
+    
+                                            <TableCell align="left">
+                                                <Stack>
+                                                <Typography variant="subtitle2" fontWeight="bold">
+                                                    {DateTime.fromJSDate(new Date(item.timestampOrigin)).toFormat('LLL dd yyyy hh:mm a')}
+                                                </Typography>
+                                                <Typography fontWeight="normal" variant="caption">
+                                                    { item.type ? item.type: null }
+                                                    </Typography>
+                                                </Stack>
+                                            </TableCell>   
+    
+                                            <TableCell align="right">
+                                                <Stack
+                                                    direction="row"
+                                                    spacing={1}
+                                                >   
+                                                    <Tooltip title="Serve client" placement="left">
+                                                    <IconButton onClick={() => sendClientServing(item)}>
+                                                        <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
+                                                    </IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="Send notification" placement="top">
+                                                    <IconButton onClick={() => sendClientNotification(item)}>
+                                                        <NotificationsIcon fontSize="small" htmlColor="#FF0000"/>                                           
+                                                    </IconButton>
+                                                    </Tooltip>
+                                                    <Tooltip title="Edit client information" placement="right">
+                                                    <IconButton onClick={() => editClientInfo(item)}>
+                                                        <EditIcon fontSize="small" />
+                                                    </IconButton>      
+                                                    </Tooltip>
+                                                </Stack>
+                                            </TableCell> 
+    
+                                        </TableRow>
+                                        )})): 
+                                        <TableRow>
+                                            <TableCell colSpan={6} align="center">
+                                                No data available
+                                            </TableCell>
+                                        </TableRow>  
+                                    )
+                                }
+                                
                                 </TableBody>
                             </Table>
                         </TableContainer>
                     </Paper>
                 </div>
-                    ): null
-                }
                                     
                                 
         
