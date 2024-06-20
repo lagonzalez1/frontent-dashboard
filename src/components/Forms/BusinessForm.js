@@ -28,6 +28,8 @@ const BusinessForm = ({reloadPage}) => {
   
   const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
+  const user = useSelector((state) => state.user);
+
   const dispatch = useDispatch();
   const [permissionMessage, setPermissionMessage] = useState(null);
 

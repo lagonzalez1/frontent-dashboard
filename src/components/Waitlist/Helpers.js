@@ -1,4 +1,5 @@
 
+import React from "react";
 import axios from "axios";
 import { DateTime } from "luxon";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -177,10 +178,8 @@ export const moveClientUp = (clientId, currentClients) => {
           resolve(response.data.msg);
         }
         else{
-          if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
-            reject('Request timed out. Please try again later.'); // Handle timeout error
-          }
-          resolve(response.data.msg);
+          reject('Request timed out. Please try again later.'); // Handle timeout error
+
         }
         
       })

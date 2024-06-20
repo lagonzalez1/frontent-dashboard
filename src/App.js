@@ -24,7 +24,6 @@ const BusinessWaitlist = lazy(() => import ('./pages/Waitlist/BusinessWaitlist')
 const LandingPage = lazy(() => import('./pages/Landing/LandingPage'));
 const PasswordReset = lazy(() => import('./pages/PasswordReset/PasswordReset'));
 const VerifyUser = lazy(() => import("./pages/Verify/VerifyUser"));
-const WelcomeExtras = lazy(() => import('./pages/Welcome/WelcomeExtras'))
 
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword/ForgotPassword'))
 
@@ -66,7 +65,6 @@ function App() {
             <Route path={'/welcome/:link/selector'} element={<WelcomeSelector />}></Route> { /** Check if business open. Advance if so. */}
             <Route path={'/welcome/:link/size'} element={<WelcomeSize />}></Route> { /** Check if business open. Advance if so. */}
             <Route path={'/welcome/:link/details'} element={<WelcomeDetails />}></Route> { /** Check if business open. Advance if so. */}
-            <Route path={'/welcome/:link/extras'} element={<WelcomeExtras />}></Route> { /** Check if business open. Advance if so. */}
             <Route path={'/welcome/:link/visits/:unid'} element={<Waiting/>}></Route>
             <Route path={'/welcome/:link/waitlist'} element={<BusinessWaitlist />}></Route>
             <Route path={'/welcome/:link/:status/landingPage'} element={<LandingPage />}></Route>

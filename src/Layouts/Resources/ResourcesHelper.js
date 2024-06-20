@@ -65,7 +65,7 @@ export const findResourceTag = (id) => {
 
 
 export const updateResources = async (form) => {
-  return new Promise((resolve, rejects) => {
+  return new Promise((resolve, reject) => {
     const { user, business} = getStateData();
     const accessToken = getAccessToken();
     const headers = { headers: { 'x-access-token': accessToken }};
@@ -76,7 +76,6 @@ export const updateResources = async (form) => {
       if (response.status === 200){
         resolve(response.data.msg)
       }
-      rejects(response.data.msg)
     })
     .catch(error => {
       console.log(error);

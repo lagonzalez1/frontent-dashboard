@@ -227,7 +227,7 @@ export default function WelcomeSelector() {
             setTimezone(response.timezone)
         })
         .catch(error => {
-            setErrors({title: 'Error', body: error.msg});
+            setErrorMessage({title: 'Error', body: error.msg});
             setDisable(true); 
         })
     }

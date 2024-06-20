@@ -14,35 +14,6 @@ export const getEmployeeImageRef = () => {
 
 
 
-export const requestProfileImages = async (ids) => {
-    const { user, business} = getStateData();
-    const accessToken = getAccessToken();
-    const email = user.email;
-    const requests = ids.map(id => axios.get(`/api/internal/get_employee_images`,{headers: {'x-access-token': accessToken}, params: {id}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'}) );
-    try {
-        const responses = await axios.all(requests);
-        const images = responses.map(response => response.data);
-        return images;
-    }
-    catch(error) {
-        console.log(error);
-        if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
-            reject('Request timed out. Please try again later.'); // Handle timeout error
-        }
-        if (error.response) {
-            console.log(error.response);
-            reject({msg: 'Response error', error: error.response});
-        }
-        else if (error.request){
-            console.log(error.request);
-            reject({msg: 'No response from server', error: error.request})
-        }
-        else {
-            reject({msg: 'Request setup error', error: error.message})
-        }
-    }
-}
-
 
 /**
  *  IF payload includes _id then we treat the backedn to edit a current employee.

@@ -149,15 +149,15 @@ export default function Welcome() {
         switch(type) {
             case 'FACE':
                 const facebook = window.open(social.facebook, '_blank', 'noopener,noreferrer')
-                if (facebook) newWindow.opener = null    
+                if (facebook) window.opener = null    
             break;
             case 'TWIT':
                 const twitter = window.open(social.twitter, '_blank', 'noopener,noreferrer')
-                if (twitter) newWindow.opener = null
+                if (twitter) window.opener = null
                 break;
             case 'INSTA':
                 const instagram = window.open(social.instagram, '_blank', 'noopener,noreferrer')
-                if (instagram) newWindow.opener = null
+                if (instagram) window.opener = null
                 break;
         }
         

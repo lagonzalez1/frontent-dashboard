@@ -11,6 +11,7 @@ import { setSnackbar } from '../../reducers/user';
 import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";
 import { Lock, QrCode } from "phosphor-react";
+import { Close } from "@mui/icons-material";
 
 export default function Personalization ({reloadPage}) {
 
@@ -156,7 +157,7 @@ export default function Personalization ({reloadPage}) {
                             setError(null);
                         }}
                         >
-                        <CloseIcon fontSize="inherit" />
+                            <Close fontSize="inherit" />
                         </IconButton>
                     }
                     sx={{ mb: 2 }}

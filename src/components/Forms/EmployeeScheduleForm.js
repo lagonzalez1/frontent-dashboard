@@ -22,7 +22,7 @@ import { ArrowUp } from 'phosphor-react';
  handleCheckBoxChange This function will not trigger casuing the WEEK days to update.
 */
 
-export default function EmployeeScheduleForm({employee, reloadPage}) {
+export default function EmployeeScheduleForm({employee, reloadPage, closeEditSchedule}) {
 
     const business = useSelector((state) => state.business);
     const schedule = useSelector((state) => state.business.schedule);
@@ -297,7 +297,7 @@ export default function EmployeeScheduleForm({employee, reloadPage}) {
                     </div>
                 ))}
                 <br />
-                <LoadingButton loading={loading} sx={{ borderRadius: 7}} variant="contained" color="primary" type="submit">
+                <LoadingButton loading={loading} sx={{ borderRadius: 5}} variant="contained" color="primary" type="submit">
                     submit
                 </LoadingButton>
                 </form>  

@@ -1,6 +1,11 @@
+import React from "react";
 import axios from "axios";
-export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;    
 import { NumberOne, NumberTwo, NumberThree, NumberFour, NumberFive, NumberSix, NumberSeven, NumberEight, NumberNine } from "phosphor-react";
+
+
+
+export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;    
+
 let GET_IDENTIFIER = '/api/external/identifierRequest';
 let GET_EMPLOYEELIST = '/api/external/employeeList';
 let GET_BUSINES_ARGS = `/api/external/businessArgs`;
@@ -17,10 +22,6 @@ let POST_ACK_CHAT = '/api/external/ack_chat';
 
 
 
-export const iconsList = (position) => {
-    let iconLi = [i1, i2, i3, i4, i5, i6, i7, i8, i9, i10]
-    return iconLi[position - 1];
-}
 
 
 export const isAppointmentEditable = (link, clientId, type, timestamp) => {

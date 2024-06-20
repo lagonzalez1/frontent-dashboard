@@ -29,6 +29,8 @@ import { usePermission } from '../../auth/Permissions';
 import CheckCircle from '@mui/icons-material/CheckCircle';
 import { Check, FileCsv, Flag, Trash } from "phosphor-react"
 
+
+
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -100,10 +102,16 @@ const Customers = () => {
     setAnchorEl(null);
   };
 
-  const handlePrint = () => {
-    const printThis = convertToCSV(data);
-    console.log(printThis)
-    handleClose();
+  const handlePrint = async () => {
+    try {
+      const printThis = await convertTo_CSV(data);
+      console.log(printThis)
+      handleClose();
+    }
+    catch (error) {
+      dispatch(setSnackbar({requestMessage: "Error found", requestStatus: error.msg}));
+    }
+    
   };
 
   const submitFlagClient = () => {

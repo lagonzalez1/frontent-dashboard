@@ -67,6 +67,16 @@ const Waitlist = ({setClient, setEditClient}) => {
     }, [reload])
 
 
+    useEffect(() => {
+        if (!td) {
+            getWaitlistData();
+        }
+        return () => {
+            setTableData();
+        }
+    }, [td])
+
+
 
     const getWaitlistData = () => {
         if (accessToken === undefined) { return ;}

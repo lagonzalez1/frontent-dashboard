@@ -43,6 +43,10 @@ import { setWaitlistClients } from "../../reducers/business";
  *                        - Define light mode as true, in app.js proccess any changes and update theme.
  *                        - Handle changess in Dashboard.js
  * 
+ * 
+ * Chat box:
+ * npm install @chatscope/chat-ui-kit-react
+ * 
  *             
  */
 
@@ -53,6 +57,7 @@ export default function Dashboard () {
     const bid = useSelector((state) => { return state.business._id;});
     const DAYONE = useSelector((state) => state.business.timestamp);
     const timezone = useSelector((state) => state.business.timezone);
+
     const [loading, setLoading] = useState(false);
     const [openCompletion, openStripeCompletion] = useState(false);
     const [stripeSession, setStripeSession] = useState({sessionId: '', status: '', title: ''})
@@ -63,8 +68,6 @@ export default function Dashboard () {
 
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
     const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
-
-
 
     const WS_URL = 'ws://127.0.0.1:443/api/internal/socket';
     const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
@@ -92,7 +95,7 @@ export default function Dashboard () {
             const str = JSON.stringify(lastJsonMessage);
             const parse = JSON.parse(str);
             console.log(parse)
-            setWaitlistClients(parse);
+            dispatch(setWaitlistClients(parse))
         }
     }, [lastMessage, lastJsonMessage])
 
@@ -200,7 +203,7 @@ export default function Dashboard () {
             case 8: 
                 return <Help />;
             default:
-                <ErrorPage errorMessage={"Failed to load the current location. Please feel free to reload this page. If that doesnt relsove this issue. Send us a email at support@waitonline.us"} type={404} /> 
+                return <ErrorPage errorMessage={"Failed to load the current location. Please feel free to reload this page. If that doesnt relsove this issue. Send us a email at support@waitonline.us"} type={404} /> 
         }
     }
     const MemoizedRenderLocation = useMemo(() => RenderLocation, [reload]);

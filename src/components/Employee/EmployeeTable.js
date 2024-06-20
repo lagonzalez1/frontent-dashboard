@@ -13,7 +13,7 @@ import { Table, TableCell, TableHead, TableBody, Button, Typography, Container
 import { useDispatch, useSelector } from "react-redux";
 import AddEmployeeForm from "../Forms/AddEmployeeForm";
 import CloseIcon from "@mui/icons-material/Close"
-import { requestRemoveEmployee, requestBlockEmployee, requestProfileImages, getEmployeeImageRef } from "../FormHelpers/AddNewEmployeeFormHelper";
+import { requestRemoveEmployee, requestBlockEmployee, getEmployeeImageRef } from "../FormHelpers/AddNewEmployeeFormHelper";
 import { setSnackbar } from "../../reducers/user";
 import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';

@@ -36,7 +36,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons'
 
 import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requestClientStatus,
-    getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, iconsList, placementTitle, requestClientReview, getBusinessTimezone, 
+    getAvailableAppointments, requestClientEditApp, getEmployeeList, PHONE_REGEX, placementTitle, requestClientReview, getBusinessTimezone, 
     acknowledgeChat,
     isAppointmentEditable} from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";

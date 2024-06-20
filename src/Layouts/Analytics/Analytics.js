@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating, IconButton, Select, MenuItem, Card, CardContent, CircularProgress, Divider, Avatar, ListItemAvatar } from "@mui/material";
+import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating, IconButton, Select, MenuItem, Card, CardContent, CircularProgress, Divider, Avatar, ListItemAvatar, Skeleton } from "@mui/material";
 import { useSelector } from "react-redux";
 import { findEmployee, findResource, findService, getEmployeeList, getEmployees } from "../../hooks/hooks";
 import StarIcon from '@mui/icons-material/Star';
@@ -7,6 +7,7 @@ import { getBusinessAnalytics, getEmployeeAnalytics, getEmployeeAnalyticsRange }
 import { DateTime } from "luxon";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import CachedIcon from '@mui/icons-material/Cached';
+import { useDispatch } from "react-redux";
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 
 import { Package, HourglassHigh, UserSwitch , UsersThree, XCircle, Database, FireSimple, Drop,Waves , Campfire , FlowerLotus, Tree, Coffee, User  } from "phosphor-react"; 
@@ -18,6 +19,7 @@ import GuageCircular from "../../components/Vizual/GuageCircular";
 import ServiceBar from "../../components/Vizual/ServiceBar";
 import ResourcesBars from "../../components/Vizual/ResourcesBars";
 import GuagePercentages from "../../components/Vizual/GuagePercentages";
+import { setSnackbar } from "../../reducers/user";
 
 
 
@@ -28,7 +30,7 @@ const Analytics = () => {
     //const employeeList = getEmployeeList();
     const [range, setRange] = useState({ start: DateTime.local().setZone(business.timezone), end: DateTime.local().setZone(business.timezone)});
 
-
+    const dispatch = useDispatch();
     const accessToken = useSelector((state) => state.tokens.access_token);
     const [type, setType] = useState('AVERAGE');
     const [employeeId, setEmployeeSelect] = useState('');
