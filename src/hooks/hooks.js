@@ -446,7 +446,7 @@ export const getAppointmentTable = (date, accessToken) => {
     return new Promise((resolve, reject) => {
         const { user,  business} = getStateData();
         const bid = business._id;
-        axios.get(GET_APPOINTMENTDATA, {headers: {'x-access-token': accessToken} , params: {bid, appointmentDate: date, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        axios.get(GET_APPOINTMENTDATA, { headers: {'x-access-token': accessToken} , params: {bid, appointmentDate: date, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data);
         })

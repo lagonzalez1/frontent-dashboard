@@ -43,6 +43,11 @@ import { ClientWaitingTheme, ClientWelcomeTheme } from "../../theme/theme.js";
 import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
 import { LoadingButton } from "@mui/lab";
 import { AttachMoneyRounded, AutoAwesomeRounded, RestoreRounded } from "@mui/icons-material";
+import ChatComponent from "../../components/Chat/ChatComponent.js";
+import useWebSocket, { ReadyState } from "react-use-websocket"
+import { useSelector, useDispatch } from 'react-redux';
+import { addToList } from "../../reducers/chatter.js";
+
 
 
 export default function Waiting() {
@@ -61,6 +66,9 @@ export default function Waiting() {
     const [open, setOpen] = useState(false);
     const [status, setStatus] = useState(false);
     const [type, setType] = useState(null);
+    const [ms, setLastMessage] = useState(null);
+
+    
 
 
     const [appointments, setAppointments] = useState(null);
@@ -79,7 +87,7 @@ export default function Waiting() {
     const [editPretenseLoader,setEditPretenseLoader] = useState(false);
     const [openChat, setOpenChat] = useState(false); 
     const [serviceTags, setServiceTags] = useState({});
-
+    const dispatch = useDispatch();
     const [reload, setReload] = useState(false);
 
     const [service, setService] = useState(null);
@@ -90,6 +98,39 @@ export default function Waiting() {
 
     const [openSnack, setOpenSnack] = useState(false);
     const [presentArgs, setPresent] = useState(null);
+
+    const WS_URL = 'ws://127.0.0.1:80/api/external/socket';
+    const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
+        WS_URL,
+        {
+          share: false,
+          shouldReconnect: () => true,
+        },
+    )
+    useEffect(() => {
+        console.log("Connection state changed");
+        if (readyState === ReadyState.OPEN) {
+            sendJsonMessage({
+                action: "monitor",
+                data: {
+                    documentId: '6674d44256ccc39959df901b',
+                    unid: unid
+                },
+            });
+        }
+    }, [readyState, unid])
+
+    useEffect(() => {        
+        if (lastJsonMessage !== null) {
+            const str = JSON.stringify(lastJsonMessage);
+            const parse = JSON.parse(str);
+            const messages = parse.messages;
+            console.log(parse);
+            
+            dispatch(addToList(messages.at(-1)));
+
+        }
+    }, [lastMessage, lastJsonMessage])
 
     const [clientStatus, setClientStatus] = useState({
         noShow: false,
@@ -512,8 +553,6 @@ export default function Waiting() {
         })
     }
 
-    
-
     const LoadHeader = ({presentArgs}) => {
         // No show case
         if(clientStatus.noShow === true) {
@@ -608,8 +647,8 @@ export default function Waiting() {
                     (
                         <>
                         <Divider />
-                        <Button endIcon={<NotificationsActiveRoundedIcon/>} onClick={() => setUpdateClient(true)} variant="outlined" color="warning" sx={{ borderRadius: 10}}>
-                            <Typography variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>Status
+                        <Button disableElevation endIcon={<NotificationsActiveRoundedIcon htmlColor="#FFFFFF"/>} onClick={() => setUpdateClient(true)} variant="contained" color="warning" sx={{ borderRadius: 10}}>
+                            <Typography variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>Status
                         </Typography>
                         </Button>
                         </>
@@ -1262,11 +1301,12 @@ export default function Waiting() {
                 anchor="bottom"
                 open={openChat}
                 onClose={closeChatContainer}
+                
             >
-                <Box minHeight={'50vh'}>
-                    Chat container here
-                </Box>
-            </Drawer>
+                <Box sx={{ maxHeight: '45vh'}}>
+                    <ChatComponent unid={unid} />
+                </Box>            
+                </Drawer>
 
             <Dialog
                 id="leave_dialog"
