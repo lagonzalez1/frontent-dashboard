@@ -1,4 +1,9 @@
 
+
+body {
+  background-color: black;
+}
+
 .number-box {
     width: 100px;
     height: 100px;

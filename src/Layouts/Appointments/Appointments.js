@@ -5,12 +5,10 @@ import { Stack, Typography, Button, Grid, TableHead,TableRow, TableCell, Paper, 
     ListItem,
     ListItemButton,
     ListItemText,
-    ListItemAvatar,
     ListItemIcon,
     Chip,
     TextField,
-    Alert,
-    AlertTitle} from "@mui/material";
+} from "@mui/material";
 
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -18,7 +16,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 
-import { findEmployee, moveClientServing, findService, getAppointmentTable, sendNotification } from "../../hooks/hooks";
+import { findEmployee, moveClientServing, getAppointmentTable, sendNotification, searchServices, searchEmployees } from "../../hooks/hooks";
 import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -152,7 +150,7 @@ const Appointments = ({setClient, setEditClient}) => {
     }
 
     function handleDateChange(date) {
-        const dateObj = date.toISO();
+        const dateObj = date.startOf('day').toISO();
         sessionStorage.setItem(APPOINTMENT_DATE_SELECT, dateObj); 
         setReloadPage(true);
     };
@@ -433,7 +431,7 @@ const Appointments = ({setClient, setEditClient}) => {
                                     <DatePicker
                                         label="Date"
                                         value={quickViewDate}
-                                        minDate={baseLineDate}
+                                        minDate={baseLineDate.startOf('day')}
                                         onChange={handleQuickViewDateChange}
                                     />
                                     <IconButton color="primary" onClick={() => addDate()}>
@@ -452,7 +450,7 @@ const Appointments = ({setClient, setEditClient}) => {
                             onMonthChange={handelMonthChage}
                             onChange={handleDateChange}
                             renderInput={(params) => <TextField {...params} />}
-                            minDate={currentDate}
+                            minDate={currentDate.startOf('day')}
                             
                             slots={{
                                 day: ServerDay,
@@ -719,7 +717,7 @@ const Appointments = ({setClient, setEditClient}) => {
                                                         {client.fullname}
                                                     </Typography>
                                                     <Typography fontWeight="normal" variant="caption">
-                                                        {client.serviceTag ? findService(client.serviceTag).title : null}
+                                                        {client.serviceTag ? searchServices(client.serviceTag, serviceList).title : null}
                                                     </Typography>
                                                     </Stack>
                                                     </Stack>
@@ -736,7 +734,7 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Typography fontWeight={'bold'} variant="body2">
-                                                        {findEmployee(client.employeeTag).fullname}
+                                                        {searchEmployees(client.employeeTag, employeeList).fullname}
                                                     </Typography>
                                                 </TableCell>
                                                 <TableCell>

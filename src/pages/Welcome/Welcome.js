@@ -13,7 +13,7 @@ import { getBusinessPresent, getBusinessTimezone, isBusinesssOpen } from "./Welc
 import PunchClockTwoToneIcon from '@mui/icons-material/PunchClockTwoTone';
 import "../../css/Welcome.css";
 import { ThemeProvider } from "@emotion/react";
-import { ClientWelcomeTheme } from "../../theme/theme";
+import { ClientWelcomeTheme, ClientWelcomeThemeDark } from "../../theme/theme";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { FacebookLogo, InstagramLogo, TwitterLogo, XLogo } from "phosphor-react";
 
@@ -237,7 +237,7 @@ export default function Welcome() {
     
     return (
         <>  
-            <ThemeProvider theme={ClientWelcomeTheme}>
+            <ThemeProvider theme={ClientWelcomeThemeDark}>
                 <Box className="center-box">
                 <Grid 
                     container
@@ -249,7 +249,7 @@ export default function Welcome() {
                 >   
                     <Slide direction="up" in={zoomIntoView} mountOnEnter unmountOnExit>
                     <Grid className="grid-item" item xs={12} md={3} lg={3} xl={3}>
-                    <Card variant="outlined" className="wcard" sx={{pt: 1, borderRadius: 3, p: 4}}>
+                    <Card variant="outlined"  sx={{pt: 1, borderRadius: 3, p: 4}}>
                             { loading ? 
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 2}}>
                                 <CircularProgress size={20}/>

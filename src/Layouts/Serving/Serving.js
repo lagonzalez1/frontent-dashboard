@@ -6,7 +6,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useSelector, useDispatch } from "react-redux";
 import  { columns, completeClientAppointment } from "./Helper";
-import {  findResource, findService, getServingCount, findEmployee, getServingClients } from "../../hooks/hooks";
+import {  getServingCount, getServingClients, searchServices, searchEmployees, searchResources } from "../../hooks/hooks";
 import "../../css/Serving.css";
 import { setReload, setSnackbar } from "../../reducers/user";
 import CloseIcon from "@mui/icons-material/Close"
@@ -20,6 +20,9 @@ export default function Serving({setClient}) {
 
     const dispatch = useDispatch();
     const business = useSelector((state) => state.business);
+    const services = useSelector((state) => state.business.services);
+    const resources = useSelector((state) => state.business.resources);
+    const employees = useSelector((state) => state.business.employees);
     const accessToken = useSelector((state) => state.tokens.access_token);
     const [loading, setLoading] = useState(false);
     const [servingList, setServingList] = useState([]);
@@ -187,19 +190,19 @@ export default function Serving({setClient}) {
                                     {item.fullname}
                                 </Typography>
                                 <Typography variant="caption">
-                                    {item.serviceTag ? findService(item.serviceTag).title : null}
+                                    {item.serviceTag ? searchServices(item.serviceTag, services).title : null}
                                 </Typography>
                                 </TableCell>
                                 <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.partySize}</Typography>
                                 </TableCell>
                                 <TableCell align="left"> 
-                                    <Typography variant="subtitle2" fontWeight="bolder">{findEmployee(item.status.served_by).fullname}</Typography>
+                                    <Typography variant="subtitle2" fontWeight="bolder">{searchEmployees(item.status.served_by, employees).fullname}</Typography>
                                     
                                 </TableCell>
                                 <TableCell align="left"> 
                                     <Typography variant="subtitle2" fontWeight="bolder">
-                                        {'Resource: ' + findResource(item.resourceTag).title }
+                                        {'Resource: ' + searchResources(item.resourceTag, resources).title }
                                     </Typography>
                                 </TableCell>
                                 <TableCell align="left">

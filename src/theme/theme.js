@@ -42,7 +42,7 @@ export const theme = createTheme({
 // Poppins ,sans-serif
 export const ClientWelcomeTheme = createTheme({
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#000000',
     },
@@ -80,21 +80,22 @@ export const ClientWelcomeTheme = createTheme({
 // Poppins ,sans-serif
 export const ClientWelcomeThemeDark = createTheme({
   palette: {
-    type: 'light',
+    mode: 'dark',
     primary: {
-      main: '#2196f3',
+      main: '#36caf4',
     },
     secondary: {
-      main: '#ff5722',
+      main: '#36caf4',
     },
     info: {
-      main: '#616161',
+      main: '#FF9800',
     },
     error: {
-      main: '#f44336',
+      main: '#FF0015',
     },
     warning: {
-      main: '#ff9800',
+      main: '#F46036',
+      light: '#fdefea'
     },
     success: {
       main: '#4caf50',
@@ -102,12 +103,22 @@ export const ClientWelcomeThemeDark = createTheme({
   },
   typography: {
     fontFamily: "Poppins",
+    
   },
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          color: 'white'
+        }
+      }
+    },
+  }
 })
 
 export const ClientWaitingTheme = createTheme({
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#000000',
     },
@@ -121,7 +132,8 @@ export const ClientWaitingTheme = createTheme({
       main: '#FF0015',
     },
     warning: {
-      main: '#FFC107',
+      main: '#ffcc00',
+      dark: '#BA8B00'
     },
     success: {
       main: '#4caf50',
@@ -141,9 +153,47 @@ export const ClientWaitingTheme = createTheme({
   }
 });
 
+export const ClientWaitingThemeDark = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: '#000000',
+    },
+    secondary: {
+      main: '#36caf4',
+    },
+    info: {
+      main: '#FF9800',
+    },
+    error: {
+      main: '#FF0015',
+    },
+    warning: {
+      main: '#F46036',
+      light: '#EA3E0D'
+    },
+    success: {
+      main: '#4caf50',
+    }
+  },
+  typography: {
+    fontFamily: "Poppins",
+    
+  },
+  components: {
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          color: 'white'
+        }
+      }
+    },
+  }
+});
+
 export const BusinessWaitlistTheme = createTheme({
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#000000',
     },
@@ -180,7 +230,7 @@ export const BusinessWaitlistTheme = createTheme({
 
 export const HomePageTheme = createTheme({
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#673ab7',
       contrastText: 'rgba(255,255,255,0.87)',
@@ -290,7 +340,7 @@ export const DashboardThemeDark = createTheme({
 
 export const RegisterTheme = createTheme({
   palette: {
-    type: 'light',
+    mode: 'light',
     primary: {
       main: '#673ab7',
     },

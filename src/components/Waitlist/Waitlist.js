@@ -14,7 +14,7 @@ import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-import { findResource, findService, moveClientServing, sendNotification, getNoShowClients, getWaitlistTable, getWaitlistWaittime } from "../../hooks/hooks";
+import { moveClientServing, sendNotification, getNoShowClients, getWaitlistTable, getWaitlistWaittime, searchServices, searchResources } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
@@ -26,8 +26,10 @@ import { usePermission } from "../../auth/Permissions";
 import { DateTime } from "luxon";
 import ServingClient from "../Dialog/ServingClient";
 import { ArrowSquareOut, Lock, LockOpen } from "phosphor-react";
-import { FmdGoodRounded, WarningRounded } from "@mui/icons-material";
+import { ChatRounded, FmdGoodRounded, WarningRounded } from "@mui/icons-material";
 import { setWaitlistClients, setNoShowData } from "../../reducers/business";
+import ChatBusiness from "../Chat/ChatBusiness";
+import { isAcceptingOrReject } from "../../selectors/waitlistSelectors";
 
 
 
@@ -39,6 +41,9 @@ const Waitlist = ({setClient, setEditClient}) => {
     const tableData = useSelector((state) => state.business.currentClients);
     const noShowData = useSelector((state) => state.business.noShowData);
     const accessToken = useSelector((state) => state.tokens.access_token);
+    const services = useSelector((state) => state.business.services);
+    const resources = useSelector((state) => state.business.resources);
+
     const business = useSelector((state) => state.business);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
@@ -50,12 +55,15 @@ const Waitlist = ({setClient, setEditClient}) => {
     const [ns_loading, setNsLoading] = useState(false);
     const [clientId, setClientId] = useState();
     const [waittime, setWaittime] = useState(null);
+    const [chatDialog, setOpenChatDialog] = useState(false);
+    const [chatClient, setChatClient] = useState({ payload: null, open: false});
+
     //const [tableData, setTableData] = useState(td);
     
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
 
-    let accepting = acceptingRejecting();
+    let accepting = useSelector((state) => isAcceptingOrReject(state));
 
 
     useEffect(() => {
@@ -121,6 +129,13 @@ const Waitlist = ({setClient, setEditClient}) => {
     const handleOpenVert = (event, id) => {
         setClientId(id);
         setAnchorElVert(event.currentTarget);
+    }
+
+    const openChat = (item) => {
+        setChatClient((prev) => ({...prev, open: true, payload: item}));
+    }
+    const closeChat = () => {
+        setChatClient({open: false, payload: null});
     }
 
     /**
@@ -415,7 +430,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                                     <TableRow>
                                         {
                                            columns.map((col) => (
-                                            <TableCell key={col.id} align='left'>
+                                            <TableCell key={col.id} align='left' sx={{minWidth: col.minWidth}}>
                                                 <Typography variant="body2">{ col.label }</Typography>
                                             </TableCell>
                                            )) 
@@ -457,7 +472,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                                     <Stack>
                                     <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
                                     <Typography fontWeight="normal" variant="caption">
-                                        { item.serviceTag ? findService(item.serviceTag).title: null }
+                                        { item.serviceTag ? searchServices(item.serviceTag, services).title: null }
                                     </Typography>
                                     </Stack>
                                     </Stack>
@@ -468,7 +483,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
                                 <TableCell align="left">
                                     <Typography fontWeight="bold" variant="body2">
-                                        { item.resourceTag ? findResource(item.resourceTag).title : null }
+                                        { item.resourceTag ? searchResources(item.resourceTag, resources).title : null }
                                     </Typography>
                                 </TableCell>
                                 <TableCell align="left">
@@ -476,12 +491,20 @@ const Waitlist = ({setClient, setEditClient}) => {
                                         {item.waittime ? ( item.waittime.hours >= 1 ? (`${item.waittime.hours} Hr ${item.waittime.minutes} Min.`): (`${item.waittime.minutes} Min.`)): (null) } 
                                     </Typography>
                                 </TableCell>                                       
-                                <TableCell align="right">
+                                <TableCell align="left">
                                     <Stack
                                         direction="row"
-                                        spacing={1}
+                                        spacing={0}
+                                        alignItems={'center'}
+                                        justifyContent="space-evenly"
+                                        justifyItems={'center'}
                                     >
-                                        <Tooltip title={'serve client'} placement="left">
+                                        <Tooltip title={'Chat with your clients'} placement="left">
+                                            <IconButton onClick={() => openChat(item) }>
+                                                <ChatRounded />
+                                            </IconButton>
+                                        </Tooltip>
+                                        <Tooltip title={'serve client'} placement="top">
                                         <IconButton onClick={() => sendClientServing(item)}>
                                             <CheckCircleIcon fontSize="small" htmlColor="#4CBB17"/>
                                         </IconButton>
@@ -507,29 +530,32 @@ const Waitlist = ({setClient, setEditClient}) => {
                                             <MoreVertIcon fontSize="small"  />
                                         </IconButton>
                                         </Tooltip>
-
-                                            <Menu
-                                                id="long-menu"
-                                                MenuListProps={{'aria-labelledby': 'long-button'}}
-                                                anchorEl={anchorElVert}
-                                                open={clientId === item._id && openVert ===  true}
-                                                onClose={handleCloseVert}
-                                            >
-                                                {
-                                                clientOptions.map((option) => {
-                                                    return (
-                                                        <MenuItem key={`${option.id}-${item._id}`} onClick={ () => handleOptionChange(option.id) }>
-                                                            <ListItemIcon>
-                                                                {option.icon}
-                                                            </ListItemIcon>
-                                                            {option.label}
-                                                        </MenuItem>
-                                                    )
-                                                })
-                                                }  
-                                            </Menu>     
+                                        
+                                        <Menu
+                                            id="long-menu"
+                                            MenuListProps={{'aria-labelledby': 'long-button'}}
+                                            anchorEl={anchorElVert}
+                                            open={clientId === item._id && openVert ===  true}
+                                            onClose={handleCloseVert}
+                                        >
+                                            {
+                                            clientOptions.map((option) => {
+                                                return (
+                                                    <MenuItem key={`${option.id}-${item._id}`} onClick={ () => handleOptionChange(option.id) }>
+                                                        <ListItemIcon>
+                                                            {option.icon}
+                                                        </ListItemIcon>
+                                                        {option.label}
+                                                    </MenuItem>
+                                                )
+                                            })
+                                            }  
+                                        </Menu>     
                                     </Stack>
-                                </TableCell>            
+                                </TableCell>
+
+                            
+
                             </TableRow>
                         )}) 
                     ): 
@@ -554,7 +580,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
                 
 
-                <div className="table_content">
+                <div className="table_content" id="no-show-table">
                     <Paper sx={{ width: '100%', overflow: 'hidden'}}>
                         <TableContainer>
                             <Table stickyHeader aria-label='main_table'>
@@ -602,7 +628,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                                                 <Stack>
                                                 <Typography variant="subtitle2" fontWeight="bolder">{item.fullname}</Typography>
                                                 <Typography fontWeight="normal" variant="caption">
-                                                    { item.serviceTag ? findService(item.serviceTag).title: null }
+                                                    { item.serviceTag ? searchServices(item.serviceTag, services).title: null }
                                                 </Typography>
                                                 </Stack>
                                             </TableCell>
@@ -613,7 +639,7 @@ const Waitlist = ({setClient, setEditClient}) => {
     
                                             <TableCell align="left">
                                                 <Typography fontWeight="bold" variant="body2">
-                                                    { item.resourceTag ? findResource(item.resourceTag).title : null }
+                                                    { item.resourceTag ? searchResources(item.resourceTag, resources).title : null }
                                                 </Typography>
                                             </TableCell>
     
@@ -673,6 +699,10 @@ const Waitlist = ({setClient, setEditClient}) => {
             <FabButton />
 
             </div>
+            
+            
+            
+            <ChatBusiness open={chatClient.open} onClose={closeChat} client={chatClient.payload} />
 
             {serveDialog && <ServingClient onClose={closeClientServing} open={serveDialog} type={serveType} clientId={clientId} />}
 

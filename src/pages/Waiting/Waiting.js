@@ -7,23 +7,18 @@ Drawer} from "@mui/material";
 
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import StarIcon from '@mui/icons-material/Star';
-
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import PunchClockTwoToneIcon from "@mui/icons-material/PunchClockTwoTone"
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import CloseIcon from "@mui/icons-material/Close";
-import PersonIcon from '@mui/icons-material/Person';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import { useNavigate, useParams } from "react-router-dom";
 import { APPOINTMENT, WAITLIST } from "../../static/static.js";
-import AvTimerRoundedIcon from '@mui/icons-material/AvTimerRounded';
-import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
+
 import BlockRoundedIcon from '@mui/icons-material/BlockRounded';
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
-import IosShareRoundedIcon from '@mui/icons-material/IosShareRounded';
-import EventAvailableRoundedIcon from '@mui/icons-material/EventAvailableRounded';
 import FormatListNumberedRoundedIcon from '@mui/icons-material/FormatListNumberedRounded';
 import * as Yup from 'yup';
 import "../../css/Waiting.css";
@@ -39,14 +34,15 @@ import { getIdentifierData, leaveWaitlistRequest, requestBusinessArguments, requ
     acknowledgeChat,
     isAppointmentEditable} from "./WaitingHelper.js";
 import { DatePicker } from "@mui/x-date-pickers";
-import { ClientWaitingTheme, ClientWelcomeTheme } from "../../theme/theme.js";
+import { ClientWaitingTheme, ClientWaitingThemeDark, ClientWelcomeTheme } from "../../theme/theme.js";
 import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
 import { LoadingButton } from "@mui/lab";
 import { AttachMoneyRounded, AutoAwesomeRounded, RestoreRounded } from "@mui/icons-material";
-import ChatComponent from "../../components/Chat/ChatComponent.js";
 import useWebSocket, { ReadyState } from "react-use-websocket"
 import { useSelector, useDispatch } from 'react-redux';
 import { addToList } from "../../reducers/chatter.js";
+import { Badge } from "@mui/material";
+import ChatClient from "../../components/Chat/ChatClient.js";
 
 
 
@@ -99,6 +95,8 @@ export default function Waiting() {
     const [openSnack, setOpenSnack] = useState(false);
     const [presentArgs, setPresent] = useState(null);
 
+    const [chatBadge, setChatBadge] = useState(false);
+
     const WS_URL = 'ws://127.0.0.1:80/api/external/socket';
     const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
         WS_URL,
@@ -108,25 +106,27 @@ export default function Waiting() {
         },
     )
     useEffect(() => {
+        console.log(user)
         console.log("Connection state changed");
-        if (readyState === ReadyState.OPEN) {
+        if (readyState === ReadyState.OPEN && user !== null) {
+            const chatter_id = user.chatter;
             sendJsonMessage({
                 action: "monitor",
                 data: {
-                    documentId: '6674d44256ccc39959df901b',
+                    // This is the _id assigned once a Chat is created -> Waitlist , Appointments
+                    documentId: chatter_id,
                     unid: unid
                 },
             });
         }
-    }, [readyState, unid])
+    }, [readyState, unid, user])
 
     useEffect(() => {        
         if (lastJsonMessage !== null) {
             const str = JSON.stringify(lastJsonMessage);
             const parse = JSON.parse(str);
             const messages = parse.messages;
-            console.log(parse);
-            
+            setChatBadge(true);
             dispatch(addToList(messages.at(-1)));
 
         }
@@ -613,11 +613,11 @@ export default function Waiting() {
                 <div className="circle_green">
                     { presentArgs.position === true ? (
                         <>
-                        { position <= 9 ? placementTitle[position].icon : <Check size={88} color="#40932a" weight="bold" />}
+                        { position <= 9 ? placementTitle[position].icon : <Check size={88} color="#6036f4" weight="bold" />}
                         </>
                     ): 
                         <>
-                            <Check size={88} color="#40932a" weight="bold" />
+                            <Check size={88} color="#6036f4" weight="bold" />
                         </>
                     }
                 </div>
@@ -690,18 +690,24 @@ export default function Waiting() {
                 </Container>
                 {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
-                    <Stack direction={'row'} spacing={2}>
-                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="primary" variant="contained" startIcon={<AutoAwesomeRounded />} onClick={() => openChatContainer()}>
+                    <Stack direction={'row'} spacing={1}>
+
+                        <Badge invisible={chatBadge} color="success" badgeContent={1} max={1} variant="dot" anchorOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}>
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="secondary" variant="contained" startIcon={<AutoAwesomeRounded />} onClick={() => openChatContainer()}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                  Chat
                             </Typography>
                         </Button>
-                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="primary" variant="contained"  startIcon={<FormatListNumberedRoundedIcon />} onClick={() => navigateToWaitlist() }> 
+                        </Badge>
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="secondary" variant="contained"  startIcon={<FormatListNumberedRoundedIcon />} onClick={() => navigateToWaitlist() }> 
                         <Typography variant="caption" sx={{color: 'white' }}>
                             wailist
                         </Typography>
                         </Button>
-                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="primary" variant="contained"  startIcon={<BlockRoundedIcon/>} onClick={() => setOpen(true)}> 
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="secondary" variant="contained"  startIcon={<BlockRoundedIcon/>} onClick={() => setOpen(true)}> 
                             <Typography variant="caption" sx={{color: 'white' }}>
                             cancel
                             </Typography>
@@ -947,7 +953,7 @@ export default function Waiting() {
 
     return(
         <>
-            <ThemeProvider theme={ClientWaitingTheme}>
+            <ThemeProvider theme={ClientWaitingThemeDark}>
 
             <Box className="center-box">
                 <Grid container
@@ -958,7 +964,7 @@ export default function Waiting() {
                 >
                 <Grid item className="grid-item" xs={12} md={3} lg={2} xl={2}>
                     <Card variant="outlined" sx={{pt: 1, borderRadius: 3, p: 2}}>
-                    <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" color="gray" textAlign={'center'} gutterBottom>
+                    <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" color={'gray'} textAlign={'center'} gutterBottom>
                         <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
                     </Typography>
                     {loading ? (
@@ -1301,12 +1307,11 @@ export default function Waiting() {
                 anchor="bottom"
                 open={openChat}
                 onClose={closeChatContainer}
-                
             >
-                <Box sx={{ maxHeight: '45vh'}}>
-                    <ChatComponent unid={unid} />
+                <Box sx={{ maxHeight: '45vh', backgroundColor: 'black'}}>
+                    <ChatClient unid={unid} closeBadge={() => setChatBadge(false)} />
                 </Box>            
-                </Drawer>
+            </Drawer>
 
             <Dialog
                 id="leave_dialog"

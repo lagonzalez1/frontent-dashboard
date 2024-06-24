@@ -17,7 +17,7 @@ const chatterSlice = createSlice({
         state.messageList.push(action.payload);
       }
     }
-  });
+});
   
   
   

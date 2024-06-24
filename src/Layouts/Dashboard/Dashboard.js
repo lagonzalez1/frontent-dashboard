@@ -31,6 +31,10 @@ import HelpDialog from "../Help/HelpDialog";
 import useWebSocket, { ReadyState } from "react-use-websocket"
 import { DateTime } from "luxon";
 import { setNoShowData, setWaitlistClients } from "../../reducers/business";
+import ChatClient from "../../components/Chat/ChatClient";
+import ChatBusiness from "../../components/Chat/ChatBusiness";
+import { addMessage, setListOfChats } from "../../reducers/businessChatter";
+import { getChatFromBusiness } from "../../components/Chat/ChatHelper";
 
 /**
  * 
@@ -90,13 +94,25 @@ export default function Dashboard () {
         }
     }, [readyState, bid, timezone])
 
-    useEffect(() => {        
+    useEffect(() => {
+        console.log("Last update", DateTime.local().toISO());   
+        console.log(lastJsonMessage);        
         if (lastJsonMessage !== null) {
             const str = JSON.stringify(lastJsonMessage);
             const parse = JSON.parse(str);
             console.log(parse)
-            dispatch(setWaitlistClients(parse.currentClients))
-            dispatch(setNoShowData(parse.noShowData))
+            if (parse.currentClients) {
+                dispatch(setWaitlistClients(parse.currentClients))
+            }
+            if (parse.noShowData) {
+                dispatch(setNoShowData(parse.noShowData))
+            }
+            if (parse.chatter_id) {
+                const lastMessage = parse.messages;
+                dispatch(addMessage({chatter_id: parse.chatter_id, message: lastMessage.at(-1)}))
+            }
+            
+            
         }
     }, [lastMessage, lastJsonMessage])
 
@@ -116,7 +132,8 @@ export default function Dashboard () {
             return;
         }finally {
             setLoading(false);
-            setAuthCompleted(true)
+            setAuthCompleted(true);
+            getChatters();
         }
     }
 
@@ -143,7 +160,18 @@ export default function Dashboard () {
         };
     }, []);
    */ 
-   
+    const getChatters = async() => {
+        try {
+            const result = await getChatFromBusiness();
+            if (result.status === 200) {
+                dispatch(setListOfChats(result.data.chats));
+            }
+        }
+        catch(error) {
+            console.log(error);
+        }
+            
+    }
 
     //** User completes the subscrtiption cycle. */
     const closeStripeCompletion = () => {

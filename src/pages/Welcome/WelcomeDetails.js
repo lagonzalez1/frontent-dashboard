@@ -15,7 +15,7 @@ import { DateTime } from "luxon";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { ThemeProvider, useTheme } from "@emotion/react";
-import { ClientWelcomeTheme } from "../../theme/theme";
+import { ClientWelcomeTheme, ClientWelcomeThemeDark } from "../../theme/theme";
 import { APPOINTMENT, CLIENT, WAITLIST } from "../../static/static";
 import LoadingButton from '@mui/lab/LoadingButton';
 import "../../css/Welcome.css";
@@ -232,7 +232,7 @@ export default function WelcomeDetails() {
 
     return (
         <>  
-            <ThemeProvider theme={ClientWelcomeTheme}>
+            <ThemeProvider theme={ClientWelcomeThemeDark}>
             <Box className="center-box">
                 <Grid 
                     container
@@ -244,7 +244,7 @@ export default function WelcomeDetails() {
                 >
                     <Zoom in={zoomIntoView} mountOnEnter unmountOnExit>
                         <Grid className="grid-item" item xs={12} md={4} lg={3} xl={3}>
-                        <Card className="wcard" variant="outlined" sx={{pt: 1, borderRadius: 3, p: 3}}>
+                        <Card variant="outlined" sx={{pt: 1, borderRadius: 3, p: 3}}>
                         <Container sx={{ textAlign: 'left'}}>
                             <IconButton onClick={ () => redirectBackPage() }>
                                 <KeyboardBackspaceIcon textAlign="left" fontSize="small"/>
@@ -269,7 +269,7 @@ export default function WelcomeDetails() {
                             <Typography variant="h4" fontWeight="bold" gutterBottom>
                                 Enter your details
                             </Typography>
-                            <Typography variant="body2" textAlign={'center'} gutterBottom>
+                            <Typography variant="body2" textAlign={'center'} color={'error'} gutterBottom>
                                 You have <strong>{`${formatTime(seconds)}`} </strong>to secure your spot!
                             </Typography>
 
@@ -337,7 +337,7 @@ export default function WelcomeDetails() {
                                     preview ? (
                                         <>
                                             <Box sx={{ pt: 2, display: 'block', width: '100%', maxWidth: '100%'}}>
-                                                <Alert icon={<CloudDone />} severity='secondary' sx={{ textAlign: 'left'}}>
+                                                <Alert icon={<CloudDone />} severity='warning' variant="standard" sx={{ textAlign: 'left'}}>
                                                     <AlertTitle><Typography variant="body1"><strong>Details</strong></Typography></AlertTitle>
 
                                                     {

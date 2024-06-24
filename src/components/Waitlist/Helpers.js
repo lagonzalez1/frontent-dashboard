@@ -312,42 +312,6 @@ export const removeClient = (id, type) => {
 };
 
 
-  
-
-
-
-
-
-// Might need a buffer to aaccept appointments a bit earlier.
-export const acceptingRejecting = () => {
-    const { user, business } = getStateData();
-    let currentDate = DateTime.local().setZone(business.timezone);
-    let weekday = currentDate.weekdayLong;
-    let currentSchedule = business.schedule[weekday];
-    
-    const override = business.accepting_override;
-    // Check if override is active for the same day.
-    if(override.lastDate){
-      const overrideDate = DateTime.fromJSDate(new Date(override.lastDate));
-      if (overrideDate.hasSame(currentDate, 'day')){
-        return override.accepting;
-      }
-    }
-    if (currentSchedule.start === '' || currentSchedule.end === ''){
-      return false;
-    }
-    const start = DateTime.fromFormat(currentSchedule.start, "HH:mm");
-    const end = DateTime.fromFormat(currentSchedule.end,"HH:mm");
-    // Check if current time is within start and end.
-    if ( currentDate >= start && currentDate <= end){
-      return true;
-    }else {
-      return false;
-    }
-
-} 
-
-
 /*
     STATIC VARIABLES
 */
@@ -363,8 +327,9 @@ export const columns = [
     { id: 'size', label: 'Party size', minWidth: 50 },
     { id: 'resource', label: 'Resource', minWidth: 50 },
     { id: 'wait', label: 'Time waited', minWidth: 40 },
-    { id: 'actions', label: 'Actions', minWidth: 160 },
-];
+    { id: 'actions', label: 'Actions', minWidth: 100 },
+
+  ];
 
 export const noShowColumns = [
   { id: 'position', label: '#', minWidth: 5 },
@@ -372,7 +337,7 @@ export const noShowColumns = [
   { id: 'size', label: 'Party size', minWidth: 50 },
   { id: 'resource', label: 'Resource', minWidth: 50 },
   { id: 'created', label: 'Created on', minWidth: 40 },
-  { id: 'actions', label: '', minWidth: 160 },
+  { id: 'actions', label: '', minWidth: 140 },
 ];
 
 export const clientOptions = [

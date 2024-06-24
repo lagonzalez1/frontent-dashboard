@@ -7,17 +7,15 @@ import TabPanel from '@mui/lab/TabPanel';
 import CloseIcon from "@mui/icons-material/Close"
 import { DateTime } from "luxon";
 import { useDispatch, useSelector } from "react-redux";
-import { completeClientAppointment, findEmployee, findService, moveClientServing, requestNoShow, sendNotification, undoClientServing, sendChatToClient } from "../../hooks/hooks";
+import { completeClientAppointment, requestNoShow, sendNotification, undoClientServing, sendChatToClient, searchServices, searchEmployees } from "../../hooks/hooks";
 import axios from "axios";
 import { getHeaders, getStateData } from "../../auth/Auth";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { WAITLIST, SERVING, APPOINTMENT, NOSHOW } from "../../static/static";
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import NotificationsActiveRoundedIcon from '@mui/icons-material/NotificationsActiveRounded';
 import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
 import DoNotDisturbRoundedIcon from '@mui/icons-material/DoNotDisturbRounded';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-import PlaylistAddRoundedIcon from '@mui/icons-material/PlaylistAddRounded';
 import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
 import DirectionsCarFilledIcon from '@mui/icons-material/DirectionsCarFilled';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
@@ -38,7 +36,8 @@ const Drawer = ({client, setClient}) => {
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
     const { checkSubscription } = useSubscription();
-
+    const services = useSelector((state) => state.business.services);
+    const employees = useSelector((state) => state.business.employees);
     const [value, setValue] = React.useState('1');
     const [payload, setPayload] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -300,7 +299,7 @@ const Drawer = ({client, setClient}) => {
                                         <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Served by</Typography>
                                     </Grid>
                                     <Grid sx={{ justifyContent: 'right'}} item>
-                                        <Typography variant="body2">{payload && findEmployee(payload.status.served_by).fullname }</Typography>
+                                        <Typography variant="body2">{payload && searchEmployees(payload.status.served_by, employees).fullname }</Typography>
                                     </Grid>
                                 </Grid>
                                 <br/>
@@ -363,7 +362,7 @@ const Drawer = ({client, setClient}) => {
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Service</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography variant="body2">{payload && findService(payload.serviceTag).title}</Typography>
+                                <Typography variant="body2">{payload && searchServices(payload.serviceTag, services).title}</Typography>
 
                             </Grid>
                         </Grid>
@@ -377,7 +376,7 @@ const Drawer = ({client, setClient}) => {
                                 <Typography sx={{ justifyContent: 'left'}} variant="body2" fontWeight={'bold'}>Staff requested</Typography>
                             </Grid>
                             <Grid sx={{ justifyContent: 'right'}} item>
-                                <Typography variant="body2">{payload && findEmployee(payload.employeeTag).fullname}</Typography>
+                                <Typography variant="body2">{payload && searchEmployees(payload.employeeTag, employees).fullname}</Typography>
                             </Grid>
                         </Grid>
                         <br/>
@@ -461,8 +460,8 @@ const Drawer = ({client, setClient}) => {
                                         <ListItemText>
                                             <Stack>
                                             <Typography variant="body2"> { "Last visit: " + DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
-                                            <Typography variant="body2"> { "Employee: " + findEmployee(object.employee).fullname }</Typography>
-                                            <Typography variant="body2"> {'Service: '} { findService(object.serviceTag).title }</Typography>
+                                            <Typography variant="body2"> { "Employee: " + searchEmployees(object.employee, employees).fullname }</Typography>
+                                            <Typography variant="body2"> {'Service: '} { searchServices(object.serviceTag, services).title }</Typography>
                                             <Typography variant="body2"> {"Notes: "} { object.notes ? object.notes: 'No notes.' }</Typography>
                                             </Stack>
                                         </ListItemText>
@@ -489,8 +488,8 @@ const Drawer = ({client, setClient}) => {
                                             <ListItemText>
                                                 <Stack>
                                                 <Typography variant="body2"> {'Last visit: '}{DateTime.fromISO(object.timestamp).toLocaleString() }</Typography>
-                                                <Typography variant="body2"> {"Employee: "}{ findEmployee(object.employee).fullname }</Typography>
-                                                <Typography variant="body2"> {'Service: '} { findService(object.serviceTag).title }</Typography>
+                                                <Typography variant="body2"> {"Employee: "}{ searchEmployees(object.employee, employees).fullname }</Typography>
+                                                <Typography variant="body2"> {'Service: '} { searchServices(object.serviceTag, services).title }</Typography>
                                                 <Typography variant="body2">{"Notes: "} { object.notes ? object.notes: 'No notes.' }</Typography>
                                                 </Stack>
                                             </ListItemText>

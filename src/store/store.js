@@ -3,17 +3,19 @@ import userReducer from '../reducers/user';
 import businessReducer from '../reducers/business';
 import tokensReducer from '../reducers/tokens';
 import chatterReducer from "../reducers/chatter";
+import businessChatter from '../reducers/businessChatter';
 
 
 const saveToLocalStorage = (store) => (next) => (action) => {
   const result = next(action); // Call the next middleware or reducer
 
   // Save user and business data to local storage
-  const { user, business, tokens, chatter } = store.getState();
+  const { user, business, tokens, chatter, businessChatter } = store.getState();
   localStorage.setItem('user', JSON.stringify(user));
   localStorage.setItem('business', JSON.stringify(business));
   localStorage.setItem('tokens',JSON.stringify(tokens))
   localStorage.setItem('chatter',JSON.stringify(chatter))
+  localStorage.setItem('businessChatter',JSON.stringify(businessChatter))
 
   return result;
 };
@@ -23,7 +25,8 @@ const store = configureStore({
     user: userReducer,
     business: businessReducer,
     tokens: tokensReducer,
-    chatter: chatterReducer
+    chatter: chatterReducer,
+    businessChatter: businessChatter
 
   },
   middleware:  (getDefaultMiddleware) =>

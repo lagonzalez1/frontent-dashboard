@@ -1,32 +1,25 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import '../../css/Customers.css';
-import { Stack, Grid, Menu, MenuItem, IconButton, TextField, Typography,
+import { Stack, Grid, IconButton, TextField, Typography,
    Skeleton, Table, TableCell, TableBody, TableHead, TableContainer, TableRow,Paper, Dialog, DialogTitle, DialogContent, DialogActions, Button, Chip,
    Box, Collapse, Tooltip, CircularProgress, 
    Slide} from '@mui/material';
 import DateSelect from '../../components/Select/DateSelect';
 import StateSelect from '../../components/Select/StateSelect';
-import EmployeeSelect from '../../components/Select/EmployeeSelect';
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import SearchIcon from "@mui/icons-material/Search";
 import { useDispatch, useSelector } from 'react-redux';
 import { columns, convertTo_CSV, flagClientAccount, getLastVisit, removeFromAnalytics, searchAnalyticsKeyword} from './CustomerHelper';
-import { findEmployee, findService, getAnalyticsClients } from '../../hooks/hooks';
+import {  getAnalyticsClients, searchEmployees, searchServices } from '../../hooks/hooks';
 import { setReload, setSnackbar } from '../../reducers/user';
 import { DateTime } from 'luxon';
-import AlertMessageGeneral from '../../components/AlertMessage/AlertMessageGeneral';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import BackspaceRoundedIcon from '@mui/icons-material/BackspaceRounded';
 import NotesIcon from '@mui/icons-material/Notes';
 import CloseIcon from "@mui/icons-material/Close"
 import NotesDialog from '../../components/Dialog/NotesDialog';
 import ReviewDialog from '../../components/Dialog/ReviewDialog';
 import RateReviewRoundedIcon from '@mui/icons-material/RateReviewRounded';
-
 import { usePermission } from '../../auth/Permissions';
-import CheckCircle from '@mui/icons-material/CheckCircle';
 import { Check, FileCsv, Flag, Trash } from "phosphor-react"
 
 
@@ -40,6 +33,10 @@ const Customers = () => {
   const { checkPermission } = usePermission();
   const business = useSelector((state) => state.business);
   const permissionLevel = useSelector((state) => state.user.permissions);
+  const services = useSelector(state => state.business.services)
+  const resources = useSelector(state => state.business.resources)
+  const employees = useSelector(state => state.business.employees)
+
   const dispatch = useDispatch();
 
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -365,12 +362,12 @@ const Customers = () => {
                                 <Typography variant='body2'>{DateTime.fromISO(summary.timestamp).toFormat('LLL dd yy')}</Typography>
                               </TableCell>
                               <TableCell>
-                                <Typography variant='body2'>{findService(summary.service).title}</Typography>
+                                <Typography variant='body2'>{searchServices(summary.service, services).title}</Typography>
                                 
                               </TableCell>
                         
                               <TableCell>
-                                <Typography variant='body2'>{findEmployee(summary.employee).fullname}</Typography>
+                                <Typography variant='body2'>{searchEmployees(summary.employee, employees).fullname}</Typography>
 
                               </TableCell>
                               <TableCell>
@@ -461,12 +458,12 @@ const Customers = () => {
                                 <Typography variant='body2'>{DateTime.fromISO(summary.appointmentDate).toFormat('LLL dd yy')}</Typography>
                               </TableCell>
                               <TableCell>
-                                <Typography variant='body2'>{findService(summary.service).title}</Typography>
+                                <Typography variant='body2'>{searchServices(summary.service, services).title}</Typography>
                                 
                               </TableCell>
                               
                               <TableCell>
-                                <Typography variant='body2'>{findEmployee(summary.employee).fullname}</Typography>
+                                <Typography variant='body2'>{searchEmployees(summary.employee, employees).fullname}</Typography>
 
                               </TableCell>
                               <TableCell>

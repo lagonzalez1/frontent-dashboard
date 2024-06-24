@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import { BarChart } from '@mui/x-charts/BarChart';
-import { findService } from '../../hooks/hooks';
+import { searchServices } from '../../hooks/hooks';
 import {
     blueberryTwilightPalette,
     mangoFusionPalette,
     cheerfulFiestaPalette,
   } from '@mui/x-charts/colorPalettes';
+import { useSelector } from 'react-redux';
 
 export default function ServiceBar({serviceData, loading}) {
     const [dataSet, setDataSet] = useState([]);
+    const services = useSelector(state => state.business.services);
 
     useEffect(() => {
         loadData();
@@ -18,7 +20,7 @@ export default function ServiceBar({serviceData, loading}) {
         let set = []
         if (serviceData) {
             for (var i = 0; i < serviceData.length; i ++){
-                let serviceTitle = findService(serviceData[i].id);
+                let serviceTitle = searchServices(serviceData[i].id, services);
                 if (serviceTitle.title === "NA"){ continue; } // Skip deleted services
                 let object = {
                     title: serviceTitle.title,

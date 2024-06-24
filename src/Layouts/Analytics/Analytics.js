@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Box, Button, Grid, List, ListItem, ListItemButton, ListItemText, ListItemIcon, Stack, Typography, Rating, IconButton, Select, MenuItem, Card, CardContent, CircularProgress, Divider, Avatar, ListItemAvatar, Skeleton } from "@mui/material";
 import { useSelector } from "react-redux";
-import { findEmployee, findResource, findService, getEmployeeList, getEmployees } from "../../hooks/hooks";
+import {searchEmployees, searchResources, searchServices } from "../../hooks/hooks";
 import StarIcon from '@mui/icons-material/Star';
 import { getBusinessAnalytics, getEmployeeAnalytics, getEmployeeAnalyticsRange } from "./AnalyticsHelper";
 import { DateTime } from "luxon";
@@ -15,7 +15,6 @@ import Collapse from '@mui/material/Collapse';
 import BusinessTotalsBars from "../../components/Vizual/BusinessTotalsBars";
 import GuageService from "../../components/Vizual/GuageService";
 import EmployeePie from "../../components/Vizual/EmployeePie";
-import GuageCircular from "../../components/Vizual/GuageCircular";
 import ServiceBar from "../../components/Vizual/ServiceBar";
 import ResourcesBars from "../../components/Vizual/ResourcesBars";
 import GuagePercentages from "../../components/Vizual/GuagePercentages";
@@ -32,6 +31,10 @@ const Analytics = () => {
 
     const dispatch = useDispatch();
     const accessToken = useSelector((state) => state.tokens.access_token);
+    const services = useSelector(state => state.business.services);
+    const resources = useSelector(state => state.business.resources);
+    const employees = useSelector(state => state.business.employees);
+
     const [type, setType] = useState('AVERAGE');
     const [employeeId, setEmployeeSelect] = useState('');
     const [employeeData, setEmployeeData] = useState(null);
@@ -242,7 +245,7 @@ const Analytics = () => {
                                     <GuagePercentages value={Math.floor(item.avg * 100)} />
 
                                     <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
-                                        { findResource(item.id).title }
+                                        { searchResources(item.id, resources).title }
                                     </Typography>
 
                                     <Typography gutterBottom  variant="subtitle2">
@@ -261,7 +264,7 @@ const Analytics = () => {
                                     <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
                                         <GuagePercentages value={Math.floor(item.avg * 100) } />
                                         <Typography gutterBottom fontWeight={'bold'} textAlign={'center'} variant="subtitle2">
-                                            {findService(item.id).title }
+                                            {searchServices(item.id, services).title }
                                         </Typography>
 
                                         <Typography gutterBottom variant="subtitle2">
@@ -407,7 +410,7 @@ const Analytics = () => {
 
                             {businessData && businessData.employeeRatings.map((item, index) => {
                                 const id = item.id;
-                                const employeeResult = findEmployee(id);
+                                const employeeResult = searchEmployees(id, employees);
                                 if (employeeResult.fullname === "NA") { return null; }
                                 const popularity = Math.ceil(item.popularity);
                                 const rating = Math.ceil(item.data);

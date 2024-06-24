@@ -1,4 +1,6 @@
-
+body {
+  background-color: black;
+}
 
 .center-box {
   display: flex;

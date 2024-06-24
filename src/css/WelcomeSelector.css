@@ -1,6 +1,11 @@
 
+  body {
+    background-color: black;
+  }
 
-
+  .description {
+    overflow-wrap: break-word !important;
+  }
   .center-box {
     display: flex;
     justify-content: center;

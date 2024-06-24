@@ -1,5 +1,5 @@
-import React, {useState, useEffect } from "react";
-import { Container} from "@mui/material";
+import React, {useState, useEffect, useRef } from "react";
+import { Container, Box, CircularProgress} from "@mui/material";
 import styles from '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, AttachmentButton, SendButton, InputToolbox } from '@chatscope/chat-ui-kit-react';
 import { DateTime } from "luxon";
@@ -10,7 +10,7 @@ import { setMessageList } from "../../reducers/chatter"
 
 // Send data through here
 
-export default function ChatComponent({unid}) {
+export default function ChatClient({unid, closeBadge}) {
 
 
     const DIRECTION_CLIENT = "outgoing";
@@ -18,30 +18,20 @@ export default function ChatComponent({unid}) {
     const [loading, setLoading] = useState(false);
     const [messageList, setMessageListO] = useState([]);
     const [message, setMessage] = useState('');
+    const inputRef = useRef();
 
     const localStorageMessageList = useSelector((state) => state.chatter.messageList);
 
-
-
-
-
-    // 1. Need to check if chat already exist to load to user. 
-    
-    // 2. If not just load it from GET
-
-
-    // SSend via POST or put to backend and save the chat. 
-    // Get singleton array to show all messages. (Must be sorted baswed on time);
-
-
-
     useEffect(() => {
-        toFetch();    
+        toFetch();  
+    
+        // Reset badge once oppend.
+        return () => {
+            //closeBadge();
+        }
     }, [])
 
-    useEffect(() => {
-        setMessageListO(localStorageMessageList);
-    }, [localStorageMessageList])
+    
 
 
 
@@ -49,7 +39,12 @@ export default function ChatComponent({unid}) {
         if (!localStorageMessageList) {
             setLoading(true);
             const result = await getChat(unid);
-            dispatch(setMessageList(result));
+            if (result) {
+                dispatch(setMessageList(result));
+                setMessage('');
+                return;
+            }
+            console.log(result)
         }
     }
     
@@ -60,24 +55,38 @@ export default function ChatComponent({unid}) {
 
 
     const sendChat = async () => {
-        if (message !== "") {
+        if (message.trim()) {
             const time = DateTime.local().toISO();
-            const response = await sendChatFromClient(unid, message, time, DIRECTION_CLIENT);
-            if (response.data.status === 200) {
+            sendChatFromClient(unid, message, time, DIRECTION_CLIENT)
+            .then(response => {
+                console.log(response);
+            })
+            .catch(error => {
+                console.log(error)
+            })
+            .finally(() => {
                 setMessage('');
-            }
+            })
         }
     }
 
 
+
     return (
         <div styles={{position:"relative"}}>
-            <MainContainer>
-                <ChatContainer style={{ minHeight: '45vh', marginBottom: '0px'}}>       
-                <MessageList style={{height: "35vh"}}>
+            <MainContainer style={styles}>
+                <ChatContainer style={{ minHeight: '45vh', marginBottom: '0px'}}>
+                {loading ? (
+                    <Box sx={{display: 'flex'}}>
+                        <CircularProgress size={13} />
+                    </Box>
+                ): null}       
+                <MessageList style={{height: "35vh"}} >
                     {localStorageMessageList ? localStorageMessageList.map((item, index) => {
                         return (
-                            <Message 
+                            <Message
+                                key={index}
+                                style={styles}  
                                 model={{
                                 direction: `${item.direction}`,
                                 message: `${item.message}`,
@@ -89,11 +98,15 @@ export default function ChatComponent({unid}) {
                     }) :null}
                 </MessageList>
 
-                <MessageInput value={message} onChange={(e) => handleMessageChange(e) } onSend={() => sendChat()}
+                <MessageInput
+                    autoFocus
+                    attachButton={false}
+                    value={message}
+                    style={styles} 
+                    onChange={(e) => handleMessageChange(e) }
+                    onSend={() => sendChat()}
                     placeholder="Type message here"
                 />
-                <InputToolbox>
-                </InputToolbox>
                 </ChatContainer>
             </MainContainer>
         </div>

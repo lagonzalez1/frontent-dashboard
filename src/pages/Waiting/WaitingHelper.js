@@ -210,13 +210,13 @@ export const requestBusinessArguments = (link) => {
 }
 
 export const placementTitle = {
-    1: {abrv: 'st', message: 'You are up next!', icon: <NumberOne size={88} color="#40932a" weight="bold"/>, message2: 'Please check in at the front desk.'},
-    2: {abrv: 'nd', message: 'Almost there!',  icon: <NumberTwo size={88} color="#40932a" weight="bold"/>, message2: 'Please check in at the front desk.'},
-    3: {abrv: 'rd', message: 'You are almost there!',  icon: <NumberThree size={88} color="#40932a" weight="bold" />, message2: 'Please be ready to check in at thefront desk.'},
-    4: {abrv: 'th', message: 'You are almost there!',  icon: <NumberFour size={88} color="#40932a" weight="bold"/>, message2: 'Please be ready to check in at thefront desk.'},
-    5: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberFive size={88} color="#40932a" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
-    6: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberSix size={88} color="#40932a" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
-    7: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberSeven size={88} color="#40932a" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
-    8: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberEight size={88} color="#40932a" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
-    9: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberNine size={88} color="#40932a" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
+    1: {abrv: 'st', message: 'You are up next!', icon: <NumberOne size={88} color="#36caf4" weight="bold"/>, message2: 'Please check in at the front desk.'},
+    2: {abrv: 'nd', message: 'Almost there!',  icon: <NumberTwo size={88} color="#36caf4" weight="bold"/>, message2: 'Please check in at the front desk.'},
+    3: {abrv: 'rd', message: 'You are almost there!',  icon: <NumberThree size={88} color="#36caf4" weight="bold" />, message2: 'Please be ready to check in at thefront desk.'},
+    4: {abrv: 'th', message: 'You are almost there!',  icon: <NumberFour size={88} color="#36caf4" weight="bold"/>, message2: 'Please be ready to check in at thefront desk.'},
+    5: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberFive size={88} color="#36caf4" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
+    6: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberSix size={88} color="#36caf4" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
+    7: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberSeven size={88} color="#36caf4" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
+    8: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberEight size={88} color="#36caf4" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
+    9: {abrv: 'th', message: 'Thanks for staying patient',  icon: <NumberNine size={88} color="#36caf4" weight="bold"/>, message2: 'Please keep us updated via the alert button!'},
 }

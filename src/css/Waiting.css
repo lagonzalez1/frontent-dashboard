@@ -1,5 +1,7 @@
 
-
+body {
+  background-color: black;
+}
 
 .circle_yellow {
   position: relative;
@@ -42,7 +44,7 @@
   }
 
   .circle_green {
-    border: 5px solid #40932a;
+    border: 5px solid #36caf4;
     border-radius: 50%;
     height: 150px;
     width: 150px;
@@ -57,7 +59,7 @@
   @keyframes pulse_green {
     0% {
       transform: scale(0.95);
-      box-shadow: 0 0 0 0 #41932aa2;
+      box-shadow: 0 0 0 0 #36cbf485 ;
     }
   
     70% {
@@ -205,7 +207,7 @@
 
 
 .blob_waitlist {
-  background-color: #80b900;
+  background-color: #6036f4;
 	border-radius: 50%;
 	margin: 10px;
 	height: 120px;

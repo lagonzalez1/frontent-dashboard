@@ -597,7 +597,36 @@ export const findResource = (id) => {
         }
     }
     return { title: 'NA'}
-}   
+}
+
+export const searchResources = (id, resources) => {
+    if (resources.length === 0) { return; }
+    for (let i = 0, n = resources.length; i < n; ++i) {
+        const resource = resources[i];
+        if (resource._id === id) { return resource; }
+    }
+    return { title: 'Not applicable'}
+}
+
+export const searchServices = (id, services) => {
+    if (services.length === 0) { return; }
+    for (let i = 0, n = services.length; i < n; ++i) {
+        const service = services[i];
+        if (service._id === id) { return service; }
+    }
+    return { title: 'Not applicable'}
+}
+
+
+
+export const searchEmployees = (id, employees) => {
+    if (employees.length === 0) { return; }
+    for (let i = 0, n= employees.length; i < n ; ++i) {
+        const employee = employees[i];
+        if (employee._id === id ){ return employee; }
+    }
+    return { fullname: 'Na.'}
+}
 
 /**
  * 
