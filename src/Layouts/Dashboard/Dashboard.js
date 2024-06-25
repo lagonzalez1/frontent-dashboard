@@ -73,7 +73,7 @@ export default function Dashboard () {
     const [client, setClient] = useState({ payload: null, open: false, fromComponent: null});
     const [editClient, setEditClient] = useState({ payload: null, open: false, fromComponent: null});
 
-    const WS_URL = 'ws://127.0.0.1:443/api/internal/socket';
+    const WS_URL = 'wss://127.0.0.1:4000/api/internal/socket';
     const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
         WS_URL,
         {

@@ -96,7 +96,7 @@ export default function Waiting() {
 
     const [chatBadge, setChatBadge] = useState(false);
 
-    const WS_URL = 'ws://127.0.0.1:80/api/external/socket';
+    const WS_URL = 'wss://127.0.0.1:4001/api/external/socket';
     const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
         WS_URL,
         {

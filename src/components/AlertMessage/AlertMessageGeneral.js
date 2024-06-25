@@ -26,7 +26,7 @@ export default function AlertMessageGeneral({open, onClose, title, body, type}) 
             sx={{ mb: 2 }}
             >
             <AlertTitle>
-                <Typography variant="body2" fontWeight={'bold'}>{title}</Typography>
+                <Typography variant="subtitle1" fontWeight={'bold'}>{title}</Typography>
             </AlertTitle>
                 <Typography variant="body2">-{body}</Typography>
             </Alert>
