@@ -29,11 +29,12 @@ import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGener
 import SortRoundedIcon from '@mui/icons-material/SortRounded';
 
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import { Add, ArrowRightAltOutlined, Bolt, CloseRounded, CloudDone, EventAvailableOutlined, FmdGoodRounded, KeyboardArrowDown, KeyboardArrowDownOutlined, KeyboardArrowLeft, KeyboardArrowLeftRounded, KeyboardArrowRightRounded, Remove } from "@mui/icons-material";
+import { Add, ArrowRightAltOutlined, Bolt, ChatRounded, CloseRounded, CloudDone, EventAvailableOutlined, FmdGoodRounded, KeyboardArrowDown, KeyboardArrowDownOutlined, KeyboardArrowLeft, KeyboardArrowLeftRounded, KeyboardArrowRightRounded, Remove } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as Yup from 'yup';
 import LoadingButton from "@mui/lab/LoadingButton";
 import { ButtonGroup } from "react-bootstrap";
+import ChatBusiness from "../../components/Chat/ChatBusiness";
 
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
@@ -53,6 +54,8 @@ const Appointments = ({setClient, setEditClient}) => {
     const [slots, setSlots] = useState([]);
     const [slotMessage, setSlotMessage] = useState({title: null, body: null });
     const [quickViewLoader, setQuickViewLoader] = useState(false);
+    const [chatClient, setChatClient] = useState({ payload: null, open: false});
+
 
 
     const [highlightedDays, setHighlightedDays] = useState([]);
@@ -172,6 +175,13 @@ const Appointments = ({setClient, setEditClient}) => {
         })
     }
 
+    const openChat = (item) => {
+        setChatClient((prev) => ({...prev, open: true, payload: item}));
+    }
+    const closeChat = () => {
+        setChatClient({open: false, payload: null});
+    }
+
     const sortByEmployees = () => {
         if (data.length === 0) { return ; }
 
@@ -224,7 +234,12 @@ const Appointments = ({setClient, setEditClient}) => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
         .catch(error => {
+            if (error.code === "EENVELOPE") {
+                dispatch(setSnackbar({requestMessage: 'Client email issue', requestStatus: true}));
+                return;
+            }
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
+
         })
         .finally(() => {
             setQuickViewLoader(false);
@@ -325,6 +340,7 @@ const Appointments = ({setClient, setEditClient}) => {
     }
 
     const isServiceTagsUsed = () => {
+        console.log("Being called ?")
         let object = {}
         for (let i = 0, n = checked.length; i < n; ++i) {
             let indexOfService = checked[i];
@@ -342,14 +358,16 @@ const Appointments = ({setClient, setEditClient}) => {
     const loadAllAvailableSlots = () => {
         let tags = isServiceTagsUsed();
         if (formik.values.employee_id && formik.values.service_id && Object.keys(tags).length > 0) {
+            setSlotMessage({title: null, body: null});
             getAllSlotsAppointments(formik.values.employee_id, quickViewDate.toISO(), formik.values.service_id, tags)
             .then(response => {
                 if (response.status === 201) {
-                    console.log(response.data.msg)
                     setSlotMessage({title: 'Alert', body: response.data.msg})
                     return;
+                }else {
+                    setSlots(response.data.data);
+                    return;
                 }
-                setSlots(response.data.data);
             })
             .catch(error => {
                 console.log(error);
@@ -739,6 +757,11 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Stack direction={'row'} spacing={1}>
+                                                        <Tooltip title={'Chat with your clients'} placement="left">
+                                                            <IconButton onClick={() => openChat(client) }>
+                                                                <ChatRounded />
+                                                            </IconButton>
+                                                        </Tooltip>
                                                         <Tooltip title={'Serve client'} placement="left">
                                                         <IconButton onClick={() => sendClientServing(client._id)}>
                                                             <CheckCircleIcon color={'success'}/>
@@ -775,7 +798,7 @@ const Appointments = ({setClient, setEditClient}) => {
                         
                 
                 }
-                
+
 
                 {
                     /**
@@ -784,6 +807,7 @@ const Appointments = ({setClient, setEditClient}) => {
                      * 
                      */
                 }
+                <ChatBusiness open={chatClient.open} onClose={closeChat} client={chatClient.payload} />
                 <FabAppointment />
                 
         </div>

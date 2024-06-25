@@ -37,7 +37,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { ClientWaitingTheme, ClientWaitingThemeDark, ClientWelcomeTheme } from "../../theme/theme.js";
 import ChatRoundedIcon from '@mui/icons-material/ChatRounded';
 import { LoadingButton } from "@mui/lab";
-import { AttachMoneyRounded, AutoAwesomeRounded, RestoreRounded } from "@mui/icons-material";
+import { AttachMoneyRounded, AutoAwesomeRounded, CancelOutlined, RestoreRounded, TurnRightOutlined } from "@mui/icons-material";
 import useWebSocket, { ReadyState } from "react-use-websocket"
 import { useSelector, useDispatch } from 'react-redux';
 import { addToList } from "../../reducers/chatter.js";
@@ -62,7 +62,6 @@ export default function Waiting() {
     const [open, setOpen] = useState(false);
     const [status, setStatus] = useState(false);
     const [type, setType] = useState(null);
-    const [ms, setLastMessage] = useState(null);
 
     
 
@@ -125,8 +124,9 @@ export default function Waiting() {
         if (lastJsonMessage !== null) {
             const str = JSON.stringify(lastJsonMessage);
             const parse = JSON.parse(str);
-            const messages = parse.messages;
-            setChatBadge(true);
+            const messages = parse.messages
+            const lastMessage = messages.at(-1).sender === "BUSINESS";
+            if (lastMessage) { setChatBadge(true); }
             dispatch(addToList(messages.at(-1)));
 
         }
@@ -437,6 +437,7 @@ export default function Waiting() {
                 pt: 0
             }}
             value={value}
+            color={'secondary'}
             onChange={onChange}
             renderInput={(params) => <TextField {...params} />}
             minDate={currentDate}
@@ -451,15 +452,19 @@ export default function Waiting() {
             return (
                 <Alert
                     severity='success'
+                    variant="standard"
                     sx={{ mb: 2 }}
                     icon={<ChatRoundedIcon />}
                     >
                         <AlertTitle textAlign="left"><strong>Message from establishment</strong></AlertTitle>
-                        <Stack>
+                        <Stack spacing={0.5}>
                         <Typography textAlign={'left'} variant="body2">{chat ? chat.body: null}</Typography>
                         <Typography textAlign={'left'} variant="caption">{chat ? "updated: " + DateTime.fromJSDate(new Date(chat.timestamp)).toFormat('LLL dd hh:mm a'): null}</Typography>
+                       <Box>
+                        {chat && chat.acknowledge === true ? <Button size="small" sx={{borderRadius: 5}} variant="contained" color="success" endIcon={<CheckCircle/>}>acknowledged</Button> : <LoadingButton size="small" sx={{borderRadius: 5}} variant="outlined" color="success" loading={acknowledgeLoading} onClick={() => updateChatAcknowledge()}>acknowledge</LoadingButton>}
+                       </Box>
                        </Stack>
-                       {chat && chat.acknowledge === true ? <Button endIcon={<CheckCircle/>}>acknowledged</Button> : <LoadingButton loading={acknowledgeLoading} onClick={() => updateChatAcknowledge()}>acknowledge</LoadingButton>}
+                       
 
                 </Alert>
             )
@@ -596,8 +601,8 @@ export default function Waiting() {
                 <Typography textAlign={'center'} variant="h5" fontWeight="bold"> Appointment details </Typography>
                 <Typography textAlign={'center'} variant="body2"> Keep this page open for any updates!</Typography>
 
-                <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
-                    <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not comming
+                <Button startIcon={<CancelOutlined />} disabled={errors ? true: false} onClick={() => setOpen(true)} variant="contained" color="error" sx={{ borderRadius: 10}}>
+                    <Typography  variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>I'm not coming
                     </Typography>
                 </Button>
                 <ChatBox chat={user.chat} />
@@ -656,8 +661,8 @@ export default function Waiting() {
                     : 
                     (
                         <>
-                        <Button disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
-                            <Typography  variant="body2" fontWeight="bold" sx={{color: 'black', margin: 1 }}>I'm not coming
+                        <Button startIcon={<CancelOutlined />} disabled={errors ? true: false} onClick={() => setOpen(true)} variant="outlined" color="error" sx={{ borderRadius: 10}}>
+                            <Typography  variant="body2" fontWeight="bold" sx={{color: 'white', margin: 1 }}>I'm not coming
                             </Typography>
                         </Button>
 
@@ -696,18 +701,18 @@ export default function Waiting() {
                                 vertical: 'top',
                                 horizontal: 'left',
                             }}>
-                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="secondary" variant="contained" startIcon={<AutoAwesomeRounded />} onClick={() => openChatContainer()}>
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false || clientStatus.noShow ? true: false} color="secondary" variant="contained" startIcon={<AutoAwesomeRounded htmlColor="#FFFFF" />} onClick={() => openChatContainer()}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                  Chat
                             </Typography>
                         </Button>
                         </Badge>
-                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="secondary" variant="contained"  startIcon={<FormatListNumberedRoundedIcon />} onClick={() => navigateToWaitlist() }> 
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false || clientStatus.noShow ? true: false} color="secondary" variant="contained"  startIcon={<FormatListNumberedRoundedIcon htmlColor="#FFFFF"  />} onClick={() => navigateToWaitlist() }> 
                         <Typography variant="caption" sx={{color: 'white' }}>
                             wailist
                         </Typography>
                         </Button>
-                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false} color="secondary" variant="contained"  startIcon={<BlockRoundedIcon/>} onClick={() => setOpen(true)}> 
+                        <Button disableElevation sx={{ borderRadius: 5}} disabled={errors ? true: false || clientStatus.noShow ? true: false} color="secondary" variant="contained"  startIcon={<BlockRoundedIcon htmlColor="#FFFFF" />} onClick={() => setOpen(true)}> 
                             <Typography variant="caption" sx={{color: 'white' }}>
                             cancel
                             </Typography>
@@ -725,7 +730,7 @@ export default function Waiting() {
                     <Card variant="outlined">
                         <CardActionArea onClick={ () => handleDirectionsClick() }>
                         <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                            <NavigationArrow alignmentBaseline="center" weight="duotone" size={24} />
+                            <TurnRightOutlined fontSize="large" />
                             <Typography variant="caption">Directions</Typography>
                         </CardContent>
                         </CardActionArea>
@@ -737,8 +742,15 @@ export default function Waiting() {
                     <Card variant="outlined">
                         <CardActionArea onClick={() => openChatContainer()}>
                             <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 1 }}>
-                                <AutoAwesomeRounded />
+                                {
+                                    chatBadge ? (
+                                        <Badge color="success" badgeContent="+1">
+                                            <AutoAwesomeRounded fontSize="large" />
+                                        </Badge>
+                                    ): <AutoAwesomeRounded fontSize="large" />
+                                }
                                 <Typography variant="caption">Chat</Typography>
+                                
                             </CardContent>
                             </CardActionArea>
                         </Card>
@@ -779,17 +791,17 @@ export default function Waiting() {
                 {serving !== true &&
                 <Container sx={{ justifyContent: 'center',  alignItems: 'center', display: 'flex'}}>
                     <Stack direction={'row'} spacing={2}>
-                        <Button disableElevation disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}} startIcon={<NotificationsActiveRoundedIcon />} onClick={() => setUpdateClient(true)}>
+                        <Button disableElevation disabled={errors ? true: false || clientStatus.noShow ? true: false} color="secondary" variant="contained" sx={{borderRadius: 5}} startIcon={<NotificationsActiveRoundedIcon />} onClick={() => setUpdateClient(true)}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                 {'Status'}
                             </Typography>
                         </Button>
-                        <Button disableElevation disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BorderColorRoundedIcon/>} onClick={() => attemptEditAppointment()}>
+                        <Button disableElevation disabled={errors ? true: false || clientStatus.noShow ? true: false} color="secondary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BorderColorRoundedIcon />} onClick={() => attemptEditAppointment()}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                 {'edit'}
                             </Typography>
                         </Button>
-                        <Button disableElevation disabled={errors ? true: false} color="primary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BlockRoundedIcon />} onClick={() => setOpen(true)}>
+                        <Button disableElevation disabled={errors ? true: false || clientStatus.noShow ? true: false} color="secondary" variant="contained" sx={{borderRadius: 5}}  startIcon={<BlockRoundedIcon />} onClick={() => setOpen(true)}>
                             <Typography variant="caption" sx={{color: 'white' }}>
                                 {'cancel'}
                             </Typography>
@@ -799,7 +811,7 @@ export default function Waiting() {
                 }
                 <Divider />
                     <Box sx={{textAlign: 'left'}}>
-                        <Alert severity="warning">
+                        <Alert severity="warning" variant="standard">
                             <AlertTitle>
                                 <Typography fontWeight={'bold'}>{'Scheduled appointments'}</Typography>
                             </AlertTitle>
@@ -964,13 +976,13 @@ export default function Waiting() {
                 >
                 <Grid item className="grid-item" xs={12} md={3} lg={2} xl={2}>
                     <Card variant="outlined" sx={{pt: 1, borderRadius: 3, p: 2}}>
-                    <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" color={'gray'} textAlign={'center'} gutterBottom>
-                        <Link underline="hover" href={`/welcome/${link}`}>{link}</Link>
+                    <Typography sx={{pt: 1}} variant="body2" fontWeight="bold" textAlign={'center'} gutterBottom>
+                        <Link color={'gray'} underline="hover" href={`/welcome/${link}`}>{link}</Link>
                     </Typography>
                     {loading ? (
                     <Box>
                         <Container sx={{ display: 'flex', justifyContent: 'center', justifyItems: 'center'}}>
-                            <CircularProgress sx={{ p: 2}} />
+                            <CircularProgress color="secondary" sx={{ p: 2}} />
                         </Container>
                     </Box>)
                     : 
@@ -1021,39 +1033,40 @@ export default function Waiting() {
                             <Form>
                             <Stack sx={{ pt: 1 }} direction="column" spacing={2}>
                                 <Field
-                                as={TextField}
-                                id="fullname"
-                                name="fullname"
-                                label="Customer name"
-                                placeholder="Customer name"
-                                error={touched.fullname && !!errors.fullname}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
+                                    as={TextField}
+                                    id="fullname"
+                                    name="fullname"
+                                    color={'secondary'}
+                                    label="Customer name"
+                                    placeholder="Customer name"
+                                    error={touched.fullname && !!errors.fullname}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
                                 />
                                 <ErrorMessage name="fullname" component="div" />
  
                                 <Field
-                                as={TextField}
-                                id="email"
-                                name="email"
-                                disabled={true}
-                                label="Customer email"
-                                placeholder="Email"
-                                error={touched.email && !!errors.email}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
+                                    as={TextField}
+                                    id="email"
+                                    name="email"
+                                    disabled={true}
+                                    label="Customer email"
+                                    placeholder="Email"
+                                    error={touched.email && !!errors.email}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
                                 />
                                 <ErrorMessage name="email" component="div" />
                                 <Field
-                                as={TextField}
-                                id="phone"
-                                name="phone"
-                                disabled={true}
-                                label="Phone"
-                                placeholder="xxx-xxx-xxxx"
-                                error={touched.phone && !!errors.phone}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
+                                    as={TextField}
+                                    id="phone"
+                                    name="phone"
+                                    disabled={true}
+                                    label="Phone"
+                                    placeholder="xxx-xxx-xxxx"
+                                    error={touched.phone && !!errors.phone}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
                                 />
                                 <ErrorMessage name="phone" component="div" />
                                 <Typography variant="caption">To reduce or increase party size please <strong>cancel</strong> and make create new request.</Typography>
@@ -1068,7 +1081,7 @@ export default function Waiting() {
                                     onBlur={handleBlur}
                                 />
                                 <ErrorMessage name="partySize" component="div" />                            
-                                <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Select your new date </Typography>
+                                    <Typography gutterBottom variant="subtitle2" fontWeight={'bold'} textAlign={'left'}>Select your new date </Typography>
                                 <Box>
                                     <FutureDatePicker label="Appointment date" value={selectedDate} onChange={handleDateChange}  />
                                 </Box>
@@ -1089,16 +1102,15 @@ export default function Waiting() {
                                             rowSpacing={2}
                                             spacing={.5}
                                             alignItems="stretch"
-                                        
                                         >
                                             {
                                                 employeeList.map((employee) => {
                                                     return (
                                                         <Grid item key={employee.id}>
-                                                            <Card className="card-style" sx={{backgroundColor: values.employee_id === employee.id ? "#E8E8E8": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee, setFieldValue)}>
+                                                            <Card className="card-style" sx={{backgroundColor: values.employee_id === employee.id ? "#2e2e2e": "", maxWidth: 200, maxHeight: 300}} variant="outlined" onClick={() => handleEmployeeChange(employee, setFieldValue)}>
                                                                 <CardActionArea>
                                                                             <CardContent>
-                                                                                <Stack spacing={1} direction={'row'} alignItems={'center'}>
+                                                                                <Stack  sx={{ overflowWrap: 'break-word', textWrap: 'wrap'}} spacing={1} direction={'row'} alignItems={'center'}>
                                                                                     <Avatar src={employee.image !== null ? employee.image : null} />
                                                                                     <Typography variant="body2" fontWeight={'bold'}>
                                                                                         {employee.fullname}
@@ -1146,7 +1158,7 @@ export default function Waiting() {
                                                                .filter((service) => service.employeeTags.includes(values.employee_id))
                                                                .map((service) => (
                                                                    <Grid item key={service._id}>
-                                                                       <Card variant="outlined" className="card-style" sx={{backgroundColor: serviceTags[index] === service._id ? "#E8E8E8": "", minHeight: 180}} onClick={() => handleServiceChange(service, setFieldValue, values, index)}>
+                                                                       <Card variant="outlined" className="card-style" sx={{backgroundColor: serviceTags[index] === service._id ? "#2e2e2e": "", minHeight: 180}} onClick={() => handleServiceChange(service, setFieldValue, values, index)}>
                                                                            <CardActionArea>
                                                                                <CardContent>
                                                                                <Stack spacing={0.2}>
@@ -1208,7 +1220,7 @@ export default function Waiting() {
                                                         sx={{ margin: 1, borderRadius: 5}}
                                                         variant={values.start === appointment.start ? "contained": "outlined"}
                                                         onClick={() => handleAppointmentClick(appointment, setFieldValue)} 
-                                                        color={values.start === appointment.start ? 'primary': 'secondary'}
+                                                        color={values.start === appointment.start ? 'secondary': 'secondary'}
                                                         id={`appointment${index}`}>
                                                         <Typography sx={{ whiteSpace: 'nowrap' }} variant="caption">{DateTime.fromFormat(appointment.start, "HH:mm").toFormat("hh:mm a")}</Typography>
                                                         
@@ -1231,18 +1243,19 @@ export default function Waiting() {
                                 <Divider variant="middle" />
 
                                 <Field
-                                as={TextField}
-                                id="notes"
-                                name="notes"
-                                label="Notes"
-                                placeholder="Additional notes"
-                                error={touched.notes && !!errors.notes}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
+                                    as={TextField}
+                                    id="notes"
+                                    name="notes"
+                                    label="Notes"
+                                    placeholder="Additional notes"
+                                    error={touched.notes && !!errors.notes}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    color={'secondary'}
                                 />
                                 <ErrorMessage name="notes" component="div" />
 
-                                <Button disabled={isSubmitting} type="submit" sx={{ borderRadius: 5}} variant="contained">Submit</Button>
+                                <Button disabled={isSubmitting} type="submit" sx={{ borderRadius: 5}} variant="contained" color="warning" >Submit</Button>
 
                             </Stack>
                             </Form>
@@ -1307,8 +1320,14 @@ export default function Waiting() {
                 anchor="bottom"
                 open={openChat}
                 onClose={closeChatContainer}
+                sx={{
+                    borderTopRightRadius: 8,
+                    borderTopLeftRadius: 8,
+                    right: 0,
+                    left: 0     
+                }}
             >
-                <Box sx={{ maxHeight: '45vh', backgroundColor: 'black'}}>
+                <Box sx={{ maxHeight: '45vh'}}>
                     <ChatClient unid={unid} closeBadge={() => setChatBadge(false)} />
                 </Box>            
             </Drawer>

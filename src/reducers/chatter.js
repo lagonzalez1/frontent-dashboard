@@ -14,6 +14,7 @@ const chatterSlice = createSlice({
         state.messageList = action.payload;
       },
       addToList: (state, action) => {
+        if (state.messageList === null) { return; }
         state.messageList.push(action.payload);
       }
     }

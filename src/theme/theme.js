@@ -174,6 +174,7 @@ export const ClientWaitingThemeDark = createTheme({
     },
     success: {
       main: '#4caf50',
+      dark: "#3c8c40",
     }
   },
   typography: {

@@ -26,20 +26,18 @@ const Analytics = () => {
 
     
     const business = useSelector((state) => state.business);
-    //const employeeList = getEmployeeList();
     const [range, setRange] = useState({ start: DateTime.local().setZone(business.timezone), end: DateTime.local().setZone(business.timezone)});
 
     const dispatch = useDispatch();
     const accessToken = useSelector((state) => state.tokens.access_token);
     const services = useSelector(state => state.business.services);
     const resources = useSelector(state => state.business.resources);
-    const employees = useSelector(state => state.business.employees);
+    const employeeList = useSelector(state => state.business.employees);
 
     const [type, setType] = useState('AVERAGE');
     const [employeeId, setEmployeeSelect] = useState('');
     const [employeeData, setEmployeeData] = useState(null);
     const [businessData, setBusinessData] = useState(null);
-    const [employeeList, setEmployeeList] = useState();
     const [loading, setLoading] = useState(false);
 
     const [loadBusiness, setLoadBusiness] = useState(false);
@@ -56,18 +54,9 @@ const Analytics = () => {
         setEmployeeSelect(index);
     };
 
-    const getEmployeeList = () => {
-        getEmployees()
-        .then(response => {
-            setEmployeeList(response.employees);
-        })
-        .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
-        })
-    }
+    
 
     useEffect(() => {
-        getEmployeeList()
         getEmployeeData();
     }, [employeeId])
 
@@ -410,7 +399,7 @@ const Analytics = () => {
 
                             {businessData && businessData.employeeRatings.map((item, index) => {
                                 const id = item.id;
-                                const employeeResult = searchEmployees(id, employees);
+                                const employeeResult = searchEmployees(id, employeeList);
                                 if (employeeResult.fullname === "NA") { return null; }
                                 const popularity = Math.ceil(item.popularity);
                                 const rating = Math.ceil(item.data);

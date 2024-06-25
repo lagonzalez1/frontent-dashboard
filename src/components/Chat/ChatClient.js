@@ -7,6 +7,7 @@ import { getChat, sendChatFromClient } from "./ChatHelper";
 import useWebSocket, { ReadyState } from "react-use-websocket"
 import { useSelector, useDispatch } from 'react-redux';
 import { setMessageList } from "../../reducers/chatter"
+import WaitingResponse from "../Snackbar/WaitingResponse";
 
 // Send data through here
 
@@ -16,14 +17,13 @@ export default function ChatClient({unid, closeBadge}) {
     const DIRECTION_CLIENT = "outgoing";
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
-    const [messageList, setMessageListO] = useState([]);
     const [message, setMessage] = useState('');
-    const inputRef = useRef();
+    const [serverResponse, setServerResponse] = useState({open: false, title: null, body: null, data: null});
 
     const localStorageMessageList = useSelector((state) => state.chatter.messageList);
 
     useEffect(() => {
-        toFetch();  
+        loadChatter();  
     
         // Reset badge once oppend.
         return () => {
@@ -33,18 +33,26 @@ export default function ChatClient({unid, closeBadge}) {
 
     
 
+    const closeServerResponse = () => {
+        setServerResponse({open: false, title: null, body: null, data: null});
+    }
 
 
-    const toFetch = async () => {
+    const loadChatter = async () => {
         if (!localStorageMessageList) {
             setLoading(true);
-            const result = await getChat(unid);
-            if (result) {
-                dispatch(setMessageList(result));
+            getChat(unid)
+            .then(response => {
+                dispatch(setMessageList(response));
+            })
+            .catch(error => {
+                setServerResponse({open: true, title: 'Error', body: 'Unable to load chats.', data: error});
+                console.log(error);
+            })
+            .finally(() => {
                 setMessage('');
-                return;
-            }
-            console.log(result)
+                setLoading(false);
+            })
         }
     }
     
@@ -66,6 +74,7 @@ export default function ChatClient({unid, closeBadge}) {
             })
             .finally(() => {
                 setMessage('');
+                closeBadge()
             })
         }
     }
@@ -74,21 +83,22 @@ export default function ChatClient({unid, closeBadge}) {
 
     return (
         <div styles={{position:"relative"}}>
-            <MainContainer style={styles}>
-                <ChatContainer style={{ minHeight: '45vh', marginBottom: '0px'}}>
+            <WaitingResponse open={serverResponse.open} onClose={closeServerResponse} payload={serverResponse.data} title={serverResponse.title} body={serverResponse.body} />
+            <MainContainer>
+                <ChatContainer style={{ minHeight: '45vh', marginBottom: '0px', width: '100%'}}>
                 {loading ? (
                     <Box sx={{display: 'flex'}}>
                         <CircularProgress size={13} />
                     </Box>
                 ): null}       
-                <MessageList style={{height: "35vh"}} >
+                <MessageList style={{height: "40vh"}} >
                     {localStorageMessageList ? localStorageMessageList.map((item, index) => {
+                        const DIRECTION = item.sender === "BUSINESS" ? 'incoming': 'outgoing';
                         return (
                             <Message
-                                key={index}
-                                style={styles}  
+                                key={index} 
                                 model={{
-                                direction: `${item.direction}`,
+                                direction: DIRECTION,
                                 message: `${item.message}`,
                                 sentTime: "just now",
                                 sender: ``
@@ -102,7 +112,6 @@ export default function ChatClient({unid, closeBadge}) {
                     autoFocus
                     attachButton={false}
                     value={message}
-                    style={styles} 
                     onChange={(e) => handleMessageChange(e) }
                     onSend={() => sendChat()}
                     placeholder="Type message here"

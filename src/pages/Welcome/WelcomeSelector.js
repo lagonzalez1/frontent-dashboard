@@ -41,9 +41,8 @@ export default function WelcomeSelector() {
     const [openWaitlistSummary, setOpenWaitlistSummary] = useState(false);
     const [acceptingStatus, setAcceptingStatus] = useState({waitlist: false, appointments: false});
 
-    const [alertAppointments, setAlertAppointment] = useState(false);
     const [errorMessage, setErrorMessage] = useState({title: '', body: ''});
-    const [appointmentSearchErrors, setAppointmentSearchErrors] = useState({title: null, body: null, type: null});
+    const [appointmentSearchErrors, setAppointmentSearchErrors] = useState({title: null, body: null, type: null, open: false});
     const [employeeSearchErrors, setEmployeeSearchErrors] = useState({open: false, title: null, body: null});
     const [timezone, setTimezone] = useState(null);
 
@@ -378,7 +377,6 @@ export default function WelcomeSelector() {
     }
 
     const searchAppointments = (id) => {
-        setAlertAppointment(false);
         if (appointmentData.date === null || appointmentData.employee_id === null){ 
             handleErrorRefChange(); // Trigger ref to show error message.
             setErrorMessage({title: 'Error', body: 'Please make sure you have selected a date, employee and service.'});
@@ -389,8 +387,7 @@ export default function WelcomeSelector() {
         getAvailableAppointments(payload)
         .then(response => {
             if(Object.keys(response.data).length === 0){
-                setAlertAppointment(true);
-                setAppointmentSearchErrors({title: 'Error', body: response.msg, type: 'warning'})
+                setAppointmentSearchErrors({title: 'Error', body: response.msg, type: 'warning', open: true})
                 return;
             }
             setSlots(response.data);
@@ -424,6 +421,11 @@ export default function WelcomeSelector() {
             setLoading(false);
             setOpenEmployees(true);
         })
+    }
+
+    const closeAppointmentSearchErrors = () => {
+        
+        setEmployeeSearchErrors({open: false, title: null, body: null, open: false});
     }
 
 
@@ -545,10 +547,10 @@ export default function WelcomeSelector() {
                                                         appointmentEmployees.map((employee) => {
                                                             return (
                                                                 <Grid item key={employee.id}>
-                                                                    <Card className="card-style" sx={{backgroundColor: appointmentData.employee_id === employee.id ? "#2e2e2e": "" }} variant="outlined" onClick={() => handleEmployeeChange(employee)}>
+                                                                    <Card className="card-style" sx={{backgroundColor: appointmentData.employee_id === employee.id ? "#2e2e2e": "", maxWidth: 200}} variant="outlined" onClick={() => handleEmployeeChange(employee)}>
                                                                         <CardActionArea>
                                                                             <CardContent>
-                                                                                <Stack spacing={1} direction={'row'} alignItems={'center'}>
+                                                                                <Stack spacing={1} direction={'row'} alignItems={'center'} sx={{ overflowWrap: 'break-word', textWrap: 'wrap'}}>
                                                                                     <Avatar src={employee.image !== null ? employee.image : null} />
                                                                                     <Typography variant="body2" fontWeight={'bold'}>
                                                                                         {employee.fullname}
@@ -569,14 +571,14 @@ export default function WelcomeSelector() {
                                                     }     
                                                     {
                                                         employeeSearchErrors && employeeSearchErrors.open === true ? (
-                                                            <Box>
+                                                            <Grid item>
                                                                 <Alert severity="warning" variant="standard" onClose={() => setEmployeeSearchErrors({open: false, title: null, body: null})}>
                                                                     <AlertTitle>
                                                                         <Typography variant="body2">{employeeSearchErrors.title}</Typography>
                                                                     </AlertTitle>
                                                                     <Typography variant="caption">{employeeSearchErrors.body}</Typography>
                                                                 </Alert>
-                                                            </Box>
+                                                            </Grid>
                                                         ) : null
                                                     }                                               
                                                 </Grid>
@@ -610,7 +612,7 @@ export default function WelcomeSelector() {
                                                                                 .filter((service) => service.employeeTags.includes(appointmentData.employee_id))
                                                                                 .map((service) => (
                                                                                     <Grid item key={service._id}>
-                                                                                        <Card variant="outlined" className="card-style" sx={{backgroundColor: serviceTags[index] === service._id ? "#2e2e2e": "", minHeight: 200, maxWidth: 200}} onClick={() => handleGuestServiceClick(index,service)}>
+                                                                                        <Card variant="outlined" className="card-style" sx={{backgroundColor: serviceTags[index] === service._id ? "#2e2e2e": "", minHeight: 200, maxWidth: 200, maxHeight: 300}} onClick={() => handleGuestServiceClick(index,service)}>
                                                                                             <CardActionArea>
                                                                                                 <CardContent>
                                                                                                 <Stack sx={{ overflowWrap: 'break-word', textWrap: 'wrap'}} spacing={0.2}>
@@ -695,7 +697,12 @@ export default function WelcomeSelector() {
                                                         ): null
                                                     }
                                                         <Grid item>
-                                                            <AlertMessageGeneral open={alertAppointments} onClose={setAlertAppointment} title={appointmentSearchErrors.title} body={appointmentSearchErrors.body} type={appointmentSearchErrors.type} />
+                                                            <Alert severity="warning" variant="standard" onClose={() => closeAppointmentSearchErrors()}>
+                                                                    <AlertTitle>
+                                                                        <Typography variant="body2">{appointmentSearchErrors.title}</Typography>
+                                                                    </AlertTitle>
+                                                                    <Typography variant="caption">{appointmentSearchErrors.body}</Typography>
+                                                                </Alert>
                                                         </Grid>
                                                     </Grid>
                                                 </Box>
@@ -777,7 +784,7 @@ export default function WelcomeSelector() {
                                             >
                                                 {Array.isArray(businessExtras.employees) ? businessExtras.employees.map((employee) => (
                                                     <MenuItem key={employee.id} value={employee.id}>
-                                                        <Stack spacing={1} direction={'row'} alignItems={'center'}>
+                                                        <Stack  sx={{ overflowWrap: 'break-word', textWrap: 'wrap'}} spacing={1} direction={'row'} alignItems={'center'}>
                                                             <Avatar src={employee.image !== null ? employee.image : null} />
                                                             <Typography variant="body2" fontWeight={'bold'}>
                                                                 {employee.fullname}
@@ -816,17 +823,17 @@ export default function WelcomeSelector() {
                                                         .filter((service) => service.employeeTags.includes(waitlistData.employee_id))
                                                         .map((service) => (
                                                             <Grid item key={service._id}>
-                                                                <Card variant="outlined" sx={{backgroundColor: waitlistData.service_id === service._id ? "#2e2e2e": "", minHeight: 200, maxWidth: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                                                <Card className="card-style" variant="outlined" sx={{backgroundColor: waitlistData.service_id === service._id ? "#2e2e2e": "", minHeight: 200, maxWidth: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
                                                                     <CardActionArea>
                                                                         <CardContent>
-                                                                        <Stack spacing={0.2}>
+                                                                        <Stack spacing={0.2} sx={{ overflowWrap: 'break-word', textWrap: 'wrap'}}>
                                                                             <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
                                                                             <Typography textAlign="center" gutterBottom color="text.secondary" variant="caption">
                                                                                 {service.description}
                                                                             </Typography>
                                                                         </Stack>
                                                                         <Divider variant="middle" />                                                                    
-                                                                        <Stack sx={{m: 1}} spacing={0.5}>
+                                                                        <Stack spacing={0.5} sx={{ m: 1,overflowWrap: 'break-word', textWrap: 'wrap'}}>
                                                                             <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
                                                                             <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
                                                                         </Stack>
@@ -857,17 +864,17 @@ export default function WelcomeSelector() {
                                                     businessExtras ? 
                                                     businessExtras.services.map((service) => (
                                                         <Grid item key={service._id}>
-                                                            <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#E8E8E8": "", minHeight: 200}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
+                                                            <Card variant="outlined" className="card-style" sx={{backgroundColor: waitlistData.service_id === service._id ? "#2e2e2e": "", minHeight: 200, maxWidth: 200, maxHeight: 300}} onClick={() => setWaitlistData((prev) => ({...prev, service_id: service._id, serviceTitle: service.title}))}>
                                                                 <CardActionArea>
                                                                     <CardContent>
-                                                                    <Stack spacing={0.2}>
+                                                                    <Stack spacing={0.2}  sx={{ overflowWrap: 'break-word', textWrap: 'wrap'}}>
                                                                         <Typography component="div" variant="body2" textAlign={'center'} fontWeight={'bold'}>{service.title}</Typography>
                                                                         <Typography className="large-desc" textAlign="center" gutterBottom color="text.secondary" variant="caption">
                                                                             {service.description}
                                                                         </Typography>
                                                                     </Stack>
                                                                     <Divider variant="middle" />                                                                    
-                                                                    <Stack sx={{m: 1}} spacing={0.5}>
+                                                                    <Stack spacing={0.5}  sx={{ overflowWrap: 'break-word', textWrap: 'wrap'}}>
                                                                         <Chip color="secondary"  variant="contained" label={"Length: " + service.duration + " min"} icon={<RestoreRounded color={'white'} size={10} />} />
                                                                         <Chip color="success" variant="contained" label={"Cost: " + service.cost} icon={<AttachMoneyRounded color={'white'} size={10} />} />
                                                                     </Stack>

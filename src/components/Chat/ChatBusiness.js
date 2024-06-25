@@ -1,4 +1,4 @@
-import React, {useState, useEffect } from "react";
+import React, {useState, useEffect, useMemo } from "react";
 import { Container, Box, CircularProgress, Dialog, Slide, DialogContent, DialogTitle, IconButton, Typography} from "@mui/material";
 import styles from '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import { MainContainer, ChatContainer, MessageList, Message, MessageInput, AttachmentButton, SendButton, InputToolbox } from '@chatscope/chat-ui-kit-react';
@@ -7,6 +7,7 @@ import { getChat, sendChatFromBusiness, sendChatFromClient } from "./ChatHelper"
 import { useSelector, useDispatch } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
 import { selectMessagesByChatId } from "../../selectors/businessChatSelectors";
+import { setSnackbar } from "../../reducers/user";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -22,6 +23,7 @@ export default function ChatBusiness({open, onClose, client}) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [chatterId, setChatterId] = useState(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         setLoading(true)
@@ -49,13 +51,38 @@ export default function ChatBusiness({open, onClose, client}) {
                 console.log(response);
             })
             .catch(error => {
-                console.log(error)
+                dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
             })
             .finally(() => {
                 setMessage('');
             })
         }        
     }
+    
+    const MessageComponentMemo = useMemo(() => messages, []);
+
+
+    const Messages = () => {
+        return (
+            <>
+            {messages ? messages.map((item, index) => {
+                    const DIRECTION = item.sender === "CLIENT" ? 'incoming': 'outgoing';
+                return (
+                    <Message
+                        key={index} 
+                        model={{
+                            direction: DIRECTION,
+                            message: `${item.message}`,
+                            sentTime: "just now",
+                            sender: ``
+                        }} 
+                    />
+                )
+            }) :null}
+            </>
+        )
+    }
+
 
     return (
 
@@ -84,9 +111,7 @@ export default function ChatBusiness({open, onClose, client}) {
                 </IconButton>
             <DialogContent>
                 <div styles={{position:"relative"}}>
-                    <MainContainer
-                        
-                    >
+                    <MainContainer>
                         <ChatContainer>
                         {loading ? (
                             <Box sx={{display: 'flex'}}>
@@ -94,21 +119,10 @@ export default function ChatBusiness({open, onClose, client}) {
                             </Box>
                         ): null}       
                         <MessageList style={{height: "35vh"}}>
-                        {messages ? messages.map((item, index) => {
-                        return (
-                            <Message
-                                key={index} 
-                                model={{
-                                direction: `${item.direction}`,
-                                message: `${item.message}`,
-                                sentTime: "just now",
-                                sender: ``
-                                }} 
-                            />
-                        )
-                    }) :null}
-                        </MessageList>
 
+                        <Messages />
+                       
+                        </MessageList>
                         <MessageInput
                             attachButton={false}
                             value={message} 

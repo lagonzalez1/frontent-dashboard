@@ -149,15 +149,15 @@ export default function Welcome() {
         switch(type) {
             case 'FACE':
                 const facebook = window.open(social.facebook, '_blank', 'noopener,noreferrer')
-                if (facebook) window.opener = null    
+                if (facebook) window.opener = null;    
             break;
             case 'TWIT':
                 const twitter = window.open(social.twitter, '_blank', 'noopener,noreferrer')
-                if (twitter) window.opener = null
+                if (twitter) window.opener = null;
                 break;
             case 'INSTA':
                 const instagram = window.open(social.instagram, '_blank', 'noopener,noreferrer')
-                if (instagram) window.opener = null
+                if (instagram) window.opener = null;
                 break;
         }
         
@@ -286,8 +286,11 @@ export default function Welcome() {
                     </Grid>
                     </Slide>
                 </Grid>
-
                 </Box>
+
+                
+
+
             <Dialog
                 open={businessInfo}
                 onClose={closeBusinessInfo}

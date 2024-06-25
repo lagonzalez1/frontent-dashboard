@@ -92,11 +92,9 @@ export default function Dashboard () {
                 },
             });
         }
-    }, [readyState, bid, timezone])
+    }, [readyState])
 
     useEffect(() => {
-        console.log("Last update", DateTime.local().toISO());   
-        console.log(lastJsonMessage);        
         if (lastJsonMessage !== null) {
             const str = JSON.stringify(lastJsonMessage);
             const parse = JSON.parse(str);
@@ -142,24 +140,6 @@ export default function Dashboard () {
         checkAuthStatus();
     },[reload]);
 
-
-    /*
-    useEffect(() => {
-        const myFunction = () => {
-            reloadBusinessData(dispatch);
-        };
-        const query = new URLSearchParams(window.location.search);
-        if (query.get('quick_start')) {
-            setGettingStarted(true);
-        }
-        // Reload after 1.5 min
-        const intervalId = setInterval(myFunction, 90000);
-        return () => {
-          // Clear the interval to avoid memory leaks
-            clearInterval(intervalId);
-        };
-    }, []);
-   */ 
     const getChatters = async() => {
         try {
             const result = await getChatFromBusiness();

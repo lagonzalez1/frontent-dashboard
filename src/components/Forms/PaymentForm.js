@@ -194,7 +194,7 @@ const SubscriptionForm = () => {
         }
 
 
-        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_PLAN ? "lightgray": ""}} variant="outlined" id="waitlist">
+        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_PLAN ? "#2e2e2e": ""}} variant="outlined" id="waitlist">
         <CardActionArea onClick={() => handlePlanChange(WAITLIST_PLAN)} >
           <CardContent>
           <Typography variant='caption' color="text.secondary" gutterBottom>
@@ -214,7 +214,7 @@ const SubscriptionForm = () => {
           </CardActionArea>
         </Card>
         <br/>
-        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_APP_ANALYTICS_PLAN ? "lightgray": ""}} variant="outlined" id="appointment">
+        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_APP_ANALYTICS_PLAN ? "#2e2e2e": ""}} variant="outlined" id="appointment">
         <CardActionArea onClick={() => handlePlanChange(WAITLIST_APP_ANALYTICS_PLAN)}>
           <CardContent>
           <Typography variant='caption' color="text.secondary" gutterBottom>
@@ -236,7 +236,7 @@ const SubscriptionForm = () => {
         </Card>
         <br/>
 
-        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_APP_PLAN ? "silver": ""}} variant="outlined">
+        <Card sx={{ borderRadius: 4, backgroundColor: selectedPlan === WAITLIST_APP_PLAN ? "#2e2e2e": ""}} variant="outlined">
           <CardActionArea onClick={() => handlePlanChange(WAITLIST_APP_PLAN)}>
           <CardContent>
             <Typography variant='caption' color="text.secondary" gutterBottom>

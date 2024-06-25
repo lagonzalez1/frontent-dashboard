@@ -14,11 +14,11 @@ import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-import { moveClientServing, sendNotification, getNoShowClients, getWaitlistTable, getWaitlistWaittime, searchServices, searchResources } from "../../hooks/hooks";
+import {  sendNotification, getNoShowClients, getWaitlistTable, getWaitlistWaittime, searchServices, searchResources } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
-    clientOptions, OPTIONS_SELECT, acceptingRejecting,
+    clientOptions, OPTIONS_SELECT,
     removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState, noShowColumns} from "./Helpers";
 import { WAITLIST, NOSHOW, APPOINTMENT } from "../../static/static";
 import FabButton from "../Add/FabButton";
@@ -30,6 +30,8 @@ import { ChatRounded, FmdGoodRounded, WarningRounded } from "@mui/icons-material
 import { setWaitlistClients, setNoShowData } from "../../reducers/business";
 import ChatBusiness from "../Chat/ChatBusiness";
 import { isAcceptingOrReject } from "../../selectors/waitlistSelectors";
+import { TransitionGroup } from 'react-transition-group';
+
 
 
 
@@ -49,16 +51,12 @@ const Waitlist = ({setClient, setEditClient}) => {
     const reload = useSelector((state) => state.reload);
 
     const [anchorElVert, setAnchorElVert] = useState(null);
-    //const [noShowData, setNoShow] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
     const [loading, setLoading] = useState(false);
     const [ns_loading, setNsLoading] = useState(false);
     const [clientId, setClientId] = useState();
     const [waittime, setWaittime] = useState(null);
-    const [chatDialog, setOpenChatDialog] = useState(false);
     const [chatClient, setChatClient] = useState({ payload: null, open: false});
-
-    //const [tableData, setTableData] = useState(td);
     
     const open = Boolean(anchorEl);
     const openVert = Boolean(anchorElVert);
@@ -402,7 +400,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                     <Grid item xs={6} md={6} lg={6} sx={{ display: 'flex', justifyContent: 'left'}}>
                         <Stack direction={"row"} spacing={1}>
 
-                            {user.permissions === 3 || user.permissions === 2 ? (<Tooltip title="Logged in as employee" placement="bottom">
+                            {user.permissions === 3 || user.permissions === 2 || user.permissions === 1 ? (<Tooltip title="Logged in as employee" placement="bottom">
                                 <Chip color="error" icon={<BadgeIcon />} label={user.email} />
                             </Tooltip>): null}
                             
