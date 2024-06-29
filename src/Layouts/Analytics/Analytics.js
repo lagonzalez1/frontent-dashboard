@@ -43,8 +43,6 @@ const Analytics = () => {
     const [loadBusiness, setLoadBusiness] = useState(false);
     const [businessLoader, setBusinessLoader] = useState(false);
 
-
-
     const [error, setError] = useState(false);
     const [openError, setOpenError] = useState(false);
     const [alert, setAlert] = useState({title: null, body: null})

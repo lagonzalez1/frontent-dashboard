@@ -6,29 +6,31 @@ Slide} from '@mui/material';
 import AddService from "../../components/AddService/AddService.js";
 import CloseIcon from "@mui/icons-material/Close"
 import {  StyledCardService, stringAvatar, getServicesTotal, getEmployeeTags, removeExistingEmployees, removeEmployeeTag, updateService, Transition } from "./ServicesHelper.js"; 
-import { getServicesAvailable, reloadBusinessData } from "../../hooks/hooks.js";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDispatch, useSelector } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions.js";
 import LoadingButton from '@mui/lab/LoadingButton';
-import { AttachCurrencyDollarOutlined, AttachCurrencyDollarTwoTone, AvTimerOutlined, AvTimerTwoTone, PublicOffOutlined, PublicOffTwoTone, PublicRounded, PublicTwoTone } from "@mui/icons-material";
-import { ClockClockwise, ClockCountdown, Globe, LockSimple, LockSimpleOpen, CurrencyDollar } from "phosphor-react";
-import { Global } from "@emotion/react";
-
+import { ClockClockwise, LockSimple, LockSimpleOpen, CurrencyDollar } from "phosphor-react";
+import { reloadBusinessData } from '../../hooks/hooks';
+import { authFields, authTokens } from "../../selectors/authSelectors";
 
 export default function Services() {
 
-
     const { checkPermission, canEmployeeEdit} = usePermission();
+    const dispatch = useDispatch();
+    const { access_token, cookie_token } = useSelector((state) => authTokens(state));
+    const { authEmail, authId } = useSelector((state) => authFields(state));
+    const serviceList = useSelector((state) => state.business.services);
+
     const [dialog, setDialog] = useState(false);
     const {active, unactive} = getServicesTotal();
     const [service, setService] = useState({});
     const [loading, setLoading] = useState(false);
     const [reloadPage, setReloadPage] = useState(false);
-    const serviceList = useSelector((state) => state.business.services);
-    const dispatch = useDispatch();
+    
+
     
 
     const [form, setForm] = useState({
@@ -92,7 +94,7 @@ export default function Services() {
     }
 
     useEffect(() => {  
-        reloadBusinessData(dispatch);     
+        reloadBusinessData(dispatch, access_token, authEmail, authId);
         return () => {
             setReloadPage(false);
         } 

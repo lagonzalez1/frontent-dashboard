@@ -3,6 +3,7 @@ import axios from "axios";
 import { DateTime } from "luxon";
 import { getStateData, getAccessToken, getHeaders } from "../auth/Auth";
 import { setBusiness } from "../reducers/business";
+import Cookies from 'js-cookie'
 
 
 let POST_NOSHOW = '/api/internal/noShow';
@@ -15,28 +16,39 @@ let POST_NOTIFYCLIENT = '/api/internal/notify_client';
 let POST_SEND_CHAT = '/api/internal/send_chat'
 
 let GET_WAITTIME = '/api/internal/waittime';
-let GET_BUSINESS = '/api/internal/reload_business/';
+let GET_BUSINESS = '/api/internal/reload_business';
 let GET_SERVINGTABLE = '/api/internal/serving_table';
 let GET_APPOINTMENTDATA = '/api/internal/appointment_data';
 let GET_NOSHOW = '/api/internal/no_show';
 let GET_WAITLIST = '/api/internal/get_waitlist';
 let GET_EMPLOYEES = '/api/internal/get_employees'
 
-export const reloadBusinessData = (dispatch) => {
-    const { _, business } = getStateData();
-    const accessToken = getAccessToken();
-    const headers = { headers: {'x-access-token': accessToken} }
-    const id = business._id;
-    const ENDPOINT = GET_BUSINESS + id;
-    axios.get(ENDPOINT, headers)
-    .then(response => {
-        dispatch(setBusiness(response.data.result));
-        // Maybe get headers here again ?
-    })
-    .catch(error => {
-        console.log(error);
-        return new Error(error);
-    })
+
+// authId is the businessId
+export const reloadBusinessData = (authEmail, bid) => {
+    //const headers = { headers: {'x-access-token': access_token} }
+
+    const token = Cookies.get('_auth');
+    const accessToken = Cookies.get('accessToken');
+
+    
+    return new Promise((resolve, reject) => {
+        axios.get(GET_BUSINESS, {
+            params: {
+                b_id: bid,
+                email: authEmail
+            },
+            timeout: 90000,
+            timeoutErrorMessage: 'Timeout error.'
+        })
+        .then(response => {
+            resolve(response.data.result);
+        })
+        .catch(error => {
+            console.log(error);
+            reject(new Error('Failed to fetch business data.'));
+        });
+    });
 
 }
 

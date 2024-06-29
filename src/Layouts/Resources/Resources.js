@@ -3,7 +3,6 @@ import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogAc
 Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel, Divider, Slide, Box, CircularProgress } from '@mui/material';
 import { getResourcesTotal, StyledCardService, stringAvatar,
  findResourceTag, findResourceServing, updateResources, Transition } from "./ResourcesHelper"; 
-import { findClient, reloadBusinessData } from "../../hooks/hooks";
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -11,9 +10,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions.js";
 import LoadingButton from '@mui/lab/LoadingButton';
-import { PersonRounded } from "@mui/icons-material";
-import { User, Article } from "phosphor-react";
-
+import { User } from "phosphor-react";
+import { reloadBusinessData } from '../../hooks/hooks';
+import { authFields, authTokens } from "../../selectors/authSelectors";
 
 export default function Resources() {
 
@@ -22,6 +21,8 @@ export default function Resources() {
 
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
+    const { access_token, cookie_token } = useSelector((state) => authTokens(state));
+    const { authEmail, authId } = useSelector((state) => authFields(state));
 
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
@@ -72,7 +73,7 @@ export default function Resources() {
       }
 
       useEffect(() => {
-        reloadBusinessData(dispatch);
+        reloadBusinessData(dispatch, access_token, authEmail, authId);
         return () => {
             setReloadPage(false);
         }

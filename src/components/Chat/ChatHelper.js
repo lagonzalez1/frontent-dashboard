@@ -2,6 +2,9 @@ import axios from "axios";
 import { getAccessToken, getHeaders, getStateData } from "../../auth/Auth";
 
 
+
+// MISSING MIDDLEWARE
+
 export const sendChatFromClient = (unid, message, time, direction) => {
     return new Promise((resolve, reject) => {
         axios.post('/api/external/client_chat', {unid, message, time, direction})
@@ -58,11 +61,10 @@ export const getChat = (unid) => {
 }
 
 
-export const getChatFromBusiness = () => {
+export const getChatFromBusiness = (id, email, access_token) => {
     return new Promise((resolve, reject) => {
-        const { user, business } = getStateData();
-        const headers = getHeaders();
-        axios.get('/api/internal/chatter_business', {...headers, params: { b_id: business._id, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+        const headers = { headers : { 'x-access-token': access_token} }
+        axios.get('/api/internal/chatter_business', {...headers, params: { b_id: id, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
         .then((response) => {
             resolve(response);
         })

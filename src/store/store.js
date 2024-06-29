@@ -9,6 +9,10 @@ import businessChatter from '../reducers/businessChatter';
 const saveToLocalStorage = (store) => (next) => (action) => {
   const result = next(action); // Call the next middleware or reducer
 
+  // Load or refresh access evvery time -> User (tokens, permissions, email, ids) 
+  // Keep and reload based Business info based on localstorage
+  // Business keep and use the same state unless reloadBusiness is called and or ws reloads
+
   // Save user and business data to local storage
   const { user, business, tokens, chatter, businessChatter } = store.getState();
   localStorage.setItem('user', JSON.stringify(user));

@@ -65,6 +65,7 @@ const Waitlist = ({setClient, setEditClient}) => {
 
 
     useEffect(() => {
+        console.log("ENTER WAITLIST");
         setLoading(true)
         getWaitlistData(); // Load initially
         loadNoShowData(); // Load initially

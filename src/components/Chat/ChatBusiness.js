@@ -65,20 +65,7 @@ export default function ChatBusiness({open, onClose, client}) {
     const Messages = () => {
         return (
             <>
-            {messages ? messages.map((item, index) => {
-                    const DIRECTION = item.sender === "CLIENT" ? 'incoming': 'outgoing';
-                return (
-                    <Message
-                        key={index} 
-                        model={{
-                            direction: DIRECTION,
-                            message: `${item.message}`,
-                            sentTime: "just now",
-                            sender: ``
-                        }} 
-                    />
-                )
-            }) :null}
+            
             </>
         )
     }
@@ -120,7 +107,20 @@ export default function ChatBusiness({open, onClose, client}) {
                         ): null}       
                         <MessageList style={{height: "35vh"}}>
 
-                        <Messages />
+                        {messages ? messages.map((item, index) => {
+                                const DIRECTION = item.sender === "CLIENT" ? 'incoming': 'outgoing';
+                            return (
+                                <Message
+                                    key={index} 
+                                    model={{
+                                        direction: DIRECTION,
+                                        message: `${item.message}`,
+                                        sentTime: "just now",
+                                        sender: ``
+                                    }} 
+                                />
+                            )
+                        }) :null}
                        
                         </MessageList>
                         <MessageInput

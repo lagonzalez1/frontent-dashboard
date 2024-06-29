@@ -9,12 +9,12 @@ const SubscriptionContext = createContext();
 // currentSubscription is null and throwing an Error.
 export const SubscriptionProvider = ({ children }) => {
     const currentSubscription = useSelector((state) => state.user.subscription);
+    console.log("Current subscription", currentSubscription);
     const termDate = useSelector((state) => state.business.terminating);
     if (currentSubscription === null || currentSubscription === undefined) {
         // Return null or a loading indicator while waiting for the subscription data
         return null;
     }
-
 /**
  * 
  * 

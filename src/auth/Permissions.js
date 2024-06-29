@@ -31,7 +31,7 @@ export const PermissionProvider = ({ children }) => {
 
 
     return (
-        <PermissionContext.Provider value={{ checkPermission, canEmployeeEdit}}>
+        <PermissionContext.Provider value={{ checkPermission, canEmployeeEdit }}>
             {children}
         </PermissionContext.Provider>
     );

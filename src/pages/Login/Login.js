@@ -10,13 +10,14 @@ import BadgeIcon from '@mui/icons-material/Badge';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonIcon from '@mui/icons-material/Person';
 import { useSelector, useDispatch } from 'react-redux';
-import { setLocation, setPermisisons, setUser } from '../../reducers/user';
+import { setIndex, setLocation, setOptions, setPermisisons, setUser } from '../../reducers/user';
 import { setAuthAccessToken, setAuthCookieToken } from "../../reducers/tokens";
 import { DateTime } from "luxon";
 import loginImage from "../../assets/images/login.jpg"
 import { HomePageTheme } from "../../theme/theme";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { setBusiness } from "../../reducers/business";
 
 export default function Login() {
     
@@ -93,48 +94,43 @@ export default function Login() {
     }
 
     async function loginRequest(data) {
-        const response = await axios.post('/api/external/login', data)
+        const response = await axios.post('/api/external/loginv2', data)
         return response;
     }
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
         setLoading(true);
         if ( credentials.email && credentials.password ){
-            const data = { email: credentials.email, password: credentials.password };
-            loginRequest(data)
-            .then(response => {
+            const data = { email: credentials.email, password: credentials.password }
+            try {
+                const response = await axios.post('/api/external/loginv2', data)
                 if (response.status === 200){
+                    // Contains long duration token: response.data.token
                     signIn({
                         token: response.data.token,
                         expiresIn: response.data.expiration,
                         tokenType: "Bearer",
                         authState: { id: response.data.id, email: credentials.email },
                     });
-                    
-                    setAccessToken(response.data.accessToken);
-                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions, trial: response.data.trial, trialStatus: response.data.trialStatus }));
-                    // Set business ref ?
+                    dispatch(setIndex(response.data.defaultIndex)); 
+                    dispatch(setLocation(0));
+                    dispatch(setOptions(response.data.businessOptions));
+                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions, bid: response.data.bid,
+                        trial: response.data.trial, trialStatus: response.data.trialStatus, subscription: response.data.subscription, emailConfirm: response.emailConfirm}));
                     navigate('/Dashboard');
                     setLoading(false);
                     return;
                 }
-                setErrors(response.data.msg);
-                setAlert(true);
-                setLoading(false);
-            })
-            .catch(error => {
-                setLoading(false);
+            }  
+            catch(error) {
                 console.log(error);
-                setErrors(error.response.data.msg);
+                setErrors('Issue found.');
                 setAlert(true);
-            })
-        }
-        else {
-            setLoading(false);
-            setErrors('Error: Empty fields found.');
-            setAlert(true);
-            return;
-        }
+            }
+            finally {
+                setLoading(false);
+            }
+        } 
 	}
 
     const handleLoginChange = (event, type) => {

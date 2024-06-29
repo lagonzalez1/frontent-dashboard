@@ -19,6 +19,7 @@ const initialState = {
   trialStatus: null,
   trial: null,
   emailConfirm: null,
+  bid: null,
 };
 
 
@@ -36,6 +37,7 @@ const userSlice = createSlice({
       state.trial = action.payload.trial;
       state.trialStatus = action.payload.trialStatus;
       state.emailConfirm = action.payload.emailConfirm;
+      state.bid = action.payload.bid
     },
     logoutUser: (state) => {
       state.email = null;

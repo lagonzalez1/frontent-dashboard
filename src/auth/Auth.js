@@ -12,6 +12,8 @@ import { setBusiness } from "../reducers/business";
 import { setIndex, setLocation, setOptions, setUser } from "../reducers/user";
 import { useSelector } from "react-redux";
 import { setAuthAccessToken, setAuthCookieToken } from "../reducers/tokens";
+import Cookies from 'js-cookie'
+
 
 const TOKEN_KEY = 'access_token';
 const BUSINESS = 'business';
@@ -82,25 +84,32 @@ const USER = 'user';
     })
   }
   
+  export const authenticateUser = () => {
+    
+  }
+
+
+  // MISSING ACCESS_TOKEN AND BID
 
   /**
    * 
    * @param {Redux Obj} dispatch  Sync available data to store. 
    * @returns                     Boolean: Aauthenticate state. 
    */
-  export const isAuthenticated = async (dispatch) => {
+  export const isAuthenticated = async (dispatch, authId, authEmail) => {
     if (!checkLocalStorage()) {
       return false;
     }
     try {
-      const status = await checkAccessToken();
+      const status = await checkAccessToken(authId, authEmail);
       dispatch(setBusiness(status.business));
+      // This is what im missing. Subscription details for SubscriptionContext
       dispatch(setUser({ id: status.id, email: status.email, permissions: status.permissions, subscription: status.subscription, 
-        trial: status.trial, trialStatus: status.trialStatus, emailConfirm: status.emailConfirm }))
-      dispatch(setIndex(status.defaultIndex));
-      dispatch(setAuthAccessToken(status.accessToken));
-      dispatch(setAuthCookieToken(status.token));
-      dispatch(setLocation(0));
+        trial: status.trial, trialStatus: status.trialStatus, emailConfirm: status.emailConfirm }));
+      dispatch(setIndex(status.defaultIndex)); 
+      dispatch(setAuthAccessToken(status.accessToken)); // 
+      dispatch(setAuthCookieToken(status.token)); // 
+      dispatch(setLocation(0)); 
       dispatch(setOptions(status.businessOptions));
       return true;
     } catch (error) {
@@ -109,16 +118,16 @@ const USER = 'user';
   };
   
 
+
   // Issue: The token being passed into function is not being utilized.
   //        The token used in cookie-parse rather.
   //        What i need to do: Configure a header object and pass it via Auth Bearer 'Token'
-  async function checkAccessToken() {
+  async function checkAccessToken(authId, authEmail) {
     try {
-      const token = getAccessToken();
-      const { user } = getStateData();
-      const id = user.id;
-      const email = user.email;
-      const response = await axios.post('/api/internal/refresh_access', { id, email }, { headers: { 'x-access-token': token } });
+      const all = Cookies.get();
+      const access_token = Cookies.get('accessToken');
+      console.log("Access token on file", access_token);
+      const response = await axios.post('/api/internal/refresh_access', { id: authId, email: authEmail }, { headers: { 'x-access-token': access_token } });
       if (response.status === 200) {
         return response.data;
       } else {

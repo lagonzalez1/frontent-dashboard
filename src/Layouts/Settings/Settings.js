@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy } from "react";
 import { Box, Container,Paper, Typography, Divider, Grid, Stack } from "@mui/material";
 import LocationForm from "../../components/Forms/LocationForm";
 import OpeningHoursForm from "../../components/Forms/OpeningHoursForm";
@@ -13,15 +13,18 @@ import AddEmployeeForm from "../../components/Forms/AddEmployeeForm";
 import EmployeeTable from "../../components/Employee/EmployeeTable";
 import Personalization from "../../components/Forms/Personalization";
 import NotificationForm from "../../components/Forms/NotificationForm";
-import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import { reloadBusinessData } from '../../hooks/hooks';
+import { authFields, authTokens } from "../../selectors/authSelectors";
+
 
 
 
 export default function Settings() {
 
     const business = useSelector((state) => state.business);
+    const { authEmail, authId } = useSelector((state) => authFields(state));
     const dispatch = useDispatch();
+
 
 
     const [reload, setLoading] = useState(false);
@@ -31,7 +34,7 @@ export default function Settings() {
     }
 
     useEffect(() => {
-        reloadBusinessData(dispatch);
+        reloadBusinessData(authEmail, business._id);
         return () => {
             setLoading(false);
         }

@@ -74,7 +74,7 @@ function App() {
             <Route path={'/Dashboard'} element={
                 <RequireAuth loginPath='/Login'>
                     <ThemeProvider theme={theme && theme === "light" ? DashboardThemeLight : DashboardThemeDark}>
-                      <Dashboard/>                
+                        <Dashboard/>                
                     </ThemeProvider>
                 </RequireAuth>
             }></Route>
