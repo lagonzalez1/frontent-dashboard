@@ -28,6 +28,26 @@ export const getResourcesAvailable = () => {
 }
 
 
+export const resourceInUse = (appointments, currentClient, id) => {
+  let total = []
+  if (!currentClient) {
+    for (var client of currentClient){
+      if (client.resourceTag === id && client.status.serving === true && client.status.noShow === false && client.status.cancelled === false) {
+        total.push(client);
+      }
+    }
+  }
+  if (!appointments) {
+    for (var client of appointments) {
+      if (client.resourceTag === id && client.status.serving === true && client.status.noShow === false && client.status.cancelled === false) {
+        total.push(client);
+      }
+    }
+  }
+  return total;
+}
+
+
 
 // This need to be updated based on the fact that multiple people can be on a resource.
 export const findResourceServing = (id) => {
@@ -36,16 +56,21 @@ export const findResourceServing = (id) => {
   let total = []
   const appointmentClients = business.appointments;
   const clients = business.currentClients;
-  for (var client of clients){
-    if (client.resourceTag === id && client.status.serving === true) {
-      total.push(client);
+  if (!appointmentClients) {
+    for (var client of clients){
+      if (client.resourceTag === id && client.status.serving === true) {
+        total.push(client);
+      }
     }
   }
-  for (var client of appointmentClients) {
-    if (client.resourceTag === id && client.status.serving === true) {
-      total.push(client);
+  if (!clients) {
+    for (var client of appointmentClients) {
+      if (client.resourceTag === id && client.status.serving === true) {
+        total.push(client);
+      }
     }
   }
+  
   return total;
 }
 

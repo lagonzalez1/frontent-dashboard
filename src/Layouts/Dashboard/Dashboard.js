@@ -66,28 +66,6 @@ export default function Dashboard () {
     )
     
 
-    async function checkAuthStatus() {
-        setLoading(true);
-        try {
-            // Returning false with useSelector solution
-            // Need to load all values in login. 
-            const isAuth = await isAuthenticated( dispatch, authId, authEmail, access_token );
-            if (isAuth === false) {
-                removeUserState();
-                signOut();
-                return;
-            }
-        }catch(error) {
-            removeUserState();
-            signOut();
-            return;
-        }finally {
-            setLoading(false);
-            setAuthCompleted(true);
-            //getChatters();
-        }
-    }
-
     const isUserStateSaved = async () => {
         try {
             // Wrapping the localStorage operations in a Promise
@@ -122,8 +100,6 @@ export default function Dashboard () {
 
     const tryAuthenticate = async (id, email) => {
         try {
-            console.log("tryAuthenticate id", id)
-            console.log("tryAuthenticate email", email)
             const response = await authenticateUser(id, email);
             const payload = await response.data;
             if ( payload ) {
@@ -131,7 +107,7 @@ export default function Dashboard () {
                     bid: payload.bid, subscription: payload.subscription, trialStatus: payload.trialStatus,
                     trial: payload.trial, emailConfirm: payload.confirm, defaultIndex: payload.defaultIndex, 
                     permissions: payload.permissions, bid: payload.bid}));
-                return true
+                return payload.bid;
             }
             return false;
         }
@@ -154,7 +130,6 @@ export default function Dashboard () {
                     reject(error);
                 }
             });
-
             let parse = JSON.parse(state);
             // This is failing to parse because this clears on localhost
             if (parse.currentClients === null) {
@@ -187,14 +162,14 @@ export default function Dashboard () {
     const completeCycle = async () => {
         try {
             const isSaved = await isUserStateSaved();
+            console.log(isSaved);
             if (!isSaved) {
                 removeUserState();
                 signOut();
-                Cookies.remove('accessToken');
                 setAuthCompleted(false);
                 return;
             }
-            
+            // Changed this to return bid or false
             const attemptAuth = await tryAuthenticate(isSaved.id, isSaved.email);
             if (!attemptAuth) {
                 removeUserState();
@@ -202,8 +177,9 @@ export default function Dashboard () {
                 setAuthCompleted(false);
                 return;
             }
-            await loadBusinessData(isSaved.bid, isSaved.email);
-            await getChatters(isSaved.bid, isSaved.email);
+            
+            await loadBusinessData(isSaved.bid ? isSaved.bid: isSaved.id, isSaved.email);
+            await getChatters(isSaved.bid ? isSaved.bid: isSaved.id, isSaved.email);
             setAuthCompleted(true);
             setLoading(false);
         } catch (error) {

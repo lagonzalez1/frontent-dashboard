@@ -67,6 +67,17 @@ const USER = 'user';
     removeUser();
     removeAccessToken();
     removeBusinessState();
+    removeTheme();
+  }
+
+  const removeTheme = () => {
+    try {
+      localStorage.removeItem('theme');
+    }
+    catch (error) {
+      console.log("Unable to remove theme");
+    }
+    
   }
 
   export const updateBusinessIndex = async (businessId) => {

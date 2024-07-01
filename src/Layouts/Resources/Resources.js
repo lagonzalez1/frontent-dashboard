@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef} from "react";
 import { Grid, Typography, Stack,CardContent,Avatar, Container, Dialog, DialogActions, DialogTitle, DialogContent, Switch, Button,
 Select, MenuItem, FormControlLabel, CardActionArea, IconButton, FormLabel, Paper, TableContainer, TableHead, TableCell, TableBody, TableRow, Table, FormControl, InputLabel, Divider, Slide, Box, CircularProgress } from '@mui/material';
 import { getResourcesTotal, StyledCardService, stringAvatar,
- findResourceTag, findResourceServing, updateResources, Transition } from "./ResourcesHelper"; 
+ findResourceTag, updateResources, Transition, resourceInUse } from "./ResourcesHelper"; 
 import AddResource from "../../components/AddResource/AddResource.js";
 import CloseIcon from "@mui/icons-material/Close";
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -22,6 +22,8 @@ export default function Resources() {
 
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
+    const appointments = useSelector((state) => state.business.appointments)
+    const currentClients = useSelector((state) => state.business.currentClients)
     const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
 
@@ -88,7 +90,7 @@ export default function Resources() {
 
 
     const RenderResourceInUse = ({id}) => {
-        let inUse = findResourceServing(id);
+        let inUse = resourceInUse(appointments, currentClients, id);
         if (inUse.length <= 0) { return null}
         return (
             <Box>
