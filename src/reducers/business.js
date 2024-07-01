@@ -28,14 +28,17 @@ const initialState = {
   _id: null,
   country: null,
   schedule: null,
-  noShowData: null
-
+  noShowData: null,
+  appointmentDate: null,
 };
 
 const businessSlice = createSlice({
   name: 'business',
   initialState,
   reducers: {
+    setAppointmentDate: (state, action) => {
+      state.appointmentDate = action.payload;
+    },
     setBusiness: (state, action) => {
       state.schedule = action.payload.schedule;
       state.services = action.payload.services;
@@ -75,5 +78,5 @@ const businessSlice = createSlice({
   },
 });
 
-export const { setBusiness, setWaitlistClients, setNoShowData} = businessSlice.actions;
+export const { setBusiness, setWaitlistClients, setNoShowData, setAppointmentDate} = businessSlice.actions;
 export default businessSlice.reducer;

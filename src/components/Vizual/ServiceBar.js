@@ -24,7 +24,7 @@ export default function ServiceBar({serviceData, loading}) {
                 if (serviceTitle.title === "NA"){ continue; } // Skip deleted services
                 let object = {
                     title: serviceTitle.title,
-                    avg: serviceData[i].avg,
+                    avg: Math.floor(serviceData[i].avg * 100),
                     total: serviceData[i].count
                 }
                 set.push(object);
@@ -41,8 +41,8 @@ export default function ServiceBar({serviceData, loading}) {
                 dataset={dataSet}
                 xAxis={[{ scaleType: 'band', dataKey: 'title' }]}
                 series={[
-                    {dataKey : 'avg', label: 'Average', valueFormatter},
-                    {dataKey : 'total', label: 'Totals', valueFormatter}
+                    {dataKey : 'avg', label: 'Average %', valueFormatter},
+                    {dataKey : 'total', label: 'Totals #', valueFormatter}
                 ]}
                 colors={blueberryTwilightPalette}
 

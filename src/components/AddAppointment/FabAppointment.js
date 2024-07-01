@@ -16,6 +16,7 @@ import { DateTime } from "luxon";
 import { useSubscription } from "../../auth/Subscription";
 import { usePermission } from "../../auth/Permissions";
 import LoadingButton from '@mui/lab/LoadingButton';
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 
@@ -28,7 +29,8 @@ export default function FabAppointment () {
     const [errors, setError] = useState();
     const [success, setSuccess] = useState();
     const [nextStep, setNextStep] = useState(false);
-    
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
+
 
 
     const [loading, setLoading] = useState(false);
@@ -168,7 +170,7 @@ export default function FabAppointment () {
         setLoading(true);
         const serviceTags = generateObjectServices(formik.values.size, formik.values.service_id);
         const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate, serviceTags }
-        getAvailableAppointments(payload)
+        getAvailableAppointments(payload, bid, email)
         .then(response => {
             setAppointments(response.data)
             setSuccess(response.msg)

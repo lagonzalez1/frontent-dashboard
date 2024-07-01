@@ -7,4 +7,4 @@ const id = (state) => state.user.id;
 const bid = (state) => state.user.bid;
 
 
-export const payloadAuth = createSelector([id, email, bid], (id, email, bid) => { return {id, email, bid}});
+export const payloadAuth = createSelector([id, email, bid], (id, email, bid) => { return {id, email, bid}} );

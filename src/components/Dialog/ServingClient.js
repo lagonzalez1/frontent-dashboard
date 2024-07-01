@@ -3,8 +3,9 @@ import { Dialog, Button, IconButton, DialogActions, Typography, DialogContent, D
 import CloseIcon from "@mui/icons-material/Close"
 import { DateTime } from "luxon";
 import { getEmployeeList, moveClientServing } from "../../hooks/hooks";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSnackbar } from "../../reducers/user";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 const ServingClient = ({open, onClose, clientId, type}) => {
@@ -12,10 +13,11 @@ const ServingClient = ({open, onClose, clientId, type}) => {
     const dispatch = useDispatch();
     const employeeList = getEmployeeList();
     const [employeeId, setEmployeeId] = useState('');
+    const {id, email, bid} = useSelector(state => payloadAuth(state));
 
     const sendClientServing = (clientId, type) => {
         console.log(`Sending client ${clientId} from ${type} to serving`)
-        moveClientServing(clientId, type, employeeId)
+        moveClientServing(clientId, type, employeeId, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })

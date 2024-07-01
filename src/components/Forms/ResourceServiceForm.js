@@ -9,6 +9,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
 import { LoadingButton } from "@mui/lab";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 export default function ResourceServiceForm ({ reloadPage }) {
@@ -21,6 +22,7 @@ export default function ResourceServiceForm ({ reloadPage }) {
     const [serviceId, setServiceId] = useState(null)
     const [disable, disableDelete] = useState(false);
     const [loading, setLoading] = useState(false);
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
     const dispatch = useDispatch();
     
@@ -60,9 +62,8 @@ export default function ResourceServiceForm ({ reloadPage }) {
         if (value.delete === true) {
             setLoading(true)
             console.log(serviceId);
-            const payload = { ...value, serviceId }
-
-            requestRemoveService(payload)
+            const payload = { ...value, serviceId}
+            requestRemoveService(payload, bid, email)
             .then(response => {
                 dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
             })
@@ -77,8 +78,8 @@ export default function ResourceServiceForm ({ reloadPage }) {
             return;
         }
         setLoading(true)
-        const payload = { ...value, serviceId }
-        updateService(payload)
+        const payload = { ...value, serviceId}
+        updateService(payload, bid, email )
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
@@ -96,7 +97,7 @@ export default function ResourceServiceForm ({ reloadPage }) {
         if (value.delete === true) {
             const payload = { ...value, resourceId }
             setLoading(true);
-            requestRemoveResource(payload)
+            requestRemoveResource(payload, bid, email )
             .then(response => {
                 dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
             })

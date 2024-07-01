@@ -17,19 +17,10 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
  * Middleware OK
  *                  
  */
-export const addCustomerWaitlist = (payload) => {
+export const addCustomerWaitlist = (payload, bid, email, timezone, timestamp) => {
     return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
-      const id = user.id;
-      const b_id = business._id;
-      const timezone = business.timezone;
-      const timestamp = DateTime.local().setZone(business.timezone).toISO();
-
       
-      
-      const data = { id, b_id, timezone, payload: {...payload, timestamp}, email: user.email };
+      const data = { id, b_id: bid, timezone, payload: {...payload, timestamp}, email };
       axios.post('/api/internal/create_client', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
           resolve(response.data);

@@ -16,15 +16,17 @@ import { setReload, setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
 import { useSubscription } from "../../auth/Subscription";
 import PersonIcon from '@mui/icons-material/Person';
+import { payloadAuth } from "../../selectors/requestSelectors";
+import { DateTime } from "luxon";
 
 
 
 export default function FabButton () {
 
     const dispatch = useDispatch();
-    const accessToken = useSelector((state) => state.tokens.access_token);
-
     const { cancelledSubscription } = useSubscription();
+    const {bid, email, id} = useSelector((state) => payloadAuth(state));
+    
     const [open, setOpen] = useState(false);
     const [errors, setError] = useState();
     const business = useSelector((state) => state.business);
@@ -48,8 +50,8 @@ export default function FabButton () {
     }, [])
 
     const getWaittime = () => {
-        if (accessToken === undefined ) { return;}
-        getWaitlistWaittime(accessToken)
+        const date = DateTime.local().setZone(business.timezone).toISO();
+        getWaitlistWaittime(bid, email, date)
         .then(response => {
             setWaittime(response.waittimeObject);
         })
@@ -63,7 +65,10 @@ export default function FabButton () {
 
     const handleSubmit = (payload) => {
         setLoading(true);
-        addCustomerWaitlist(payload)
+
+        const timezone = business.timezone;
+        const timestamp = DateTime.local().setZone(business.timezone).toISO();
+        addCustomerWaitlist(payload, bid, email, timezone, timestamp)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
         })

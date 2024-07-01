@@ -24,7 +24,6 @@ export const getEmployeeImageRef = () => {
  */
 export const requestEmployeeAdd = (formData, config) => {
     return new Promise((resolve, reject) => {
-        
         axios.post('/api/internal/add_employee', formData, {...config, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data.msg);
@@ -52,10 +51,6 @@ export const requestEmployeeAdd = (formData, config) => {
 // * Middleware OK
 export const requestEmployeeEdit = (formData, config) => {
     return new Promise((resolve, reject) => {
-        const { user, business} = getStateData();
-        const b_id = business._id;
-        //const headers = getHeaders();
-        //const data = { payload: {...payload}, b_id, email: user.email}
         axios.post('/api/internal/edit_employee', formData, {...config, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data.msg);
@@ -89,13 +84,10 @@ export const requestEmployeeEdit = (formData, config) => {
  *  * Middleware OK
 
  */
-export const requestRemoveEmployee = (employeeId) => {
+export const requestRemoveEmployee = (employeeId, bid, email) => {
     return new Promise((resolve, reject) => {
-        const { user, business} = getStateData();
-        const b_id = business._id;
-        const headers = getHeaders();
-        const data = { employeeId, b_id, email: user.email}
-        axios.post('/api/internal/remove_employee', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        const data = { employeeId, b_id: bid, email}
+        axios.post('/api/internal/remove_employee', data, {timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data.msg);
         })
@@ -129,13 +121,12 @@ export const requestRemoveEmployee = (employeeId) => {
  *  * Middleware OK
 
  */
-export const requestBlockEmployee = (payload) => {
+export const requestBlockEmployee = (payload, bid, email) => {
     return new Promise((resolve, reject) => {
-        const { user, business} = getStateData();
-        const b_id = business._id;
+
         const headers = getHeaders();
-        const data = { ...payload, b_id, email: user.email}
-        axios.post('/api/internal/block_employee', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        const data = { ...payload, b_id: bid, email}
+        axios.post('/api/internal/block_employee', data, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data.msg);
         })

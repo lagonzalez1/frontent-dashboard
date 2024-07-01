@@ -13,7 +13,7 @@ import { Table, TableCell, TableHead, TableBody, Button, Typography, Container
 import { useDispatch, useSelector } from "react-redux";
 import AddEmployeeForm from "../Forms/AddEmployeeForm";
 import CloseIcon from "@mui/icons-material/Close"
-import { requestRemoveEmployee, requestBlockEmployee, getEmployeeImageRef } from "../FormHelpers/AddNewEmployeeFormHelper";
+import { requestRemoveEmployee, requestBlockEmployee } from "../FormHelpers/AddNewEmployeeFormHelper";
 import { setSnackbar } from "../../reducers/user";
 import EmployeeScheduleForm from "../Forms/EmployeeScheduleForm";
 import BorderColorRoundedIcon from '@mui/icons-material/BorderColorRounded';
@@ -26,11 +26,12 @@ import { LoadingButton } from "@mui/lab";
 import { Calendar, Eye, EyeClosed, PencilSimpleLine, Trash } from "phosphor-react";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import { Transition } from "../FormHelpers/OpeningHoursHelper";
+import { payloadAuth } from "../../selectors/requestSelectors";
 // Show table of employees
 // Allow to delete and add employees
 
 
-export default function EmployeeTable({reloadPage}) {
+export default function EmployeeTable() {
 
 
     const { canEmployeeEdit, checkPermission } = usePermission();
@@ -38,6 +39,7 @@ export default function EmployeeTable({reloadPage}) {
     const { checkSubscription, cancelledSubscription } = useSubscription();
     //const employees = useSelector((state) => state.business.employees);
     const business = useSelector((state) => state.business);
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
 
     const [employeeDialog, setEmployeeDialog] = useState(false);
@@ -91,7 +93,7 @@ export default function EmployeeTable({reloadPage}) {
     }
     const removeEmployee = (id) => {
         setLoading(true);
-        requestRemoveEmployee(id)
+        requestRemoveEmployee(id, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
         })
@@ -147,6 +149,10 @@ export default function EmployeeTable({reloadPage}) {
         }
     }, [reload])
 
+    const reloadPage = () => {
+        setReload(true);
+    }
+
     const changevisibility= () => {
         if (!employee) { 
             console.log("Set error message change visibility");
@@ -158,7 +164,7 @@ export default function EmployeeTable({reloadPage}) {
         const data = { revert: visibility.revert,
             lastUpdate: currentDate, show: visibility.show, hide: visibility.hide,
             eid: employee._id}
-        requestBlockEmployee(data)
+        requestBlockEmployee(data, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
         })
@@ -174,7 +180,7 @@ export default function EmployeeTable({reloadPage}) {
     }
 
     const getEmployeeList = () => {
-        getEmployees()
+        getEmployees(bid, email)
         .then(response => {
             setEmployees(response.employees);
         })
@@ -187,8 +193,8 @@ export default function EmployeeTable({reloadPage}) {
     const ShowVisibilityOptions = ({employee}) => {
         if (employee.visibility.lastUpdate === null) {
             return (
-                <Typography variant="body1">
-                    {'No active changes as of now.'}
+                <Typography variant="body1" color={'warning'}>
+                    {'-No active changes as of now.'}
                 </Typography>
             )
         }
@@ -201,7 +207,7 @@ export default function EmployeeTable({reloadPage}) {
             if (isSameDay) {
                 return (
                     <Stack spacing={1} direction={'row'}>
-                    <Typography variant="body1">
+                    <Typography variant="body1" color={'error'}>
                         {hide ? "- " + currentDate.toLocaleString() + ' HIDDEN': null}
                         {show ? "-  " + currentDate.toLocaleString() + ' VISIBLE' : null}
                     </Typography>
@@ -216,7 +222,7 @@ export default function EmployeeTable({reloadPage}) {
             }
             else {
                 return (
-                    <Typography variant="body1">
+                    <Typography variant="body1" color={'warning'}>
                         {'No active changes.'}
                     </Typography>
                 )
@@ -227,44 +233,35 @@ export default function EmployeeTable({reloadPage}) {
     return (
         <>
 
-            <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+            <List sx={{ width: '100%', bgcolor: 'background.paper', maxHeight: '400'}}>
                 {employees ? employees.map((employee, index) => {
                     return (
                         <>
                         <ListItem  
                             secondaryAction = {
                             <Stack direction={'row'} spacing={1}>
+                               
                                 <Tooltip title="delete employee" placement="top">
-                                <IconButton disabled={!checkPermission('EMPL_REMOVE')} onClick={() => confirmDelete(employee._id)}>
-                                    <Stack sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                        <Trash size={20} weight="duotone" />
+                                    <Button startIcon={<Trash size={20} weight="duotone" />} disabled={!checkPermission('EMPL_REMOVE')} onClick={() => confirmDelete(employee._id)}>
                                         <Typography variant="caption">delete</Typography>
-                                    </Stack>
-                                </IconButton>
+                                    </Button>
                                 </Tooltip>
+
                                 <Tooltip title="edit employee schedule" placement="top">
-                                <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editEmployee(employee)}>
-                                    <Stack sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                        <PencilSimpleLine size={20} weight="duotone" />
+                                <Button startIcon={<PencilSimpleLine size={20} weight="duotone" />} disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editEmployee(employee)}>
                                         <Typography variant="caption">edit</Typography>
-                                    </Stack>
-                                </IconButton>
+                                </Button>
                                 </Tooltip>
+
                                 <Tooltip title="add employee schedule" placement="top">
-                                <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editSchedule(employee)}>
-                                    <Stack sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                        <Calendar size={20} weight="duotone" />
+                                <Button startIcon={<Calendar size={20} weight="duotone" />} disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => editSchedule(employee)}>
                                         <Typography variant="caption">schedule</Typography>
-                                    </Stack>
-                                </IconButton>
+                                </Button>
                                 </Tooltip>
                                 <Tooltip title="Make employee available/unavailable" placement="top">
-                                <IconButton disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => showQuickActions(employee)}>
-                                    <Stack sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                        <Eye size={20} weight="duotone" />
-                                        <Typography variant="caption">visibility</Typography>
-                                    </Stack>
-                                </IconButton>
+                                <Button startIcon={<Eye size={20} weight="duotone" />} disabled={!canEmployeeEdit(employee._id, 'EMPL_EDIT')} onClick={() => showQuickActions(employee)}>
+                                    <Typography variant="caption">visibility</Typography>
+                                </Button>
                                 </Tooltip>
                             </Stack>
                         }
@@ -454,7 +451,8 @@ export default function EmployeeTable({reloadPage}) {
            </DialogTitle>
 
             <DialogContent>
-                <Typography variant="body1" gutterBottom>Toggle employee visibility for waitlist and appointments for the remainder of today.</Typography>
+                <Typography variant="body1" gutterBottom>Change employee visability for today.</Typography>
+                <Typography variant="body1" gutterBottom>In part, employee will not be bookable until the end of today.</Typography>
                 
                 {employee && <ShowVisibilityOptions employee={employee} /> }
 

@@ -12,6 +12,7 @@ import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";
 import { Lock, QrCode } from "phosphor-react";
 import { Close } from "@mui/icons-material";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 export default function Personalization ({reloadPage}) {
 
@@ -22,6 +23,7 @@ export default function Personalization ({reloadPage}) {
     const link = useSelector((state) => state.business.publicLink);
     const imageRef = useSelector((state) => state.business.settings.profileImage);
     const dispatch = useDispatch();
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
     const [error, setError] = useState(null);
     const [image, setImage] = useState(null);
@@ -52,7 +54,15 @@ export default function Personalization ({reloadPage}) {
 
 
     const getCurrentProfileImage = () => {
-        axios.get('api/internal/get_profile_image/'+imageRef)
+
+        const config = {
+            headers : {
+                'Content-type': 'multipart/form-data'
+            },
+            timeout: 90000,
+            timeoutErrorMessage: 'Timeout error'
+        }
+        axios.get('/api/internal/get_profile_image', {...config, params: {id: imageRef, email, bid},  timeout: 90000, timeoutErrorMessage: 'Timeout error.' })
         .then(response => {
             if (response.status === 200) {
                 setProfileImage(response.data);
@@ -106,19 +116,20 @@ export default function Personalization ({reloadPage}) {
     }
 
     const uploadImage = () => {
-        const { user, business} = getStateData();
-        const token = getAccessToken();
         const config = {
             headers : {
-                'X-Access-token': token,
                 'Content-type': 'multipart/form-data'
-            }
+            },
+            timeout: 90000,
+            timeoutErrorMessage: 'Timeout error'
         }
+        
         const formData = new FormData();
         const file = dataURLtoBlob(image.image);
         formData.append('profile_image', file, image.name);
-        formData.append('b_id', business._id)
+        formData.append('b_id', bid)
         formData.append('profileImage', imageRef ? imageRef: null);
+        formData.append('email', email);
         setLoading(true);
         axios.post('/api/internal/upload_profile_image', formData, config)
         .then(response => {

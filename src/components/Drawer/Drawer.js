@@ -28,6 +28,7 @@ import ServingClient from "../Dialog/ServingClient";
 import { removeClient } from "../Waitlist/Helpers";
 import { LoadingButton } from "@mui/lab";
 import { FactCheckOutlined } from "@mui/icons-material";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 
@@ -36,8 +37,10 @@ const Drawer = ({client, setClient}) => {
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
     const { checkSubscription } = useSubscription();
+
     const services = useSelector((state) => state.business.services);
     const employees = useSelector((state) => state.business.employees);
+    const { bid, email, id } = useSelector(state => payloadAuth(state));
     const [value, setValue] = React.useState('1');
     const [payload, setPayload] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -63,7 +66,8 @@ const Drawer = ({client, setClient}) => {
     };
 
     const moveClientComplete = (client) => {
-        completeClientAppointment(client)
+        const currentTime = DateTime.local().setZone(business.timezone).toISO();
+        completeClientAppointment(client, currentTime, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         }).catch(error => {
@@ -97,8 +101,10 @@ const Drawer = ({client, setClient}) => {
     }
 
     const sendChatClient = () => {
-        setChatLoading(true)
-        sendChatToClient(chat, payload._id, payload.type)
+        setChatLoading(true);
+        const timestamp = DateTime.local().setZone(business.timezone).toISO();
+
+        sendChatToClient(chat, payload._id, payload.type, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
             setLoading(false)
@@ -132,7 +138,7 @@ const Drawer = ({client, setClient}) => {
 
     const undoClient = (clientId) => {
         const data = {clientId, type: payload.type}
-        undoClientServing(data)
+        undoClientServing(data, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
@@ -177,7 +183,7 @@ const Drawer = ({client, setClient}) => {
 
 
     const sendClientNoShow = (payload) => {
-        requestNoShow(payload._id, payload.type)
+        requestNoShow(payload._id, payload.type, bid, email)
           .then((client) => {
             console.log(client)
             if (!client) {

@@ -15,7 +15,8 @@ import { findClient } from "../../hooks/hooks";
 // Current data
 
 const ENDPOINT_ACCEPTING = '/api/internal/update_accepting' 
-
+let GET_NOSHOW = '/api/internal/no_show';
+let GET_WAITLIST = '/api/internal/get_waitlist';
 
 export const handleOpenNewTab = (endpoint) => {
     const url = 'https://waitonline.us/welcome/'+endpoint;
@@ -45,13 +46,11 @@ export const requestBusinessState = () => {
 
 
 //* Middleware OK
-export const requestNoShow = (clientId, type) => {
+export const requestNoShow = (clientId, type, bid, email) => {
   return new Promise((resolve, reject) => {
-    const { user, business } = getStateData();
-    const accessToken = getAccessToken();
-    const headers = { headers: { 'x-access-token': accessToken } };
-    const payload = { bId: business._id, clientId, type, email: user.email}
-    axios.post('/api/internal/noShow', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    
+    const payload = { bId: bid, clientId, type, email}
+    axios.post('/api/internal/noShow', payload, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       resolve(response.data)
 
@@ -88,23 +87,16 @@ export const requestNoShow = (clientId, type) => {
  *  * Middleware OK
 
  */
-export const requestChangeAccept = (accepting) => {
+export const requestChangeAccept = (accepting, bid, email, currentDate) => {
   return new Promise((resolve, reject) => {
-    const { user, business } = getStateData();
-    const accessToken = getAccessToken();
-    const email = user.email;
-    const b_id = business._id;
-    const headers = { headers: { 'x-access-token': accessToken } };
-    const currentDate = DateTime.local().setZone(business.timezone).toISO();
     const requestBody = {
       currentDate,
-      accessToken,
       email: email,
-      b_id,
+      b_id: bid,
       accepting
     };
 
-    axios.put(ENDPOINT_ACCEPTING, requestBody, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    axios.put(ENDPOINT_ACCEPTING, requestBody, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         resolve(response.data); // Resolve the promise with the response data
       })
@@ -139,13 +131,11 @@ export const requestChangeAccept = (accepting) => {
  *                    Grab ref to client timestamp below.
  * Middleware OK
  */
-export const moveClientUp = (clientId, currentClients) => {
+export const moveClientUp = (clientId, currentClients, bid, email, timezone) => {
   return new Promise((resolve, reject) => {
-    const { user, business } = getStateData();
     const list = currentClients;
     // No change to be made since list to small.
     if (list.length < 2) { return resolve('No changes made.'); }
-    const timezone = business.timezone;
     let clientAbove = null;
     let clientTimestamp = null;
     // Find client below.
@@ -168,11 +158,9 @@ export const moveClientUp = (clientId, currentClients) => {
     }
     if (clientAbove !== null && clientTimestamp !== null) {
       const clientAboveTimestamp = DateTime.fromISO(clientAbove.timestamp).setZone(timezone).toISO()
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
 
-      const payload = { clientId, clientTimestamp, clientSwapId: clientAbove._id ,bId: business._id, clientSwapTimestamp :clientAboveTimestamp, email: user.email}
-      axios.put('/api/internal/update_timestamp', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+      const payload = { clientId, clientTimestamp, clientSwapId: clientAbove._id ,bId: bid, clientSwapTimestamp :clientAboveTimestamp, email}
+      axios.put('/api/internal/update_timestamp', payload, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         if(response.status === 200){
           resolve(response.data.msg);
@@ -212,13 +200,11 @@ export const moveClientUp = (clientId, currentClients) => {
  *  * Middleware OK
 
  */
-export const moveClientDown = (clientId, currentClients) => {
+export const moveClientDown = (clientId, currentClients, bid, email, timezone) => {
   return new Promise((resolve, reject) => {
-    const { user, business } = getStateData();
     const list = currentClients
     // No change to be made since list to small.
     if (list.length < 2) { return resolve('No changes made'); }
-    const timezone = business.timezone;
     let clientBelow = null;
     let clientTimestamp = null;
     console.log("LIST: ", list)
@@ -242,11 +228,8 @@ export const moveClientDown = (clientId, currentClients) => {
     }
     if (clientBelow !== null && clientTimestamp !== null) {
       const clientSwapTimestamp = DateTime.fromISO(clientBelow.timestamp).setZone(timezone).toISO();
-
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
-      const payload = { clientId, clientTimestamp, bId: business._id, clientSwapTimestamp, clientSwapId: clientBelow._id, email: user.email}
-      axios.put('/api/internal/update_timestamp',payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+      const payload = { clientId, clientTimestamp, bId: bid, clientSwapTimestamp, clientSwapId: clientBelow._id, email}
+      axios.put('/api/internal/update_timestamp',payload, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         if(response.status === 200){
           resolve(response.data.msg);
@@ -278,15 +261,70 @@ export const moveClientDown = (clientId, currentClients) => {
 }
 
 
+export const getNoShowClients = (bid, email) => {
+  return new Promise((resolve, reject) => {
+      axios.get(GET_NOSHOW, { params: {bid, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+      .then(response => {
+          resolve(response);
+      })
+      .catch(error => {
+          console.log(error);
+          if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+              reject('Request timed out. Please try again later.'); // Handle timeout error
+          }
+          if (error.response) {
+              console.log(error.response);
+              reject({msg: 'Response error', error: error.response});
+          }
+          else if (error.request){
+              console.log(error.request);
+              reject({msg: 'No response from server', error: error.request})
+          }
+          else {
+              reject({msg: 'Request setup error', error: error.message})
+          }
+          
+      })
+  })
+}
+
+// Need to complete, this is the waitlist on Dashboard
+export function getWaitlistTable (bid, email, time) {
+    
+  return new Promise((resolve, reject) => {   
+      axios.get(GET_WAITLIST,{ params: {time, bid, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+      .then(response => {
+          resolve(response.data.result);
+      })
+      .catch(error => {
+          console.log(error);
+          if (error.code === 'ECONNABORTED' && error.message === 'Timeout error') {
+              reject('Request timed out. Please try again later.'); // Handle timeout error
+          }
+          if (error.response) {
+              console.log(error.response);
+              reject({msg: 'Response error', error: error.response});
+          }
+          else if (error.request){
+              console.log(error.request);
+              reject({msg: 'No response from server', error: error.request})
+          }
+          else {
+              reject({msg: 'Request setup error', error: error.message})
+          }
+          
+      })
+  })
+}
+
+
 
 // Middleware OK
-export const removeClient = (id, type) => {
-  const { user, business } = getStateData();
-  const accessToken = getAccessToken();
-  const payload = { clientId: id, bId: business._id, type, email: user.email };
-  const headers = { headers: { 'x-access-token': accessToken } };
+export const removeClient = (id, type, bid, email) => {
+ 
+  const payload = { clientId: id, bId: bid, type, email };
   return new Promise((resolve, reject) => {
-    axios.post('/api/internal/remove_client', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    axios.post('/api/internal/remove_client', payload, {timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then((response) => {
         resolve(response.data.msg);
       })

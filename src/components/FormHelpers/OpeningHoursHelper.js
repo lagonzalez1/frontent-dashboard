@@ -10,12 +10,9 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 
 export const DAYOFWEEK = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
 
-export const requestTimezoneChange = (timezone) => {
+export const requestTimezoneChange = (timezone, bid, email) => {
   return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
-      axios.put('/api/internal/update_timezone', {timezone, b_id: business._id}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+      axios.put('/api/internal/update_timezone', {timezone, b_id: bid, email}, { timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
       .then(response => {
         resolve(response.data);
       })
@@ -41,12 +38,10 @@ export const requestTimezoneChange = (timezone) => {
   })
 }
 
-export const requestRemoveCloseDate = (dateId) => {
+export const requestRemoveCloseDate = (dateId, bid, email) => {
   return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
-      axios.put('/api/internal/remove_close_date', {dateId, b_id: business._id}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+
+      axios.put('/api/internal/remove_close_date', {dateId, b_id: bid, email}, { timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
       .then(response => {
         resolve(response.data);
       })
@@ -73,13 +68,10 @@ export const requestRemoveCloseDate = (dateId) => {
 }
 
 
-export const requestScheduleChange = (payload) => {
+export const requestScheduleChange = (payload, bid, email) => {
   return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
       const schedule = {...payload}
-      axios.put('/api/internal/update_schedule', {schedule, b_id: business._id}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+      axios.put('/api/internal/update_schedule', {schedule, b_id: bid, email}, { timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
       .then(response => {
         resolve(response.data);
       })
@@ -106,13 +98,9 @@ export const requestScheduleChange = (payload) => {
 }
 
 
-export const requestClosedDate = (date, employeeId, start, end) => {
+export const requestClosedDate = (date, employeeId, start, end, bid, email) => {
   return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
-      
-      axios.put('/api/internal/insert_closed_date', {date, b_id: business._id, employeeId, start, end}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+      axios.put('/api/internal/insert_closed_date', {date, b_id: bid, email, employeeId, start, end, }, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         resolve(response.data);
       })

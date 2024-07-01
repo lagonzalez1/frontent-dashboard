@@ -5,6 +5,8 @@ import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import axios from "axios";
 import { startSubscriptionTest } from "../FormHelpers/StartSubscriptionHelper";
 import { CURRENT_PLANS } from "../../static/static";
+import { payloadAuth } from "../../selectors/requestSelectors";
+import { useSelect } from "@mui/base";
 
 
 
@@ -14,12 +16,13 @@ const StartSubscription = ({open, onClose, plan}) => {
     // Access-Control-Allow-Origin is denying this redirect 
     // This request returns back a 303 redirect with the header containing my link to stripe.
     // My page is from origin: localhost:3000 -> stripe.com/...
+    const {id, email, bid} = useSelect((state) => payloadAuth(state));
 
     const testingSubscription = () => {
         console.log("Cllicked")
         // Hard coded price of item in stripe
         if (plan !== "" || plan !== undefined || plan !== null) {
-            startSubscriptionTest(plan)
+            startSubscriptionTest(plan, bid, email)
             .then(res => {
                 // Redirect user to stripe.
                 window.location.href = res.data.link;

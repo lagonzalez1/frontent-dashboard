@@ -16,7 +16,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 
-import { findEmployee, moveClientServing, getAppointmentTable, sendNotification, searchServices, searchEmployees } from "../../hooks/hooks";
+import {  moveClientServing, getAppointmentTable, sendNotification, searchServices, searchEmployees } from "../../hooks/hooks";
 import { APPOINTMENT, APPOINTMENT_DATE_SELECT } from "../../static/static";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
@@ -29,22 +29,29 @@ import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGener
 import SortRoundedIcon from '@mui/icons-material/SortRounded';
 
 import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
-import { Add, ArrowRightAltOutlined, Bolt, ChatRounded, CloseRounded, CloudDone, EventAvailableOutlined, FmdGoodRounded, KeyboardArrowDown, KeyboardArrowDownOutlined, KeyboardArrowLeft, KeyboardArrowLeftRounded, KeyboardArrowRightRounded, Remove } from "@mui/icons-material";
+import { Add, ArrowRightAltOutlined, Bolt, ChatRounded, CloseRounded, CloudDone, EventAvailableOutlined, FmdGoodRounded, KeyboardArrowDown, KeyboardArrowDownOutlined
+    , KeyboardArrowLeftRounded, KeyboardArrowRightRounded, Remove } from "@mui/icons-material";
 import { useFormik } from "formik";
 import * as Yup from 'yup';
 import LoadingButton from "@mui/lab/LoadingButton";
-import { ButtonGroup } from "react-bootstrap";
 import ChatBusiness from "../../components/Chat/ChatBusiness";
+import { payloadAuth } from "../../selectors/requestSelectors";
+import { setAppointmentDate} from "../../reducers/business";
+import { removeChatId } from "../../reducers/businessChatter";
+import { sortAppointmentListByEmployees } from "../../selectors/businessSelectors";
+
 
 const Appointments = ({setClient, setEditClient}) => {
     const dispatch = useDispatch();
     const { checkPermission } = usePermission();
 
-    const accessToken = useSelector((state) => state.tokens.access_token);
     const business = useSelector((state) => state.business);
+    const state = useSelector(state => state);
+    const timezone = useSelector((state) => state.business.timezone);
     const employeeList = useSelector((state) => state.business.employees);
     const serviceList = useSelector((state) => state.business.services);
-
+    const chatUpdates = useSelector((state) => state.businessChatter.newChatIds);
+    const { bid, email, id } = useSelector((state) => payloadAuth(state));
 
     const [loading, setLoading] = useState(false);
     const [reloadPage, setReloadPage] = useState(false);
@@ -55,15 +62,15 @@ const Appointments = ({setClient, setEditClient}) => {
     const [slotMessage, setSlotMessage] = useState({title: null, body: null });
     const [quickViewLoader, setQuickViewLoader] = useState(false);
     const [chatClient, setChatClient] = useState({ payload: null, open: false});
-
-
+    const [sortClients, setSortClients] = useState(false)
 
     const [highlightedDays, setHighlightedDays] = useState([]);
     const [data, setData] = useState([]);
 
     const baseLineDate = DateTime.local().setZone(business.timezone);
-
     const currentDate = DateTime.local().setZone(business.timezone);
+
+
     const [selectedDate, setSelectedDate] = useState();
     const [phoneNumber, setPhoneNumber] = useState(null);
 
@@ -71,6 +78,7 @@ const Appointments = ({setClient, setEditClient}) => {
     const [quickViewDate, setQuickViewDate] = useState(currentDate);
     const [serviceTags, setServiceTags] = useState({});
     const [checked, setChecked] = useState([]);
+
 
     const handleToggle = (value, service) => () => {
         const currentIndex = checked.indexOf(value);
@@ -90,6 +98,7 @@ const Appointments = ({setClient, setEditClient}) => {
     const handleAppointmentClick = (index, slot) => {
         setSelectedAppointment(() => ({index: index, slot: slot }))
     }
+    
 
     useEffect(() => {
         getLastSearchedDate();
@@ -101,11 +110,11 @@ const Appointments = ({setClient, setEditClient}) => {
     function getLastSearchedDate () {
         const date = sessionStorage.getItem(APPOINTMENT_DATE_SELECT);
         if (date) {
-            if (accessToken === undefined) { return; }
             setLoading(true);
             let lastDate = DateTime.fromISO(date, {zone: 'utc'});
+            dispatch(setAppointmentDate(lastDate.toISO()));
             setSelectedDate(lastDate)
-            getAppointmentTable(lastDate, accessToken)
+            getAppointmentTable(lastDate, bid, email)
             .then(response => {
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
@@ -119,10 +128,10 @@ const Appointments = ({setClient, setEditClient}) => {
             })
         }
         else {
-            if (accessToken === undefined) { return;}
             setLoading(true);
             setSelectedDate(currentDate)
-            getAppointmentTable(currentDate, accessToken)
+            dispatch(setAppointmentDate(currentDate.toISO()));
+            getAppointmentTable(currentDate, bid, email)
             .then(response => {
                 setHighlightedDays(response.highlightDays)
                 setData(response.data);
@@ -139,7 +148,8 @@ const Appointments = ({setClient, setEditClient}) => {
     }
 
     const sendClientServing = (clientId) => {
-        moveClientServing(clientId, APPOINTMENT)
+        const currentTime = DateTime.local().setZone(business.timezone).toISO();
+        moveClientServing(clientId, APPOINTMENT,'', bid, email, currentTime)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
@@ -154,6 +164,7 @@ const Appointments = ({setClient, setEditClient}) => {
 
     function handleDateChange(date) {
         const dateObj = date.startOf('day').toISO();
+        dispatch(setAppointmentDate(date));
         sessionStorage.setItem(APPOINTMENT_DATE_SELECT, dateObj); 
         setReloadPage(true);
     };
@@ -166,7 +177,7 @@ const Appointments = ({setClient, setEditClient}) => {
     }
     const sendClientNotification = (clientId) => {
         const payload = {clientId: clientId, type: APPOINTMENT}
-        sendNotification(payload)
+        sendNotification(payload, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })
@@ -177,14 +188,16 @@ const Appointments = ({setClient, setEditClient}) => {
 
     const openChat = (item) => {
         setChatClient((prev) => ({...prev, open: true, payload: item}));
+        dispatch(removeChatId({id: item.chatter}));
     }
     const closeChat = () => {
         setChatClient({open: false, payload: null});
     }
 
     const sortByEmployees = () => {
-        if (data.length === 0) { return ; }
-
+        setSortClients((prev) => !prev);
+        const sorted = sortAppointmentListByEmployees(state);
+        setData(sorted);
     }
 
     const handelMonthChage = (date) => {
@@ -225,11 +238,11 @@ const Appointments = ({setClient, setEditClient}) => {
             setSlotMessage({title: null, body: null});
             return;
         }
-        const date = DateTime.fromISO(quickViewDate).toISO();
+        const date = DateTime.fromISO(quickViewDate).startOf('day').toISO();
         const appointment = { start: selectedAppointment.slot.start, end: selectedAppointment.slot.end}
         const timestamp = DateTime.local().setZone(business.timezone).toISO();
         const data = { ...values, appointmentDate: date, appointment: appointment, serviceTags, timestamp};
-        createAppointmentPretense(data)
+        createAppointmentPretense(data, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
@@ -239,7 +252,6 @@ const Appointments = ({setClient, setEditClient}) => {
                 return;
             }
             dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}));
-
         })
         .finally(() => {
             setQuickViewLoader(false);
@@ -318,6 +330,7 @@ const Appointments = ({setClient, setEditClient}) => {
 
     const handleEmployeeClick = (e) => {
         formik.setFieldValue('employee_id', e)
+        formik.setFieldValue('service_id', '')
     }
 
 
@@ -335,6 +348,7 @@ const Appointments = ({setClient, setEditClient}) => {
 
     const handleQuickViewDateChange = (date) => {
         setSlots([]);
+        setSelectedAppointment({index: null, slot: null})
         let dateChange = date.startOf('day');
         setQuickViewDate(dateChange);
     }
@@ -351,15 +365,13 @@ const Appointments = ({setClient, setEditClient}) => {
 
     useEffect(() => {
         loadAllAvailableSlots()
-        // IF  employee_id, service_id are ok reload the available slots
-        // AXIOS
     } ,[serviceTags, quickViewDate])
 
     const loadAllAvailableSlots = () => {
         let tags = isServiceTagsUsed();
         if (formik.values.employee_id && formik.values.service_id && Object.keys(tags).length > 0) {
             setSlotMessage({title: null, body: null});
-            getAllSlotsAppointments(formik.values.employee_id, quickViewDate.toISO(), formik.values.service_id, tags)
+            getAllSlotsAppointments(formik.values.employee_id, quickViewDate.toISO(), formik.values.service_id, tags, bid, email)
             .then(response => {
                 if (response.status === 201) {
                     setSlotMessage({title: 'Alert', body: response.data.msg})
@@ -371,14 +383,13 @@ const Appointments = ({setClient, setEditClient}) => {
             })
             .catch(error => {
                 console.log(error);
-                dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+                dispatch(setSnackbar({requestMessage: "Unable to get appointment scheduled. Try again later.", requestStatus: true}))
             })
             .finally(() => {
                 // Loaders
             })
         }
-        console.log("idle");
-        
+        dispatch(setSnackbar({requestMessage: "Please select an employee, service and an appointment slot."}))
     }
     
 
@@ -420,13 +431,13 @@ const Appointments = ({setClient, setEditClient}) => {
                         </Grid>
                         <Grid item>
                         <Tooltip title="Sort your appointment list by employee" placement="bottom">
-                            <Chip onClick={() => sortByEmployees()} color="warning" icon={<SortRoundedIcon />} label={'Group by employee'} />
+                            <Chip onClick={() => sortByEmployees()} color={sortClients ? "success": "warning"} icon={<SortRoundedIcon />} label={'Group by employee'} />
                         </Tooltip>
                         </Grid>
 
                         <Grid item>
                         <Tooltip title="Check availability" placement="bottom">
-                            <Chip onClick={() => openQuickView()} color="warning" icon={<Bolt />} label={'Availability'} />
+                            <Chip onClick={() => openQuickView()} color={quickView ? "success": "warning"} icon={<Bolt />} label={'Availability'} />
                         </Tooltip>
                         </Grid>
                     </Grid>
@@ -674,6 +685,8 @@ const Appointments = ({setClient, setEditClient}) => {
                                             id="notes"
                                             name="notes"
                                             label="Notes"
+                                            multiline
+                                            rows={2}
                                             placeholder="Additional notes"
                                             onChange={formik.handleChange}
                                             value={formik.values.notes}
@@ -690,7 +703,7 @@ const Appointments = ({setClient, setEditClient}) => {
                         </form>
                     ):
                     <div className="servingTable">
-                    <Paper sx={{ width: '100%', overflow: 'hidden'}}>
+                    <Paper sx={{ width: '100%', overflow: 'hidden', maxHeight: '95vh'}}>
                         <TableContainer>
                             <Table stickyHeader aria-label='main_table'>
                                 <TableHead>
@@ -757,11 +770,26 @@ const Appointments = ({setClient, setEditClient}) => {
                                                 </TableCell>
                                                 <TableCell>
                                                     <Stack direction={'row'} spacing={1}>
-                                                        <Tooltip title={'Chat with your clients'} placement="left">
+                                                        
+                                                        {
+                                                            chatUpdates[client.chatter] && chatUpdates[client.chatter].messageCount > 0 ? (
+                                                            <Badge color="secondary" badgeContent={chatUpdates[client.chatter].messageCount}>
+                                                                <Tooltip title={'Chat with your clients'} placement="left">
+                                                                    <IconButton onClick={() => openChat(client) }>
+                                                                        <ChatRounded />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            </Badge>
+                                                            ):
+                                                            <Tooltip title={'Chat with your clients'} placement="left">
                                                             <IconButton onClick={() => openChat(client) }>
                                                                 <ChatRounded />
                                                             </IconButton>
                                                         </Tooltip>
+                                                        }
+                                                        
+
+
                                                         <Tooltip title={'Serve client'} placement="left">
                                                         <IconButton onClick={() => sendClientServing(client._id)}>
                                                             <CheckCircleIcon color={'success'}/>

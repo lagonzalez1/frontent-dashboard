@@ -64,14 +64,10 @@ export const findResourceTag = (id) => {
 
 
 
-export const updateResources = async (form) => {
+export const updateResources = async (form, bid, email) => {
   return new Promise((resolve, reject) => {
-    const { user, business} = getStateData();
-    const accessToken = getAccessToken();
-    const headers = { headers: { 'x-access-token': accessToken }};
-    const bId = business._id;
-    const data = { ...form, bId};
-    axios.put('/api/internal/update_resources', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    const data = { ...form, bId:bid, email};
+    axios.put('/api/internal/update_resources', data, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       if (response.status === 200){
         resolve(response.data.msg)
@@ -146,15 +142,16 @@ export const StyledCardService = styled(Card)(({ theme }) => ({
     return color;
   }
   
-  export function stringAvatar(name) {
+
+  export const stringAvatar = (name) => {
     let initials = '';
+    if (!name) {return; }
   
     if (name.includes(' ')) {
       initials = `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`;
     } else {
       initials = name[0];
     }
-  
     return {
       sx: {
         bgcolor: stringToColor(name),

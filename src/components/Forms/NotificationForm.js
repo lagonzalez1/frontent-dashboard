@@ -8,6 +8,7 @@ import { requestNotificationChange } from "../FormHelpers/NotificationFormHelper
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
+import { payloadAuth } from '../../selectors/requestSelectors';
 
  // Working on all forms.
 
@@ -19,10 +20,11 @@ const NotificationForm = ({reloadPage}) => {
   const business = useSelector((state) => state.business);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-  
+  const {id, bid, email} = useSelector((state) => payloadAuth(state));
+
   const handleSubmit = (values) => {    
     setLoading(true)
-    requestNotificationChange(values)
+    requestNotificationChange(values, bid, email)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
     })

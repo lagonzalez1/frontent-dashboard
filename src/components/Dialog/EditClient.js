@@ -13,15 +13,17 @@ import { setReload, setSnackbar } from "../../reducers/user";
 import { DatePicker } from "@mui/x-date-pickers";
 import { requestClientEditWait, requestClientEditApp, Transition, PHONE_REGEX, rerquestClientContactEdit } from "./EditClientHelper";
 import { APPOINTMENT, WAITLIST } from "../../static/static";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 export default function EditClient({setEditClient, editClient}) {
 
 
     const business = useSelector((state) => state.business);
-    const serviceList = getServicesAvailable();
-    const resourceList = getResourcesAvailable();
-    const employeeList = getEmployeeList();
+    const serviceList = useSelector(state => state.business.services);
+    const resourceList = useSelector(state => state.business.resources);
+    const employeeList = useSelector(state => state.business.employees);
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
     const dispatch = useDispatch();
 
@@ -86,7 +88,7 @@ export default function EditClient({setEditClient, editClient}) {
 
 
     const updateContactInformation = (payload) => {
-        rerquestClientContactEdit(payload) 
+        rerquestClientContactEdit(payload, bid, email) 
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
         })
@@ -102,7 +104,7 @@ export default function EditClient({setEditClient, editClient}) {
     }
 
     const waitlistEdit = (payload) => {
-        requestClientEditWait(payload)
+        requestClientEditWait(payload, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
         })
@@ -118,7 +120,7 @@ export default function EditClient({setEditClient, editClient}) {
     } 
 
     const appointmentEdit = (payload) => {
-        requestClientEditApp(payload)
+        requestClientEditApp(payload, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
         })
@@ -173,7 +175,7 @@ export default function EditClient({setEditClient, editClient}) {
         }
         setErrors(null);
         const payload = { employeeId: employeeId, serviceId: serviceId, appointmentDate: selectedDate }
-        getAvailableAppointments(payload)
+        getAvailableAppointments(payload, bid, email)
         .then(response => {
             setAppointments(response.data)
             setSuccess(response.msg)

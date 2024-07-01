@@ -5,9 +5,12 @@ import {
     mangoFusionPalette,
     cheerfulFiestaPalette,
   } from '@mui/x-charts/colorPalettes';
+import { useSelector } from 'react-redux';
 
 export default function BusinessTotalsBars({data}) {
     const [dataSet, setDataSet] = useState([]);
+    const resources = useSelector(state => state.business.resources);
+    const services = useSelector(state => state.business.services);
 
     useEffect(() => {
         console.log(data)

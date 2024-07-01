@@ -14,12 +14,12 @@ import SouthAmericaIcon from '@mui/icons-material/SouthAmerica';
 import EditIcon from '@mui/icons-material/Edit';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BadgeIcon from '@mui/icons-material/Badge';
-import {  sendNotification, getNoShowClients, getWaitlistTable, getWaitlistWaittime, searchServices, searchResources } from "../../hooks/hooks";
+import {  sendNotification, searchServices, searchResources, getWaitlistWaittime } from "../../hooks/hooks";
 import { useSelector, useDispatch } from "react-redux";
 import { setReload, setSnackbar } from "../../reducers/user";
 import { handleOpenNewTab, requestChangeAccept, options, columns, 
     clientOptions, OPTIONS_SELECT,
-    removeClient, moveClientDown, moveClientUp, requestNoShow, requestBusinessState, noShowColumns} from "./Helpers";
+    removeClient, moveClientDown, moveClientUp, requestNoShow, getNoShowClients, getWaitlistTable, noShowColumns} from "./Helpers";
 import { WAITLIST, NOSHOW, APPOINTMENT } from "../../static/static";
 import FabButton from "../Add/FabButton";
 import { usePermission } from "../../auth/Permissions";
@@ -29,8 +29,9 @@ import { ArrowSquareOut, Lock, LockOpen } from "phosphor-react";
 import { ChatRounded, FmdGoodRounded, WarningRounded } from "@mui/icons-material";
 import { setWaitlistClients, setNoShowData } from "../../reducers/business";
 import ChatBusiness from "../Chat/ChatBusiness";
-import { isAcceptingOrReject } from "../../selectors/waitlistSelectors";
+import { isAcceptingOrReject } from "../../selectors/businessSelectors";
 import { TransitionGroup } from 'react-transition-group';
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 
@@ -47,8 +48,11 @@ const Waitlist = ({setClient, setEditClient}) => {
     const resources = useSelector((state) => state.business.resources);
 
     const business = useSelector((state) => state.business);
+    const timezone = useSelector((state) => state.business.timezone);
     const user = useSelector((state) => state.user);
     const reload = useSelector((state) => state.reload);
+
+    const { id, email, bid} = useSelector((state) => payloadAuth(state));
 
     const [anchorElVert, setAnchorElVert] = useState(null);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -62,7 +66,6 @@ const Waitlist = ({setClient, setEditClient}) => {
     const openVert = Boolean(anchorElVert);
 
     let accepting = useSelector((state) => isAcceptingOrReject(state));
-
 
     useEffect(() => {
         console.log("ENTER WAITLIST");
@@ -78,8 +81,8 @@ const Waitlist = ({setClient, setEditClient}) => {
 
 
     const getWaitlistData = () => {
-        if (accessToken === undefined) { return ;}
-        getWaitlistTable(accessToken)
+        const time = DateTime.local().setZone(business.timezone).toISO()
+        getWaitlistTable(bid, email, time)
         .then(response => {
             dispatch(setWaitlistClients(response));
         })
@@ -91,23 +94,22 @@ const Waitlist = ({setClient, setEditClient}) => {
         })
     }
     const loadNoShowData = () => {
-        if (accessToken === undefined) { return ;}
-        getNoShowClients(accessToken)
+        getNoShowClients(bid, email)
         .then(response => {
             dispatch(setNoShowData(response.data.result))
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: 'Unable to load no show clients', requestStatus: true}))
         })
     }
     const getWaittime = () => {
-        if (accessToken === undefined) { return ;}
-        getWaitlistWaittime(accessToken)
+        const date = DateTime.local().setZone(business.timezone).toISO();
+        getWaitlistWaittime(bid, email, date)
         .then(response => {
             setWaittime(response.waittime);
         })
         .catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+            dispatch(setSnackbar({requestMessage: 'Unable to get waittime.', requestStatus: true}))
         })
         .finally(() => {
             setLoading(false);
@@ -155,7 +157,8 @@ const Waitlist = ({setClient, setEditClient}) => {
             return;
         }
         setLoading(true);
-        requestChangeAccept(storeState)
+        const currentDate = DateTime.local().setZone(business.timezone).toISO();
+        requestChangeAccept(storeState, bid, email, currentDate)
         .then(response => {
             dispatch(setSnackbar({ requestMessage: response.msg, requestStatus: true }));
             setAnchorEl(null);
@@ -185,7 +188,7 @@ const Waitlist = ({setClient, setEditClient}) => {
             case OPTIONS_SELECT.NO_SHOW:
                 setLoading(true);
                 // This is the wrong noshow.
-                requestNoShow(clientId, WAITLIST)
+                requestNoShow(clientId, WAITLIST, bid, email)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
                 })  
@@ -201,7 +204,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                 return;
             case OPTIONS_SELECT.MOVE_UP:
                 setLoading(true)
-                moveClientUp(clientId,tableData)
+                moveClientUp(clientId,tableData, bid, email, timezone)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
                 })  
@@ -216,7 +219,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                 return;
             case OPTIONS_SELECT.MOVE_DOWN:
                 setLoading(true)
-                moveClientDown(clientId,tableData)
+                moveClientDown(clientId,tableData, bid, email, timezone)
                 .then(response => {
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
                 })  
@@ -232,7 +235,7 @@ const Waitlist = ({setClient, setEditClient}) => {
                 return;
             case OPTIONS_SELECT.REMOVE:
                 setLoading(true);
-                removeClient(clientId, WAITLIST)
+                removeClient(clientId, WAITLIST, bid, email)
                 .then(response => {
                     console.log(response)
                     dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
@@ -288,7 +291,7 @@ const Waitlist = ({setClient, setEditClient}) => {
         const TYPE = client.type;
         // This is an issue when it comes to appointments.
         var payload = {clientId: clientId, type: TYPE}
-        sendNotification(payload)
+        sendNotification(payload, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         })

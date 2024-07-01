@@ -8,11 +8,10 @@ let POST_EMPLOYEE_ANALYTICS_RANGE = '/api/internal/employee_analytics_range';
 
 
 // Get Totals
-export function getEmployeeAnalytics (id, accessToken) {
+export function getEmployeeAnalytics (id, bid, email) {
     return new Promise((resolve, reject) => {
-       const { user, business} = getStateData();
-       const params = { bid: business._id, eid: id, email: user.email}
-       axios.get(GET_EMPLOYEE_ANALYTICS, {headers: {'x-access-token': accessToken}, params, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+       const params = { bid: bid, eid: id, email}
+       axios.get(GET_EMPLOYEE_ANALYTICS, {params, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
        .then(response => {
             resolve(response.data.data);
        }) 
@@ -36,12 +35,10 @@ export function getEmployeeAnalytics (id, accessToken) {
 
 
 // Get range
-export function getEmployeeAnalyticsRange (payload) {
+export function getEmployeeAnalyticsRange (payload, bid, email) {
      return new Promise((resolve, reject) => {
-        const { user, business} = getStateData();
-        const headers = getHeaders();
-        const params = { bid: business._id, ...payload, email: user.email}
-        axios.get(POST_EMPLOYEE_ANALYTICS_RANGE, {headers, params, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        const params = { ...payload, email, bid}
+        axios.get(POST_EMPLOYEE_ANALYTICS_RANGE, { params, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
              resolve(response.data.data);
         }) 
@@ -64,11 +61,10 @@ export function getEmployeeAnalyticsRange (payload) {
  }
 
 
- export function getBusinessAnalytics (accessToken) {
+ export function getBusinessAnalytics (bid, email) {
      return new Promise((resolve, reject) => {
-        const { user, business} = getStateData();
-        const headers = getHeaders();
-        axios.get(GET_BUSINESS_ANALYTICS,{headers, params: {bid: business._id, email: user.email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+
+        axios.get(GET_BUSINESS_ANALYTICS,{params: {bid: bid, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
              resolve(response.data.data);
         }) 

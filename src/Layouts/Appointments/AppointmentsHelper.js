@@ -17,11 +17,9 @@ export const columns = [
 ];
 
 
-function createAppointmentRequest(payload) {
-    const { user, business } = getStateData();
-    const header = getHeaders();
-    const data = { payload: {...payload}, b_id: business._id, email: user.email };
-    return axios.post(POST_CREATEAPPOINTMENT, data, header);
+function createAppointmentRequest(payload, bid, email) {
+    const data = { payload: {...payload}, b_id: bid, email };
+    return axios.post(POST_CREATEAPPOINTMENT, data);
 }
 
 /**
@@ -31,18 +29,17 @@ function createAppointmentRequest(payload) {
  *          Reject: Appointment failed
  * Middleware OK
  */
-export const createAppointmentPretense = (payload) => {
+export const createAppointmentPretense = (payload, bid, email) => {
     return new Promise((resolve, reject) => {
-        const { user, business } = getStateData();
-        const header = getHeaders();
-        const data = { payload: {...payload}, b_id: business._id, email: user.email };
+        
+        const data = { payload: {...payload}, b_id: bid, email };
 
         axios
-        .post(POST_VALIDATE, data, {...header, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        .post(POST_VALIDATE, data, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then((response) => {
             if (response.data.isValid) {
             // If validation is successful, proceed to create the appointment
-            return createAppointmentRequest(payload);
+            return createAppointmentRequest(payload, bid, email);
             } else {
                 // If validation fails, reject the promise with an error message
                 reject('Appointment validation failed');
@@ -61,12 +58,10 @@ export const createAppointmentPretense = (payload) => {
 };
 
 
-export function getAllSlotsAppointments (eid, date, serviceId, serviceTags) { 
-    const { user, business } = getStateData();
-    const payload = { bid: business._id, email: user.email, appointmentDate: date, employeeId: eid, serviceId, serviceTags}
-    const header = getHeaders();
+export function getAllSlotsAppointments (eid, date, serviceId, serviceTags, bid, email) { 
+    const payload = {  bid, email, appointmentDate: date, employeeId: eid, serviceId, serviceTags}
     return new Promise((resolve, reject) => {
-        axios.post(POST_SLOTS_QUICK_VIEW, payload,{...header, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        axios.post(POST_SLOTS_QUICK_VIEW, payload,{ timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response);
         })

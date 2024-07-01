@@ -9,6 +9,7 @@ import { setSnackbar } from '../../reducers/user';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
+import { payloadAuth } from '../../selectors/requestSelectors';
 
 const validationSchema = Yup.object().shape({
   businessName: Yup.string().required(),
@@ -29,6 +30,7 @@ const BusinessForm = ({reloadPage}) => {
   const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
   const user = useSelector((state) => state.user);
+  const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
   const dispatch = useDispatch();
   const [permissionMessage, setPermissionMessage] = useState(null);
@@ -36,10 +38,8 @@ const BusinessForm = ({reloadPage}) => {
   
   const handleSubmit = (values) => {
     setLoading(true);
-    const accessToken = getAccessToken();
-    const headers = { headers: {'x-access-token': accessToken}}
-    const payload = { ...values, b_id: business._id, email: user.email}
-    axios.put('/api/internal/update_business', payload, {headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    const payload = { ...values, b_id: bid, email}
+    axios.put('/api/internal/update_business', payload, {timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
     })

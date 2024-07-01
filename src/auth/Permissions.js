@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { findEmployee } from '../hooks/hooks';
+import { searchEmployees } from '../hooks/hooks';
 
 const PermissionContext = createContext();
 
 export const PermissionProvider = ({ children }) => {
     const userPermissions = useSelector((state) => state.user.permissions);
     const signOnEmail = useSelector((state) => state.user.email);
+    const employees = useSelector((state) => state.business.employees)
     let permissions = {
         0: ['SETTINGS', 'EMP_CHANGE', 'SERV_CHANGE', 'RESO_CHANGE', 'CUST_REMOVAL','RESO_DEL', 'SERV_DEL', 'OPEN_LOCK', 'LOC_URL','PERS_IMG', 'BUSI_FIELDS',
         'HOUR_TZ', 'HOUR_OPEN_HR', 'HOUR_CLOSE_DEL', 'SYSTEM', 'NOTI_SETTINGS','CLIENT_REMOVAL', 'CLIENT_EDIT', 'EMPL_ATTACH',
@@ -23,7 +24,7 @@ export const PermissionProvider = ({ children }) => {
     };
 
     const canEmployeeEdit = (id, requiredPermission) => {
-        const isEmployee = findEmployee(id); // Employee can delete its own request
+        const isEmployee = searchEmployees(id,employees); // Employee can delete its own request
         if (signOnEmail === isEmployee.employeeUsername) { return true; }
         if (permissions[userPermissions].includes(requiredPermission)) { return true;} // Override for 0, 1
         return false; // Otherwise deny

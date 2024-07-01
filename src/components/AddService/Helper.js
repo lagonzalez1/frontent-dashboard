@@ -9,13 +9,10 @@ import { getStateData, getAccessToken } from "../../auth/Auth";
  * @returns                 Promise containing the results of axios.
  */
 
-export const submitService = (data) => {
+export const submitService = (data, bid, email) => {
   return new Promise(function(resolve, reject) {
-    const { user, business } = getStateData();
-    const accessToken = getAccessToken();
-    const headers = { headers: { 'x-access-token': accessToken } };
-    const payload = { b_id: business._id, ...data, email: user.email}
-    axios.post('/api/internal/create_service', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    const payload = { b_id: bid, ...data, email}
+    axios.post('/api/internal/create_service', payload, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       if(response.status === 200){
         resolve(response.data);

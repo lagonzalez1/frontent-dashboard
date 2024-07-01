@@ -38,11 +38,8 @@ export const TITLE = {
 
 // Middleware OK
 export const requestExtraChanges = (payload) => {
-    const { user, business } = getStateData();
     return new Promise((resolve, reject) => {
-        const accessToken = getAccessToken();  
-        const headers = { headers: { 'x-access-token': accessToken}} 
-        axios.put('/api/internal/update_extras', {payload, email: user.email}, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        axios.put('/api/internal/update_extras', {payload}, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response.data);
         })

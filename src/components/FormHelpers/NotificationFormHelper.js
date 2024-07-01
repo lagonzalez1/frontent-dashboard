@@ -1,12 +1,11 @@
 import { getHeaders, getStateData } from "../../auth/Auth"
 import axios from "axios";
 
-export const requestNotificationChange = (data) => {
+export const requestNotificationChange = (data, bid, email) => {
     return new Promise((resolve, reject) => {
-        const { user, business } = getStateData();
-        const headers = getHeaders();
-        const payload = { ...data, b_id: business._id, user: user.email}
-        axios.post('/api/internal/update_notifications', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+
+        const payload = { ...data, b_id: bid, email}
+        axios.post('/api/internal/update_notifications', payload, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
             resolve(response);
         })

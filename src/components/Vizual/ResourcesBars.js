@@ -23,7 +23,7 @@ export default function ResourcesBars({resourceData}) {
                 if (resourceTitle.title === "NA"){ continue; } // Skip deleted services
                 let object = {
                     title: resourceTitle.title,
-                    avg: resourceData[i].avg,
+                    avg: Math.floor(resourceData[i].avg * 100),
                     total: resourceData[i].count
                 }
                 set.push(object);
@@ -39,8 +39,8 @@ export default function ResourcesBars({resourceData}) {
                 dataset={dataSet}
                 xAxis={[{ scaleType: 'band', dataKey: 'title' }]}
                 series={[
-                    {dataKey : 'avg', label: 'Average', valueFormatter},
-                    {dataKey : 'total', label: 'Totals', valueFormatter}
+                    {dataKey : 'avg', label: 'Average %', valueFormatter},
+                    {dataKey : 'total', label: 'Totals #', valueFormatter}
                 ]}
                 colors={mangoFusionPalette}
             height={400}

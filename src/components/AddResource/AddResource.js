@@ -12,6 +12,7 @@ import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import LoadingButton from '@mui/lab/LoadingButton';
 import makeStyles from "@emotion/styled"
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 const validationSchema = Yup.object().shape({
   title: Yup.string().required('Title is required').max(20),
@@ -46,10 +47,14 @@ const useStyles = makeStyles((theme) => ({
 export default function AddResource({reloadParent}) {
   const { checkPermission } = usePermission();
   const { cancelledSubscription } = useSubscription();
+
+  const serviceList = useSelector((state) => state.business.services)
+  const { id, email, bid } = useSelector((state) => payloadAuth(state))
+
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const business = useSelector((state) => state.business);
-  const serviceList = getServicesAvailable();
+  
   const dispatch = useDispatch();
   const classes = useStyles();
 
@@ -66,7 +71,7 @@ export default function AddResource({reloadParent}) {
     try {
       console.log(values)
       setLoading(true);
-      addResource(values)
+      addResource(values, bid, email)
       .then(data => {
         dispatch(setSnackbar({requestMessage: data.msg, requestStatus: true}));
         handleClose();

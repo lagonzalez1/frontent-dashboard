@@ -6,7 +6,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useSelector, useDispatch } from "react-redux";
 import  { columns, completeClientAppointment } from "./Helper";
-import {  getServingCount, getServingClients, searchServices, searchEmployees, searchResources } from "../../hooks/hooks";
+import {  getServingClients, searchServices, searchEmployees, searchResources } from "../../hooks/hooks";
 import "../../css/Serving.css";
 import { setReload, setSnackbar } from "../../reducers/user";
 import CloseIcon from "@mui/icons-material/Close"
@@ -14,6 +14,8 @@ import { useSubscription } from "../../auth/Subscription";
 import Collapse from '@mui/material/Collapse';
 import AlertMessageGeneral from "../../components/AlertMessage/AlertMessageGeneral";
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import { payloadAuth } from "../../selectors/requestSelectors";
+import { DateTime } from "luxon";
 
 export default function Serving({setClient}) {
     const { checkSubscription } = useSubscription();
@@ -23,7 +25,9 @@ export default function Serving({setClient}) {
     const services = useSelector((state) => state.business.services);
     const resources = useSelector((state) => state.business.resources);
     const employees = useSelector((state) => state.business.employees);
-    const accessToken = useSelector((state) => state.tokens.access_token);
+    const { id, bid, email } = useSelector((state) => payloadAuth(state));
+
+    
     const [loading, setLoading] = useState(false);
     const [servingList, setServingList] = useState([]);
     const [errors, setErrors] = useState({title: null, body: null});
@@ -54,8 +58,7 @@ export default function Serving({setClient}) {
 
     const getServingList = () => {
         setLoading(true);
-        if (accessToken === undefined) { return; }
-        getServingClients(accessToken)
+        getServingClients(bid, email)
         .then(response => {
             setServingList(response.result);
             setTotals((prev) => ({...prev, totalPartys: response.totalPartys, personCount: response.personCount}))
@@ -90,12 +93,14 @@ export default function Serving({setClient}) {
             setErrors({title: 'No User', body: 'No user selected'});
             return;
         }
+        const currentTime = DateTime.local().setZone(business.timezone).toISO();
         setLoading(true)
-        completeClientAppointment(client, clientNotes, saveClient)
+        completeClientAppointment(client, clientNotes, saveClient, bid, email, currentTime)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
         }).catch(error => {
-            dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+            console.log(error);
+            dispatch(setSnackbar({requestMessage: "Unable to checkout client.", requestStatus: true}))
         })
         .finally(() => {
             closeNotesDialog();
@@ -113,12 +118,6 @@ export default function Serving({setClient}) {
         setOpenErrors(false);
     }
 
-
-    const formatTime = (time) => {
-        const minutes = Math.floor(time / 60);
-        const remainingSeconds = time % 60;
-        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-    };
 
     return(
         <div className="servingContainer">
@@ -296,7 +295,7 @@ export default function Serving({setClient}) {
                             </FormGroup>
                         </DialogContent>
                         <DialogActions>
-                            <Button sx={{ borderRadius: 7}} variant="contained" onClick={() => checkoutClient()}>Complete</Button>
+                            <Button sx={{ borderRadius: 5}} variant="contained" onClick={() => checkoutClient()}>Complete</Button>
                         </DialogActions>
 
                     </Dialog>

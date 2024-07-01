@@ -12,6 +12,7 @@ import { getCountries } from "../../pages/Register/RegisterHelper.js";
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { useFormik } from "formik";
 import { HOURS_LIST } from "../../pages/Testing/RegisterTest.js";
+import { payloadAuth } from "../../selectors/requestSelectors.js";
 
 const DAYOFWEEK = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday', 7: 'Sunday'}
 

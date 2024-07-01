@@ -30,12 +30,9 @@ import HelpDialog from "../Help/HelpDialog";
 import useWebSocket, { ReadyState } from "react-use-websocket"
 import { DateTime } from "luxon";
 import { setBusiness, setNoShowData, setWaitlistClients } from "../../reducers/business";
-import ChatClient from "../../components/Chat/ChatClient";
-import ChatBusiness from "../../components/Chat/ChatBusiness";
-import { addMessage, setListOfChats } from "../../reducers/businessChatter";
+import { addChatId, addMessage, setListOfChats } from "../../reducers/businessChatter";
 import { getChatFromBusiness } from "../../components/Chat/ChatHelper";
-import { authFields, authTokens } from "../../selectors/authSelectors";
-import { setIndex, setSnackbar, setUser } from "../../reducers/user";
+import { setIndex, setLocation, setSnackbar, setUser } from "../../reducers/user";
 import axios from "axios";
 import { payloadAuth } from "../../selectors/requestSelectors";
 import { reloadBusinessData } from "../../hooks/hooks";
@@ -45,17 +42,8 @@ export default function Dashboard () {
     const signOut = useSignOut();
     const reload = useSelector((state) => state.user.reload);
     const timezone = useSelector((state) => state.business.timezone);
-    const authPayload = useSelector((state) => payloadAuth(state));
-    const location = useSelector((state) => state.user.location);
-
-
-    // Need a different way to call refresh_access and getBusinessData
-    //const { access_token, cookie_token } = useSelector((state) => authTokens(state));
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
     const authEmail = useSelector((state) => state.user.email)
-    const authId = useSelector((state) => state.user.id)
-    // Currently getting a response from login but after i make another request right after to load all values.
-    // Maybe i authenticate on log in ? 
-    // Set all the data then and no longer need to auth until refresh happens on Dashsboard.
 
     const [loading, setLoading] = useState(false);
     const [openCompletion, openStripeCompletion] = useState(false);
@@ -77,21 +65,6 @@ export default function Dashboard () {
         },
     )
     
-
-    const connetWebhook = () => {
-        if (readyState === ReadyState.OPEN) {
-            sendJsonMessage({
-                action: "monitor",
-                data: {
-                    documentId: authId,
-                    currentTime: DateTime.local().setZone(timezone).toISO()
-                },
-            });
-        }
-        
-    }
-
-
 
     async function checkAuthStatus() {
         setLoading(true);
@@ -115,9 +88,6 @@ export default function Dashboard () {
         }
     }
 
-
-    
-
     const isUserStateSaved = async () => {
         try {
             // Wrapping the localStorage operations in a Promise
@@ -135,63 +105,73 @@ export default function Dashboard () {
     
             // Parsing the state
             const parsedState = JSON.parse(state);
-            console.log(parsedState)
-    
+            console.log("Is null:", parsedState.email, parsedState.id)
             // Check if the parsed state contains a non-null email
-            if ( parsedState.email === null) {
-                return false;
+            if ( parsedState.email === null || parsedState.id === null) {
+                return null;
             } else {
                 //console.log("User saved", parsedState);
-                dispatch(setUser(parsedState));
-                return true;
+                dispatch(setUser({...parsedState}));
+                return {id: parsedState.id, email: parsedState.email, bid: parsedState.bid};
             }
         } catch (error) {
             console.error('Error checking user state:', error);
-            return false;
+            return null;
         }
     };
 
-    const tryAuthenticate = async () => {
-        const id = authPayload.id;
-        const email = authPayload.email;
-        authenticateUser(id, email)
-        .then(response => {
-            const payload = response.data;
-            dispatch(setUser({id: payload.id, email: payload.email, 
-                bid: payload.bid, subscription: payload.subscription, trialStatus: payload.trialStatus,
-                trial: payload.trial, emailConfirm: payload.confirm, defaultIndex: payload.defaultIndex, 
-                permissions: payload.permissions, bid: payload.bid}));
-            return true;
-        })
-        .catch(error => {
+    const tryAuthenticate = async (id, email) => {
+        try {
+            console.log("tryAuthenticate id", id)
+            console.log("tryAuthenticate email", email)
+            const response = await authenticateUser(id, email);
+            const payload = await response.data;
+            if ( payload ) {
+                dispatch(setUser({id: payload.id, email: payload.email, 
+                    bid: payload.bid, subscription: payload.subscription, trialStatus: payload.trialStatus,
+                    trial: payload.trial, emailConfirm: payload.confirm, defaultIndex: payload.defaultIndex, 
+                    permissions: payload.permissions, bid: payload.bid}));
+                return true
+            }
+            return false;
+        }
+        catch(error) {
             console.log(error);
             return false;
-        })        
+        }
     }
 
-    const loadBusinessData = async () => {
+    const loadBusinessData = async (id, email) => {
         try {
-            const state = localStorage.getItem('business');
+            const state = await new Promise((resolve, reject) => {
+                try {
+                    const storedState = localStorage.getItem('business');
+                    if (storedState === null) {
+                        return reject(new Error('No business state found in local storage'));
+                    }
+                    resolve(storedState);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+
             let parse = JSON.parse(state);
-            if (parse['publicLink'] === null) {
-                // Attempt server refresh. 
-                let email = authPayload.email; 
-                let bid = authPayload.bid;
-                reloadBusinessData(email, bid)
-                .then(response => {
+            // This is failing to parse because this clears on localhost
+            if (parse.currentClients === null) {
+                // not being called becasue above
+                const result = await reloadBusinessData(email, id)
+                const response = await result;
+                if (response) {
                     dispatch(setBusiness(response));
-                    return;
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
+                    dispatch(setLocation(0))
                     setLoading(false);
                     setAuthCompleted(true);
-                })   
+                    return;
+                }
             }
             else {
                 const parse = JSON.parse(state);
+                dispatch(setLocation(0))
                 dispatch(setIndex(0))
                 dispatch(setBusiness(parse));
                 setAuthCompleted(true);
@@ -205,57 +185,105 @@ export default function Dashboard () {
     }
 
     const completeCycle = async () => {
-        const isSaved = await isUserStateSaved();
-        console.log("State status", isSaved);
-        if (isSaved === false) { 
-            removeUserState();
-            signOut();
-            setAuthCompleted(false);
-            return;
-        }else {
-            let attemptAuth = tryAuthenticate();
-            console.log("attemptAuth", attemptAuth)
-            if ( !attemptAuth ) {
+        try {
+            const isSaved = await isUserStateSaved();
+            if (!isSaved) {
+                removeUserState();
+                signOut();
+                Cookies.remove('accessToken');
+                setAuthCompleted(false);
+                return;
+            }
+            
+            const attemptAuth = await tryAuthenticate(isSaved.id, isSaved.email);
+            if (!attemptAuth) {
                 removeUserState();
                 signOut();
                 setAuthCompleted(false);
                 return;
-            }else {
-                loadBusinessData();
-                connetWebhook();
-                getChatters();
-                return;
+            }
+            await loadBusinessData(isSaved.bid, isSaved.email);
+            await getChatters(isSaved.bid, isSaved.email);
+            setAuthCompleted(true);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error during complete cycle:", error);
+            removeUserState();
+            signOut();
+            setAuthCompleted(false);
+        }
+    }
+    
+    useEffect(() => {
+        if (lastJsonMessage !== null) {
+            console.log("Changes being updated...")
+            const str = JSON.stringify(lastJsonMessage);
+            const parse = JSON.parse(str);
+            if (parse.business) {
+                dispatch(setBusiness(parse.business))
+            }
+            if (parse.currentClients) {
+                dispatch(setWaitlistClients(parse.currentClients))
+            }
+            if (parse.noShowData) {
+                dispatch(setNoShowData(parse.noShowData))
+            }
+            if (parse.chatter_id) {
+                const lastMessage = parse.messages;
+                dispatch(addMessage({chatter_id: parse.chatter_id, message: lastMessage.at(-1)}))
+                if (lastMessage.at(-1).sender === "CLIENT"){
+                    dispatch(addChatId({id: parse.chatter_id}));
+                }
+                 
             }
         }
-       
-    }
+    }, [lastMessage, lastJsonMessage])
 
+    useEffect(() => {
+        // Check to see if this is a redirect back from Checkout
+        const query = new URLSearchParams(window.location.search);
+        if (query.get('success')) {
+            openStripeCompletion(true);
+            setStripeSession({sessionId: query.get('session_id'), status: 'Thank you for your support! Your account is active and ready to use.', title: 'Success', icon: 'okay'})
+        }
+        if (query.get('cancelled')) {
+            openStripeCompletion(true);
+            setStripeSession({sessionId: query.get('session_id'), status: 'Order canceled -- continue to shop around and checkout when you are ready.', title: 'Incomplete', icon:'cancelled'})        
+        }
+  }, [stripeSession.sessionId]);
 
-    useEffect(() => { 
+    useEffect(() => {
         console.log("Dashboard-render.");
-        // If user is saved try auth.
-        //checkAuthStatus();
-        // Subscription was the issue.
-
-        completeCycle();
-        
-        
-        
-        
+        completeCycle();       
     },[reload]);
 
 
+    useEffect(() => {
+        if (readyState === ReadyState.OPEN) {
+            const time = DateTime.local().setZone(timezone).toISO();
+            console.log("Connecting...", bid)
+            sendJsonMessage({
+                action: "monitor",
+                data: {
+                    documentId: bid,
+                    currentTime: time
+                },
+            });
+        }  
+    }, [readyState])
 
 
-    const getChatters = async() => {
+    
+
+    const getChatters = async(bid, email) => {
         try {
-            const result = await getChatFromBusiness(authId, authEmail);
-            if (result.status === 200) {
-                dispatch(setListOfChats(result.data.chats));
-            }
+            const result = await getChatFromBusiness(bid, email);
+            const response = await result;
+            dispatch(setListOfChats(response.data.chats));
         }
         catch(error) {
             console.log(error);
+            dispatch(setSnackbar({requestMessage: 'Unable to get chats from clients.', requestStatus: true}))
         }
             
     }
@@ -281,42 +309,11 @@ export default function Dashboard () {
         setGettingStarted(false);
     }
 
-    useEffect(() => {
-        if (lastJsonMessage !== null) {
-            const str = JSON.stringify(lastJsonMessage);
-            const parse = JSON.parse(str);
-            console.log(parse)
-            if (parse.currentClients) {
-                dispatch(setWaitlistClients(parse.currentClients))
-            }
-            if (parse.noShowData) {
-                dispatch(setNoShowData(parse.noShowData))
-            }
-            if (parse.chatter_id) {
-                const lastMessage = parse.messages;
-                dispatch(addMessage({chatter_id: parse.chatter_id, message: lastMessage.at(-1)}))
-            }
-        }
-    }, [lastMessage, lastJsonMessage])
-
-    useEffect(() => {
-        // Check to see if this is a redirect back from Checkout
-        
-        const query = new URLSearchParams(window.location.search);
-        if (query.get('success')) {
-            openStripeCompletion(true);
-            setStripeSession({sessionId: query.get('session_id'), status: 'Thank you for your support! Your account is active and ready to use.', title: 'Success', icon: 'okay'})
-        }
-        if (query.get('cancelled')) {
-            openStripeCompletion(true);
-            setStripeSession({sessionId: query.get('session_id'), status: 'Order canceled -- continue to shop around and checkout when you are ready.', title: 'Incomplete', icon:'cancelled'})        
-        }
-  }, [stripeSession.sessionId]);
+    
 
 
     const RenderLocation = () => {
-        console.log("ENN");
-        console.log(location);
+        const location = useSelector((state) => state.user.location);
         const emailConfirm = useSelector((state) => state.user.emailConfirm);
         if (emailConfirm === false) { return <ErrorPage errorMessage={"Please confirm your email by verifying your identity. Once completed come back here and refresh the page."} type={403} />; }
         switch(location) {
@@ -358,8 +355,7 @@ export default function Dashboard () {
                                 sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
                                 open={loading}
                             >   
-                                {console.log("STUCK")}
-                                <CircularProgress color="inherit" />
+                                <CircularProgress size={17} color='warning' />
                             </Backdrop>)
                             : <MemoizedRenderLocation />}
                             <Success />

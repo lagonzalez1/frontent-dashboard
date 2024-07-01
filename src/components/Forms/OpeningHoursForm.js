@@ -12,12 +12,13 @@ import { TIMEZONES, validationSchemaSchedule, validationSchemaTimezone,
   requestTimezoneChange, requestScheduleChange, requestClosedDate, requestRemoveCloseDate,validateTimerange, DAYOFWEEK, Transition } from "../FormHelpers/OpeningHoursHelper";
 import { DateTime } from 'luxon';
 import { setSnackbar } from '../../reducers/user';
-import {  findEmployee, getEmployeeList } from '../../hooks/hooks';
+import {  searchEmployees } from '../../hooks/hooks';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
 import { BellZ, CheckSquare, ClockCounterClockwise } from 'phosphor-react';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { payloadAuth } from '../../selectors/requestSelectors';
 
 
 
@@ -36,7 +37,7 @@ const OpeningHoursForm = ({reloadPage}) => {
     DateTime.local(),
     DateTime.local(),
   ]);
-  const employeeList = getEmployeeList();
+  const employeeList = useSelector(state => state.business.employees);
 
   const [scheduledDaysOff, setScheduledDaysOff] = useState(false);
   const [tableLoader, setScheduleTableLoader] = useState(false);
@@ -46,6 +47,8 @@ const OpeningHoursForm = ({reloadPage}) => {
   const [closedDialog, setClosedDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [closeDateLoader,setCloseDateLoader] = useState(false);
+  const {id, bid, email} = useSelector((state) => payloadAuth(state));
+
 
   const dispatch = useDispatch();
 
@@ -57,7 +60,7 @@ const OpeningHoursForm = ({reloadPage}) => {
       setLoading(false);
       return;
     }
-    requestTimezoneChange(timezone.timezone)
+    requestTimezoneChange(timezone.timezone, bid, email)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
@@ -73,7 +76,7 @@ const OpeningHoursForm = ({reloadPage}) => {
 
   const scheduleSubmit = (schedule) => {
     setLoading(true);
-    requestScheduleChange(schedule)
+    requestScheduleChange(schedule, bid, email)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
@@ -117,7 +120,7 @@ const OpeningHoursForm = ({reloadPage}) => {
       }
     }
     setCloseDateLoader(true);
-    requestClosedDate(selectedDate.toISO(), employeeTag, start, end)
+    requestClosedDate(selectedDate.toISO(), employeeTag, start, end, bid, email)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
@@ -134,7 +137,7 @@ const OpeningHoursForm = ({reloadPage}) => {
 
   const removeClosedDate = (dateId) => {
     setScheduleTableLoader(true);
-    requestRemoveCloseDate(dateId)
+    requestRemoveCloseDate(dateId, bid, email)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}));
     })
@@ -579,7 +582,7 @@ const OpeningHoursForm = ({reloadPage}) => {
                       </TableCell>
                       <TableCell>
                         <Typography variant='caption'>
-                          { findEmployee(item.employeeTag).fullname }
+                          { searchEmployees(item.employeeTag, employeeList).fullname }
                         </Typography>
                       </TableCell>
                       <TableCell>

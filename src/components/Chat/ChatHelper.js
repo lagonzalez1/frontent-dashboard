@@ -35,7 +35,7 @@ export const sendChatFromClient = (unid, message, time, direction) => {
 
 export const getChat = (unid) => {
     return new Promise((resolve, reject) => {
-        axios.get('/api/external/chatter', { params: {unid} , timeout: 90000, timeoutErrorMessage: 'Timeout error' })
+        axios.get('/api/external/chatter', { params: { unid } , timeout: 90000, timeoutErrorMessage: 'Timeout error' })
         .then((response) => {
             resolve(response.data.messages);
         })
@@ -61,10 +61,9 @@ export const getChat = (unid) => {
 }
 
 
-export const getChatFromBusiness = (id, email, access_token) => {
+export const getChatFromBusiness = (bid, email) => {
     return new Promise((resolve, reject) => {
-        const headers = { headers : { 'x-access-token': access_token} }
-        axios.get('/api/internal/chatter_business', {...headers, params: { b_id: id, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+        axios.get('/api/internal/chatter_business', { params: { b_id: bid, email}, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
         .then((response) => {
             resolve(response);
         })
@@ -90,12 +89,10 @@ export const getChatFromBusiness = (id, email, access_token) => {
 }
 
 
-export const sendChatFromBusiness = (message, timestamp, direction, chatter_id) => {
+export const sendChatFromBusiness = (message, timestamp, direction, chatter_id, bid, email) => {
     return new Promise((resolve, reject) => {
-        const { user, business } = getStateData();
-        const headers = getHeaders();
-        const payload = { bid: business._id, email: user.email, message, timestamp, direction, chatter_id}
-        axios.post('/api/internal/business_chat', payload, { ...headers, timeout: 900000, timeoutErrorMessage: 'Timeout error'})
+        const payload = { bid, email, message, timestamp, direction, chatter_id}
+        axios.post('/api/internal/business_chat', payload, { timeout: 900000, timeoutErrorMessage: 'Timeout error'})
         .then((response) => {
             resolve(response);
         })

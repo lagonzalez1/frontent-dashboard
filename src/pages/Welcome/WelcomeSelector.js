@@ -696,14 +696,19 @@ export default function WelcomeSelector() {
                                                             })
                                                         ): null
                                                     }
-                                                        <Grid item>
-                                                            <Alert severity="warning" variant="standard" onClose={() => closeAppointmentSearchErrors()}>
-                                                                    <AlertTitle>
-                                                                        <Typography variant="body2">{appointmentSearchErrors.title}</Typography>
-                                                                    </AlertTitle>
-                                                                    <Typography variant="caption">{appointmentSearchErrors.body}</Typography>
-                                                                </Alert>
-                                                        </Grid>
+                                                        {
+                                                            appointmentSearchErrors.open ? (
+                                                                <Grid item>
+                                                                    <Alert severity="warning" variant="standard" onClose={() => closeAppointmentSearchErrors()}>
+                                                                        <AlertTitle>
+                                                                            <Typography variant="body2">{appointmentSearchErrors.title}</Typography>
+                                                                        </AlertTitle>
+                                                                        <Typography variant="caption">{appointmentSearchErrors.body}</Typography>
+                                                                    </Alert>
+                                                                </Grid>
+                                                            ):
+                                                            null
+                                                        }
                                                     </Grid>
                                                 </Box>
                                             </Grow>

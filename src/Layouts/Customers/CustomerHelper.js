@@ -14,12 +14,10 @@ export const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 
-export function searchAnalyticsKeyword (word) {
+export function searchAnalyticsKeyword (word, bid, email) {
     return new Promise((resolve, reject) => {
-       const { user, business} = getStateData();
-       const headers = getHeaders();
-       const payload = {b_id: business._id, keyword: word}
-       axios.post(POST_ANALYTICS_SEARCH_KEYWORD, payload, headers)
+       const payload = {b_id: bid, email, keyword: word}
+       axios.post(POST_ANALYTICS_SEARCH_KEYWORD, payload)
        .then(response => {
         resolve(response.data.payload)
        }) 
@@ -67,12 +65,11 @@ export function convertTo_CSV (payload) {
     });
 }
 
-export function removeFromAnalytics (id) {
+export function removeFromAnalytics (id, bid, email) {
     return new Promise((resolve, reject) => {
-       const { user, business} = getStateData();
-       const headers = getHeaders();
-       const payload = {b_id: business._id, eid: id}
-       axios.post(POST_ANALYTIC_REMOVE, payload, headers)
+
+       const payload = {b_id: bid,email, eid: id}
+       axios.post(POST_ANALYTIC_REMOVE, payload)
        .then(response => {
         resolve(response.data.msg);
        }) 
@@ -94,12 +91,10 @@ export function removeFromAnalytics (id) {
     })
 }
 
-export function flagClientAccount (id, flagStatus) {
+export function flagClientAccount (id, flagStatus, bid, email) {
     return new Promise((resolve, reject) => {
-       const { user, business} = getStateData();
-       const headers = getHeaders();
-       const payload = {b_id: business._id, eid: id, email: user.email, flagStatus}
-       axios.post(POST_FLAG_CLIENT, payload, {...headers, timeout: 900000, timeoutErrorMessage: 'Timeout error'})
+       const payload = {b_id: bid, eid: id, email: email, flagStatus}
+       axios.post(POST_FLAG_CLIENT, payload, {timeout: 900000, timeoutErrorMessage: 'Timeout error'})
        .then(response => {
         resolve(response.data);
        }) 

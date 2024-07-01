@@ -17,6 +17,7 @@ import { submitService, Transition } from './Helper';
 import { setReload, setSnackbar } from '../../reducers/user';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 const useStyles = makeStyles((theme) => ({
   fab: {
@@ -54,6 +55,7 @@ const AddService = ({reloadParent}) => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { id, email, bid } = useSelector((state) => payloadAuth(state));
   const employees = useSelector((state) => state.business.employees);
   const dispatch = useDispatch();
 
@@ -67,7 +69,7 @@ const AddService = ({reloadParent}) => {
 
   const handleSubmit = (values) => {
     setLoading(true)
-    submitService(values)
+    submitService(values, bid, email)
     .then(response => {
         dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
     })

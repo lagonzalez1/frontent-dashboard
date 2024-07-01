@@ -32,16 +32,11 @@ export const getResourcesAvailable = () => {
 
 
 // Middleware OK
-export const addResource = (payload) => {
+export const addResource = (payload, bid, email) => {
     return new Promise((resolve, reject) => {
-      const { user, business } = getStateData();
-      const accessToken = getAccessToken();
-      const headers = { headers: { 'x-access-token': accessToken } };
-      const b_id = business._id;
-      console.log(payload)
-      const data = { b_id, ...payload, email: user.email };
+      const data = { b_id: bid, ...payload, email };
       axios
-        .post('/api/internal/create_resource', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        .post('/api/internal/create_resource', data, {timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
           resolve(response.data);
         })

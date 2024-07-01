@@ -8,6 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import CloseIcon from '@mui/icons-material/Close';
 import { selectMessagesByChatId } from "../../selectors/businessChatSelectors";
 import { setSnackbar } from "../../reducers/user";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -23,6 +24,7 @@ export default function ChatBusiness({open, onClose, client}) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [chatterId, setChatterId] = useState(null);
+    const { id, bid, email } = useSelector(state => payloadAuth(state));
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -31,7 +33,7 @@ export default function ChatBusiness({open, onClose, client}) {
             setChatterId(client.chatter); // Set chatter_id from client
             setLoading(false); // Set loading to false once chatter_id is available
         }
-    }, [client]);
+    }, [client, open]);
 
     // Retrieve messages for the given chatter_id
     const messages = useSelector((state) => chatterId ? selectMessagesByChatId(state, chatterId) : []);
@@ -46,8 +48,8 @@ export default function ChatBusiness({open, onClose, client}) {
         if (message.trim()){
             const chatter_id = client.chatter;
             const timestamp = DateTime.local().setZone(timezone).toISO();
-            sendChatFromBusiness(message, timestamp, DIRECTION_BUSINESS, chatter_id)
-            .then(response => {
+            sendChatFromBusiness(message, timestamp, DIRECTION_BUSINESS, chatter_id, bid, email)
+            .then(response => { 
                 console.log(response);
             })
             .catch(error => {
@@ -59,13 +61,23 @@ export default function ChatBusiness({open, onClose, client}) {
         }        
     }
     
-    const MessageComponentMemo = useMemo(() => messages, []);
-
-
     const Messages = () => {
         return (
             <>
-            
+            {messages ? messages.map((item, index) => {
+                    const DIRECTION = item.sender === "CLIENT" ? 'incoming': 'outgoing';
+                return (
+                    <Message
+                        key={index} 
+                        model={{
+                            direction: DIRECTION,
+                            message: `${item.message}`,
+                            sentTime: "just now",
+                            sender: ``
+                        }} 
+                    />
+                )
+            }) :null}
             </>
         )
     }
@@ -98,13 +110,17 @@ export default function ChatBusiness({open, onClose, client}) {
                 </IconButton>
             <DialogContent>
                 <div styles={{position:"relative"}}>
-                    <MainContainer>
+                    <MainContainer
+                        id="businessChatContainer"
+                    >
                         <ChatContainer>
                         {loading ? (
                             <Box sx={{display: 'flex'}}>
                                 <CircularProgress size={13} />
                             </Box>
                         ): null}       
+
+                        
                         <MessageList style={{height: "35vh"}}>
 
                         {messages ? messages.map((item, index) => {
@@ -121,6 +137,7 @@ export default function ChatBusiness({open, onClose, client}) {
                                 />
                             )
                         }) :null}
+
                        
                         </MessageList>
                         <MessageInput

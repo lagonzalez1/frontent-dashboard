@@ -7,6 +7,7 @@ import { setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
 import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 export default function ClientForm({reloadPage}) {
@@ -17,6 +18,8 @@ export default function ClientForm({reloadPage}) {
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
     const [loading, setLoading ] = useState(false);
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
+
 
     const initialValues = {
         email: settings.email,
@@ -26,7 +29,7 @@ export default function ClientForm({reloadPage}) {
 
     const handleSubmit = (values) => {
         setLoading(true);
-        const payload = { b_id: business._id, values}
+        const payload = { b_id: bid, values, email}
         requestInputFieldChange(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))

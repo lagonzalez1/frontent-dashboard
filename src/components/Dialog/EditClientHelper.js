@@ -11,12 +11,10 @@ export const PHONE_REGEX = /^\d{3}-\d{3}-\d{4}$/;
 
 
 // Middleware OK
-export const rerquestClientContactEdit = (payload) => {
+export const rerquestClientContactEdit = (payload, bid, email) => {
     return new Promise((resolve, reject) => {
-        const { user , business} = getStateData();
-        const headers = getHeaders();
-        const data = {payload: {...payload}, b_id: business._id, email: user.email}
-        axios.post(`/api/internal/update_client_contact`, data, headers)
+        const data = {payload: {...payload}, b_id: bid, email}
+        axios.post(`/api/internal/update_client_contact`, data)
         .then(response => {
             resolve(response.data.msg);
         })
@@ -39,12 +37,10 @@ export const rerquestClientContactEdit = (payload) => {
 }
 
 // Middleware OK
-export const requestClientEditApp = (payload) => {
+export const requestClientEditApp = (payload, bid, email) => {
     return new Promise((resolve, reject) => {
-        const {user, business} = getStateData();
-        const headers = getHeaders();
-        const data = {payload: {...payload}, b_id: business._id, client_id: payload._id, email: user.email}
-        axios.post(`/api/internal/update_client_appointment`, data, headers)
+        const data = {payload: {...payload}, b_id: bid, client_id: payload._id, email}
+        axios.post(`/api/internal/update_client_appointment`, data)
         .then(response => {
             resolve(response.data.msg);
         })
@@ -66,12 +62,10 @@ export const requestClientEditApp = (payload) => {
     })
 }
 // Middleware OK
-export const requestClientEditWait = (payload) => {
+export const requestClientEditWait = (payload, bid, email) => {
     return new Promise((resolve, reject) => {
-        const {user, business} = getStateData();
-        const headers = getHeaders();
-        const data = {payload: {...payload}, b_id: business._id, client_id: payload._id, email: user.email}
-        axios.post(`/api/internal/update_client_waitlist`, data, headers)
+        const data = {payload: {...payload}, b_id: bid, client_id: payload._id, email}
+        axios.post(`/api/internal/update_client_waitlist`, data)
         .then(response => {
             resolve(response.data.msg);
         })

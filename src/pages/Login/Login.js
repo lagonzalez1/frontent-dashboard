@@ -63,8 +63,8 @@ export default function Login() {
                     });
                     setAccessToken(response.data.accessToken);
                     dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions }));
-                    dispatch(setAuthAccessToken(response.data.accessToken));
-                    dispatch(setAuthCookieToken(response.data.token));
+                    //dispatch(setAuthAccessToken(response.data.accessToken));
+                    //dispatch(setAuthCookieToken(response.data.token));
                     navigate('/Dashboard');
                     setLoading(false);
                     return;

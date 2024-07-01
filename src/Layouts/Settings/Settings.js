@@ -34,11 +34,11 @@ export default function Settings() {
     }
 
     useEffect(() => {
-        reloadBusinessData(authEmail, business._id);
+        //reloadBusinessData(authEmail, business._id);
         return () => {
-            setLoading(false);
+            //setLoading(false);
         }
-    }, [reload])
+    }, [])
 
     return(
         <>
@@ -51,7 +51,7 @@ export default function Settings() {
 
                     <Stack sx={{ pt: 5}} direction={'column'} spacing={5}>
                         <Grid container id="location">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6}>
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Location
@@ -70,7 +70,7 @@ export default function Settings() {
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
                         <Grid container id="Personalize">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6}>
                                 <Stack>
                                     <Typography fontWeight='bold'  variant="h6">
                                         Personalize
@@ -82,13 +82,13 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <Personalization reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
                         <Grid container id="hours">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Hours
@@ -104,14 +104,14 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <OpeningHoursForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
 
                         <Divider sx={{backgroundColor: 'lightgray'}} />
                         <Grid container id="presentation">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         System
@@ -124,7 +124,7 @@ export default function Settings() {
                                 </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <SystemForm reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
@@ -132,7 +132,7 @@ export default function Settings() {
                         <Divider sx={{backgroundColor: 'lightgray'}} />
 
                         <Grid container id="notifications">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Notification settings
@@ -145,14 +145,14 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <NotificationForm reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
 
                         <Divider sx={{backgroundColor: 'lightgray'}} />
                         <Grid container id="business">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Business info
@@ -162,7 +162,7 @@ export default function Settings() {
                                 </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <BusinessForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
@@ -170,7 +170,7 @@ export default function Settings() {
                         <Divider sx={{backgroundColor: 'lightgray'}} />
 
                         <Grid container id="payment">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Add employees
@@ -188,7 +188,7 @@ export default function Settings() {
                                     
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <EmployeeTable reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
@@ -196,7 +196,7 @@ export default function Settings() {
 
                         <Divider sx={{backgroundColor: 'lightgray'}} />
                         <Grid container id="presentation">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Client welcome page
@@ -206,14 +206,14 @@ export default function Settings() {
                                 </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <ClientSignForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
 
                         <Divider sx={{backgroundColor: 'lightgray'}} />
                         <Grid container id="presentation">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Client form 
@@ -223,7 +223,7 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <ClientForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
@@ -232,7 +232,7 @@ export default function Settings() {
                         <Divider sx={{backgroundColor: 'lightgray'}} />
 
                         <Grid container id="payment">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Resources and services
@@ -245,14 +245,14 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <ResourceServiceForm reloadPage={reloadPage}/>
                             </Grid>
                         </Grid>
                         <Divider sx={{backgroundColor: 'lightgray'}} />
 
                         <Grid container id="payment">
-                            <Grid sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
+                            <Grid item sx={{ p: 3}} xs={12} md={6} sm={12} lg={6} >
                                 <Stack>
                                     <Typography fontWeight='bold' variant="h6">
                                         Payment info
@@ -266,7 +266,7 @@ export default function Settings() {
                                     <Typography variant="substitle2">Please provide your business name and email associated with your account.</Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid item sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
                                 <PaymentForm />
                             </Grid>
                         </Grid>

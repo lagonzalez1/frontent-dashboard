@@ -1,12 +1,12 @@
 import React, { lazy, useEffect, useState, Suspense } from 'react';
 import './App.css';
-import WebFont from 'webfontloader';
 import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 
 import { ThemeProvider } from '@emotion/react';
 import { DashboardThemeLight, DashboardThemeDark } from './theme/theme';
 import { useTheme } from './theme/ThemeContext';
 import { RequireAuth } from "react-auth-kit";
+import { Backdrop, CircularProgress } from '@mui/material';
 
 
 // Import only when needed to. 
@@ -47,7 +47,17 @@ function App() {
   return (
     <Router>
       <div id="mainContainer">
-        <Suspense fallback={<div style={{display: 'flex', justifyContent: 'center'}}><h6>Loading ...</h6></div>}>
+        <Suspense fallback= {
+          <Backdrop
+            sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={true}
+          >   
+          {console.log("Wait")}
+          <CircularProgress color="warning" />
+        </Backdrop>  
+        }
+        
+        >
           <Routes>
             <Route path='/' element={<Homepage />}></Route>
             <Route path='/Register' element={<Register />}></Route>

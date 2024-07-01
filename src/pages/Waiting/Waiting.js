@@ -53,7 +53,6 @@ export default function Waiting() {
     
     const [alert, setAlert] = useState({title: null, message: null, color: null, open: false});
     const [message, setMessage] = useState(null);
-    
     const [loading, setLoading] = useState(false);
     const [wait, setWait] = useState(false);
 
@@ -62,9 +61,6 @@ export default function Waiting() {
     const [open, setOpen] = useState(false);
     const [status, setStatus] = useState(false);
     const [type, setType] = useState(null);
-
-    
-
 
     const [appointments, setAppointments] = useState(null);
     const [editClient, setEditClient] = useState(false);
@@ -96,7 +92,7 @@ export default function Waiting() {
 
     const [chatBadge, setChatBadge] = useState(false);
 
-    const WS_URL = 'wss://127.0.0.1:4001/api/external/socket';
+    const WS_URL = 'ws://127.0.0.1:4001/api/external/socket';
     const { sendJsonMessage, lastJsonMessage, readyState, lastMessage } = useWebSocket(
         WS_URL,
         {
@@ -105,7 +101,6 @@ export default function Waiting() {
         },
     )
     useEffect(() => {
-        console.log(user)
         console.log("Connection state changed");
         if (readyState === ReadyState.OPEN && user !== null) {
             const chatter_id = user.chatter;
@@ -118,7 +113,7 @@ export default function Waiting() {
                 },
             });
         }
-    }, [readyState, unid, user])
+    }, [user, readyState])
 
     useEffect(() => {        
         if (lastJsonMessage !== null) {
@@ -127,8 +122,8 @@ export default function Waiting() {
             const messages = parse.messages
             const lastMessage = messages.at(-1).sender === "BUSINESS";
             if (lastMessage) { setChatBadge(true); }
+            console.log("New message", messages)
             dispatch(addToList(messages.at(-1)));
-
         }
     }, [lastMessage, lastJsonMessage])
 

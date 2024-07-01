@@ -15,14 +15,16 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { ClockClockwise, LockSimple, LockSimpleOpen, CurrencyDollar } from "phosphor-react";
 import { reloadBusinessData } from '../../hooks/hooks';
 import { authFields, authTokens } from "../../selectors/authSelectors";
+import { payloadAuth } from "../../selectors/requestSelectors.js";
+import { AttachMoneyOutlined, LockOpenRounded, LockRounded, TimelapseOutlined } from "@mui/icons-material";
 
 export default function Services() {
 
     const { checkPermission, canEmployeeEdit} = usePermission();
     const dispatch = useDispatch();
-    const { access_token, cookie_token } = useSelector((state) => authTokens(state));
-    const { authEmail, authId } = useSelector((state) => authFields(state));
+    const { id, bid, email } = useSelector((state) => payloadAuth(state));
     const serviceList = useSelector((state) => state.business.services);
+    const employees = useSelector(state => state.business.employees)
 
     const [dialog, setDialog] = useState(false);
     const {active, unactive} = getServicesTotal();
@@ -56,7 +58,7 @@ export default function Services() {
 
     const handleUpdateService = () => {
         setLoading(true);
-        updateService(form)
+        updateService(form, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
@@ -73,8 +75,9 @@ export default function Services() {
 
     const removeEmployeeService = (id, serviceId) => {
         setLoading(true);
+        console.log(serviceId)
         const data = { employeeId: id, serviceId: serviceId}
-        removeEmployeeTag(data)
+        removeEmployeeTag(data, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
@@ -94,11 +97,11 @@ export default function Services() {
     }
 
     useEffect(() => {  
-        reloadBusinessData(dispatch, access_token, authEmail, authId);
+        //reloadBusinessData(dispatch, access_token, authEmail, authId);
         return () => {
-            setReloadPage(false);
+            //setReloadPage(false);
         } 
-    },[reloadPage])
+    },[])
 
     
 
@@ -122,37 +125,38 @@ export default function Services() {
         </Grid>
 
         
-        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} columnSpacing={2} rowSpacing={2}>
-            { serviceList ? serviceList.map((service) => (
-                <Grid item key={service._id}>
-                    <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleClick(service)}>
+        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} direction={'row'} alignItems="stretch" columnSpacing={1} rowSpacing={1}>
+            { serviceList ? serviceList.map((service, index) => (
+                <Grid item xs={12} md={4} lg={3} sm={4} key={index}>
+                    <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px', maxHeight: '200px', minHeight: '175px'}} onClick={() => handleClick(service)}>
                         <CardActionArea>
                         <CardContent>
                             <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center'}}> 
                             {service ? <Avatar {...stringAvatar(service.title)} />: null}
                             <Box sx={{ paddingLeft: 1, paddingRight: 1}}>    
-                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
-                            {service.active ? (<FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/>):
-                             (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
-                                { ' ' + service.title}
-                            </Typography>
-                            <Stack spacing={0.5}>
-                                <Typography variant="body2" component="p">
-                                    
-                                <ClockClockwise size={18} weight="duotone" />
-                                <strong> Duration: </strong> {service.duration}
+                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 'bold' }}>
+                                {service.active ? (<FiberManualRecordIcon fontSize="xs" htmlColor="#00FF00"/>):
+                                (<FiberManualRecordIcon fontSize="xs" htmlColor="#FF0000"/>)}
+                                    { ' ' + service.title}
                                 </Typography>
-                                <Typography  variant="body2" component="p">
-                                    <CurrencyDollar size={18} weight="duotone" />
-                                    <strong> Cost: </strong> {service.cost}
-                                </Typography>
-                                <Typography  variant="body2" component="p">
-                                    {service.public ? <LockSimple size={18} weight="duotone" />: <LockSimpleOpen size={18} weight="duotone" /> }
-                                    <strong> Public: </strong> {service.public ? 'True': 'False'}
-                                </Typography>
-                            </Stack>
+                                <Stack spacing={0.5}>
+                                    <Typography variant="body2" component="p">
+                                        {service.description ? service.description : null}
+                                    </Typography>
+                                    <Typography variant="body2" component="p">
+                                    <TimelapseOutlined fontSize="small"/>
+                                        Duration: {service.duration}
+                                    </Typography>
+                                    <Typography  variant="body2" component="p">
+                                        <AttachMoneyOutlined fontSize="small" />
+                                        Cost: {service.cost}
+                                    </Typography>
+                                    <Typography  variant="body2" component="p">
+                                        {service.public ? <LockRounded fontSize="small" />: <LockOpenRounded fontSize="small" /> }
+                                        Public: {service.public ? 'True': 'False'}
+                                    </Typography>
+                                </Stack>
                             </Box>
-
                             </Stack>    
                         </CardContent>  
                         </CardActionArea>  
@@ -238,7 +242,7 @@ export default function Services() {
                                     </TableHead>
                                     <TableBody>
                                         {
-                                        service ? getEmployeeTags(service.employeeTags).map((employee, index) => {
+                                        service ? getEmployeeTags(service.employeeTags, employees).map((employee, index) => {
                                             
                                             return (
                                                 <TableRow key={index}>

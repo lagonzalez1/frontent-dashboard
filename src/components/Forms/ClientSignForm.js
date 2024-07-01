@@ -7,6 +7,7 @@ import { setSnackbar } from "../../reducers/user";
 import { usePermission } from "../../auth/Permissions";
 import { useSubscription } from "../../auth/Subscription";
 import { LoadingButton } from "@mui/lab";
+import { payloadAuth } from "../../selectors/requestSelectors";
 
 
 export default function ClientSignForm({reloadPage}) {
@@ -17,6 +18,7 @@ export default function ClientSignForm({reloadPage}) {
     const settings = useSelector((state) => state.business.settings.present);
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
     const initialValues = {
         position: settings.position,
@@ -30,7 +32,7 @@ export default function ClientSignForm({reloadPage}) {
 
     const handleSubmit = (values) => {
         setLoading(true);
-        const payload = { values, b_id: business._id}
+        const payload = { values, b_id: bid, email}
         requestExtraChanges(payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))

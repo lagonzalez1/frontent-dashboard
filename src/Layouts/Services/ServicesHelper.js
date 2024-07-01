@@ -2,7 +2,7 @@ import axios from 'axios';
 import { styled } from '@mui/system';
 import { Card, Slide } from '@mui/material';
 import { getAccessToken, getStateData } from '../../auth/Auth';
-import { findEmployee, getEmployeeList } from '../../hooks/hooks';
+import { searchEmployees, getEmployeeList } from '../../hooks/hooks';
 import React from 'react';
 
 
@@ -28,12 +28,11 @@ export const getServicesTotal  = () => {
 
 
 
-export const getEmployeeTags = (employeeTags) => {
+export const getEmployeeTags = (employeeTags, array) => {
     let employees = []
     if (employeeTags.length === 0) { return [];}
     for (var id of employeeTags) {
-      const employee = findEmployee(id);
-      if (employee.fullname === "NA") {continue; }
+      const employee = searchEmployees(id, array);
       employees.push(employee);
     }
     return employees
@@ -45,13 +44,10 @@ export const removeExistingEmployees = (employeeIds) => {
     return currentEmployees.filter(obj => !employeeIds.includes(obj._id));
 }
 
-export const updateService = (data) => {
-  const { user, business} = getStateData();
-  const accessToken = getAccessToken();
-  const payload = { ...data, bid: business._id}
-  const headers = { headers: { 'x-access-token': accessToken } };
+export const updateService = (data, bid, email) => {
+  const payload = { ...data, bid, email}
   return new Promise((resolve, reject) => {
-      axios.put('/api/internal/update_service', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+      axios.put('/api/internal/update_service', payload, {timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         if(response.status === 200) {
           resolve(response.data.msg);
@@ -80,13 +76,10 @@ export const updateService = (data) => {
 
 
 
-export const removeEmployeeTag = (data) => {
-  const { user, business} = getStateData();
-  const accessToken = getAccessToken();
-  const payload = { ...data, bid: business._id}
-  const headers = { headers: { 'x-access-token': accessToken } };
+export const removeEmployeeTag = (data, bid, email) => {
+  const payload = { ...data, bid, email}
   return new Promise((resolve, reject) => {
-    axios.post('/api/internal/service_remove_tag',payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    axios.post('/api/internal/service_remove_tag',payload, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
       .then(response => {
         if(response.status === 200) {
           resolve(response.data.msg);

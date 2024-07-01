@@ -12,6 +12,7 @@ import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
 import { getAccessToken, getStateData } from '../../auth/Auth';
 import VpnKeyRoundedIcon from '@mui/icons-material/VpnKeyRounded';
+import { payloadAuth } from '../../selectors/requestSelectors';
 
 
 
@@ -27,6 +28,7 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState(null);
     const [profileImage, setProfileImage] = useState(null);
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
 
     const dispatch = useDispatch();
@@ -86,11 +88,8 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
         setLoading(true);
         // Handle new employee request.
         if (employee === null || employee === undefined) {
-          const { user, business } = getStateData();
-          const token = getAccessToken();
           const config = {
               headers : {
-                  'X-Access-token': token,
                   'Content-type': 'multipart/form-data'
               }
           }
@@ -100,16 +99,17 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
             const file = dataURLtoBlob(image.image);
             formData.append('employee_image', file, image.name);
           }
-          formData.append('b_id', business._id);
+          formData.append('b_id',bid);
+          formData.append('email', email);
           formData.append('payload', flattenedJSON);
-          formData.append('email', user.email);
           requestEmployeeAdd(formData, config)
           .then(res => {
               dispatch(setSnackbar({requestMessage: res, requestStatus: true}))
               setLoading(false);
             })
           .catch(error => {
-              dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
+              console.log(error)
+              dispatch(setSnackbar({requestMessage: 'Unable to process this request right now.', requestStatus: true}))
               setLoading(false);
             })
           .finally(() => {
@@ -118,11 +118,8 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
           })
         } else { 
           // Handle the edit request.
-          const { user, business } = getStateData();
-          const token = getAccessToken();
           const config = {
               headers : {
-                  'X-Access-token': token,
                   'Content-type': 'multipart/form-data'
               }
           }
@@ -134,9 +131,9 @@ export default function AddEmployeeForm ({ employee, closeModal, reloadPage }) {
             formData.append('employee_image_edit', file, image.name);
             formData.append('image_path', employee.image_path); // GET_REQUEST returns this image
           }
-          formData.append('b_id', business._id);
+          formData.append('b_id', bid);
           formData.append('payload', flattenedJSON);
-          formData.append('email', user.email);
+          formData.append('email', email);
           requestEmployeeEdit(formData, config)
           .then(res => {
               dispatch(setSnackbar({requestMessage: res, requestStatus: true}))

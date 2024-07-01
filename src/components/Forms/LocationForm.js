@@ -11,6 +11,7 @@ import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
 import { ArrowSquareOut } from 'phosphor-react';
+import { payloadAuth } from '../../selectors/requestSelectors';
 
 
 
@@ -31,6 +32,7 @@ const LocationForm = ({reloadPage}) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
 
 
@@ -45,12 +47,10 @@ const LocationForm = ({reloadPage}) => {
       setLoading(false)
       return;
     }
-    axios.get('/api/internal/unique_link/'+ values.locationUrl )
+    axios.get('/api/internal/unique_link/'+ values.locationUrl)
       .then((response) => {
         if(response.status === 200){
-          const accessToken = getAccessToken();
-          const headers = { headers: { 'x-access-token': accessToken } };
-          axios.put('/api/internal/update_location',{url: values.locationUrl, b_id: business._id}, headers)
+          axios.put('/api/internal/update_location',{url: values.locationUrl, b_id: bid, email})
           .then(response => {
             dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}))
           })

@@ -18,16 +18,16 @@ import { CloudCheck  } from "phosphor-react";
 import { DateTime } from 'luxon';
 import { getUserStripeInformation, manageUserSubscription, updateUserSubscription } from '../FormHelpers/PaymentFormHelper';
 import { setSnackbar } from '../../reducers/user';
+import { payloadAuth } from '../../selectors/requestSelectors';
 
 
 
 
 const SubscriptionForm = () => {
-  // Plan will end up being a stripe unid and or the price_id of current plan.
-  //const plan = useSelector((state) => state.business.currentPlan); // plan_id will be saved as string in db.
   const ref = useSelector((state) => state.business.stripe.ref);
   const dispatch = useDispatch();
 
+  const {id, bid, email} = useSelector((state) => payloadAuth(state));
   const [register, setRegister] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState('');
   const [subscription, setSubcription] = useState(false);
@@ -59,7 +59,7 @@ const SubscriptionForm = () => {
   const retriveStripeInformation = () => {
     let stripeRef = ref;
 
-    getUserStripeInformation(stripeRef)
+    getUserStripeInformation(stripeRef, bid, email)
     .then(response => {
       setStripe(response.payload);
       setSelectedPlan(response.payload.price_id);
@@ -93,7 +93,7 @@ const SubscriptionForm = () => {
     if (stripe.customer_id === ""|| stripe.customer_id === undefined) { return; }
     setLoading(true);
     const customer_id = stripe.customer_id;
-    manageUserSubscription(customer_id)
+    manageUserSubscription(customer_id, bid, email)
     .then(response => {
       window.location.href = response;
     })
@@ -115,7 +115,7 @@ const SubscriptionForm = () => {
     setLoading(true);
     const price_id = selectedPlan;
     const subscription_id = stripe.subscription_id;
-    updateUserSubscription(subscription_id, price_id)
+    updateUserSubscription(subscription_id, price_id, bid, email)
     .then(response => {
       dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
     })

@@ -15,12 +15,10 @@ export const validationSchemaResource = Yup.object().shape({
 });
 
 
-export const requestRemoveResource = (payload) => {
+export const requestRemoveResource = (payload, bid, email) => {
   return new Promise((resolve, reject) => {
-    const { user, business} = getStateData();
-    const headers = getHeaders();
-    const data = { ...payload, b_id: business._id, email: user.email }
-    axios.post('/api/internal/remove_resource', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+    const data = { ...payload, b_id: bid, email }
+    axios.post('/api/internal/remove_resource', data, { timeout: 90000, timeoutErrorMessage: 'Timeout error'})
     .then(response => {
       reject(response.data.msg)
     })
@@ -33,12 +31,10 @@ export const requestRemoveResource = (payload) => {
   })
 }
 
-export const requestRemoveService = (payload) => {
+export const requestRemoveService = (payload, bid, email) => {
   return new Promise((resolve, reject) => {
-    const { user, business} = getStateData();
-    const headers = getHeaders();
-    const data = { ...payload, b_id: business._id, email: user.email }
-    axios.post('/api/internal/remove_service', data, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
+    const data = { ...payload, b_id: bid, email }
+    axios.post('/api/internal/remove_service', data, { timeout: 90000, timeoutErrorMessage: 'Timeout error.'})
     .then(response => {
       reject(response.data.msg)
     })
@@ -54,13 +50,10 @@ export const requestRemoveService = (payload) => {
 
 
 
-export const updateService = (data) => {
-    const { user, business} = getStateData();
-    const accessToken = getAccessToken();
-    const payload = { ...data, bid: business._id, email: user.email}
-    const headers = { headers: { 'x-access-token': accessToken } };
+export const updateService = (data, bid, email) => {
+    const payload = { ...data, bid: bid, email}
     return new Promise((resolve, reject) => {
-        axios.put('/api/internal/service_text', payload, {...headers, timeout: 90000, timeoutErrorMessage: 'Timeout error'})
+        axios.put('/api/internal/service_text', payload, {timeout: 90000, timeoutErrorMessage: 'Timeout error'})
         .then(response => {
           if(response.status === 200) {
             resolve(response.data);

@@ -13,6 +13,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import { User } from "phosphor-react";
 import { reloadBusinessData } from '../../hooks/hooks';
 import { authFields, authTokens } from "../../selectors/authSelectors";
+import { payloadAuth } from "../../selectors/requestSelectors.js";
 
 export default function Resources() {
 
@@ -21,8 +22,8 @@ export default function Resources() {
 
     const employeeList = useSelector((state) => state.business.employees);
     const resourceData = useSelector((state) => state.business.resources);
-    const { access_token, cookie_token } = useSelector((state) => authTokens(state));
-    const { authEmail, authId } = useSelector((state) => authFields(state));
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
+
 
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
@@ -54,7 +55,7 @@ export default function Resources() {
     const handleUpdateResource = async () => {
         if (!form){ return; }
         setLoading(true);
-        updateResources(form)
+        updateResources(form, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
         })
@@ -72,12 +73,15 @@ export default function Resources() {
         setReloadPage(true);
       }
 
+
+
       useEffect(() => {
-        reloadBusinessData(dispatch, access_token, authEmail, authId);
+
+        //reloadBusinessData( email, bid);
         return () => {
-            setReloadPage(false);
+            //setReloadPage(false);
         }
-      }, [reloadPage]);
+      }, []);
 
 
 
@@ -119,8 +123,8 @@ export default function Resources() {
         
         <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} columnSpacing={2} rowSpacing={2} >
             { resourceData ? resourceData.map((resource, index) => (
-                    <Grid item key={resource._id}>
-                        <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px'}} onClick={() => handleResourceClick(resource)}>
+                    <Grid item xs={12} md={4} lg={3} sm={4} key={index}>
+                        <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px', maxHeight: '200px', minHeight: '175px'}} onClick={() => handleResourceClick(resource)}>
                         <CardActionArea>
                         <CardContent>
                             <Stack direction="row" spacing={1} sx={{ alignItems: 'center', pt: 1, pb: 1}}>
@@ -134,13 +138,13 @@ export default function Resources() {
                                 <Stack spacing={0.5}>
                                 <Typography variant="body2" component="p">
                                         <User size={18} weight="duotone" />
-                                        <strong>Assigned: </strong> { findResourceTag(resource.employeeTag) }
+                                        Assigned: { findResourceTag(resource.employeeTag) }
                                 </Typography>
                                 <Typography variant="body2" component="p">
-                                        <strong>Serving max: </strong> {resource.size}
+                                         Serving max: {resource.size}
                                 </Typography> 
                                 <Typography variant="body2" component="p">
-                                        <strong>Desc: </strong> {resource.description}
+                                        Desc:  {resource.description}
                                 </Typography>    
                                 </Stack> 
                                 </Box>

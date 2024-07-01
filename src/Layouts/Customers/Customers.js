@@ -21,6 +21,7 @@ import ReviewDialog from '../../components/Dialog/ReviewDialog';
 import RateReviewRoundedIcon from '@mui/icons-material/RateReviewRounded';
 import { usePermission } from '../../auth/Permissions';
 import { Check, FileCsv, Flag, Trash } from "phosphor-react"
+import { payloadAuth } from '../../selectors/requestSelectors';
 
 
 
@@ -32,10 +33,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const Customers = () => {
   const { checkPermission } = usePermission();
   const business = useSelector((state) => state.business);
-  const permissionLevel = useSelector((state) => state.user.permissions);
   const services = useSelector(state => state.business.services)
-  const resources = useSelector(state => state.business.resources)
   const employees = useSelector(state => state.business.employees)
+  const {id, email, bid} = useSelector((state) => payloadAuth(state));
 
   const dispatch = useDispatch();
 
@@ -73,7 +73,7 @@ const Customers = () => {
       return;
     }
     setLoading(true)
-    searchAnalyticsKeyword(searchTerm)
+    searchAnalyticsKeyword(searchTerm, bid, email)
     .then(response => {
       setData(response);
     })
@@ -115,7 +115,7 @@ const Customers = () => {
       if (!client) { return ;}
       console.log(client);
       const flagStatus = client.status.flag;
-      flagClientAccount(client._id, flagStatus)
+      flagClientAccount(client._id, flagStatus, bid, email)
       .then(response => {
         dispatch(setSnackbar({requestMessage: response.msg, requestStatus: true}))
       })
@@ -135,22 +135,22 @@ const Customers = () => {
       return;
     }
     convertTo_CSV(data)
-    .then(response => {
-      const timestamp = DateTime.local().toUTC();
-      const csvData = response.data;
-      // Create a Blob object from the CSV data
-      const blob = new Blob([csvData], { type: 'text/csv' });
-      // Create a temporary URL for the Blob
-      const url = window.URL.createObjectURL(blob);
-      // Create a link element and trigger the download
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${timestamp}.csv`;
-      a.click();
-    
-    // Revoke the URL to free up memory
-    window.URL.revokeObjectURL(url);
-    })
+      .then(response => {
+        const timestamp = DateTime.local().toUTC();
+        const csvData = response.data;
+        // Create a Blob object from the CSV data
+        const blob = new Blob([csvData], { type: 'text/csv' });
+        // Create a temporary URL for the Blob
+        const url = window.URL.createObjectURL(blob);
+        // Create a link element and trigger the download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${timestamp}.csv`;
+        a.click();
+      
+      // Revoke the URL to free up memory
+      window.URL.revokeObjectURL(url);
+      })
     .catch(error => {
       dispatch(setSnackbar({requestMessage: error.msg, requestStatus: true}))
     })
@@ -164,9 +164,9 @@ const Customers = () => {
   const loadCustomers = (sort, stateSort) => {
     if ( !sort || !stateSort) { return; }
     const currentTime = DateTime.local().setZone(business.timezone).toISO();
-    const payload = {bid: business._id, sort, stateSort, currentTime}
+    const payload = {bid, email ,sort, stateSort, currentTime}
     setLoading(true)
-    getAnalyticsClients(payload)
+    getAnalyticsClients(payload, bid, email)
     .then(response => {
       setData(response.payload);
     })
@@ -217,7 +217,7 @@ const Customers = () => {
       return;
     }
     setLoading(true);
-    removeFromAnalytics(client._id)
+    removeFromAnalytics(client._id, bid, email)
     .then((response) => {
       dispatch(setSnackbar({requestMessage: response, requestStatus: true}));
     })
@@ -544,7 +544,7 @@ const Customers = () => {
         </Grid>
 
         <div className="customersTable">
-            <Paper sx={{ width: '100%', overflow: 'hidden'}}>
+            <Paper sx={{ width: '100%', overflow: 'hidden', maxHeight: '95vh'}}>
                 <TableContainer>
                     <Table stickyHeader aria-label='main_table'>
                         <TableHead>

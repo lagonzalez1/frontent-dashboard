@@ -10,6 +10,7 @@ import { DateTime } from 'luxon';
 import { usePermission } from '../../auth/Permissions';
 import { useSubscription } from '../../auth/Subscription';
 import { LoadingButton } from '@mui/lab';
+import { payloadAuth } from '../../selectors/requestSelectors';
 
 export default function SystemForm({reloadPage}) {
 
@@ -21,6 +22,7 @@ export default function SystemForm({reloadPage}) {
     const business = useSelector((state) => state.business);
     const [loading, setLoading] = useState(false);
     const dispatch = useDispatch();
+    const {id, bid, email} = useSelector((state) => payloadAuth(state));
 
     const initialValues = {
         equalDate: settings.equalDate,
@@ -43,12 +45,9 @@ export default function SystemForm({reloadPage}) {
     });
 
     const handleSubmit = (values) => {
-        const accessToken = getAccessToken();
-        const { user, business } = getStateData();
-        const payload = { ...values, b_id: business._id, email: user.email}
-        const headers = { headers: { 'x-access-token': accessToken } };
+        const payload = { ...values, b_id: bid, email}
         setLoading(true);
-        axios.put('/api/internal/update_system', payload, headers)
+        axios.put('/api/internal/update_system', payload)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response.data.msg, requestStatus: true}));
         })
