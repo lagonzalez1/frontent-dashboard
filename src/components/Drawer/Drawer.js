@@ -37,7 +37,6 @@ const Drawer = ({client, setClient}) => {
     const business = useSelector((state) => state.business);
     const dispatch = useDispatch();
     const { checkSubscription } = useSubscription();
-
     const services = useSelector((state) => state.business.services);
     const employees = useSelector((state) => state.business.employees);
     const { bid, email, id } = useSelector(state => payloadAuth(state));
@@ -164,7 +163,7 @@ const Drawer = ({client, setClient}) => {
     }
 
     const sendRemoveClient = (id, type) => {
-        removeClient(id, type)
+        removeClient(id, type, bid, email)
         .then(response => {
             dispatch(setSnackbar({requestMessage: response, requestStatus: true}))
             setLoading(false)

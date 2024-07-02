@@ -76,18 +76,24 @@ body {
     min-width: 30vw !important;
   }
 }
+@media (min-width: 1000px) {
+  .grid-item {
+    max-width: 35vw !important;
+    min-width: 35vw !important;
+  }
+}
 
 @media (min-width: 1200px) {
   .grid-item {
-    max-width: 20vw !important;
-    min-width: 20vw !important;
+    max-width: 35vw !important;
+    min-width: 35vw !important;
   }
 }
 
 
 @media (min-width: 1600px) {
   .grid-item {
-    max-width: 20vw !important;
-    min-width: 20vw !important;
+    max-width: 25vw !important;
+    min-width: 25vw !important;
   }
 }

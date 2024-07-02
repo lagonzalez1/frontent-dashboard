@@ -151,8 +151,8 @@ export default function ResourceServiceForm ({ reloadPage }) {
             </Typography>
             <List>
             {
-                resources ? resources.map((item) => (
-                    <ListItem disablePadding>
+                resources ? resources.map((item, index) => (
+                    <ListItem disablePadding key={index}>
                         <ListItemButton onClick={() => openResourceDialog(item) }>
                             <ListItemText primary={item.title} secondary={item.description} />
                         </ListItemButton>
@@ -167,8 +167,8 @@ export default function ResourceServiceForm ({ reloadPage }) {
                 </Typography>
             <List>
             {
-                services ? services.map((item) => (
-                    <ListItem disablePadding>
+                services ? services.map((item, index) => (
+                    <ListItem disablePadding key={index}>
                         <ListItemButton onClick={() => openServiceDialog(item) }>
                             <ListItemText primary={item.title} secondary={item.description} />
                         </ListItemButton>

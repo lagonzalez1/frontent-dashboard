@@ -13,7 +13,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setIndex, setLocation, setOptions, setPermisisons, setUser } from '../../reducers/user';
 import { setAuthAccessToken, setAuthCookieToken } from "../../reducers/tokens";
 import { DateTime } from "luxon";
-import loginImage from "../../assets/images/login.jpg"
 import { HomePageTheme } from "../../theme/theme";
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -61,8 +60,7 @@ export default function Login() {
                         tokenType: "Bearer",
                         authState: { id: response.data.id, email: employeeCred.employeeUsername },    
                     });
-                    setAccessToken(response.data.accessToken);
-                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions }));
+                    dispatch(setUser({ id: response.data.id, email: response.data.email, permissions: response.data.permissions, bid: response.data.id }));
                     navigate('/Dashboard');
                     setLoading(false);
                     return;

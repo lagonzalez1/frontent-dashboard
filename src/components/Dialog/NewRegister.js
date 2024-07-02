@@ -287,10 +287,10 @@ const NewRegister = ({open, onClose}) => {
                       <Typography variant="caption" fontWeight={'bold'}>Work days </Typography>
                       <Typography variant="caption"> days your business is available to the public. </Typography>
                       <Stack spacing={1} sx={{pt: 1}}>
-                      {Object.keys(formik.values.schedule).map((day) => (
+                      {Object.keys(formik.values.schedule).map((day, index) => (
                         <Box>
                         <FormControlLabel
-                          key={day}
+                          key={index}
                           control={
                             <Checkbox
                             checked={formik.values.schedule[day]}

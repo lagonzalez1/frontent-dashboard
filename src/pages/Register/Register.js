@@ -277,10 +277,9 @@ export default function Register(props){
                         token: response.data.token,
                         expiresIn: 3600,
                         tokenType: "Bearer",
-                        authState: { id: response.data.id },
+                        authState: { id: response.data.id, email: response.data.email },
                     })
-                    setAccessToken(response.data.accessToken);
-                    dispatch(SETUSER({ id: response.data.id, email: response.data.email}));
+                    dispatch(SETUSER({ id: response.data.id, email: response.data.email, bid: response.data.bid, emailConfirm: false}));
                     setLoading(false);
                     navigate('/Dashboard');
                     return;

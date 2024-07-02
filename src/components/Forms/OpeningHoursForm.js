@@ -393,7 +393,6 @@ const OpeningHoursForm = ({reloadPage}) => {
         TransitionComponent={Transition}
         onClose={closeClosedDialog}
         maxWidth={'sm'}
-        fullWidth={'sm'}
       
       >
         <DialogTitle>

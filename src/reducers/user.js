@@ -18,7 +18,7 @@ const initialState = {
   subscription: null,
   trialStatus: null,
   trial: null,
-  emailConfirm: null,
+  emailConfirm: false,
   bid: null,
 };
 

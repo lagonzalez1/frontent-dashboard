@@ -237,7 +237,7 @@ export default function EmployeeTable() {
                 {employees ? employees.map((employee, index) => {
                     return (
                         <>
-                        <ListItem  
+                        <ListItem key={index}  
                             secondaryAction = {
                             <Stack direction={'row'} spacing={1}>
                                
@@ -289,8 +289,6 @@ export default function EmployeeTable() {
                 
             </List>
             <Stack spacing={1}>
-
-
                 
             </Stack>
             <br/>
@@ -429,7 +427,7 @@ export default function EmployeeTable() {
                 id="quickActions"
                 open={quickActions}
                 onClose={handleActionClose}
-                fullWidth={'xs'}
+                fullWidth={false}
                 maxWidth={'xs'}
                 TransitionComponent={Transition}
             >

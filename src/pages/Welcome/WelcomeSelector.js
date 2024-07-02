@@ -722,6 +722,8 @@ export default function WelcomeSelector() {
                                                 name="notes"
                                                 label="Anything we need to know?"
                                                 fullWidth
+                                                multiline
+                                                rows={2}
                                                 color="secondary"
                                                 size="small"
                                                 placeholder="Additional notes"
@@ -930,6 +932,8 @@ export default function WelcomeSelector() {
                                                 id="notes"
                                                 name="notes"
                                                 label="Notes"
+                                                rows={2}
+                                                multiline
                                                 color="secondary"
                                                 placeholder="Additional notes"
                                                 value={waitlistData.notes}

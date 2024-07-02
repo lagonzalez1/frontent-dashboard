@@ -43,7 +43,6 @@ export default function Dashboard () {
     const reload = useSelector((state) => state.user.reload);
     const timezone = useSelector((state) => state.business.timezone);
     const {id, bid, email} = useSelector((state) => payloadAuth(state));
-    const authEmail = useSelector((state) => state.user.email)
 
     const [loading, setLoading] = useState(false);
     const [openCompletion, openStripeCompletion] = useState(false);
@@ -88,7 +87,7 @@ export default function Dashboard () {
             if ( parsedState.email === null || parsedState.id === null) {
                 return null;
             } else {
-                //console.log("User saved", parsedState);
+                console.log("User saved", parsedState);
                 dispatch(setUser({...parsedState}));
                 return {id: parsedState.id, email: parsedState.email, bid: parsedState.bid};
             }
@@ -103,9 +102,10 @@ export default function Dashboard () {
             const response = await authenticateUser(id, email);
             const payload = await response.data;
             if ( payload ) {
+                console.log(payload);
                 dispatch(setUser({id: payload.id, email: payload.email, 
                     bid: payload.bid, subscription: payload.subscription, trialStatus: payload.trialStatus,
-                    trial: payload.trial, emailConfirm: payload.confirm, defaultIndex: payload.defaultIndex, 
+                    trial: payload.trial, emailConfirm: payload.emailConfirm, defaultIndex: payload.defaultIndex, 
                     permissions: payload.permissions, bid: payload.bid}));
                 return payload.bid;
             }
@@ -119,36 +119,12 @@ export default function Dashboard () {
 
     const loadBusinessData = async (id, email) => {
         try {
-            const state = await new Promise((resolve, reject) => {
-                try {
-                    const storedState = localStorage.getItem('business');
-                    if (storedState === null) {
-                        return reject(new Error('No business state found in local storage'));
-                    }
-                    resolve(storedState);
-                } catch (error) {
-                    reject(error);
-                }
-            });
-            let parse = JSON.parse(state);
-            // This is failing to parse because this clears on localhost
-            if (parse.currentClients === null) {
-                // not being called becasue above
-                const result = await reloadBusinessData(email, id)
-                const response = await result;
-                if (response) {
-                    dispatch(setBusiness(response));
-                    dispatch(setLocation(0))
-                    setLoading(false);
-                    setAuthCompleted(true);
-                    return;
-                }
-            }
-            else {
-                const parse = JSON.parse(state);
+            const result = await reloadBusinessData(email, id)
+            const response = await result;
+            if (response) {
+                dispatch(setBusiness(response));
                 dispatch(setLocation(0))
-                dispatch(setIndex(0))
-                dispatch(setBusiness(parse));
+                setLoading(false);
                 setAuthCompleted(true);
                 return;
             }
@@ -162,7 +138,6 @@ export default function Dashboard () {
     const completeCycle = async () => {
         try {
             const isSaved = await isUserStateSaved();
-            console.log(isSaved);
             if (!isSaved) {
                 removeUserState();
                 signOut();
@@ -177,9 +152,8 @@ export default function Dashboard () {
                 setAuthCompleted(false);
                 return;
             }
-            
-            await loadBusinessData(isSaved.bid ? isSaved.bid: isSaved.id, isSaved.email);
-            await getChatters(isSaved.bid ? isSaved.bid: isSaved.id, isSaved.email);
+            await loadBusinessData(attemptAuth, isSaved.email);
+            await getChatters(attemptAuth, isSaved.email);
             setAuthCompleted(true);
             setLoading(false);
         } catch (error) {

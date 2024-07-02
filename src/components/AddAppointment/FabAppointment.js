@@ -41,8 +41,8 @@ export default function FabAppointment () {
     const [selectedAppointment, setSelectedAppointment] = useState(null);
     const [phoneNumber, setPhoneNumber] = useState(null);
 
-    const serviceList = getServicesAvailable();
-    const employeeList = getEmployeeList();
+    const serviceList = useSelector((state) => state.business.services);
+    const employeeList = useSelector((state) => state.business.employees);
 
     const handleClickOpen = () => {
         setOpen(true);
@@ -237,12 +237,9 @@ export default function FabAppointment () {
                 </IconButton>
                 </DialogTitle>
                 <DialogContent>
-                    { employeeList && employeeList.length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order to use appointments, you must have employees with schedules ready to book. 
+                    { serviceList && serviceList.length === 0 ?  (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong></AlertTitle>In order to use appointments, you must have employees with schedules and services ready to book. 
                     Check out settings page under <u> add employees!</u></Alert>): null}
-                    { serviceList && serviceList
-                                .filter((service) => service.employeeTags.includes(formik.values.employee_id)).length === 0 ?  
-                                (<Alert severity="warning"><AlertTitle><strong>Appointments info</strong>
-                                </AlertTitle>In order for your customers to book appointments you need to attach your employees to your services! Check out the side bar <u>Services</u></Alert>): null}
+                    
                     { errors ? <Alert severity="error">{'Error'}</Alert>: null }
                     <form onSubmit={formik.handleSubmit}>
                         <Stack sx={{ pt: 1 }} direction="column" spacing={2}>

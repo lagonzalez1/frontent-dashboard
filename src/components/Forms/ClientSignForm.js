@@ -52,7 +52,7 @@ export default function ClientSignForm({reloadPage}) {
                     <Form>
                     <Stack spacing={1}>
                         {Object.entries(values).map(([key, value]) => (
-                            <Box>
+                            <Box key={key}>
                             <Typography fontWeight='bold' variant="subtitle2">{TITLE[key]}</Typography>
                             <Typography variant="body2">{LABELS[key]}</Typography>
                             <FormControlLabel

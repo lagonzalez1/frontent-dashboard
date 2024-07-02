@@ -25,11 +25,9 @@ export default function BusinessWaitlist () {
 
 
     useEffect(() => {
-        // Load initially
         getWaitlist();
         const intervalId = setInterval(getWaitlist, 20000);
         return () => {
-          // Clear the interval to avoid memory leaks
             clearInterval(intervalId);
         };
       }, []); 

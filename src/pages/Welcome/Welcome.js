@@ -112,7 +112,9 @@ export default function Welcome() {
         .then(([businessOpenResponse, businessPresentResponse]) => {
             setOpen(businessOpenResponse.isOpen);
             setNextAvailableDate(businessPresentResponse.nextAvailable);
-            setAcceptingStatus({appointments: businessOpenResponse.acceptingAppointments, waitlist: businessOpenResponse.acceptingWaitlist});
+            setAcceptingStatus({
+                appointments: businessOpenResponse.acceptingAppointments, 
+                waitlist: businessOpenResponse.acceptingWaitlist});
             setBusinessPresent(businessPresentResponse.presentables);
             setSystem(businessPresentResponse.system);
             setWaittimeRange(businessPresentResponse.waittimeRange);
@@ -280,6 +282,8 @@ export default function Welcome() {
                             <IconButton onClick={() => setShowBusinessInfo(true)}>
                                 <InfoOutlinedIcon fontSize="small"/>
                             </IconButton>
+                            <br/>
+                            <Typography variant="caption" fontWeight="bold" color="gray">Turn VPN off*</Typography>
                             </Box>
 
                         </Card>

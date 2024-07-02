@@ -125,10 +125,10 @@ export default function Services() {
         </Grid>
 
         
-        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} direction={'row'} alignItems="stretch" columnSpacing={1} rowSpacing={1}>
+        <Grid container sx={{ pt: 2, flexDirection: 'row', flexWrap: 'wrap' }} direction={'row'} alignItems="center" columnSpacing={2} rowSpacing={2} spacing={2}>
             { serviceList ? serviceList.map((service, index) => (
                 <Grid item xs={12} md={4} lg={3} sm={4} key={index}>
-                    <StyledCardService sx={{ minWidth: '300px', maxWidth: '350px', maxHeight: '200px', minHeight: '175px'}} onClick={() => handleClick(service)}>
+                    <StyledCardService sx={{ minWidth: '200px', maxWidth: '350px', maxHeight: '220px', minHeight: '155px'}} onClick={() => handleClick(service)}>
                         <CardActionArea>
                         <CardContent>
                             <Stack direction={'row'} spacing={1} sx={{ alignItems: 'center'}}> 

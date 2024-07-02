@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useMemo } from "react";
-import { Container, Box, CircularProgress, Dialog, Slide, DialogContent, DialogTitle, IconButton, Typography} from "@mui/material";
+import { Container, Box, CircularProgress, Dialog, Slide, DialogContent, DialogTitle, IconButton, Typography, Avatar} from "@mui/material";
 import styles from '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
-import { MainContainer, ChatContainer, MessageList, Message, MessageInput, AttachmentButton, SendButton, InputToolbox } from '@chatscope/chat-ui-kit-react';
+import { MainContainer, ChatContainer, MessageList, Message, MessageInput, AttachmentButton, SendButton, InputToolbox, ConversationHeader } from '@chatscope/chat-ui-kit-react';
 import { DateTime } from "luxon";
 import { getChat, sendChatFromBusiness, sendChatFromClient } from "./ChatHelper";
 import { useSelector, useDispatch } from 'react-redux';
@@ -14,8 +14,6 @@ import { payloadAuth } from "../../selectors/requestSelectors";
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
-
-
 
 export default function ChatBusiness({open, onClose, client}) {
 
@@ -60,28 +58,6 @@ export default function ChatBusiness({open, onClose, client}) {
             })
         }        
     }
-    
-    const Messages = () => {
-        return (
-            <>
-            {messages ? messages.map((item, index) => {
-                    const DIRECTION = item.sender === "CLIENT" ? 'incoming': 'outgoing';
-                return (
-                    <Message
-                        key={index} 
-                        model={{
-                            direction: DIRECTION,
-                            message: `${item.message}`,
-                            sentTime: "just now",
-                            sender: ``
-                        }} 
-                    />
-                )
-            }) :null}
-            </>
-        )
-    }
-
 
     return (
 
@@ -110,10 +86,21 @@ export default function ChatBusiness({open, onClose, client}) {
                 </IconButton>
             <DialogContent>
                 <div styles={{position:"relative"}}>
+                    <ChatContainer>
+                    <ConversationHeader>
+                        <Avatar
+                            name="Business"
+                        />
+                        <ConversationHeader.Content
+                        userName="Business"
+                        />
+                        <ConversationHeader.Actions>
+                        
+                        </ConversationHeader.Actions>
+                    </ConversationHeader>
                     <MainContainer
                         id="businessChatContainer"
                     >
-                        <ChatContainer>
                         {loading ? (
                             <Box sx={{display: 'flex'}}>
                                 <CircularProgress size={13} />
@@ -148,8 +135,8 @@ export default function ChatBusiness({open, onClose, client}) {
                             placeholder="Type message here"
                         />
                         
-                        </ChatContainer>
                     </MainContainer>
+                    </ChatContainer>
                 </div>
         </DialogContent>
         </Dialog>

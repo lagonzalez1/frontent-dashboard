@@ -64,7 +64,7 @@ export default function Settings() {
                                     </Typography>
                                 </Stack>
                             </Grid>
-                            <Grid sx={{p:3}} xs={12} md={6} sm={12} lg={6}>
+                            <Grid sx={{p:3}} item xs={12} md={6} sm={12} lg={6}>
                                 <LocationForm reloadPage={reloadPage} />
                             </Grid>
                         </Grid>
